@@ -1,55 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="icon" href="laptop_coding_48.png" type="image/png">
-        <title>Install PyTorch</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link href="article_style.css" rel="stylesheet">
-    </head>
-    <body>
-        <div class="container-fluid">
-            <div class="row">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="laptop_coding_48.png" type="image/png">
+    <title>Install PyTorch</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="article_style.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
             <nav class="col-md-2 left-sidebar">
 
             </nav>
 
             <main class="col-md-8 content">
                 <h2 class="custom-title">1.1 Install PyTorch</h2>
-                <p class="title-subtext">Install PyTorch related libraries and verify whether the installation is successful!</p>
+                <p class="title-subtext">Install PyTorch related libraries and verify whether the installation is
+                    successful!</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-04-28</p>
 
-                <p>The main task is to install and verify PyTorch related libraries. For beginners, you can skip the GPU installation and use the CPU version of PyTorch for learning (GPU will need to be installed later). The installation instructions of CPU are as follows:</p>
-                <pre><code>pip3 install torch torchvision torchaudio</code></pre>
+                <p>The main task is to install and verify PyTorch related libraries. For beginners, you can skip the GPU
+                    installation and use the CPU version of PyTorch for learning (GPU will need to be installed later).
+                    The installation instructions of CPU are as follows:</p>
+                <pre><samp>pip3 install torch torchvision torchaudio</samp></pre>
 
                 <h3>1.1.1 Install IDE</h3>
 
                 <p>We should have an IDE (Integrated Development Environment) for writing, compiling, and debugging code. You can choose what you like. I recommend using <a href="https://code.visualstudio.com/">VS Code</a> here because that’s what I use.</p>
+                <img src="res/01/vscode_ui.png" width="600" alt="VS Code">
 
                 <h3>1.1.2 Install Python</h3>
 
-                <p>Go to the Python official website to <a href="https://www.python.org/downloads/">download Python</a>. It is recommended to use the latest version.</p>
+                <p>Go to the Python official website to <a href="https://www.python.org/downloads/">download Python</a>.
+                    It is recommended to use the latest version.</p>
+                <img src="res/01/install_python.png" width="600" alt="Install Python">
 
                 <h3>1.1.3 Install CUDA</h3>
 
-                <p>The <a href="https://developer.nvidia.com/cuda-toolkit">NVIDIA<sup>®</sup> CUDA<sup>®</sup> Toolkit</a> provides a development environment for creating high-performance, GPU-accelerated applications.</p>
+                <p>The <a href="https://developer.nvidia.com/cuda-toolkit">NVIDIA<sup>®</sup> CUDA<sup>®</sup> Toolkit</a> provides a development environment for creating high-performance, GPU-accelerated applications. With it, you can develop, optimize, and deploy your applications on GPU-accelerated embedded systems, desktop workstations, enterprise data centers, cloud-based platforms, and supercomputers. The toolkit includes GPU-accelerated libraries, debugging and optimization tools, a C/C++ compiler, and a runtime library.</p>
+                <div class="d-flex justify-content-center align-items-center">
+                    <button class="btn btn-primary" onclick="window.location.href='https://developer.nvidia.com/cuda-downloads'">Download Now</button>
+                </div>
+                <p>After installed the CUDA package, we can confirm whether the installation was successful by typing <code>nvidia-smi</code> or <code>nvcc --version</code> :</p>
+                <img src="res/01/cuda_verify.png" width="600" alt="CUDA Verify">
 
                 <h3>1.1.4 Install PyTorch</h3>
 
-                <p>Go to the <a href="https://pytorch.org/get-started/locally/">PyTorch official</a> website, select preferences and run the command to install PyTorch locally.</p>
+                <p>Go to the <a href="https://pytorch.org/get-started/locally/">PyTorch official</a> website, select
+                    preferences and run the command to install PyTorch locally:</p>
+                <div class="d-flex justify-content-center align-items-center">
+                    <table class="table table-light" style="width: 80%;">
+                        <tbody>
+                            <tr>
+                                <th scope="row">PyTorch Build</th>
+                                <td class="table-active bg-warning">Stable (2.7.0)</td>
+                                <td>Preview (Nightly)</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Your OS</th>
+                                <td>Linux</td>
+                                <td class="table-active bg-warning">Mac</td>
+                                <td>Windows</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Package</th>
+                                <td>Conda</td>
+                                <td class="table-active bg-warning">Pip</td>
+                                <td>LibTorch</td>
+                                <td>Source</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Language</th>
+                                <td class="table-active bg-warning">Python</td>
+                                <td>C++/Java</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Compute Platform</th>
+                                <td>CUDA 12.6</td>
+                                <td>CUDA 12.8</td>
+                                <td>ROCm 6.3</td>
+                                <td class="table-active bg-warning">Default</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <pre><samp>pip3 install torch torchvision torchaudio</samp></pre>
+                <p>If CUDA installed, we can use the following command:</p>
+                <pre><samp>pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128</samp></pre>
 
                 <h3>1.1.5 Verify</h3>
-                <p>Download the <a href="https://github.com/artinte/deep-learning">tutorial repository</a>, open the <a href="https://github.com/artinte/deep-learning/blob/develop/01_tensor/1_install/verify.py">verify.py</a> file, import the <em>torch</em> library, and print its version:</p>
+                <p>Download the <a href="https://github.com/artinte/deep-learning">tutorial repository</a>, open the <a
+                        href="https://github.com/artinte/deep-learning/blob/develop/01_tensor/1_install/verify.py">verify.py</a>
+                    file, import the <em>torch</em> library, and print its version:</p>
                 <pre><code>import torch
 
 print(torch.__version__)</code></pre>
                 <pre><samp>2.6.0+cu124</samp></pre>
-                <p>Congratulations, you have completed the PyTorch installation task!</p>
+                <p>🎉 Congratulations, you have completed the PyTorch installation task!</p>
 
+                <p>We can use torch to create a Tensor, which will introduction in <a href="tensor_intro.html">next section</a>:</p>
+                <pre><code>x = torch.rand(size=(5, 3))</code></pre>
+                <pre><samp>tensor([[0.9032, 0.6900, 0.7404],
+        [0.2300, 0.5118, 0.5050],
+        [0.9662, 0.1400, 0.8662],
+        [0.8696, 0.9460, 0.6607],
+        [0.9800, 0.5627, 0.3977]])</samp></pre>
+                <p><code>torch.cuda.is_available()</code> to verify whether PyTorch can use CUDA acceleration, and <code>torch.mps.is_available()</code> to detect macOS acceleration settings:</p>
+                <pre><code>print(torch.cuda.is_available())
+print(torch.mps.is_available())</code></pre>
                 <div class="navigation">
-                    <a href="#">Previous: 1.0 </a>
-                    <a href="#">Next: 1.2</a>
+                    <a href="index.html">Prev: 1.0 Deep Learning with PyTorch</a>
+                    <a href="tensor_intro.html">Next: 1.2 Introduction to Tensors</a>
                 </div>
             </main>
 
@@ -58,11 +123,12 @@ print(torch.__version__)</code></pre>
                 <ul id="dynamic-sidebar" class="nav flex-column">
                 </ul>
             </aside>
-            </div>
         </div>
+    </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-        <script type="text/javascript" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-        <script src="article_script.js"></script>
-    </body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="article_script.js"></script>
+</body>
+
 </html>
