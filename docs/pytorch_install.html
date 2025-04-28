@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" href="laptop_coding_48.png" type="image/png">
+        <title>Install PyTorch</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="article_style.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="container-fluid">
+            <div class="row">
+            <nav class="col-md-2 left-sidebar">
+
+            </nav>
+
+            <main class="col-md-8 content">
+                <h2 class="custom-title">1.1 Install PyTorch</h2>
+                <p class="title-subtext">Install PyTorch related libraries and verify whether the installation is successful!</p>
+                <p style="color: #a0a0a0;">Created Date: 2025-04-28</p>
+
+                <p>The main task is to install and verify PyTorch related libraries. For beginners, you can skip the GPU installation and use the CPU version of PyTorch for learning (GPU will need to be installed later). The installation instructions of CPU are as follows:</p>
+                <pre><code>pip3 install torch torchvision torchaudio</code></pre>
+
+                <h3>1.1.1 Install IDE</h3>
+
+                <p>We should have an IDE (Integrated Development Environment) for writing, compiling, and debugging code. You can choose what you like. I recommend using <a href="https://code.visualstudio.com/">VS Code</a> here because that’s what I use.</p>
+
+                <h3>1.1.2 Install Python</h3>
+
+                <p>Go to the Python official website to <a href="https://www.python.org/downloads/">download Python</a>. It is recommended to use the latest version.</p>
+
+                <h3>1.1.3 Install CUDA</h3>
+
+                <p>The <a href="https://developer.nvidia.com/cuda-toolkit">NVIDIA<sup>®</sup> CUDA<sup>®</sup> Toolkit</a> provides a development environment for creating high-performance, GPU-accelerated applications.</p>
+
+                <h3>1.1.4 Install PyTorch</h3>
+
+                <p>Go to the <a href="https://pytorch.org/get-started/locally/">PyTorch official</a> website, select preferences and run the command to install PyTorch locally.</p>
+
+                <h3>1.1.5 Verify</h3>
+                <p>Download the <a href="https://github.com/artinte/deep-learning">tutorial repository</a>, open the <a href="https://github.com/artinte/deep-learning/blob/develop/01_tensor/1_install/verify.py">verify.py</a> file, import the <em>torch</em> library, and print its version:</p>
+                <pre><code>import torch
+
+print(torch.__version__)</code></pre>
+                <pre><samp>2.6.0+cu124</samp></pre>
+                <p>Congratulations, you have completed the PyTorch installation task!</p>
+
+                <div class="navigation">
+                    <a href="#">Previous: 1.0 </a>
+                    <a href="#">Next: 1.2</a>
+                </div>
+            </main>
+
+            <aside class="col-md-2 right-sidebar">
+                <h5><a href="index.html#section1">Tensor and Gradient Basics</a></h5>
+                <ul id="dynamic-sidebar" class="nav flex-column">
+                </ul>
+            </aside>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script type="text/javascript" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script src="article_script.js"></script>
+    </body>
+</html>
