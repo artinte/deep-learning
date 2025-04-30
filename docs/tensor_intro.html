@@ -23,13 +23,31 @@
                 <p style="color: #a0a0a0;">Created Date: 2025-04-28</p>
                 <p>In PyTorch, <strong>Tensor</strong> is a basic data structure, which is similar to NumPy array and can be efficiently operated on GPU. </p>
                 <h3>1.2.1 Tensor Creating</h3>
-                <p><a href="https://github.com/artinte/deep-learning/blob/develop/01_tensor/2_tensor/create.py">create.py</a> introduces some common methods for creating tensors.</p>
+                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/01_tensor/2_tensor/create.py">create.py</a> introduces some common methods for creating tensors.</p>
                 <p>A tensor can be constructed from a Python <a href="https://docs.python.org/3/library/stdtypes.html#list">list</a> or sequence using the <a href="https://pytorch.org/docs/stable/generated/torch.tensor.html#torch.tensor">torch.tensor()</a> constructor:</p>
+                <pre><code>python_list = [[1, 2], [3, 4]]
+tensor_from_list = torch.tensor(python_list)
+print('Tensor from list:', tensor_from_list)
+
+numpy_array = numpy.array([[1, 2], [3, 4]])
+tensor_from_array = torch.tensor(numpy_array)
+print('Tensor from array:', tensor_from_array)</code></pre>
                 <p><code>torch.tensor()</code> always copies data. If we have a Tensor data and just want to change its <code>requires_grad</code> flag, use <code>requires_grad_()</code> or <code>detach()</code> to avoid a copy. If We have a numpy array and want to avoid a copy, use <code>torch.as_tensor()</code>.</p>
 
                 <p>A tensor of specific data type can be constructed by passing a <code>torch.dtype</code> and/or a <code>torch.device</code> to a constructor or tensor creation op:</p>
+                <pre><code>device = 'cuda' if torch.cuda.is_available() else 'mps' \
+    if torch.mps.is_available() else 'cpu'
+print(device)
 
+tensor_custom = torch.tensor([1, 2, 3],
+                             dtype=torch.int64,
+                             device=device)
+print(tensor_custom)</code></pre>
+                <p>More often than not, you'll want to initialize your tensor with some value. Common cases are all zeros, all ones, or random values, and the torch module provides factory methods for all of these:</p>
+                
                 <p>For more information about building Tensors, see <a href="https://pytorch.org/docs/stable/torch.html#tensor-creation-ops">Creation Ops</a>.</p>
+
+                <p><a href="https://pytorch.org/docs/stable/torch.html#random-sampling">Random sampling</a></p>
                 
                 <h3>1.2.2 Tensor Indexing</h3>
                 <p>The content of a tensor can be accessed and modified using Python's indexing and slicing notation:</p>
