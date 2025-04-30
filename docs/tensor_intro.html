@@ -32,6 +32,10 @@ print('Tensor from list:', tensor_from_list)
 numpy_array = numpy.array([[1, 2], [3, 4]])
 tensor_from_array = torch.tensor(numpy_array)
 print('Tensor from array:', tensor_from_array)</code></pre>
+                <pre><samp>Tensor from list: tensor([[1, 2],
+        [3, 4]])
+Tensor from array: tensor([[1, 2],
+        [3, 4]])</samp></pre>
                 <p><code>torch.tensor()</code> always copies data. If we have a Tensor data and just want to change its <code>requires_grad</code> flag, use <code>requires_grad_()</code> or <code>detach()</code> to avoid a copy. If We have a numpy array and want to avoid a copy, use <code>torch.as_tensor()</code>.</p>
 
                 <p>A tensor of specific data type can be constructed by passing a <code>torch.dtype</code> and/or a <code>torch.device</code> to a constructor or tensor creation op:</p>
@@ -43,6 +47,8 @@ tensor_custom = torch.tensor([1, 2, 3],
                              dtype=torch.int64,
                              device=device)
 print(tensor_custom)</code></pre>
+                <pre><samp>cpu
+tensor([1, 2, 3])</samp></pre>
                 <p>More often than not, you'll want to initialize your tensor with some value. Common cases are all zeros, all ones, or random values, and the torch module provides factory methods for all of these:</p>
                 <pre><code>tensor_zeros = torch.zeros(size=(3, 3))
 tensor_ones = torch.ones((2, 2))
@@ -56,6 +62,17 @@ tensor_rand = torch.rand(2, 2)
 tensor_randn = torch.randn(2, 3)
 print(tensor_rand)
 print(tensor_randn)</code></pre>
+                <pre><samp>tensor([[0., 0., 0.],
+        [0., 0., 0.],
+        [0., 0., 0.]])
+tensor([[1., 1.],
+        [1., 1.]])
+tensor([[0., 0.],
+        [0., 0.]])
+tensor([[0.0530, 0.0499],
+        [0.4677, 0.8757]])
+tensor([[-1.7173,  0.5757,  0.6040],
+        [ 1.1914,  0.3525,  0.2941]])</samp></pre>
                 <p><a href="https://pytorch.org/docs/stable/generated/torch.arange.html#torch.arange">arange</a> return a 1-D tensor of size \(⌈\frac{end - start}{step}⌉\) with values from the interval <code>[start, end)</code> taken with common difference <code>step</code> beginning from <code>start</code>.</p>
                 <div class="highlight-math" style="text-align: center;">
                     \(out_{i+1} = out_i + step\)
