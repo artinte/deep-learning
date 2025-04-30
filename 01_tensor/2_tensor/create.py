@@ -10,7 +10,7 @@ tensor_from_array = torch.tensor(numpy_array)
 print('Tensor from array:', tensor_from_array)
 
 # avoid a copy
-tensor_from_array = torch.as_tensor(num_array)
+tensor_from_array = torch.as_tensor(numpy_array)
 
 device = 'cuda' if torch.cuda.is_available() else 'mps' \
     if torch.mps.is_available() else 'cpu'
