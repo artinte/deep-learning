@@ -37,6 +37,5 @@ print(tensor_randn)
 tensor_arange = torch.arange(0, 5)
 assert (tensor_arange.numpy() == [0, 1, 2, 3, 4]).all()
 tensor_linspace = torch.linspace(0, 1, steps=5)
-assert torch.allclose(
-    tensor_linspace,
+assert torch.allclose(tensor_linspace,
     torch.Tensor([0.0000, 0.2500, 0.5000, 0.7500, 1.0000]))
