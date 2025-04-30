@@ -44,10 +44,26 @@ tensor_custom = torch.tensor([1, 2, 3],
                              device=device)
 print(tensor_custom)</code></pre>
                 <p>More often than not, you'll want to initialize your tensor with some value. Common cases are all zeros, all ones, or random values, and the torch module provides factory methods for all of these:</p>
-                
-                <p>For more information about building Tensors, see <a href="https://pytorch.org/docs/stable/torch.html#tensor-creation-ops">Creation Ops</a>.</p>
+                <pre><code>tensor_zeros = torch.zeros(size=(3, 3))
+tensor_ones = torch.ones((2, 2))
+tensor_empty = torch.empty((2, 2))
+print(tensor_zeros)
+print(tensor_ones)
+print(tensor_empty)
 
-                <p><a href="https://pytorch.org/docs/stable/torch.html#random-sampling">Random sampling</a></p>
+torch.manual_seed(47)
+tensor_rand = torch.rand(2, 2)
+tensor_randn = torch.randn(2, 3)
+print(tensor_rand)
+print(tensor_randn)</code></pre>
+                <p><code>arange</code> return a 1-D tensor of size \([\frac{end - start}{step}]\) with values from the interval <code>[start, end)</code> taken with common difference <code>step</code> beginning from <code>start</code>.</p>
+                <p><code>linspace</code> create a one-dimensional tensor of size steps whose values are evenly spaced from <code>start</code> to <code>end</code>, inclusize.</p>
+                <pre><code>tensor_arange = torch.arange(0, 5)
+assert (tensor_arange.numpy() == [0, 1, 2, 3, 4]).all()
+tensor_linspace = torch.linspace(0, 1, steps=5)
+assert torch.allclose(tensor_linspace,
+    torch.Tensor([0.0000, 0.2500, 0.5000, 0.7500, 1.0000]))</code></pre>
+                <p>For more information about building Tensors, see <a href="https://pytorch.org/docs/stable/torch.html#tensor-creation-ops">Creation Ops</a> and <a href="https://pytorch.org/docs/stable/torch.html#random-sampling">Random sampling</a>.</p>
                 
                 <h3>1.2.2 Tensor Indexing</h3>
                 <p>The content of a tensor can be accessed and modified using Python's indexing and slicing notation:</p>
