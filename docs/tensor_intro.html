@@ -22,8 +22,20 @@
                 <p class="title-subtext"></p>
                 <p style="color: #a0a0a0;">Created Date: 2025-04-28</p>
                 <p>In PyTorch, <strong>Tensor</strong> is a basic data structure, which is similar to NumPy array and can be efficiently operated on GPU. </p>
+                <img src="res/01/ndarray_struct.jpg" alt="ndarray">
+                <p>Figure Conceptual diagram showing the relationship between the three fundamental objects used to describe the data in an array:</p>
+                <ul style="list-style-type: disc;">
+                    <li><p>The ndarray itself;</p></li>
+                    <li><p>The data-type object that describes the layout of a single fixed-size element of the array;</p></li>
+                    <li><p>The array-scalar Python object that is returned when a single element of the array is accessed.</p></li>
+                </ul>
+                <p>The most important property of a tensor is its shape, the shape of a PyTorch tensor tells we how many elements are along each dimension (also called axis). Here is a tensor with three axes:</p>
+                <a href="https://drive.google.com/file/d/1tFzVzTixWz6K8JXuQOD2Su1qFWv8VWPC/view?usp=sharing">
+                    <img src="res/01/three_axes.jpg" alt="Three Axis" width="600">
+                </a>
+                <p>So how do we create a tensor of shape <code>(3, 2, 5)</code>?</p>
                 <h3>1.2.1 Tensor Creating</h3>
-                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/01_tensor/2_tensor/create.py">create.py</a> introduces some common methods for creating tensors.</p>
+                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/01_basic/2_tensor/create.py">create.py</a> introduces some common methods for creating tensors.</p>
                 <p>A tensor can be constructed from a Python <a href="https://docs.python.org/3/library/stdtypes.html#list">list</a> or sequence using the <a href="https://pytorch.org/docs/stable/generated/torch.tensor.html#torch.tensor">torch.tensor()</a> constructor:</p>
                 <pre><code>python_list = [[1, 2], [3, 4]]
 tensor_from_list = torch.tensor(python_list)
@@ -89,18 +101,15 @@ assert torch.allclose(tensor_linspace,
                 <p>For more information about building Tensors, see <a href="https://pytorch.org/docs/stable/torch.html#tensor-creation-ops">Creation Ops</a> and <a href="https://pytorch.org/docs/stable/torch.html#random-sampling">Random sampling</a>.</p>
                 
                 <h3>1.2.2 Tensor Indexing</h3>
-                <h4>1.2.2.1 Basic Indexing</h4>
-                <p>The content of a tensor can be accessed and modified using Python's indexing and slicing notation:</p>
-
+                <h4>1.2.2.1 Single Element</h4>
+                <p>Single element indexing works exactly like that for other standard Python sequences. It is 0-based, and accepts negative indices for indexing from the end of the array.</p>
                 <p>Use <code>torch.Tensor.item()</code> to get a Python number from a tensor containing a single value:</p>
-                <h4>1.2.2.2 Indexing</h4>
-                <h4>1.2.2.3 Bool Indexing</h4>
-                <h4>1.2.2.4 Advanced Indexing</h4>
+                <h4>1.2.2.2 Slicing</h4>
                 <p>For more information about indexing, see <a href="https://pytorch.org/docs/stable/torch.html#indexing-slicing-joining">Indexing, Slicing, Joining, Mutating Ops</a></p>
 
                 <h3>1.2.3 Tensor Operating</h3>
                 <p>Now that we know some of the ways to create/indexing a tensor... what can we do with them?</p>
-                <p>PyTorch tensors have over three hundred operations that can ben performed on them. <a href="https://github.com/artinte/deep-learning/blob/develop/01_tensor/2_tensor/operate.py">operate.py</a> gives some basic use cases:</p>
+                <p>PyTorch tensors have over three hundred operations that can ben performed on them. <a href="https://github.com/artinte/deep-learning/blob/develop/01_basic/2_tensor/operate.py">operate.py</a> gives some basic use cases:</p>
                 <h4>1.2.3.1 Math</h4>
                 <h4>1.2.3.2 Broadcasting</h4>
                 <h4>1.2.3.3 Reshape</h4>

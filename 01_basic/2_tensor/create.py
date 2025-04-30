@@ -1,6 +1,15 @@
 import torch
 import numpy
 
+tensor3d = torch.tensor([
+    [[0, 1, 2, 3, 4],
+     [5, 6, 7, 8, 9]],
+    [[10, 11, 12, 13, 14],
+     [15, 16, 17, 18, 19]],
+    [[20, 21, 22, 23, 24],
+     [25, 26, 27, 28, 29]]])
+assert tensor3d.shape == (3, 2, 5)
+
 python_list = [[1, 2], [3, 4]]
 tensor_from_list = torch.tensor(python_list)
 print('Tensor from list:', tensor_from_list)
@@ -38,4 +47,4 @@ tensor_arange = torch.arange(0, 5)
 assert (tensor_arange.numpy() == [0, 1, 2, 3, 4]).all()
 tensor_linspace = torch.linspace(0, 1, steps=5)
 assert torch.allclose(tensor_linspace,
-    torch.Tensor([0.0000, 0.2500, 0.5000, 0.7500, 1.0000]))
+                      torch.Tensor([0.0000, 0.2500, 0.5000, 0.7500, 1.0000]))
