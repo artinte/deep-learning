@@ -24,23 +24,25 @@
                 <p>In PyTorch, <strong>Tensor</strong> is a basic data structure, which is similar to NumPy array and can be efficiently operated on GPU. </p>
                 <h3>1.2.1 Tensor Creating</h3>
                 <p><a href="https://github.com/artinte/deep-learning/blob/develop/01_tensor/2_tensor/create.py">create.py</a> introduces some common methods for creating tensors.</p>
-                <h4>1.2.1.1 Created from Data</h4>
                 <p>A tensor can be constructed from a Python <a href="https://docs.python.org/3/library/stdtypes.html#list">list</a> or sequence using the <a href="https://pytorch.org/docs/stable/generated/torch.tensor.html#torch.tensor">torch.tensor()</a> constructor:</p>
                 <p><code>torch.tensor()</code> always copies data. If we have a Tensor data and just want to change its <code>requires_grad</code> flag, use <code>requires_grad_()</code> or <code>detach()</code> to avoid a copy. If We have a numpy array and want to avoid a copy, use <code>torch.as_tensor()</code>.</p>
 
                 <p>A tensor of specific data type can be constructed by passing a <code>torch.dtype</code> and/or a <code>torch.device</code> to a constructor or tensor creation op:</p>
-                
+
+                <p>For more information about building Tensors, see <a href="https://pytorch.org/docs/stable/torch.html#tensor-creation-ops">Creation Ops</a>.</p>
                 
                 <h3>1.2.2 Tensor Indexing</h3>
                 <p>The content of a tensor can be accessed and modified using Python's indexing and slicing notation:</p>
 
                 <p>Use <code>torch.Tensor.item()</code> to get a Python number from a tensor containing a single value:</p>
 
+                <p>For more information about indexing, see <a href="https://pytorch.org/docs/stable/torch.html#indexing-slicing-joining">Indexing, Slicing, Joining, Mutating Ops</a></p>
+
                 <h3>1.2.3 Tensor Operating</h3>
 
                 <div class="navigation">
                     <a href="pytorch_install.html">Prev: 1.1 Install PyTorch</a>
-                    <a href="#">Next: 1.3 </a>
+                    <a href="data_represent.html">Next: 1.3 Data Representation</a>
                 </div>
             </main>
 
