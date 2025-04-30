@@ -56,8 +56,14 @@ tensor_rand = torch.rand(2, 2)
 tensor_randn = torch.randn(2, 3)
 print(tensor_rand)
 print(tensor_randn)</code></pre>
-                <p><code>arange</code> return a 1-D tensor of size \([\frac{end - start}{step}]\) with values from the interval <code>[start, end)</code> taken with common difference <code>step</code> beginning from <code>start</code>.</p>
-                <p><code>linspace</code> create a one-dimensional tensor of size steps whose values are evenly spaced from <code>start</code> to <code>end</code>, inclusize.</p>
+                <p><a href="https://pytorch.org/docs/stable/generated/torch.arange.html#torch.arange">arange</a> return a 1-D tensor of size \(⌈\frac{end - start}{step}⌉\) with values from the interval <code>[start, end)</code> taken with common difference <code>step</code> beginning from <code>start</code>.</p>
+                <div class="highlight-math" style="text-align: center;">
+                    \(out_{i+1} = out_i + step\)
+                </div>
+                <p><a href="https://pytorch.org/docs/stable/generated/torch.linspace.html#torch.linspace">linspace</a> create a one-dimensional tensor of size steps whose values are evenly spaced from <code>start</code> to <code>end</code>, inclusize.</p>
+                <div class="highlight-math" style="text-align: center;">
+                    \((start, start + \frac{end - start}{steps - 1}, ... , start + (steps - 2) * \frac{end - start}{steps - 1}, end)\)
+                </div>
                 <pre><code>tensor_arange = torch.arange(0, 5)
 assert (tensor_arange.numpy() == [0, 1, 2, 3, 4]).all()
 tensor_linspace = torch.linspace(0, 1, steps=5)
