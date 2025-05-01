@@ -14,10 +14,20 @@ print(sqrt2s)
 fives = ones + fours
 assert torch.isclose(fives, torch.tensor([[5.0, 5.0], [5.0, 5.0]])).all()
 
-a = torch.tensor([[1, 2], [3, 4]])
-b = torch.tensor([[5, 6], [7, 8]])
-print(torch.mm(a, b))
-assert (torch.mm(a, b) == a @ b).all()
+tensor1 = torch.tensor([[2, 3, 4, 5], [6, 7, 8, 9]])
+tensor2 = torch.tensor([[2, 2, 2, 2]])
+doubled = tensor1 * tensor2
+assert tensor1.shape == (2, 4)
+assert tensor2.shape == (1, 4)
+assert (doubled == torch.tensor([[4, 6, 8, 10], [12, 14, 16, 18]])).all()
+
+a = torch.ones(4, 3, 2)
+b = a * torch.rand(3, 2)
+c = a * torch.rand(3, 1)
+d = a * torch.rand(1, 2)
+assert b.shape == (4, 3, 2)
+assert c.shape == (4, 3, 2)
+assert d.shape == (4, 3, 2)
 
 a = torch.tensor([1, 2, 3, 4])
 assert a.sum() == 10
@@ -29,14 +39,6 @@ a = torch.tensor([1.0, 2.0, 3.0, 4.0])
 assert torch.isclose(a.mean(), torch.tensor(2.5))
 assert torch.isclose(a.max(), torch.tensor(4.0))
 assert torch.isclose(a.min(), torch.tensor(1.0))
-
-a = torch.tensor([1, 2, 3])
-b = torch.tensor([[1], [2], [3]])
-c = a + b
-assert a.shape == (3,)
-assert b.shape == (3, 1)
-assert c.shape == (3, 3)
-print(c)
 
 a = torch.randn((2, 3, 4))
 b = a.view((6, 4))
@@ -74,3 +76,8 @@ b = a.flatten()
 c = a.flatten(start_dim=1)
 assert b.shape == (24,)
 assert c.shape == (2, 12)
+
+a = torch.tensor([[1, 2], [3, 4]])
+b = torch.tensor([[5, 6], [7, 8]])
+print(torch.mm(a, b))
+assert (torch.mm(a, b) == a @ b).all()

@@ -150,7 +150,7 @@ assert (tensor1d[:, torch.newaxis] == tensor1d[:, None]).all()</code></pre>
                 <p>For more information about indexing, see <a href="https://pytorch.org/docs/stable/torch.html#indexing-slicing-joining">Indexing, Slicing, Joining, Mutating Ops</a>.</p>
 
                 <h3>1.2.3 Tensor Operating</h3>
-                <p>Now that we know some of the ways to create/indexing a tensor... what can we do with them? PyTorch tensors have over three hundred operations that can ben performed on them. <a href="https://github.com/artinte/deep-learning/blob/develop/01_basic/2_tensor/operate.py">operate.py</a> gives some basic use cases.</p>
+                <p>Now that we know some of the ways to create/indexing a tensor... what can we do with them? PyTorch tensors have hundreds of operations that can ben performed on them. <a href="https://github.com/artinte/deep-learning/blob/develop/01_basic/2_tensor/operate.py">operate.py</a> gives some basic use cases.</p>
 
                 <h4>1.2.3.2 Math</h4>
                 <p>Let’s look at basic arithmetic first, and how tensors interact with simple scalars:</p>
@@ -170,8 +170,50 @@ print(sqrt2s)</code></pre>
                 <p>Similar operations between two tensors also behave like you’d intuitively expect:</p>
                 <pre><code>fives = ones + fours
 assert torch.isclose(fives, torch.tensor([[5.0, 5.0], [5.0, 5.0]])).all()</code></pre>
+                <a href="https://drive.google.com/file/d/1k8EaNwpQlusYrRtmGz3p2FrHDdeXjjSV/view?usp=sharing">
+                    <img src="res/01/tensor_add.jpg" alt="Tensor Add">
+                </a>
+                <p>Here is a small sample from some of the major categories of operations:</p>
+                <pre><code>a = torch.tensor([1, 2, 3, 4])
+assert a.sum() == 10
+
+a = torch.tensor([[1, 2], [3, 4]])
+assert (a.sum(dim=0) == torch.tensor([4, 6])).all()
+
+a = torch.tensor([1.0, 2.0, 3.0, 4.0])
+assert torch.isclose(a.mean(), torch.tensor(2.5))
+assert torch.isclose(a.max(), torch.tensor(4.0))
+assert torch.isclose(a.min(), torch.tensor(1.0))</code></pre>
                 <h4>1.2.3.3 Broadcasting</h4>
-                <p>It’s important to note here that all of the tensors in the previous code cell were of identical shape. What happens when we try to perform a binary operation on tensors if dissimilar shape?</p>
+                <p>It’s important to note here that all of the tensors in the previous code cell were of identical shape. What happens when we try to perform a binary operation on tensors if dissimilar shape? The following cell throws a run-time error:</p>
+                <pre><code>torch.rand(2, 3) * torch.rand(3, 2)</code></pre>
+                <p>In the general case, you cannot operate on tensors of different shape this way, even in a case like the cell above, where the tensors have an identical number of elements. The exception to the same-shapes rule is <strong>Tensor Broadcasting</strong>. Here’s an example:</p>
+                <pre><code>tensor1 = torch.tensor([[2, 3, 4, 5], [6, 7, 8, 9]])
+tensor2 = torch.tensor([[2, 2, 2, 2]])
+doubled = tensor1 * tensor2
+assert tensor1.shape == (2, 4)
+assert tensor2.shape == (1, 4)
+assert (doubled == torch.tensor([[4, 6, 8, 10], [12, 14, 16, 18]])).all()</code></pre>
+                <p>Broadcasting is a way to perform an operation between tensors that have similarities in their shapes. The rules for broadcasting are:</p>
+                <ul style="list-style-type: disc;">
+                    <li><p>Each tensor must have at least one dimension - no empty tensors.</p></li>
+                    <div>
+                        <li><p>Comparing the dimension sizes of the two tensors, going from last to first:</p></li>
+                        <ul style="list-style-type: circle;">
+                            <li><p>Each dimension must be equal, or</p></li>
+                            <li><p>One of the dimensions must be of size 1, or</p></li>
+                            <li><p>The dimension does not exist in one of the tensors.</p></li>
+                        </ul>
+                    </div>
+                </ul>
+                <p>Tensors of identical shape, of course, are trivially “broadcastable”, as we saw earlier. Here are some examples of situations that honor the above rules and allow broadcasting:</p>
+                <pre><code>a = torch.ones(4, 3, 2)
+b = a * torch.rand(3, 2)
+c = a * torch.rand(3, 1)
+d = a * torch.rand(1, 2)
+assert b.shape == (4, 3, 2)
+assert c.shape == (4, 3, 2)
+assert d.shape == (4, 3, 2)</code></pre>
 
                 <h4>1.2.3.1 Copy and View</h4>                
                 
@@ -182,7 +224,7 @@ assert torch.isclose(fives, torch.tensor([[5.0, 5.0], [5.0, 5.0]])).all()</code>
                 <div class="highlight-math" style="text-align: center;">
                     \(z = x \cdot y\)
                 </div>
-                
+
 
 
                 <div class="navigation">
