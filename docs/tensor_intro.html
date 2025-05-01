@@ -101,19 +101,89 @@ assert torch.allclose(tensor_linspace,
                 <p>For more information about building Tensors, see <a href="https://pytorch.org/docs/stable/torch.html#tensor-creation-ops">Creation Ops</a> and <a href="https://pytorch.org/docs/stable/torch.html#random-sampling">Random sampling</a>.</p>
                 
                 <h3>1.2.2 Tensor Indexing</h3>
+                <p>Tensor can be indexed using the stanardard Python <code>x[obj]</code> syntax, where <code>x</code> is the array and <code>obj</code> the selection. File <a href="https://github.com/artinte/deep-learning/blob/develop/01_basic/2_tensor/indexing.py">indexing.py</a> shows some common cases.</p>
                 <h4>1.2.2.1 Single Element</h4>
                 <p>Single element indexing works exactly like that for other standard Python sequences. It is 0-based, and accepts negative indices for indexing from the end of the array.</p>
+                <a href="https://drive.google.com/file/d/1Vgy9IFONUixEfLS5fl8cVqAUSaJvYN76/view?usp=sharing">
+                    <img src="res/01/python_index.jpg" alt="Python Index">
+                </a>
+                <pre><code>tensor2d = torch.tensor([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+assert tensor2d[1][2] == 6
+assert tensor2d[0, 0] == 1
+assert tensor2d[1, 2] == 6
+assert tensor2d[-1, -1] == 9</code></pre>
                 <p>Use <code>torch.Tensor.item()</code> to get a Python number from a tensor containing a single value:</p>
-                <h4>1.2.2.2 Slicing</h4>
-                <p>For more information about indexing, see <a href="https://pytorch.org/docs/stable/torch.html#indexing-slicing-joining">Indexing, Slicing, Joining, Mutating Ops</a></p>
+                <pre><code>scalar = torch.tensor([[1]])
+assert scalar.item() == 1</code></pre>
+
+                <h4>1.2.2.2 Basic Slicing</h4>
+                <p>Basic slicing extends Python’s basic concept of slicing to N dimensions. Basic slicing occurs when obj is a <a href="https://docs.python.org/3/library/functions.html#slice">slice</a> object (constructed by <code>start:stop:step</code> notation inside of brackets), an integer, or a tuple of slice objects and integers.</p>
+                <pre><code>tensor1d = torch.tensor([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+assert (tensor1d[1:7:2] == torch.tensor([1, 3, 5])).all()</code></pre>
+                <p>Assume <code>n</code> is the number of elements in the dimension being sliced. Then, if <code>start</code> is not given it defaults to <code>0</code> for <code>step > 0</code>. If <code>end</code> is not given it defaults to <code>n</code> for <code>step > 0</code>. If <code>step</code> is not given it defaults to <code>1</code>. Note that <code>::</code> is the same as <code>:</code> and means select all indices along this axis:</p>
+                <pre><code>tensor2d = torch.tensor([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+assert (tensor2d[0] == torch.tensor([1, 2, 3])).all()
+assert (tensor2d[:, 1] == torch.tensor([2, 5, 8])).all()
+assert (tensor2d[1:, 1:] == torch.tensor([[5, 6], [8, 9]])).all()</code></pre>
+                <h4>1.2.2.3 Boolean Array</h4>
+                <p>This advanced indexing occurs when obj is an array object of Boolean type, such as may be returned from comparison operators:</p>
+                <pre><code>tensor1d = torch.tensor([10, 20, 30, 40, 50])
+tensor_mask = tensor1d > 25
+assert (tensor_mask == torch.tensor([False, False, True, True, True])).all()
+assert (tensor1d[tensor_mask] == torch.tensor([30, 40, 50])).all()</code></pre>
+                <h4>1.2.2.4 Integer Array</h4>
+                <p>Integer array indexing allows selection of arbitrary items in the array based on their N-dimensional index. Each integer array represents a number of indices into that dimension.</p>
+                <pre><code>tensor2d = torch.tensor([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+row_indices = torch.tensor([0, 1, 1, 2])
+col_indices = torch.tensor([2, 1, 1, 0])
+assert (tensor2d[row_indices, col_indices] == torch.tensor([3, 5, 5, 7])).all()</code></pre>
+                <h4>1.2.2.5 Indexing Tool</h4>
+                <p><code>Ellipsis</code> expands to the number of <code>:</code> objects needed for the selection tuple to index all dimensions:</p>
+                <pre><code>tensor3d = torch.tensor([[[1], [2], [3]], [[4], [5], [6]]])
+assert (tensor3d[..., 0] == torch.tensor([[1, 2, 3], [4, 5, 6]])).all()
+assert (tensor3d[..., 0] == tensor3d[:, :, 0]).all()</code></pre>
+                <p>Each <code>newaxis</code> object in the selection tuple serves to expand the dimensions of the resulting selection by one unit-length dimension. The added dimension is the position of the <code>newaxis</code> object in the selection tuple. <code>newaxis</code> is an alias for <code>None</code>, and <code>None</code> can be used in place of this with the same result:</p>
+                <pre><code>tensor1d = torch.tensor([1, 2, 3])
+assert tensor1d.shape == (3,)
+assert tensor1d[:, torch.newaxis].shape == (3, 1)
+assert (tensor1d[:, torch.newaxis] == tensor1d[:, None]).all()</code></pre>
+                <p>For more information about indexing, see <a href="https://pytorch.org/docs/stable/torch.html#indexing-slicing-joining">Indexing, Slicing, Joining, Mutating Ops</a>.</p>
 
                 <h3>1.2.3 Tensor Operating</h3>
-                <p>Now that we know some of the ways to create/indexing a tensor... what can we do with them?</p>
-                <p>PyTorch tensors have over three hundred operations that can ben performed on them. <a href="https://github.com/artinte/deep-learning/blob/develop/01_basic/2_tensor/operate.py">operate.py</a> gives some basic use cases:</p>
-                <h4>1.2.3.1 Math</h4>
-                <h4>1.2.3.2 Broadcasting</h4>
-                <h4>1.2.3.3 Reshape</h4>
+                <p>Now that we know some of the ways to create/indexing a tensor... what can we do with them? PyTorch tensors have over three hundred operations that can ben performed on them. <a href="https://github.com/artinte/deep-learning/blob/develop/01_basic/2_tensor/operate.py">operate.py</a> gives some basic use cases.</p>
+
+                <h4>1.2.3.2 Math</h4>
+                <p>Let’s look at basic arithmetic first, and how tensors interact with simple scalars:</p>
+                <pre><code>ones = torch.zeros(2, 2) + 1
+twos = torch.ones(2, 2) * 2
+threes = (torch.ones(2, 2) * 7 - 1) / 2
+fours = twos ** 2
+sqrt2s = twos ** 0.5
+assert torch.isclose(ones, torch.tensor([[1.0, 1.0], [1.0, 1.0]])).all()
+assert torch.isclose(twos, torch.tensor([[2.0, 2.0], [2.0, 2.0]])).all()
+assert torch.isclose(threes, torch.tensor([[3.0, 3.0], [3.0, 3.0]])).all()
+assert torch.isclose(fours, torch.tensor([[4.0, 4.0], [4.0, 4.0]])).all()
+print(sqrt2s)</code></pre>
+                <pre><samp>tensor([[1.4142, 1.4142],
+        [1.4142, 1.4142]])</samp></pre>
+                <p>As you can see above, arithmetic operations between tensors and scalars, such as addition, subtraction, multiplication, division, and exponentiation are distributed over every element of the tensor. Because the output of such an operation will be a tensor, you can chain them together with the usual operator precedence rules, as in the line where we create <code>threes</code>.</p>
+                <p>Similar operations between two tensors also behave like you’d intuitively expect:</p>
+                <pre><code>fives = ones + fours
+assert torch.isclose(fives, torch.tensor([[5.0, 5.0], [5.0, 5.0]])).all()</code></pre>
+                <h4>1.2.3.3 Broadcasting</h4>
+                <p>It’s important to note here that all of the tensors in the previous code cell were of identical shape. What happens when we try to perform a binary operation on tensors if dissimilar shape?</p>
+
+                <h4>1.2.3.1 Copy and View</h4>                
                 
+                <h4>1.2.3.4 Reshape</h4>
+
+                <h4>1.2.3.5 Tensor Product</h4>
+                <p>The <strong>Tensor Product</strong>, or <strong>Dot Product</strong> (not to be confused with an element-wise product, the * operator), is one of the most common, most useful tensor operations. In mathematical notation, note the operation with a dot (\(\cdot\)):</p>
+                <div class="highlight-math" style="text-align: center;">
+                    \(z = x \cdot y\)
+                </div>
+                
+
 
                 <div class="navigation">
                     <a href="pytorch_install.html">Prev: 1.1 Install PyTorch</a>

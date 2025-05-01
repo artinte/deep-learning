@@ -1,10 +1,18 @@
 import torch
 
-a = torch.tensor([1, 2, 3])
-b = torch.tensor([4, 5, 6])
+ones = torch.zeros(2, 2) + 1
+twos = torch.ones(2, 2) * 2
+threes = (torch.ones(2, 2) * 7 - 1) / 2
+fours = twos ** 2
+sqrt2s = twos ** 0.5
+assert torch.isclose(ones, torch.tensor([[1.0, 1.0], [1.0, 1.0]])).all()
+assert torch.isclose(twos, torch.tensor([[2.0, 2.0], [2.0, 2.0]])).all()
+assert torch.isclose(threes, torch.tensor([[3.0, 3.0], [3.0, 3.0]])).all()
+assert torch.isclose(fours, torch.tensor([[4.0, 4.0], [4.0, 4.0]])).all()
+print(sqrt2s)
 
-assert ((a + b) == torch.tensor([5, 7, 9])).all()
-assert ((a * b) == torch.tensor([4, 10, 18])).all()
+fives = ones + fours
+assert torch.isclose(fives, torch.tensor([[5.0, 5.0], [5.0, 5.0]])).all()
 
 a = torch.tensor([[1, 2], [3, 4]])
 b = torch.tensor([[5, 6], [7, 8]])
@@ -15,7 +23,7 @@ a = torch.tensor([1, 2, 3, 4])
 assert a.sum() == 10
 
 a = torch.tensor([[1, 2], [3, 4]])
-assert (tensor.sum(dim=0) == torch.tensor([4, 6])).all()
+assert (a.sum(dim=0) == torch.tensor([4, 6])).all()
 
 a = torch.tensor([1.0, 2.0, 3.0, 4.0])
 assert torch.isclose(a.mean(), torch.tensor(2.5))
@@ -23,7 +31,7 @@ assert torch.isclose(a.max(), torch.tensor(4.0))
 assert torch.isclose(a.min(), torch.tensor(1.0))
 
 a = torch.tensor([1, 2, 3])
-b = torch.tensor([1], [2], [3])
+b = torch.tensor([[1], [2], [3]])
 c = a + b
 assert a.shape == (3,)
 assert b.shape == (3, 1)
@@ -43,7 +51,7 @@ a = torch.randn((2, 3))
 b = a.transpose(0, 1)
 c = torch.randn((2, 3, 4))
 d = c.transpose(1, 2)
-assert a.shape == (3, 2)
+assert b.shape == (3, 2)
 assert d.shape == (2, 4, 3)
 
 a = torch.randn((1, 3, 1, 4))
