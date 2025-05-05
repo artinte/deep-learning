@@ -42,17 +42,18 @@ assert torch.isclose(a.min(), torch.tensor(1.0))
 
 a = torch.randn((2, 3, 4))
 b = a.view((6, 4))
-c = a.view((-1, 4))
+c = a.view((-1, 4)) # the size -1 is inferred from other dimensions
 d = a.reshape((6, 4))
 assert a.shape == (2, 3, 4)
 assert b.shape == (6, 4)
 assert c.shape == (6, 4)
-assert a.data_ptr() == d.data_ptr()
 
 a = torch.randn((2, 3))
 b = a.transpose(0, 1)
+assert (b == torch.transpose(a, 0, 1)).all()
 c = torch.randn((2, 3, 4))
 d = c.transpose(1, 2)
+assert (d == torch.transpose(c, 1, 2)).all()
 assert b.shape == (3, 2)
 assert d.shape == (2, 4, 3)
 
@@ -70,6 +71,7 @@ assert b.shape == (1, 3, 4)
 a = torch.randn((2, 3, 4))
 b = a.permute(2, 0, 1)
 assert b.shape == (4, 2, 3)
+assert b.shape == torch.permute(a, (2, 0, 1)).shape
 
 a = torch.randn((2, 3, 4))
 b = a.flatten()

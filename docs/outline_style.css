@@ -99,7 +99,7 @@ img {
 }
 
 @media screen and (max-width: 1024px) {
-    .sidebar, .right-sidebar {
+    .left-sidebar, .right-sidebar {
         display: none;
     }
     .content {
