@@ -42,7 +42,7 @@ assert torch.isclose(a.min(), torch.tensor(1.0))
 
 a = torch.randn((2, 3, 4))
 b = a.view((6, 4))
-c = a.view((-1, 4)) # the size -1 is inferred from other dimensions
+c = a.view((-1, 4))  # the size -1 is inferred from other dimensions
 d = a.reshape((6, 4))
 assert a.shape == (2, 3, 4)
 assert b.shape == (6, 4)
@@ -78,8 +78,3 @@ b = a.flatten()
 c = a.flatten(start_dim=1)
 assert b.shape == (24,)
 assert c.shape == (2, 12)
-
-a = torch.tensor([[1, 2], [3, 4]])
-b = torch.tensor([[5, 6], [7, 8]])
-print(torch.mm(a, b))
-assert (torch.mm(a, b) == a @ b).all()
