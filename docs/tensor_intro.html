@@ -19,7 +19,7 @@
 
             <main class="col-md-8 content">
                 <h2 class="custom-title">1.2 Introduction to Tensors</h2>
-                <p class="title-subtext"></p>
+                <p class="title-subtext">Introduced the creation, indexing, and common operations of tensors.</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-04-28</p>
                 <p>In PyTorch, <strong>Tensor</strong> is a basic data structure, which is similar to NumPy array and can be efficiently operated on GPU. </p>
                 <img src="res/01/ndarray_struct.jpg" alt="ndarray">
@@ -271,7 +271,68 @@ assert c.shape == (2, 12)</code></pre>
                     \(z = x \cdot y\)
                 </div>
 
+                <p>Mathematically, what does the dot operation do? Let's start with the dot product of two vectors. It's computed as follows:</p>
+                <pre><code>def naive_vector_dot(vector_a, vector_b):
+    assert len(vector_a.shape) == 1
+    assert len(vector_b.shape) == 1
+    assert vector_a.shape[0] == vector_b.shape[0]
+    z = 0.0
+    for i in range(vector_a.shape[0]):
+        z += vector_a[i] * vector_b[i]
+    return z
 
+a = torch.tensor([1, 2, 3, 4, 5])
+b = torch.tensor([1, 2, 3, 4, 5])
+assert naive_vector_dot(a, b) == 55
+assert naive_vector_dot(a, b) == torch.matmul(a, b)</code></pre>
+                <p>Given two vectors \(x, y \in R^d\), their dot product \(x^T y\) (also known as <em>inner product</em>) is a sum over the products of the elements at the same position: \(x^T y = \sum_{i=1}^{d}x_i y_i\).</p>
+                <p>We have noticed that the dot product between two vectors is a scalar and that only vectors with the same numver of elements are compatible for a dot product.</p>
+                <p>We also take the dot product between a matrix \(x\) and a vector \(y\), which returns a vector where the cofficients are the dot products between \(y\) and the rows of \(x\), Implement it as follows:</p>
+                <pre><code>def naive_matrix_vector_dot(matrix_a, vector_b):
+    assert len(matrix_a.shape) == 2
+    assert len(vector_b.shape) == 1
+    assert matrix_a.shape[1] == vector_b.shape[0]
+    result = torch.zeros(matrix_a.shape[0])
+    for i in range(matrix_a.shape[0]):
+        for j in range(matrix_a.shape[1]):
+            result[i] += matrix_a[i, j] * vector_b[j]
+    return result
+
+
+c = torch.tensor([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
+d = torch.tensor([1, 2, 3, 4, 5])
+assert (naive_matrix_vector_dot(c, d) == torch.tensor([55, 130])).all()
+assert (naive_matrix_vector_dot(c, d) == torch.matmul(c, d)).all()</code></pre>
+                <p>Of course, a dot product generalizes to tensors with an arbitrary number of axes. The most common applications may be the dot product between two matrices. We can take the dot product of two matrices \(x\) and \(y\) <code>(dot(x, y))</code> if and only if <code>x.shape[1] == y.shape[0]</code>. The result is a matrix with shape <code>(x.shape[0], y.shape[1])</code>, where the coefficients are the vector products between the rows of \(x\) and the columns of \(y\). Here's the naive implementations:</p>
+                <pre><code>def naive_matrix_dot(matrix_a, matrix_b):
+    assert len(matrix_a.shape) == 2
+    assert len(matrix_b.shape) == 2
+    assert matrix_a.shape[1] == matrix_b.shape[0]
+    result = torch.zeros((matrix_a.shape[0], matrix_b.shape[1]))
+    for i in range(matrix_a.shape[0]):
+        for j in range(matrix_b.shape[1]):
+            row_x = matrix_a[i, :]
+            column_y = matrix_b[:, j]
+            result[i, j] = naive_vector_dot(row_x, column_y)
+    return result
+
+
+e = torch.tensor([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
+f = torch.tensor([[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]])
+assert (naive_matrix_dot(e, f) == torch.tensor([[95, 110], [220, 260]])).all()
+assert (naive_matrix_dot(e, f) == torch.matmul(e, f)).all()</code></pre>
+                <p>To understand dot-product shape compatibility, it helps to visualize the input and output tensors by aligning them as shwon below:</p>
+                <a href="https://drive.google.com/file/d/1bBPPALMAYG0eXiKjd-scHHftQqqEgVj4/view?usp=sharing">
+                    <img src="res/01/matrix_dot_product.jpg" alt="Matrix Dot Product">
+                </a>
+                <p>In the figure, \(x\), \(y\) and \(z\) are pictured as rectangles (literal boxes of coefficients). Because the rows of \(x\) and the columns of \(y\) must have the same size, it follows that the width of \(x\) must match the height of \(y\).</p>
+                <p>More generally, we can take the dot product between higher-dimensional tensors, following the same rules for shape compatibility as outlined earlier for the 2D case:</p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \((a, b, c, d) \cdot (d,) \rightarrow (a, b, c)\)
+                </p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \((a, b, c, d) \cdot (d, e) \rightarrow (a, b, c, e)\)
+                </p>
 
                 <div class="navigation">
                     <a href="pytorch_install.html">Prev: 1.1 Install PyTorch</a>
