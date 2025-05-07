@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="laptop_coding_48.png" type="image/png">
+    <title>RNN from Scratch</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="article_style.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="col-md-2 left-sidebar">
+
+            </nav>
+
+            <main class="col-md-8 content">
+                <h2 class="custom-title">4.1 RNN from Scratch</h2>
+                <p class="title-subtext">A simple walkthrough of what RNNs are, how they work, and how to build one from scratch in Python!</p>
+                <p style="color: #a0a0a0;">Created Date: 2025-05-07</p>
+                <p>Recurrent Neural Networks (RNNs) are a kind of neural network that specialize in processing sequences. They’re often used in Natural Language Processing (NLP) tasks because of their effectiveness in handling text. In this post, we’ll explore what RNNs are, understand how they work, and build a real one from scratch (using only numpy) in Python.</p>
+                <p>This post assumes a basic knowledge of neural networks. Section <a href="network_scratch.html">1.6 Neural Network from Scratch</a> covers everything you’ll need to know, so I’d recommend reading that first.</p>
+                <p>Let’s get into it!</p>
+                <h3>4.1.1 The Why</h3>
+                <p>One issue with vanilla neural nets (and also CNNs) is that they only work with pre-determined sizes: they take fixed-size inputs and produce fixed-size outputs. RNNs are useful because they let us have variable-length sequences as both inputs and outputs. Here are a few examples of what RNNs can look like:</p>
+                <a href="https://drive.google.com/file/d/11xIMLAVNIKVNSwkIajAven8cYlquc1n3/view?usp=sharing">
+                    <img src="res/04/rnn_relationship.jpg" width="600" alt="RNN Relationship">
+                </a>
+                <p>This ability to process sequences makes RNNs very useful. For example:</p>
+                <ul class="with-bullets">
+                    <li><p>Machine Translation (e.g. Google Translate) is done with “many to many” RNNs. The original text sequence is fed into an RNN, which then produces translated text as output.</p></li>
+                    <li><p>Sentiment Analysis (e.g. Is this a positive or negative review?) is often done with “many to one” RNNs. The text to be analyzed is fed into an RNN, which then produces a single output classification (e.g. This is a positive review).</p></li>
+                </ul>
+                <p>Later in this post, we’ll build a “many to one” RNN from scratch to perform basic Sentiment Analysis.</p>
+                <h3>4.1.2 The How</h3>
+                <p>Let’s consider a “many to many” RNN with inputs \(x_0, x_1, ... , x_n\) that wants to produce outputs \(y_0, y_1, ... , y_n\). These \(x_i\) and \(y_i\) are vectors and can have arbitrary dimensions.</p>
+                <p>RNNs work by iteratively updating a hidden state \(h\), which is a vector that can also have arbitrary dimension. At any given step \(t\):</p>
+                
+                <div class="navigation">
+                    <a href="#">Prev: </a>
+                    <a href="#">Next: </a>
+                </div>
+            </main>
+
+            <aside class="col-md-2 right-sidebar">
+                <h5><a href="index.html#section4">Recurrent Network</a></h5>
+                <ul id="dynamic-sidebar" class="nav flex-column">
+                </ul>
+            </aside>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="article_script.js"></script>
+</body>
+
+</html>
