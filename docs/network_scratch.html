@@ -19,9 +19,31 @@
 
             <main class="col-md-8 content">
                 <h2 class="custom-title">1.7 Neural Network from Scratch</h2>
-                <p class="title-subtext"></p>
+                <p class="title-subtext">A simple explanation of how they work and how to implement one from scratch in Python.</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-10</p>
-
+                <p>Here’s something that might surprise you: neural networks aren’t that complicated! The term “neural network” gets used as a buzzword a lot, but in reality they’re often much simpler than people imagine.</p>
+                <p>This post is intended for complete beginners and assumes ZERO prior knowledge of machine learning. We’ll understand how neural networks work while implementing one from scratch in Python.</p>
+                <p>Let’s get started!</p>
+                <h3>1.7.1 Building Blocks: Neurons</h3>
+                <p>First, we have to talk about neurons, the basic unit of a neural network. A neuron takes inputs, does some math with them, and produces one output. Here’s what a 2-input neuron looks like:</p>
+                <img src="res/01/perceptron.svg" alt="Perceptron" width="600">
+                <p>3 things are happening here. First, each input is multiplied by a weight: <span class="inline-square" style="background-color:rgb(200, 0, 0)"></span></p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(x_1 \rightarrow x_1 * w_1\)
+                </p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(x_2 \rightarrow x_2 * w_2\)
+                </p>
+                <p>Next, all the weighted inputs are added together with a bias b: <span class="inline-square" style="background-color:#0f9640"></span></p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \((x_1 * w_1) + (x_2 * w_2) + b\)
+                </div>
+                <p>Finally, the sum is passed through an activation function: <span class="inline-square" style="background-color:rgb(255, 150, 0)"></span></p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(y = f(x_1 * w_1 + x_2 * w_2 + b)\)
+                </div>
+                <p>The activation function is used to turn an unbounded input into an output that has a nice, predictable form. A commonly used activation function is the sigmoid function:</p>
+                
                 <div class="navigation">
                     <a href="gradient_descent.html">Prev: 1.6 Gradient Descent</a>
                     <a href="linear_algebra.html">Next: 2.1 Linear Algebra</a>
