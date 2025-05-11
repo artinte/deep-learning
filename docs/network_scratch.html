@@ -148,9 +148,117 @@ x = numpy.array([2, 3])
 print(round(network.feedforward(x), 4))</code></pre>
                 <p>We got 0.7216 again! Looks like it works.</p>
                 <h3>1.7.3 Training a Neural Network</h3>
+                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/01_basic/7_nn_stratch/simple_network.py">simple_network.py</a> documents a complete neural network that takes as input a person's height and weight and predicts the person's gender.</p>
                 <h4>1.7.3.1 Height-Weight Dataset</h4>
+                <p>Say we have the following measurements:</p>
+                <div class="d-flex justify-content-center align-items-center" style="overflow-x: auto; width: 100%;">
+                    <table class="table table-light text-center" style="width: 80%;">
+                        <thead>
+                            <tr>
+                                <th>Weight(lb)</th>
+                                <th>height(in)</th>
+                                <th>Gender</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>160</td>
+                                <td>72</td>
+                                <td>1</td>
+                            </tr>
+                            <tr>
+                                <td>150</td>
+                                <td>70</td>
+                                <td>1</td>
+                            </tr>
+                            <tr>
+                                <td>145</td>
+                                <td>66</td>
+                                <td>0</td>
+                            </tr>
+                            <tr>
+                                <td>152</td>
+                                <td>70</td>
+                                <td>1</td>
+                            </tr>
+                            <tr>
+                                <td>145</td>
+                                <td>65</td>
+                                <td>0</td>
+                            </tr>
+                            <tr>
+                                <td>150</td>
+                                <td>64</td>
+                                <td>0</td>
+                            </tr>
+                            <tr>
+                                <td>...</td>
+                                <td>...</td>
+                                <td>...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>Only the first six data are displayed, 0 for famale, and 1 for male. All the data is shown in the figure below, blue represents males and red represents females:</p>
+                <img src="res/01/simple_dataset.png" alt="Simple Dataset" width="600">
+                <p>Let’s train our network to predict someone’s gender given their weight and height:</p>
+                <img src="res/01/network_gender.svg" alt="Network Gender">
+                <p>The data needs to be preprocessed by finding the average of height and weight and subtracting the average from all values:</p>
+                <pre><code>average_weight = int(round(x.sum() / len(x)))
+average_height = int(round(y.sum() / len(y)))
+print('Average weight:', average_weight)
+print('Average height:', average_height)
+
+x = x - average_weight
+y = y - average_height
+print('Processed weight:', x)
+print('Processed height:', y)</code></pre>
+                <pre><samp>Average weight: 148
+Average height: 68
+Processed weight: [-15  12   2  -3   4  -3   2   7  -8 -18   2  -8 -13  12   7  -3  14   7   10  -4]
+Processed height: [-3  4  2 -2  2 -3 -4 -2 -4 -6  0  0 -2  0  0 -4  6  4  2  4]</samp></pre>
+
                 <h4>1.7.3.2 MSE Loss</h4>
+                <p>Before we train our network, we first need a way to quantify how “good” it’s doing so that it can try to do “better”. That’s what the loss is.</p>
+                <p>We’ll use the mean squared error (MSE) loss:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(MSE = \frac{1}{n} \sum_{i=1}^{n}{(y_{true} - y_{pred})}^2\)
+                </div>
+                <p>Let’s break this down:</p>
+                <ul class="with-bullets">
+                    <li><p>\(n\) is the number of samples, which is 20 (10 with males, and 10 with females).</p></li>
+                </ul>
+
+                <p>For more information, you can read section 2.5 <a href="loss_function.html">Loss Function</a>.</p>
+
                 <h4>1.7.3.3 Calculating Derivative</h4>
+                <p>We now have a clear goal: minimize the loss of the neural network. We know we can change the network’s weights and biases to influence its predictions, but how do we do so in a way that decreases loss?</p>
+                <p class="comment">This section uses a bit of multivariable calculus. If you’re not comfortable with calculus, you can read section 1.5 <a href="calculus.html">Calculus</a>.</p>
+                <p>For simplicity, let’s pretend we only have one sample in our dataset:</p>
+                <div class="d-flex justify-content-center align-items-center" style="overflow-x: auto; width: 100%;">
+                    <table class="table table-light text-center" style="width: 80%;">
+                        <thead>
+                            <tr>
+                                <th>Weight (minus 148)</th>
+                                <th>height (minus 68)</th>
+                                <th>Gender</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>-15</td>
+                                <td>-3</td>
+                                <td>1</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>Then the mean squared error loss is just squared error:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(MSE = {(y_{true} - y_{pred})}^2 = {(1 - y_{pred})^2}\)
+                </div>
+                <p>Another way to think about loss is as a function of weights and biases. Let’s label each weight and bias in our network:</p>
+
                 <h4>1.7.3.4 Gradient Descent</h4>
                 <h4>1.7.3.5 Code: A Complete Network</h4>
                 <div class="navigation">
