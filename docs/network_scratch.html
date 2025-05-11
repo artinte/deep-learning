@@ -61,6 +61,98 @@
                 <p class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(y = f(w \cdot x + b) = f(7) = 0.999\)
                 </p>
+                <p>The neuron outputs 0.999 given the inputs \(x = [2, 3]\). That’s it! This process of passing inputs forward to get an output is known as <strong>feedforward</strong>.</p>
+                <h4>1.7.1.2 Coding a Neuron</h4>
+                <p>Time to implement a neuron! We’ll use <a href="https://numpy.org/">NumPy</a>, a popular and powerful computing library for Python, to help us do math, File <a href="https://github.com/artinte/deep-learning/blob/develop/01_basic/7_nn_stratch/neuron.py">neuron.py</a> show a neuron how to work:</p>
+                <pre><code>import numpy
+
+
+def sigmoid(x):
+    # Our activation function: f(x) = 1 / (1 + e^(-x))
+    return 1 / (1 + numpy.exp(-x))
+
+
+class Neuron:
+    def __init__(self, weights, bias):
+        self.weights = weights
+        self.bias = bias
+
+    def feedforward(self, inputs):
+        # Weight inputs, add bias, then use the activation function
+        total = numpy.matmul(self.weights, inputs) + self.bias
+        return sigmoid(total)
+
+
+# w1 = 0, w2 = 1
+weights = numpy.array([0, 1])
+# b = 4
+bias = 4
+# x1 = 2, x2 = 3
+x = numpy.array([2, 3])
+
+neuron = Neuron(weights, bias)
+# 0.9991
+print('Neuron output is', round(neuron.feedforward(x), 4))</code></pre>
+                <p>Recognize those numbers? That’s the example we just did! We get the same answer of 0.999.</p>
+                <h3>1.7.2 Combining Neurons into a Neural Network</h3>
+                <p>A neural network is nothing more than a bunch of neurons connected together. Here’s what a simple neural network might look like:</p>
+                <img src="res/01/simple_network.svg" alt="Simple Network">
+                <p>This network has 2 inputs, a hidden layer with 2 neurons (\(h_1\) and \(h_2\)), and an output layer with 1 neuron (\(o_1\)). Notice that the inputs for \(o_1\) are the outputs from \(h_1\) and \(h_2\) - that's what makes this a network.</p>
+                <p class="comment">A hidden layer is any layer between the input (first) layer and output (last) layer. There can be multiple hidden layers!</p>
+                <h4>1.7.2.1 An Example: Feedforward</h4>
+                <p>Let’s use the network pictured above and assume all neurons have the same weights \(w = [0, 1]\), the same bias \(b = 0\), and the same sigmoid activation function. Let \(h_1, h_2, o_1\) denote the outputs of the neurons they represent.</p>
+                <p>What happens if we pass in the input \(x = [2, 3]?\)</p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(h_1 = h_2 = f(w \cdot x + b) = f((0 * 2) + (1 * 3) + 0) = f(3) = 0.9526\)
+                </p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(o_1 = f(w \cdot [h1, h2] + b) = f((0 * h_1) + (1 * h_2) + 0) = f(0.9526) = 0.7216\)
+                </p>
+                <p>The output of the neural network for input \(x = [2, 3]\) is 0.7216. Pretty simple, right?</p>
+                <p>A neural network can have any number of layers with any number of neurons in those layers. The basic idea stays the same: feed the input(s) forward through the neurons in the network to get the output(s) at the end. For simplicity, we’ll keep using the network pictured above for the rest of this post.</p>
+                <h4>1.7.2.2 Coding a Neural Network: Feedforward</h4>
+                <p>Let’s implement feedforward for our neural network. File :</p>
+                <pre><code># ... code from previous section here
+
+class OurNeuralNetwork:
+    '''
+    A neural network with:
+        - 2 inputs
+        - a hidden layer with 2 neurons (h1, h2)
+        - an output layer with 1 neuron (o1)
+    Each neuron has the same weights and bias:
+        - w = [0, 1]
+        - b = 0
+    '''
+    def __init__(self):
+        weights = numpy.array([0, 1])
+        bias = 0
+
+        # The Neuron class here is from the previous section.
+        self.h1 = Neuron(weights, bias)
+        self.h2 = Neuron(weights, bias)
+        self.o1 = Neuron(weights, bias)
+
+    def feedforward(self, x):
+        out_h1 = self.h1.feedforward(x)
+        out_h2 = self.h2.feedforward(x)
+        
+        # The inputs for o1 are the outputs from h1 and h2.
+        out_o1 = self.o1.feedforward(numpy.array([out_h1, out_h2]))
+        return out_o1
+
+
+network = OurNeuralNetwork()
+x = numpy.array([2, 3])
+# 0.7216
+print(round(network.feedforward(x), 4))</code></pre>
+                <p>We got 0.7216 again! Looks like it works.</p>
+                <h3>1.7.3 Training a Neural Network</h3>
+                <h4>1.7.3.1 Height-Weight Dataset</h4>
+                <h4>1.7.3.2 MSE Loss</h4>
+                <h4>1.7.3.3 Calculating Derivative</h4>
+                <h4>1.7.3.4 Gradient Descent</h4>
+                <h4>1.7.3.5 Code: A Complete Network</h4>
                 <div class="navigation">
                     <a href="gradient_descent.html">Prev: 1.6 Gradient Descent</a>
                     <a href="linear_algebra.html">Next: 2.1 Linear Algebra</a>
