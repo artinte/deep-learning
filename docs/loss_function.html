@@ -26,7 +26,10 @@
                 <p>In statistics, the <strong>mean squared error (MSE)</strong> or <strong>mean squared deviation (MSD)</strong> of an estimator (of a procedure for estimating an unobserved quantity) measures the average of the squares of the errors—that is, the average squared difference between the estimated values and the true value.</p>
                 <p>We can view <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.MSELoss.html">torch.nn.MSELoss</a> to understand its calculation rules:</p>
                 <p>Creates a criterion that measures the mean squared error (squared L2 norm) between each element in the input \(x\) and target \(y\).</p>
-
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(l(x, y) = L = {{l_1, \cdots, l_n}}^T, l_n = {(x_n - y_n)}^2\)
+                </div>
+                <p>where \(N\) is the batch size.</p>
                 <div class="navigation">
                     <a href="activation_function.html">Prev: 2.4 Activation Function</a>
                     <a href="optimizer.html">Next: 2.6 Optimizer</a>
