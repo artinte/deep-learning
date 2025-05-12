@@ -273,7 +273,6 @@ Processed height: [-3  4  2 -2  2 -3 -4 -2 -4 -6  0  0 -2  0  0 -4  6  4  2  4]<
                 <p>That’s a question the partial derivative \(\frac{\partial{L}}{\partial{w_1}}\) can answer. How do we calculate it?</p>
                 <p class="comment">Here’s where the math starts to get more complex. Don’t be discouraged! I recommend getting a pen and paper to follow along - it’ll help you understand.</p>
 
-                <h4>1.7.3.4 Gradient Descent</h4>
                 <p>To start, let’s rewrite the partial derivative \(\frac{\partial{L}}{\partial{w_1}}\) in terms of \(\frac{\partial{y_{pred}}}{\partial{w_1}}\) instead:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(\frac{\partial{L}}{\partial{w_1}} = \frac{\partial{L}}{\partial{y_{pred}}} = \frac{\partial{y_{pred}}}{\partial{w_1}}\)
@@ -298,6 +297,19 @@ Processed height: [-3  4  2 -2  2 -3 -4 -2 -4 -6  0  0 -2  0  0 -4  6  4  2  4]<
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(\frac{\partial{h_1}}{\partial{w_1}} = x_1 * f'(w_1 x_1 + w_2 x_2 + b_1)\)
                 </div>
+                <p>\(x_1\) here is weight, and \(x_2\) is height. This is the second time we’ve seen \(f'(x)\) (the derivate of the sigmoid function) now! Let’s derive it:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(f'(x) = \frac{e^{-x}}{{(1 + e^{-x})}^2} = f(x) * (1 - f(x))\)
+                </div>
+                <p>We’ll use this nice form for \(f'(x)\) later.</p>
+                <p>We’re done! We’ve managed to break down \(\frac{\partial{L}}{\partial{w_1}}\) into several parts we can calculate:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\frac{\partial{L}}{\partial{w_1}} = \frac{\partial{L}}{\partial{y_{pred}}} * \frac{\partial{y_{pred}}}{\partial{h_1}} \frac{\partial{h_1}}{\partial{w_1}}\)
+                </div>
+                <p>This system of calculating partial derivatives by working backwards is known as <strong>backpropagation</strong>, or “backprop”.</p>
+                <p>Phew. That was a lot of symbols - it’s alright if you’re still a bit confused. Let’s do an example to see this in action!</p>
+
+                <h4>1.7.3.4 Gradient Descent</h4>
                 <h4>1.7.3.5 Code: A Complete Network</h4>
                 <div class="navigation">
                     <a href="gradient_descent.html">Prev: 1.6 Gradient Descent</a>
