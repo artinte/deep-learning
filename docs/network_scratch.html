@@ -227,8 +227,15 @@ Processed height: [-3  4  2 -2  2 -3 -4 -2 -4 -6  0  0 -2  0  0 -4  6  4  2  4]<
                 <p>Let’s break this down:</p>
                 <ul class="with-bullets">
                     <li><p>\(n\) is the number of samples, which is 20 (10 with males, and 10 with females).</p></li>
+                    <li><p>\(y\) represents the variable being predicted, which is Gender.</p></li>
+                    <li><p>\(y_{true}\) is the true value of the variable (the “correct answer”). </p></li>
+                    <li><p>\(y_{pred}\) is the predicted value of the variable. It’s whatever our network outputs.</p></li>
                 </ul>
-
+                <p>\({(y_{true} - y_{pred})}^2\) is known as the squared error. Our loss function is simply taking the average over all squared errors (hence the name mean squared error). The better our predictions are, the lower our loss will be!</p>
+                <p>Better predictions = Lower loss.</p>
+                <p><strong>Training a network = trying to minimize its loss.</strong></p>
+                <p>Let’s say our network always outputs 0 - in other words, it’s confident all humans are Female. What would our loss be?</p>
+                
                 <p>For more information, you can read section 2.5 <a href="loss_function.html">Loss Function</a>.</p>
 
                 <h4>1.7.3.3 Calculating Derivative</h4>
@@ -258,8 +265,20 @@ Processed height: [-3  4  2 -2  2 -3 -4 -2 -4 -6  0  0 -2  0  0 -4  6  4  2  4]<
                     \(MSE = {(y_{true} - y_{pred})}^2 = {(1 - y_{pred})^2}\)
                 </div>
                 <p>Another way to think about loss is as a function of weights and biases. Let’s label each weight and bias in our network:</p>
+                <p>Then, we can write loss as a multivariable function:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(L(w_1, w_2, w_3, w_4, w_5, w_6, b_1, b_2, b_3)\)
+                </div>
+                <p>Imagine we wanted to tweak \(w_1\), How would loss \(L\) change if we changed \(w_1\)?</p>
+                <p>That’s a question the partial derivative \(\frac{\partial{L}}{\partial{w_1}}\) can answer. How do we calculate it?</p>
+                <p class="comment">Here’s where the math starts to get more complex. Don’t be discouraged! I recommend getting a pen and paper to follow along - it’ll help you understand.</p>
 
                 <h4>1.7.3.4 Gradient Descent</h4>
+                <p>To start, let’s rewrite the partial derivative \(\frac{\partial{L}}{\partial{w_1}}\) in terms of \(\frac{\partial{y_{pred}}}{\partial{w_1}}\) instead:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\frac{\partial{L}}{\partial{w_1}} = \frac{\partial{L}}{\partial{y_{pred}}} = \frac{\partial{y_{pred}}}{\partial{w_1}}\)
+                </div>
+                <p>This works because of the Chain Rule. We can calculate</p>
                 <h4>1.7.3.5 Code: A Complete Network</h4>
                 <div class="navigation">
                     <a href="gradient_descent.html">Prev: 1.6 Gradient Descent</a>
