@@ -162,6 +162,11 @@ print(round(network.feedforward(x), 4))</code></pre>
                         </thead>
                         <tbody>
                             <tr>
+                                <td>133</td>
+                                <td>65</td>
+                                <td>0</td>
+                            </tr>
+                            <tr>
                                 <td>160</td>
                                 <td>72</td>
                                 <td>1</td>
@@ -255,7 +260,7 @@ Processed height: [-3  4  2 -2  2 -3 -4 -2 -4 -6  0  0 -2  0  0 -4  6  4  2  4]<
                             <tr>
                                 <td>-15</td>
                                 <td>-3</td>
-                                <td>1</td>
+                                <td>0</td>
                             </tr>
                         </tbody>
                     </table>
@@ -308,9 +313,43 @@ Processed height: [-3  4  2 -2  2 -3 -4 -2 -4 -6  0  0 -2  0  0 -4  6  4  2  4]<
                 </div>
                 <p>This system of calculating partial derivatives by working backwards is known as <strong>backpropagation</strong>, or “backprop”.</p>
                 <p>Phew. That was a lot of symbols - it’s alright if you’re still a bit confused. Let’s do an example to see this in action!</p>
-
+                <p>We’re going to continue pretending only first sample is in our dataset:</p>
+                <p>Let’s initialize all the weights to 1 and all the biases to 0. If we do a feedforward pass through the network, we get:</p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(h_1 = f(w_1 x_1 + w_2 x_2 + b_1) = f(-15 - 3 + 0) = \)
+                </p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(h_2 = f(w_3 x_1 + w_4 x_2 + b_2) = f(-15 - 3 + 0) = \)
+                </p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(o_1 = f(w_5 h_1 + w_6 h_2 + b_3) = \)
+                </p>
+                
                 <h4>1.7.3.4 Gradient Descent</h4>
+                <p>We have all the tools we need to train a neural network now! We’ll use an optimization algorithm called stochastic gradient descent (SGD) that tells us how to change our weights and biases to minimize loss. It’s basically just this update equation:</p>
+                <p></p>
                 <h4>1.7.3.5 Code: A Complete Network</h4>
+                <p>It’s finally time to implement a complete neural network:</p>
+
+                <h3>1.7.4 Now What?</h3>
+                <p>You made it! A quick recap of what we did:</p>
+                <ul class="with-bullets">
+                    <li><p>Introduced neurons, the building blocks of neural networks.</p></li>
+                    <li><p>Used the sigmoid activation function in our neurons.</p></li>
+                    <li><p>Saw that neural networks are just neurons connected together.</p></li>
+                    <li><p>Created a dataset with Weight and Height as inputs (or features) and Gender as the output (or label).</p></li>
+                    <li><p>Learned about loss functions and the mean squared error (MSE) loss.</p></li>
+                    <li><p>Realized that training a network is just minimizing its loss.</p></li>
+                    <li><p>Used backpropagation to calculate partial derivatives.</p></li>
+                    <li><p>Used stochastic gradient descent (SGD) to train our network.</p></li>
+                </ul>
+                <p>There’s still much more to do:</p>
+                <ul class="with-bullets">
+                    <li><p>Experiment with bigger / better neural networks using proper machine learning libraries like Tensorflow, Keras, and PyTorch.</p>
+                    <li><p>Build your first neural network with Keras.</p></li>
+                    <li><p>Discover other activation functions besides sigmoid, like Softmax.</p></li>
+                    <li><p>Discover other optimizers besides SGD.</p></li>
+                </ul>
                 <div class="navigation">
                     <a href="gradient_descent.html">Prev: 1.6 Gradient Descent</a>
                     <a href="linear_algebra.html">Next: 2.1 Linear Algebra</a>
