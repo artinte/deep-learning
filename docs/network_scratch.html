@@ -278,7 +278,26 @@ Processed height: [-3  4  2 -2  2 -3 -4 -2 -4 -6  0  0 -2  0  0 -4  6  4  2  4]<
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(\frac{\partial{L}}{\partial{w_1}} = \frac{\partial{L}}{\partial{y_{pred}}} = \frac{\partial{y_{pred}}}{\partial{w_1}}\)
                 </div>
-                <p>This works because of the Chain Rule. We can calculate</p>
+                <p>This works because of the Chain Rule. We can calculate \(\frac{\partial{L}}{\partial{y_{pred}}}\) because we computed \(L = {(y_{true} - y_{pred})}^2\) above:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\frac{\partial{L}}{\partial{y_{pred}}} = \frac{\partial{(y_{true} - y_{pred})}^2}{\partial{y_{pred}}} = -2(y_{true} - y_{pred})\)
+                </div>
+                <p>Now, let’s figure out what to do with \(\frac{\partial{y_{pred}}}{\partial{w_1}}\). Just like before, let \(h_1, h_2, o_1\) be the outputs of the neurons they represent. Then:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(y_{pred} = o_1 = f(w_5 h_1) + w_6 h_2 + b_3\)
+                </div>
+                <p>\(f\) is the sigmoid activation function, remember? Since \(w_1\) only effects \(h_1\) (not \(h_2\), we can write:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\frac{\partial{y_{pred}}}{\partial{w_1}} = \frac{\partial{y_{pred}}}{\partial{h_1}} * \frac{\partial{h_1}}{\partial{w_1}}\)
+                </div>
+                <p>Now we need calculate \(\frac{\partial{y_{pred}}}{\partial{h_1}}\) and \(\frac{\partial{h_1}}{\partial{w_1}}\):</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\frac{\partial{y_{pred}}}{\partial{h_1}} = w_5 * f'(w_5 h_1 + w_6 h_2 + b_3)\)
+                </div>
+                <p>Because of \(h_1 = f(w_1 x_1 + w_2 x_2 +b_1)\), We do the same thing for \(\frac{\partial{h_1}}{\partial{w_1}}\):</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\frac{\partial{h_1}}{\partial{w_1}} = x_1 * f'(w_1 x_1 + w_2 x_2 + b_1)\)
+                </div>
                 <h4>1.7.3.5 Code: A Complete Network</h4>
                 <div class="navigation">
                     <a href="gradient_descent.html">Prev: 1.6 Gradient Descent</a>
