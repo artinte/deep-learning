@@ -29,6 +29,26 @@
                 <a href="https://drive.google.com/file/d/1N6IIsJ1vsQRlybQya0nWtLagu8c9Xnuy/view?usp=sharing">
                     <img src="res/04/one_hot_encode.png" alt="One Hot Encode">
                 </a>
+                <p>To create a vector that contains the encoding of the sentence, you could then concatenate the one-hot vectors for each word.</p>
+                <p class="comment">Key Point: This approach is inefficient. A one-hot encoded vector is sparse (meaning, most indices are zero). Imagine you have 10,000 words in the vocabulary. To one-hot encode each word, you would create a vector where 99.99% of the elements are zero.</p>
+
+                <h4>4.2.1.2 Unique Number</h4>
+                <p>A second approach you might try is to encode each word using a unique number. Continuing the example above, you could assign 1 to "cat", 2 to "mat", and so on. You could then encode the sentence "The cat sat on the mat" as a dense vector like [5, 1, 4, 3, 5, 2]. This approach is efficient. Instead of a sparse vector, you now have a dense one (where all elements are full).</p>
+                <p>There are two downsides to this approach, however:</p>
+                <ul class="with-bullets">
+                    <li><p>The integer-encoding is arbitrary (it does not capture any relationship between words).</p></li>
+                    <li><p>An integer-encoding can be challenging for a model to interpret. A linear classifier, for example, learns a single weight for each feature. Because there is no relationship between the similarity of any two words and the similarity of their encodings, this feature-weight combination is not meaningful.</p></li>
+                </ul>
+                <h4>4.2.1.3 Word Embeddings</h4>
+                <p>Word embeddings give us a way to use an efficient, dense representation in which similar words have a similar encoding.Importantly, you do not have to specify this encoding by hand. An embedding is a dense vector of floating point values (the length of the vector is a parameter you specify). Instead of specifying the values for the embedding manually, they are trainable parameters (weights learned by the model during training, in the same way a model learns weights for a dense layer).</p>
+                <p>It is common to see word embeddings that are 8-dimensional (for small datasets), up to 1024-dimensions when working with large datasets. A higher dimensional embedding can capture fine-grained relationships between words, but takes more data to learn.</p>
+                <a href="https://drive.google.com/file/d/1jT5Wztr4WRAwbom5DzENPI4VABmO-8oo/view?usp=sharing">
+                    <img src="res/04/simple_word_embed.png" alt="Simple Word Embedding">
+                </a>
+                <p>Above is a diagram for a word embedding. Each word is represented as a 4-dimensional vector of floating point values. Another way to think of an embedding is as "lookup table". After these weights have been learned, you can encode each word by looking up the dense vector it corresponds to in the table.</p>
+
+                <h3>4.2.2 IMDb Dataset</h3>
+                <p>We will use the <a href="https://ai.stanford.edu/%7Eamaas/data/sentiment/">Large Movie Review Dataset</a> through the tutorial, and will train a sentiment classifier model on this dataset and in the process learn embeddings from scratch. To read more about loading a dataset from scratch, see the section 1.3.2 <a href="https://artinte.github.io/deep-learning/data_represent.html#text">Text - Data Representation</a>.</p>
                 
                 <div class="navigation">
                     <a href="rnn_classify_scratch.html">Prev: 4.1 RNN from Stratch</a>

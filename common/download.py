@@ -19,6 +19,8 @@ def download(url, folder='./data', sha1_hash=None):
                 sha1.update(data)
         if sha1.hexdigest() == sha1_hash:
             return fname
+        else:
+            print(sha1.hexdigest())
     # download
     print(f'Downloading {fname} from {url} ...')
     r = requests.get(url, stream=True, verify=True)
