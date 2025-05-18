@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="laptop_coding_48.png" type="image/png">
+    <title>Gaussian Processes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="article_style.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="col-md-2 left-sidebar">
+
+            </nav>
+
+            <main class="col-md-8 content">
+                <h2 class="custom-title">6.2 Gaussian Processes</h2>
+                <p class="title-subtext"></p>
+                <p style="color: #a0a0a0;">Created Date: 2025-05-18</p>
+                <p>Gaussian processes (GPs) are ubitiquous. You have already encountered many examples of GPs without realizing it. Any model that is linear in its parameters with a Gaussian distribution over the parameters is a Gaussian process. This class spans discrete models, including random walks, and autoregressive processes, as well as continuous models, including Bayesian linear regression models, polynomials, Fourier series, radial basis functions, and even neural networks with an infinite number of hidden units. There is a running joke that "everything is a special case of a Gaussian process".</p>
+                <p>Learning about Gaussian processes is important for three reasons:</p>
+                <ol>
+                    <li><p>They provide a function space perspective of modelling, which makes understanding a variety of model classes, including deep neural networks, much more approachable;</p></li>
+                    <li><p>They have an extraordinary range of applications where they are state-of-the-art, including active learning, hyperparameter learning, auto-ML, and spatiotemporal regression;</p></li>
+                    <li><p>Iver the last few years, algorithmic advances have made Gaussian processes increasingly scalable and relevant, harmonizing with deep learning through frameworks such as <a href="https://gpytorch.ai/">GPyTorch</a> (Gardner et al., 2018).</p></li>
+                </ol>
+                <p>Indeed, GPs and and deep neural networks are not competing approaches, but highly complementary, and can be combined to great effect. These algorithmic advances are not just relevant to Gaussian processes, but provide a foundation in numerical methods that is broadly useful in deep learning.</p>
+                <p>In this chapter, we introduce Gaussian processes. In the introductory notebook, we start by reasoning intuitively about what Gaussian processes are and how they directly model functions. In the priors notebook, we focus on how to specify Gaussian process priors. We directly connect the tradiational weight-space approach to modelling to function space, which will help us reason about constructing and understanding machine learning models, including deep neural networks.</p>
+                <p>We then introduce popular covariance functions, also known as kernels, which control the generalization properties of a Gaussian process. A GP with a given kernel defines a prior over functions. In the inference notebook, we will show how to use data to infer a posterior, in order to make predictions. This notebook contains from-scratch code for making predictions with a Gaussian process, as well as an introduction to GPyTorch.</p>
+                <p>In upcoming notebooks, we will introduce the numerics behind Gaussian processes, which is useful for scaling Gaussian processes but also a powerful general foundation for deep learning, and advanced use-cases such as hyperparameter tuning in deep learning. Our examples will make use of GPyTorch, which makes Gaussian processes scale, and is closely integrated with deep learning functionality and PyTorch.</p>
+                
+                <h3>18.1.1 Introduction to GP</h3>
+                <p>In many cases, machine learning amounts to estimating parameters from data. These parameters are often numerous and relatively uninterpretable — such as the weights of a neural network. Gaussian processes, by contrast, provide a mechanism for directly reasoning about the high-level properties of functions that could fit our data.</p>
+                <p>For example, we may have a sense of whether these functions are quickly varying, periodic, involve conditional independencies, or translation invariance. Gaussian processes enable us to easily incorporate these properties into our model, by directly specifying a Gaussian distribution over the function values that could fit our data.</p>
+                <p>Let’s get a feel for how Gaussian processes operate, by starting with some examples.</p>
+                <p>Suppose we observe the following dataset, of regression targets (outputs) \(y\), indexed by inputs \(x\). As an example, the targets could be changes in carbon dioxide concentrations, and the inputs could be the times at which these targets have been recorded.</p>
+                <p>What are some features of the data? How quickly does it seem to varying? Do we have data points collected at regular intervals, or are there missing inputs? How would you imagine filling in the missing regions, or forecasting up until \(x = 25\)?</p>
+                <img src="res/06/gp_observed_data.png" alt="GP Observed Data" width="400">
+                <div class="navigation">
+                    <a href="probability_theory.html">Prev: 6.1 Probability Theory</a>
+                    <a href="duffusion_math.html">Next: 6.3 Mathematical Foundation</a>
+                </div>
+            </main>
+
+            <aside class="col-md-2 right-sidebar">
+                <h5><a href="index.html#section6">Diffusion Model</a></h5>
+                <ul id="dynamic-sidebar" class="nav flex-column">
+                </ul>
+            </aside>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="article_script.js"></script>
+</body>
+
+</html>

@@ -65,6 +65,14 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#section6" onclick="toggleChildChapters(event, 'chapter6')">06 Diffusion Model</a>
+                            <ul id="chapter6" class="child-chapters" style="display: none;">
+                                <li><a class="nav-link" href="probability_theory.html">6.1 Probability Theory</a></li>
+                                <li><a class="nav-link" href="gaussian_process.html">6.2 Gaussian Processes</a></li>
+                                <li><a class="nav-link" href="#">6.3 Mathematical Foundation</a></li>
+                                <li><a class="nav-link" href="#">6.4 Diffusion from Scratch</a></li>
+                                <li><a class="nav-link" href="#">6.5 Diffusion Probability Model</a></li>
+                                <li><a class="nav-link" href="#">6.6 Latent Diffusion</a></li>
+                            </ul>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#section7" onclick="toggleChildChapters(event, 'chapter7')">07 Text</a>
@@ -93,6 +101,9 @@
                         <li class="nav-item">
                             <a class="nav-link" href="#section15" onclick="toggleChildChapters(event, 'chapter15')">15 Graph Netural Network</a>
                         </li>
+                        <ul id="chapter15" class="child-chapters" style="display: none;">
+                            <li><a class="nav-link" href="graph_foundation.html">15.1 Graph Foundation</a></li>
+                        </ul>
                     </ul>
                 </nav>
 
@@ -225,7 +236,7 @@
                         </h3>
                         <p><a href="https://www.tensorflow.org/text/tutorials/word_embeddings">Words embeddings - TensorFlow</a></p>
                         <h3 id="section4-sub3">
-                            <a href="ltsm_gru.html" style="color: inherit;">4.3 LTSM and GRU</a>
+                            <a href="lstm_and_gru.html" style="color: inherit;">4.3 LSTM and GRU</a>
                         </h3>
                         <p><a href="https://www.bioinf.jku.at/publications/older/2604.pdf">Long Short-term Memory</a></p>
                         <p>In this paper we compare different types of recurrent units in recurrent neural networks (RNNs). Especially, we focus on more sophisticated units that implement a gating mechanism, such as a long short-term memory (LSTM) unit and a recently proposed gated recurrent unit (GRU).</p>
@@ -235,7 +246,7 @@
                         </h3>
                         <p><a href="https://arxiv.org/abs/1409.0473">Neural Machine Translation by Jointly Learning to Align and Translate</a></p>
                         <h3 id="section4-sub5">
-                            <a href="#" style="color: inherit;">4.5 Attention-based NMT</a>
+                            <a href="attention_nmt.html" style="color: inherit;">4.5 Attention-based NMT</a>
                         </h3>
                         <p><a href="https://arxiv.org/abs/1508.04025">Effective Approaches to Attention-based Neural Machine Translation</a></p>
                     </section>
@@ -266,7 +277,7 @@
                         <p>We introduce a new language representation model called <strong>BERT</strong>, which stands for Bidirectional Encoder Representations from Transformers. Unlike recent language representation models, BERT is designed to pre-train deep bidirectional representations from unlabeled text by jointly conditioning on both left and right context in all layers.</p>
                         <p><a href="https://arxiv.org/abs/1810.04805">BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding</a></p>
                         <h3 id="section5-sub6">
-                            <a href="vit.html" style="color: inherit;">5.6 ViT</a>
+                            <a href="vision_transformer.html" style="color: inherit;">5.6 ViT</a>
                         </h3>
                         <p>In vision, attention is either applied in conjunction with convolutional networks, or used to replace certain components of convolutional networks while keeping their overall structure in place. We show that this reliance on CNNs is not necessary and a pure transformer applied directly to sequences of image patches can perform very well on image classification tasks.</p>
                         <p><a href="https://arxiv.org/abs/2010.11929">An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale</a></p>
@@ -275,10 +286,10 @@
                     <section id="section6" class="content-section">
                         <h2>06 Diffusion Model</h2>
                         <h3 id="section6-sub1">
-                            <a href="#" style="color: inherit;">6.1 Probability Theory</a>
+                            <a href="prob_theory.html" style="color: inherit;">6.1 Probability Theory</a>
                         </h3>
                         <h3 id="section6-sub2">
-                            <a href="#" style="color: inherit;">6.2 Gaussian Processes</a>
+                            <a href="gaussian_process.html" style="color: inherit;">6.2 Gaussian Processes</a>
                         </h3>
                         <p><a href="https://d2l.ai/chapter_gaussian-processes/index.html">Gaussian Processes - Dive into Deep Learning</a></p>
                         <h3 id="section6-sub3">
@@ -296,7 +307,7 @@
                         <p><a href="Denoising Diffusion Probabilistic Models">Denoising Diffusion Probabilistic Models</a></p>
 
                         <h3 id="section6-sub6">
-                            <a href="#" style="color: inherit;">6.6 Latent Diffusion</a>
+                            <a href="latent_diffusion.html" style="color: inherit;">6.6 Latent Diffusion</a>
                         </h3>
                         <p>To enable DM training on limited computational resources while retaining their quality and flexibility, we apply them in the latent space of powerful pretrained autoencoders.</p>
                         <p><a href="https://arxiv.org/abs/2112.10752">High-Resolution Image Synthesis with Latent Diffusion Models</a></p>
@@ -362,10 +373,10 @@
                             <a href="#" style="color: inherit;">9.5 DeepFaceLab</a>
                         </h3>
                         <h3 id="section9-sub6">
-                            <a href="#" style="color: inherit;">9.4 DeepFaceLive</a>
+                            <a href="#" style="color: inherit;">9.6 DeepFaceLive</a>
                         </h3>
                         <h3 id="section9-sub7">
-                            <a href="#" style="color: inherit;">9.4 Segment Anything</a>
+                            <a href="#" style="color: inherit;">9.7 Segment Anything</a>
                         </h3>
                         <p><a href="https://github.com/facebookresearch/segment-anything">segment-anything: provides code for running inference with the SegmentAnything Model (SAM)</a></p>
                     </section>
@@ -429,8 +440,9 @@
                     <section id="section15" class="content-section">
                         <h2>15 Graph Netural Network</h2>
                         <h3 id="section15-sub1">
-                            <a href="#" style="color: inherit;">15.1 Graph Foundation</a>
+                            <a href="graph_foundation.html" style="color: inherit;">15.1 Graph Foundation</a>
                         </h3>
+                        <p><a href="https://www.hello-algo.com/en/chapter_graph/">Graph - Hello Algo</a></p>
 
                     </section>
                 </main>
