@@ -93,13 +93,12 @@ pre {
     font-weight: bold;
 }
 .highlight {
-    background-color: #fff3cd;
-    color: #856404;
-    padding: 4px 8px;
-    border-radius: 6px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    background-color: #f0f0f0;
+    color: #333;
+    padding: 1px 3px;
+    border-radius: 3px;
     display: inline-block;
-    margin: 0 2px;
+    margin: 0 1px;
 }
 ul {
     list-style: none;
