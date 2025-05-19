@@ -54,7 +54,7 @@
                     <li><p>\(W_{hy}\) - used for all \(h_t \rightarrow y_t\) links.</p></li>
                 </ul>
                 <p>We’ll also use two biases for our RNN:</p>
-                <ul>
+                <ul class="with-bullets">
                     <li><p>\(b_h\) - added when calculating \(h_t\).</p></li>
                     <li><p>\(b_y\) - added when calculating \(y_t\).</p></li>
                 </ul>
@@ -72,7 +72,35 @@
 
                 <h3>4.1.3. The Problem</h3>
                 <p>Let’s get our hands dirty! We’ll implement an RNN from scratch to perform a simple Sentiment Analysis task: determining whether a given text string is positive or negative.</p>
-
+                <p>Here are a few samples from the small dataset I put together for this post:</p>
+                <div class="d-flex justify-content-center align-items-center" style="overflow-x: auto; width: 100%;">
+                    <table class="table table-light" style="width: 80%;">
+                        <thead>
+                            <tr>
+                                <th class="table-active bg-info">Text</th>
+                                <th class="table-active bg-info">Positive?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="table-active bg-warning">i am good </td>
+                                <td>YES</td>
+                            </tr>
+                            <tr>
+                                <td>i am bad</td>
+                                <td>NO</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h3>4.1.4 The Plan</h3>
+                <p>Since this is a classification problem, we’ll use a “many to one” RNN. This is similar to the “many to many” RNN we discussed earlier, but it only uses the final hidden state to produce the one output \(y\):</p>
+                <a href="https://drive.google.com/file/d/13w6DURS6colIrnrxaT1G4mGngZXG1MEG/view?usp=sharing">
+                    <img src="res/04/many_to_one.png" alt="Many to One">
+                </a>
+                <p>Each \(x_i\) will be a vector representing a word from the text. The output \(y\) will be a vector containing two numbers, one representing positive and the other negative. We’ll apply Softmax to turn those values into probabilities and ultimately decide between positive / negative.</p>
+                <p>Let’s start building our RNN!</p>
+                
                 <div class="navigation">
                     <a href="dense_net.html">Prev: 3.6 DenseNet</a>
                     <a href="word_embed.html">Next: 4.2 Word Embeddings</a>
