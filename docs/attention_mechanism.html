@@ -22,11 +22,19 @@
                 <p class="title-subtext"></p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-19</p>
 
-                <p>5.1.1 Queries, Keys, and Values</p>
+                <h3>5.1.1 Queries, Keys, and Values</h3>
                 <p>So far all the networks we have reviewed crucially relied on the input being of a well-defined size. For instance, the images in ImageNet are of size \(224 \times 224\) pixels and CNNs are specifically tuned to this size. Even in natural language processing the input size for RNNs is well defined and fixed.</p>
                 <p>Variable size is addressed by sequentially processing one token at a time, or by specially designed convolution kernels. This approach can lead to significant problems when the input is truly of varying size with varying information content. In particular, for long sequences it becomes quite difficult to keep track of everything that has already been generated or even viewed by the network.</p>
-                <p>Compare this to databases. In their simplest form they are collections of keys (\(k\)) and value (\(v\)).</p>
-                
+                <p>Compare this to databases. In their simplest form they are collections of keys (\(k\)) and value (\(v\)). For instance, our database \(D\) might consist of tuples <code>{("Zhang", "Aston"), ("Lipton", "Zachary"), ("Li", "Mu"), ("Smola", "Alex"), ("Hu", "Rachel"), ("Werness", "Brent")}</code> with the last name being the key and the first name being the value.</p>
+                <p>We can operate on \(D\), for instance with the exact query for "Li" which would return the value "Mu". If <code>("Li", "Mu")</code> was not a record in \(D\), there would be no valid answer. If we also allowed for approximate matches, we would retrieve <code>("Lipton", "Zachary")</code> instead.</p>
+                <p>This quite simple and trivial example nonetheless teaches us a number of useful things:</p>
+                <ul class="with-bullets">
+                    <li><p>We can design queries \(q\) that operate on \((k, v)\) pairs in such a manner as to be valid regardless of the database size.</p></li>
+                    <li><p>The same query can receive different answers, according to the contents of the database.</p></li>
+                    <li><p>The "code" being executed for operating on a large state space (the database) can be quite simple (e.g., exact match, approximate match, top-k).</p></li>
+                    <li><p>There is no need to compress or simplify the database to make the operations effective.</p></li>
+                </ul>
+                <p>Clearly we would not have introduced a simple database here if it wasn’t for the purpose of explaining deep learning. Indeed, this leads to one of the most exciting concepts introduced in deep learning in the past decade: the <strong>attention mechanism</strong>.</p>
                 <div class="navigation">
                     <a href="#">Prev: </a>
                     <a href="#">Next: 5.2 </a>
