@@ -34,7 +34,11 @@
                     <li><p>The "code" being executed for operating on a large state space (the database) can be quite simple (e.g., exact match, approximate match, top-k).</p></li>
                     <li><p>There is no need to compress or simplify the database to make the operations effective.</p></li>
                 </ul>
-                <p>Clearly we would not have introduced a simple database here if it wasn’t for the purpose of explaining deep learning. Indeed, this leads to one of the most exciting concepts introduced in deep learning in the past decade: the <strong>attention mechanism</strong>.</p>
+                <p>Clearly we would not have introduced a simple database here if it wasn't for the purpose of explaining deep learning. Indeed, this leads to one of the most exciting concepts introduced in deep learning in the past decade: the <strong>attention mechanism</strong>.</p>
+                <p>We will cover the specifics of its application to machine translation later. For now, simply consider the following: denote by \(D = {(k_1, v_1), \cdots, (k_m, v_m)}\) a database of \(m\) tuples of keys and values. Moreover, denote by \(q\) a query. Then we can define the attention over \(D\) as:</p>
+                <p>where \(\alpha(q, k_i) \in \mathbb{R} (i = 1, \cdots , m)\) are scalar attention weights. The operation itself is typically referred to as <strong>attention pooling</strong>. The name attention derives from the fact that the operation pays particular attention to the terms for which the weight \(\alpha\) is significant (i.e., large).</p>
+                <p>As such, the attention over \(D\) generates a linear combination of values contained in the database. In fact, this contains the above example as a special case where all but one weight is zero. We have a number of special cases:</p>
+                
                 <div class="navigation">
                     <a href="#">Prev: </a>
                     <a href="#">Next: 5.2 </a>
