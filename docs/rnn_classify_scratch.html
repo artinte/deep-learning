@@ -21,9 +21,10 @@
                 <h2 class="custom-title">4.1 RNN from Scratch</h2>
                 <p class="title-subtext">A simple walkthrough of what RNNs are, how they work, and how to build one from scratch in Python!</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-07</p>
-                <p>Recurrent Neural Networks (RNNs) are a kind of neural network that specialize in processing sequences. They’re often used in Natural Language Processing (NLP) tasks because of their effectiveness in handling text. In this post, we’ll explore what RNNs are, understand how they work, and build a real one from scratch (using only numpy) in Python.</p>
+                <p>Recurrent Neural Networks (RNNs) are a kind of neural network that specialize in processing sequences. They’re often used in Natural Language Processing (NLP) tasks because of their effectiveness in handling text. In this post, we’ll explore what RNNs are, understand how they work, and build a real one from scratch (using only <a href="https://numpy.org/">numpy</a>) in Python.</p>
                 <p>This post assumes a basic knowledge of neural networks. Section <a href="network_scratch.html">1.6 Neural Network from Scratch</a> covers everything you’ll need to know, so I’d recommend reading that first.</p>
                 <p>Let’s get into it!</p>
+
                 <h3>4.1.1 The Why</h3>
                 <p>One issue with vanilla neural nets (and also CNNs) is that they only work with pre-determined sizes: they take fixed-size inputs and produce fixed-size outputs. RNNs are useful because they let us have variable-length sequences as both inputs and outputs. Here are a few examples of what RNNs can look like:</p>
                 <a href="https://drive.google.com/file/d/11xIMLAVNIKVNSwkIajAven8cYlquc1n3/view?usp=sharing">
@@ -35,10 +36,43 @@
                     <li><p>Sentiment Analysis (e.g. Is this a positive or negative review?) is often done with “many to one” RNNs. The text to be analyzed is fed into an RNN, which then produces a single output classification (e.g. This is a positive review).</p></li>
                 </ul>
                 <p>Later in this post, we’ll build a “many to one” RNN from scratch to perform basic Sentiment Analysis.</p>
+
                 <h3>4.1.2 The How</h3>
                 <p>Let’s consider a “many to many” RNN with inputs \(x_0, x_1, ... , x_n\) that wants to produce outputs \(y_0, y_1, ... , y_n\). These \(x_i\) and \(y_i\) are vectors and can have arbitrary dimensions.</p>
                 <p>RNNs work by iteratively updating a hidden state \(h\), which is a vector that can also have arbitrary dimension. At any given step \(t\):</p>
-                
+                <ol>
+                    <li><p>The next hidden state \(h_t\) is calculated using the previous hidden state \(h_{t-1}\) and the next input \(x_t\).</p></li>
+                    <li><p>The next output \(y_t\) is calculated using \(h_t\).</p></li>
+                </ol>
+                <a href="https://drive.google.com/file/d/1sid5JQ7HFQZUMvo2FYTugnZ9ODp3clDx/view?usp=sharing">
+                    <img src="res/04/many_to_many.png" alt="Many to Many">
+                </a>
+                <p>Here’s what makes a RNN recurrent: it uses the same weights for each step. More specifically, a typical vanilla RNN uses only 3 sets of weights to perform its calculations:</p>
+                <ul class="with-bullets">
+                    <li><p>\(W_{xh}\) - used for all \(x_t \rightarrow h_t\) links.</p></li>
+                    <li><p>\(W_{hh}\) - used for all \(h_{t-1} \rightarrow h_t\) links.</p></li>
+                    <li><p>\(W_{hy}\) - used for all \(h_t \rightarrow y_t\) links.</p></li>
+                </ul>
+                <p>We’ll also use two biases for our RNN:</p>
+                <ul>
+                    <li><p>\(b_h\) - added when calculating \(h_t\).</p></li>
+                    <li><p>\(b_y\) - added when calculating \(y_t\).</p></li>
+                </ul>
+                <p>We’ll represent the weights as matrices and the biases as vectors. These 3 weights and 2 biases make up the entire RNN!</p>
+                <p>Here are the equations that put everything together:</p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(h_t = tanh(W_{xh} x_t + W_{hh} h_{t-1} + b_h)\)
+                </p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(y_t = W_{hy} h_t + b_y\)
+                </p>
+                <p class="comment">Don't skim over these equations. Stop and stare at this for a minute. Also, remember that the weights are matrices and the other variables are vectors.</p>
+                <p>All the weights are applied using matrix multiplication, and the biases are added to the resulting products. We then use tanh as an activation function for the first equation (but other activations like sigmoid can also be used).</p>
+                <p>No idea what an activation function is? Read section 2.4 <a href="https://artinte.github.io/deep-learning/activation_function.html">Activation Function</a>.</p>
+
+                <h3>4.1.3. The Problem</h3>
+                <p>Let’s get our hands dirty! We’ll implement an RNN from scratch to perform a simple Sentiment Analysis task: determining whether a given text string is positive or negative.</p>
+
                 <div class="navigation">
                     <a href="dense_net.html">Prev: 3.6 DenseNet</a>
                     <a href="word_embed.html">Next: 4.2 Word Embeddings</a>
