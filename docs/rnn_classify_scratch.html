@@ -83,12 +83,12 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td class="table-active bg-warning">i am good </td>
-                                <td>YES</td>
+                                <td>i am good </td>
+                                <td>True</td>
                             </tr>
                             <tr>
                                 <td>i am bad</td>
-                                <td>NO</td>
+                                <td>False</td>
                             </tr>
                         </tbody>
                     </table>
@@ -100,7 +100,25 @@
                 </a>
                 <p>Each \(x_i\) will be a vector representing a word from the text. The output \(y\) will be a vector containing two numbers, one representing positive and the other negative. We’ll apply Softmax to turn those values into probabilities and ultimately decide between positive / negative.</p>
                 <p>Let’s start building our RNN!</p>
-                
+
+                <h3>4.1.5 The Pre-Processing</h3>
+                <p>The dataset I mentioned earlier consists of two Python dictionaries:</p>
+                <p>We’ll have to do some pre-processing to get the data into a usable format. To start, we'll construct a vocabulary of all words that exist in our data:</p>
+                <p><code>vocab</code> now holds a list of all words that appear in at least one training text. Next, we'll assign an integer index to represent each word in our vocab.</p>
+                <p>We can now represent any given word with its corresponding integer index! This is necessary because RNNs can’t understand words - we have to give them numbers.</p>
+                <p>Finally, recall that each input \(x_i\) to our RNN is a vector. We'll use one-hot vectors, which contain all zeros except for a single one. The "one" in each one-hot vector will be at the word's corresponding integer index.</p>
+                <p>Since we have 18 unique words in our vocabulary, each \(x_i\) will be a 18-dimensional one-hot vector.</p>
+                <p>We’ll use <code>createInputs()</code> later to create vector inputs to pass in to our RNN.</p>
+
+                <h3>4.1.6 The Forward Phase</h3>
+                <p>It's time to start implementing our RNN! We'll start by initializing the 3 weights and 2 biases our RNN needs:</p>
+                <p class="comment">Note: We're dividing by 1000 to reduce the initial variance of our weights. This is not the best way to initialize weights, but it's simple and works for this post.</p>
+                <p>We use np.random.randn() to initialize our weights from the standard normal distribution.</p>
+                <p>Next, let's implement our RNN's forward pass. Remember these two equations (calucate \(h_t\) and \(y_t\)) we saw earlier? Here are those same equations put into code:</p>
+                <p>Pretty simple, right? Note that we initialized \(h\) to the zero vector for the first step, since there’s no previous \(h\) we can use at that point.</p>
+                <p>Let’s try it out:</p>
+                <p>Our RNN works, but it’s not very useful yet. Let’s change that…</p>
+                <h3>4.1.7 The Backward Phase</h3>
                 <div class="navigation">
                     <a href="dense_net.html">Prev: 3.6 DenseNet</a>
                     <a href="word_embed.html">Next: 4.2 Word Embeddings</a>
