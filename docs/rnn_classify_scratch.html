@@ -21,7 +21,7 @@
                 <h2 class="custom-title">4.1 RNN from Scratch</h2>
                 <p class="title-subtext">A simple walkthrough of what RNNs are, how they work, and how to build one from scratch in Python!</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-07</p>
-                <p>Recurrent Neural Networks (RNNs) are a kind of neural network that specialize in processing sequences. They’re often used in Natural Language Processing (NLP) tasks because of their effectiveness in handling text. In this post, we’ll explore what RNNs are, understand how they work, and build a real one from scratch (using only <a href="https://numpy.org/">numpy</a>) in Python.</p>
+                <p>Recurrent Neural Networks (RNNs) are a kind of neural network that specialize in processing sequences. They’re often used in Natural Language Processing (NLP) tasks because of their effectiveness in handling text. In this post, we’ll explore what RNNs are, understand how they work, and build a real one from scratch (using only <a href="https://numpy.org/">numpy</a>) in Python. Complete implementation in the file <a href="https://github.com/artinte/deep-learning/blob/develop/04_rnn/1_scratch/rnn_classify_stratch.py">rnn_classify_stratch.py</a>.</p>
                 <p>This post assumes a basic knowledge of neural networks. Section <a href="network_scratch.html">1.6 Neural Network from Scratch</a> covers everything you’ll need to know, so I’d recommend reading that first.</p>
                 <p>Let’s get into it!</p>
 
@@ -74,7 +74,7 @@
                 <p>Let’s get our hands dirty! We’ll implement an RNN from scratch to perform a simple Sentiment Analysis task: determining whether a given text string is positive or negative.</p>
                 <p>Here are a few samples from the small dataset I put together for this post:</p>
                 <div class="d-flex justify-content-center align-items-center" style="overflow-x: auto; width: 100%;">
-                    <table class="table table-light" style="width: 80%;">
+                    <table class="table table-light text-center" style="width: 80%;">
                         <thead>
                             <tr>
                                 <th class="table-active bg-info">Text</th>
@@ -102,23 +102,116 @@
                 <p>Let’s start building our RNN!</p>
 
                 <h3>4.1.5 The Pre-Processing</h3>
-                <p>The dataset I mentioned earlier consists of two Python dictionaries:</p>
+                <p>The <a href="https://github.com/artinte/deep-learning/blob/develop/common/simple_text.py">dataset</a> I mentioned earlier consists of two Python dictionaries <code>train_data</code> and <code>test_data</code>:</p>
+                <pre><code>train_data = {
+    'good': True,
+    'bad': False,
+    # ... more data
+}
+
+test_data = {
+    'this is happy': True,
+    'i am good': True,
+    # ... more data
+}</code></pre>
                 <p>We’ll have to do some pre-processing to get the data into a usable format. To start, we'll construct a vocabulary of all words that exist in our data:</p>
-                <p><code>vocab</code> now holds a list of all words that appear in at least one training text. Next, we'll assign an integer index to represent each word in our vocab.</p>
+                <pre><code># Create the vocabulary.
+vocab = list(set([w for text in simple_text.train_data.keys()
+                for w in text.split(' ')]))
+vocab_size = len(vocab)
+print(str(vocab_size), 'unique words found')</code></pre>
+                <pre><samp>18 unique words found</samp></pre>
+
+                <p><code>vocab</code> now holds a list of all words that appear in at least one training text. Next, we'll assign an integer index to represent each word in our vocab:</p>
+                <pre><code>word_to_idx = {w: i for i, w in enumerate(vocab)}
+idx_to_word = {i: w for i, w in enumerate(vocab)}
+print(word_to_idx)</code></pre>
+                <pre><samp>{'was': 0, 'good': 1, 'right': 2, 'earlier': 3, 'bad': 4, 'sad': 5,
+    'this': 6, 'or': 7, 'now': 8, 'is': 9, 'at': 10,
+    'not': 11, 'all': 12, 'i': 13, 'very': 14, 'happy': 15,
+    'am': 16, 'and': 17}</samp></pre>
+
                 <p>We can now represent any given word with its corresponding integer index! This is necessary because RNNs can’t understand words - we have to give them numbers.</p>
-                <p>Finally, recall that each input \(x_i\) to our RNN is a vector. We'll use one-hot vectors, which contain all zeros except for a single one. The "one" in each one-hot vector will be at the word's corresponding integer index.</p>
+                <p>Finally, recall that each input \(x_i\) to our RNN is a vector. We'll use <a href="word_embed.html#one_hot">one-hot</a> vectors, which contain all zeros except for a single one. The "one" in each one-hot vector will be at the word's corresponding integer index.</p>
                 <p>Since we have 18 unique words in our vocabulary, each \(x_i\) will be a 18-dimensional one-hot vector.</p>
+                <pre><code>def create_inputs(text):
+    inputs = []
+    for w in text.split(' '):
+        v = numpy.zeros((vocab_size, 1))
+        v[word_to_idx[w]] = 1
+        inputs.append(v)
+    return inputs
+
+example = list(simple_text.test_data.keys())[0]
+print(example)
+print(numpy.array(create_inputs(example)).shape)</code></pre>
+                <pre><samp>this is happy
+(3, 18, 1)</samp></pre>
                 <p>We’ll use <code>createInputs()</code> later to create vector inputs to pass in to our RNN.</p>
 
                 <h3>4.1.6 The Forward Phase</h3>
                 <p>It's time to start implementing our RNN! We'll start by initializing the 3 weights and 2 biases our RNN needs:</p>
                 <p class="comment">Note: We're dividing by 1000 to reduce the initial variance of our weights. This is not the best way to initialize weights, but it's simple and works for this post.</p>
-                <p>We use np.random.randn() to initialize our weights from the standard normal distribution.</p>
+                <p>We use <code>numpy.random.default_rng(seed=0)</code> to initialize our weights from the standard normal distribution.</p>
                 <p>Next, let's implement our RNN's forward pass. Remember these two equations (calucate \(h_t\) and \(y_t\)) we saw earlier? Here are those same equations put into code:</p>
+                <pre><code>class RNN:
+    # ...
+    def forward(self, inputs):
+        '''
+        Perform a forward pass of the RNN using the given inputs.
+        Returns the final output and hidden state.
+        - inputs is an array of one-hot vectors with shape (vocab_size, 1).
+        '''
+        h = numpy.zeros((self.Whh.shape[0], 1))
+
+        self.last_inputs = inputs
+        self.last_hs = {0: h}
+
+        # Perform each step of the RNN.
+        for i, x in enumerate(inputs):
+            h = numpy.tanh(self.Wxh @ x + self.Whh @ h + self.bh)
+            self.last_hs[i + 1] = h
+        # Compute the output.
+        y = self.Why @ h + self.by
+        return y, h</code></pre>
                 <p>Pretty simple, right? Note that we initialized \(h\) to the zero vector for the first step, since there’s no previous \(h\) we can use at that point.</p>
                 <p>Let’s try it out:</p>
+                <pre><code># Initialize our RNN!
+rnn = RNN(vocab_size, 2)
+sample = create_inputs('i am very good')
+out, h = rnn.forward(sample)
+probs = softmax(out)
+print(probs)</code></pre>
+                <pre><samp>[[0.50000238]
+    [0.49999762]]</samp></pre>
                 <p>Our RNN works, but it’s not very useful yet. Let’s change that…</p>
+
                 <h3>4.1.7 The Backward Phase</h3>
+                <p>In order to train our RNN, we first need a loss function. We’ll use <a href="loss_function.html#cross_entropy_loss">cross-entropy loss</a>, which is often paired with Softmax. Here’s how we calculate it:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(L = -ln(p_c)\)
+                </div>
+                <p>where \(p_c\) is our RNN's predicted probability for the correct class (positive or negative). For example, if a positive text is predicted to be 90% positive by our RNN, the loss is:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(L = -ln(0.90) = 0.105\)
+                </div>
+                <p>Now that we have a loss, we’ll train our RNN using gradient descent to minimize loss. That means it’s time to derive some gradients!</p>
+                <p>The following section assumes a basic knowledge of multivariable calculus. You can skip it if you want, but I recommend giving it a skim even if you don’t understand much. We’ll incrementally write code as we derive results, and even a surface-level understanding can be helpful.</p>
+                <p>Ready? Here we go.</p>
+                <h4>4.1.7.1 Definitions</h4>
+                <p>First, some definitions:</p>
+                <ul>
+                    <li><p>Let \(y\) represent the raw outputs from our RNN.</p></li>
+                    <li><p>Let \(p\) represent the final probabilities: \(p = softmax(y)\).</p></li>
+                    <li><p>Let \(c\) refer to the true label of a certain text sample, a.k.a. the “correct” class.</p></li>
+                    <li><p>Let \(L\) be the cross-entropy loss: \(L = -ln(p_c)\).</p></li>
+                    <li><p>Let \(W_{xh}\), \(W_{hh}\), and \(W_{hy}\) be the 3 weight matrices in our RNN.</p></li>
+                    <li><p>Let \(b_h\) and \(b_y\) be the 2 bias vectors in our RNN.</p>
+                </ul>
+                <h4>4.1.7.2 Setup</h4>
+                <h4>4.1.7.3 Gradients</h4>
+                <h3>4.1.8 The Culmination</h3>
+                <h3>4.1.9 The End</h3>
                 <div class="navigation">
                     <a href="dense_net.html">Prev: 3.6 DenseNet</a>
                     <a href="word_embed.html">Next: 4.2 Word Embeddings</a>

@@ -24,7 +24,7 @@
 
                 <h3>4.2.1 Representing Text as Numbers</h3>
                 <p>Machine learning models take vectors (arrays of numbers) as input. When working with text, the first thing you must do is come up with a strategy to convert strings to numbers (or to "vectorize" the text) before feeding it to the model. In this section, you will look at three strategies for doing so.</p>
-                <h4>4.2.1.1 One-hot Encodings</h4>
+                <h4 id="one_hot">4.2.1.1 One-hot Encodings</h4>
                 <p>As a first idea, you might "one-hot" encode each word in your vocabulary. Consider the sentence "The cat sat on the mat". The vocabulary (or unique words) in this sentence is (cat, mat, on, sat, the). To represent each word, you will create a zero vector with length equal to the vocabulary, then place a one in the index that corresponds to the word. This approach is shown in the following diagram.</p>
                 <a href="https://drive.google.com/file/d/1N6IIsJ1vsQRlybQya0nWtLagu8c9Xnuy/view?usp=sharing">
                     <img src="res/04/one_hot_encode.png" alt="One Hot Encode">

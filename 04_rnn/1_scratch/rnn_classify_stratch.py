@@ -2,34 +2,40 @@ import numpy
 import random
 import sys
 import pathlib
+from matplotlib import pyplot
 
 project_root = pathlib.Path(__file__).resolve().parents[2]
 sys.path.append(str(project_root))
 
-from dataset import pos_peg
-from matplotlib import pyplot
+from common import simple_text
 
 def softmax(xs):
     # Applies the softmax function to the input array.
     return numpy.exp(xs) / sum(numpy.exp(xs))
 
-print(numpy.round(softmax(numpy.array([1, 2, 3, 4]), 4)))
 
 class RNN:
     # A vanilla recurrent neural network.
     def __init__(self, input_size, output_size, hidden_size=64):
         rng = numpy.random.default_rng(seed=0)
+        # weights
         self.Whh = rng.standard_normal((hidden_size, hidden_size)) / 1000
         self.Wxh = rng.standard_normal((hidden_size, input_size)) / 1000
         self.Why = rng.standard_normal((output_size, hidden_size)) / 1000
+        # biases
         self.bh = numpy.zeros((hidden_size, 1))
         self.by = numpy.zeros((output_size, 1))
-    
+
     def forward(self, inputs):
+        '''
+        Perform a forward pass of the RNN using the given inputs.
+        Returns the final output and hidden state.
+        - inputs is an array of one-hot vectors with shape (vocab_size, 1).
+        '''
         h = numpy.zeros((self.Whh.shape[0], 1))
 
         self.last_inputs = inputs
-        self.last_hs = { 0: h}
+        self.last_hs = {0: h}
 
         # Perform each step of the RNN.
         for i, x in enumerate(inputs):
@@ -38,7 +44,7 @@ class RNN:
         # Compute the output.
         y = self.Why @ h + self.by
         return y, h
-    
+
     def backprop(self, dy, learn_rate=2e-2):
         # dy (dl/dy) has shape (output_size, 1)
         n = len(self.last_inputs)
@@ -46,7 +52,7 @@ class RNN:
         # calculate dl/dwhy and dl/dby
         dwhy = dy @ self.last_hs[n].T
         dby = dy
-        
+
         # initialize dl/dwhh, dl/dwxh, and dl/dbh to zero
         dwhh = numpy.zeros(self.Whh.shape)
         dwxh = numpy.zeros(self.Wxh.shape)
@@ -68,11 +74,11 @@ class RNN:
             dwxh += temp @ self.last_inputs[t].T
             # next dl/dh = dl/dh * (1 - h^2) * Whh
             dh = self.Whh.T @ temp
-        
+
         # clip to prevent exploding gradients
         for d in [dwxh, dwhh, dwhy, dbh, dby]:
             numpy.clip(d, -1, 1, out=d)
-    
+
         # update weights and biases using gradient descent
         self.Whh -= learn_rate * dwhh
         self.Wxh -= learn_rate * dwxh
@@ -80,13 +86,17 @@ class RNN:
         self.bh -= learn_rate * dbh
         self.by -= learn_rate * dby
 
-if __name__ == '__main__':
-    # Create the vocabulary
-    vocab = list(set([w for text in pos_peg.train_data.keys() for w in text.split(' ')]))
-    vocab_size = len(vocab)
 
-    word_to_idx = { w: i for i, w in enumerate(vocab) }
-    idx_to_word = { i: w for i, w in enumerate(vocab) }
+if __name__ == '__main__':
+    # Create the vocabulary.
+    vocab = list(set([w for text in simple_text.train_data.keys()
+                 for w in text.split(' ')]))
+    vocab_size = len(vocab)
+    print(str(vocab_size), 'unique words found')
+
+    word_to_idx = {w: i for i, w in enumerate(vocab)}
+    idx_to_word = {i: w for i, w in enumerate(vocab)}
+    print(word_to_idx)
 
     def create_inputs(text):
         inputs = []
@@ -95,8 +105,17 @@ if __name__ == '__main__':
             v[word_to_idx[w]] = 1
             inputs.append(v)
         return inputs
+    
+    example = list(simple_text.test_data.keys())[0]
+    print(example)
+    print(numpy.array(create_inputs(example)).shape)
 
+    # Initialize our RNN!
     rnn = RNN(vocab_size, 2)
+    sample = create_inputs('i am very good')
+    out, h = rnn.forward(sample)
+    probs = softmax(out)
+    print(probs)
 
     def process(data, backprop=True):
         items = list(data.items())
@@ -133,21 +152,24 @@ if __name__ == '__main__':
     accuracies = []
     # training loop
     for epoch in range(500):
-        train_loss, train_acc = process(pos_peg.train_data)
+        train_loss, train_acc = process(simple_text.train_data)
         if (epoch + 1) % 20 == 0:
             losses.append(train_loss)
             accuracies.append(train_acc)
             print('Epoch %d' % (epoch + 1))
-            print('Train: loss %.3f | accuracy: %.3f' % (train_loss, train_acc))
+            print('Train: loss %.3f | accuracy: %.3f' %
+                  (train_loss, train_acc))
 
-            test_loss, test_acc = process(pos_peg.test_data, backprop=False)
+            test_loss, test_acc = process(
+                simple_text.test_data, backprop=False)
             print('Test: loss %.3f | accuracy: %.3f' % (test_loss, test_acc))
-    
+
     (predict, _) = rnn.forward(create_inputs('i am good'))
     print('Predict text "i am good":', softmax(predict))
 
     pyplot.plot(numpy.array(range(len(losses))) * 50, losses, label='Loss')
-    pyplot.plot(numpy.array(range(len(accuracies))) * 50, accuracies, label='Accuracy')
+    pyplot.plot(numpy.array(range(len(accuracies)))
+                * 50, accuracies, label='Accuracy')
     pyplot.grid(True)
     pyplot.legend()
     pyplot.subplots_adjust(left=0.08, right=0.92, top=0.96, bottom=0.06)
