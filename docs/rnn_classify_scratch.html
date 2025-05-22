@@ -21,7 +21,7 @@
                 <h2 class="custom-title">4.1 RNN from Scratch</h2>
                 <p class="title-subtext">A simple walkthrough of what RNNs are, how they work, and how to build one from scratch in Python!</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-07</p>
-                <p>Recurrent Neural Networks (RNNs) are a kind of neural network that specialize in processing sequences. They’re often used in Natural Language Processing (NLP) tasks because of their effectiveness in handling text. In this post, we’ll explore what RNNs are, understand how they work, and build a real one from scratch (using only <a href="https://numpy.org/">numpy</a>) in Python. Complete implementation in the file <a href="https://github.com/artinte/deep-learning/blob/develop/04_rnn/1_scratch/rnn_classify_stratch.py">rnn_classify_stratch.py</a>.</p>
+                <p><strong>Recurrent Neural Networks (RNNs)</strong> are a kind of neural network that specialize in processing sequences. They’re often used in Natural Language Processing (NLP) tasks because of their effectiveness in handling text. In this post, we’ll explore what RNNs are, understand how they work, and build a real one from scratch (using only <a href="https://numpy.org/">numpy</a>) in Python. Complete implementation in the file <a href="https://github.com/artinte/deep-learning/blob/develop/04_rnn/1_scratch/rnn_classify_stratch.py">rnn_classify_stratch.py</a>.</p>
                 <p>This post assumes a basic knowledge of neural networks. Section <a href="network_scratch.html">1.6 Neural Network from Scratch</a> covers everything you’ll need to know, so I’d recommend reading that first.</p>
                 <p>Let’s get into it!</p>
 
@@ -195,12 +195,13 @@ print(probs)</code></pre>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(L = -ln(0.90) = 0.105\)
                 </div>
+
                 <p>Now that we have a loss, we’ll train our RNN using gradient descent to minimize loss. That means it’s time to derive some gradients!</p>
                 <p>The following section assumes a basic knowledge of multivariable calculus. You can skip it if you want, but I recommend giving it a skim even if you don’t understand much. We’ll incrementally write code as we derive results, and even a surface-level understanding can be helpful.</p>
                 <p>Ready? Here we go.</p>
                 <h4>4.1.7.1 Definitions</h4>
                 <p>First, some definitions:</p>
-                <ul>
+                <ul class="with-bullets">
                     <li><p>Let \(y\) represent the raw outputs from our RNN.</p></li>
                     <li><p>Let \(p\) represent the final probabilities: \(p = softmax(y)\).</p></li>
                     <li><p>Let \(c\) refer to the true label of a certain text sample, a.k.a. the “correct” class.</p></li>
@@ -209,7 +210,89 @@ print(probs)</code></pre>
                     <li><p>Let \(b_h\) and \(b_y\) be the 2 bias vectors in our RNN.</p>
                 </ul>
                 <h4>4.1.7.2 Setup</h4>
+                <p>Next, we need to edit our forward phase to cache some data for use in the backward phase. While we’re at it, we’ll also setup the skeleton for our backwards phase. Here’s what that looks like:</p>
+                <pre><code>class RNN:
+    def forward(self, inputs):
+        ...
+        self.last_inputs = inputs
+        self.last_hs = {0: h}
+
+        # Perform each step of the RNN
+        for i, x in enumerate(inputs):
+            h = np.tanh(self.Wxh @ x + self.Whh @ h + self.bh)
+            self.last_hs[i + 1] = h
+        ...
+
+    def backprop(self, dy, learn_rate=2e-2):
+        '''
+        Perform a backward pass of the RNN.
+        - d_y (dL/dy) has shape (output_size, 1).
+        - learn_rate is a float.
+        '''
+        pass</code></pre>
                 <h4>4.1.7.3 Gradients</h4>
+                <p>It’s math time! We’ll start by calculating \(\frac{\partial{L}}{\partial{y}}\). We know:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(L = -ln(p_c) = -ln(softmax(y_c))\)
+                </div>
+                <p>I’ll leave the actual derivation of \(\frac{\partial{L}}{\partial{y}}\) using the Chain Rule as an exercise for you, but the result comes out really nice:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\frac{\partial L}{\partial y_i} = \left\{
+                \begin{array}{ll}
+                p_i - 1 & \text{if } i = j \\
+                p_i & \text{if } i \neq j
+                \end{array}
+                \right.\)</div>
+                <p>For example, if we have \(p = [0.2, 0.2, 0.6]\) and the correct class is \(c = 0\), then we’d get \(\frac{\partial{L}}{\partial{y}} = [-0.8, 0.2, 0.6]\). This is also quite easy to turn into code:</p>
+                <pre><code># build dl/dy
+dl_dy = probs
+dl_dy[target] -= 1
+
+# backward
+rnn.backprop(dl_dy)</code></pre>
+                <p>Nice. Next up, let’s take a crack at gradients for \(W_{hy}\) and \(b_y\), which are only used to turn the final hidden state into the RNN’s output. We have:</p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\frac{\partial L}{\partial W_{hy}} = \frac{\partial L}{\partial y} \cdot \frac{\partial y}{\partial W_{hy}}\)
+                </p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(y = W_{hy} h_n + b_y\)
+                </p>
+                <p>where \(h_n\) is the final hidden state. Thus:</p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\frac{\partial y}{\partial W_{hy}} = h_n\)
+                </p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\frac{\partial L}{\partial W_{hy}} = \frac{\partial L}{\partial y} \cdot h_n\)
+                </p>
+                <p>Similarly, we can get:</p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\frac{\partial{y}}{\partial{b_y}} = 1\)
+                </p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\frac{\partial{L}}{\partial{b_y}} = \frac{\partial{L}}{\partial{y}}\)
+                </p>
+                <p>We can now start implementing <code>backprop()</code>!</p>
+                <pre><code>class RNN:
+    ...
+    def backprop(self, dy, learn_rate=2e-2):
+        '''
+        Perform a backward pass of the RNN.
+        - d_y (dL/dy) has shape (output_size, 1).
+        - learn_rate is a float.
+        '''
+        # dy (dl/dy) has shape (output_size, 1)
+        n = len(self.last_inputs)
+
+        # calculate dl/dwhy and dl/dby
+        dwhy = dy @ self.last_hs[n].T
+        dby = dy</code></pre>
+                <p class="comment">Reminder: We created <code>self.last_hs</code> in <code>forward()</code> earlier.</p>
+                <p>Finally, we need the gradients for \(W_{hh}\), \(W_{xh}\), and \(b_h\), which are used every step during the RNN. We have:</p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\frac{\partial L}{\partial W_{xh}} = \frac{\partial L}{\partial y} \sum_{t}(\frac{\partial y}{\partial h_t} \cdot \frac{\partial h_t}{\partial W_{xh}})\)
+                </p>
+                <p>because changing \(W_{xh}\) affects every \(h_t\), which all affect \(y\) and ultimately \(L\). In order to fully calculate the gradient of \(W_{xh}\), we’ll need to backpropagate through all timesteps, which is known as Backpropagation Through Time (BPTT):</p>
+
                 <h3>4.1.8 The Culmination</h3>
                 <h3>4.1.9 The End</h3>
                 <div class="navigation">
