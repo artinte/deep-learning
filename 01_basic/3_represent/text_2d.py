@@ -21,6 +21,9 @@ with tarfile.open(file_path, 'r:gz') as tar:
 extract_file_dir = os.path.join(extract_dir, 'aclImdb')
 print('Successfully extracted to:', extract_file_dir)
 
+train_dir = os.path.join(extract_file_dir, 'train')
+print(os.listdir(train_dir))
+
 train_pos_dir = os.path.join(extract_file_dir, 'train/pos')
 train_neg_dir = os.path.join(extract_file_dir, 'train/neg')
 print('Train positive dir:', train_pos_dir)

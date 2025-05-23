@@ -19,13 +19,15 @@
 
             <main class="col-md-8 content">
                 <h2 class="custom-title">4.2 Word Embeddings</h2>
-                <p class="title-subtext"></p>
+                <p class="title-subtext">Train own word embeddings for a sentiment classification task!</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-17</p>
+                <p>This tutorial contains an introduction to word embeddings. we will train own word embeddings for a sentiment classification task, and then visualize them in the <a href="https://projector.tensorflow.org/">Embedding Projector</a> (shown in the image below).</p>
+                <img src="res/04/beautiful_embed.jpg" alt="Beautiful Embed">
 
                 <h3>4.2.1 Representing Text as Numbers</h3>
                 <p>Machine learning models take vectors (arrays of numbers) as input. When working with text, the first thing you must do is come up with a strategy to convert strings to numbers (or to "vectorize" the text) before feeding it to the model. In this section, you will look at three strategies for doing so.</p>
                 <h4 id="one_hot">4.2.1.1 One-hot Encodings</h4>
-                <p>As a first idea, you might "one-hot" encode each word in your vocabulary. Consider the sentence "The cat sat on the mat". The vocabulary (or unique words) in this sentence is (cat, mat, on, sat, the). To represent each word, you will create a zero vector with length equal to the vocabulary, then place a one in the index that corresponds to the word. This approach is shown in the following diagram.</p>
+                <p>As a first idea, you might "one-hot" encode each word in your vocabulary, previous section 4.1 <a href="rnn_classify_scratch.html">RNN from Stratch</a> using it. Consider the sentence "The cat sat on the mat". The vocabulary (or unique words) in this sentence is (cat, mat, on, sat, the). To represent each word, you will create a zero vector with length equal to the vocabulary, then place a one in the index that corresponds to the word. This approach is shown in the following diagram.</p>
                 <a href="https://drive.google.com/file/d/1N6IIsJ1vsQRlybQya0nWtLagu8c9Xnuy/view?usp=sharing">
                     <img src="res/04/one_hot_encode.png" alt="One Hot Encode">
                 </a>
@@ -43,13 +45,26 @@
                 <p>Word embeddings give us a way to use an efficient, dense representation in which similar words have a similar encoding.Importantly, you do not have to specify this encoding by hand. An embedding is a dense vector of floating point values (the length of the vector is a parameter you specify). Instead of specifying the values for the embedding manually, they are trainable parameters (weights learned by the model during training, in the same way a model learns weights for a dense layer).</p>
                 <p>It is common to see word embeddings that are 8-dimensional (for small datasets), up to 1024-dimensions when working with large datasets. A higher dimensional embedding can capture fine-grained relationships between words, but takes more data to learn.</p>
                 <a href="https://drive.google.com/file/d/1jT5Wztr4WRAwbom5DzENPI4VABmO-8oo/view?usp=sharing">
-                    <img src="res/04/simple_word_embed.png" alt="Simple Word Embedding">
+                    <img src="res/04/simple_word_embed.png" alt="Simple Word Embedding" width="600">
                 </a>
                 <p>Above is a diagram for a word embedding. Each word is represented as a 4-dimensional vector of floating point values. Another way to think of an embedding is as "lookup table". After these weights have been learned, you can encode each word by looking up the dense vector it corresponds to in the table.</p>
 
                 <h3>4.2.2 IMDb Dataset</h3>
                 <p>We will use the <a href="https://ai.stanford.edu/%7Eamaas/data/sentiment/">Large Movie Review Dataset</a> through the tutorial, and will train a sentiment classifier model on this dataset and in the process learn embeddings from scratch. To read more about loading a dataset from scratch, see the section 1.3.2 <a href="https://artinte.github.io/deep-learning/data_represent.html#text">Text - Data Representation</a>.</p>
-                
+                <p>Download the dataset and take a look at the directories.</p>
+                <pre><code>from common import imdb_text
+
+dataset_dir = imdb_text.get_dataset_dir()
+print(os.listdir(dataset_dir))</code></pre>
+                <pre><samp>Successfully extracted to: ./data/aclImdb
+['imdbEr.txt', 'test', 'imdb.vocab', 'README', 'train']</samp></pre>
+                <p>Take a look at the <span class="highlight">train/</span> directory. It has <span class="highlight">pos</span> and <span class="highlight">neg</span> folders with movie reviews labelled as positive and negative respectively. You will use reviews from pos and neg folders to train a binary classification model.
+                <pre><code>train_dir = os.path.join(dataset_dir, 'train')
+print(os.listdir(train_dir))</code></pre>
+                <pre><samp>['urls_unsup.txt', 'neg', 'urls_pos.txt', 'unsup', 'urls_neg.txt', 'pos', 'unsupBow.feat', 'labeledBow.feat']</samp></pre>
+                <p>The train directory also has additional folders which should be removed before creating training dataset.</p>
+                <pre><code>remove_dir = os.path.join(train_dir, 'unsup')
+shutil.rmtree(remove_dir)</code></pre>
                 <div class="navigation">
                     <a href="rnn_classify_scratch.html">Prev: 4.1 RNN from Stratch</a>
                     <a href="lstm_and_gru.html">Next: 4.3 LTSM and GRU</a>
