@@ -38,7 +38,7 @@
                 <p>Later in this post, we’ll build a “many to one” RNN from scratch to perform basic Sentiment Analysis.</p>
 
                 <h3>4.1.2 The How</h3>
-                <p>Let’s consider a “many to many” RNN with inputs \(x_0, x_1, ... , x_n\) that wants to produce outputs \(y_0, y_1, ... , y_n\). These \(x_i\) and \(y_i\) are vectors and can have arbitrary dimensions.</p>
+                <p>Let’s consider a “many to many” RNN with inputs \(x_0, x_1, \cdots , x_n\) that wants to produce outputs \(y_0, y_1, \cdots , y_n\). These \(x_i\) and \(y_i\) are vectors and can have arbitrary dimensions.</p>
                 <p>RNNs work by iteratively updating a hidden state \(h\), which is a vector that can also have arbitrary dimension. At any given step \(t\):</p>
                 <ol>
                     <li><p>The next hidden state \(h_t\) is calculated using the previous hidden state \(h_{t-1}\) and the next input \(x_t\).</p></li>
@@ -213,7 +213,7 @@ print(probs)</code></pre>
                 <p>Next, we need to edit our forward phase to cache some data for use in the backward phase. While we’re at it, we’ll also setup the skeleton for our backwards phase. Here’s what that looks like:</p>
                 <pre><code>class RNN:
     def forward(self, inputs):
-        ...
+        # ...
         self.last_inputs = inputs
         self.last_hs = {0: h}
 
@@ -221,7 +221,7 @@ print(probs)</code></pre>
         for i, x in enumerate(inputs):
             h = np.tanh(self.Wxh @ x + self.Whh @ h + self.bh)
             self.last_hs[i + 1] = h
-        ...
+        # ...
 
     def backprop(self, dy, learn_rate=2e-2):
         '''
@@ -273,7 +273,7 @@ rnn.backprop(dl_dy)</code></pre>
                 </p>
                 <p>We can now start implementing <code>backprop()</code>!</p>
                 <pre><code>class RNN:
-    ...
+    # ...
     def backprop(self, dy, learn_rate=2e-2):
         '''
         Perform a backward pass of the RNN.
@@ -288,13 +288,177 @@ rnn.backprop(dl_dy)</code></pre>
         dby = dy</code></pre>
                 <p class="comment">Reminder: We created <code>self.last_hs</code> in <code>forward()</code> earlier.</p>
                 <p>Finally, we need the gradients for \(W_{hh}\), \(W_{xh}\), and \(b_h\), which are used every step during the RNN. We have:</p>
-                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(\frac{\partial L}{\partial W_{xh}} = \frac{\partial L}{\partial y} \sum_{t}(\frac{\partial y}{\partial h_t} \cdot \frac{\partial h_t}{\partial W_{xh}})\)
+                </div>
+                <p>because changing \(W_{xh}\) affects every \(h_t\), which all affect \(y\) and ultimately \(L\). In order to fully calculate the gradient of \(W_{xh}\), we’ll need to backpropagate through all timesteps, which is known as <strong>Backpropagation Through Time (BPTT):</strong></p>
+                <a href="https://drive.google.com/file/d/1t757dxY5MaozuV8oc5TzixFO3hLnCIy1/view?usp=sharing">
+                    <img src="res/04/rnn_backward.png" alt="RNN Backward">
+                </a>
+                <p>\(W_{xh}\) is used for all \(x_t \rightarrow h_t\) forward links, so we have to backpropagate back to each of those links.</p>
+                <p>Once we arrive at a given step \(t\), we need to calculate \(\frac{\partial{h_t}}{\partial{W_{xh}}}\):</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(h_t = tanh(W_{xh} x_t + W_{hh} h_{t-1} + b_h)\)
+                </div>
+                <p>The derivative of \(tanh\) is well-known:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\frac{dtanh(x)}{dx} = 1 - {tanh}^2(x)\)
+                </div>
+                <p>We use Chain Rule like usual:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\frac{\partial{h_t}}{\partial{W_{xh}}} = (1 - h_t^2) \cdot x_t\)
+                </div>
+                <p>Similarly:</p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\frac{\partial{h_t}}{\partial{W_{hh}}} = (1 - h_t^2) \cdot h_{t-1}\)
                 </p>
-                <p>because changing \(W_{xh}\) affects every \(h_t\), which all affect \(y\) and ultimately \(L\). In order to fully calculate the gradient of \(W_{xh}\), we’ll need to backpropagate through all timesteps, which is known as Backpropagation Through Time (BPTT):</p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\frac{partial{h_t}}{\partial{b_h}} = (1 - h_t^2)\)
+                </p>
+                <p>The last thing we need is \(\frac{\partial{y}}{\partial{h_t}}\). We can calculate this recursively:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\frac{\partial y}{\partial h_t} = \frac{\partial y}{\partial h_{t+1}} \cdot \frac{\partial h_{t+1}}{\partial h_t} = \frac{\partial y}{\partial h_{t+1}}(1 - h_t^2)W_{hh}\)
+                </div>
+                <p>We’ll implement BPTT starting from the last hidden state and working backwards, so we’ll already have \(\frac{\partial{y}}{\partial{h_{t+1}}}\) by the time we want to calculate \(\frac{\partial y}{\partial {h_t}}\)! The exception is the last hidden state \(h_n\):</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\frac{\partial y}{h_n} = W_{hy}\)
+                </div>
+                <p>We now have everything we need to finally implement BPTT and finish <code>backprop()</code>:</p>
+                <pre><code>class RNN:
+    # ...
+    def backprop(self, dy, learn_rate=2e-2):
+        '''
+        Perform a backward pass of the RNN.
+        - d_y (dL/dy) has shape (output_size, 1).
+        - learn_rate is a float.
+        '''
+        # dy (dl/dy) has shape (output_size, 1)
+        n = len(self.last_inputs)
 
+        # calculate dl/dwhy and dl/dby
+        dwhy = dy @ self.last_hs[n].T
+        dby = dy
+
+        # initialize dl/dwhh, dl/dwxh, and dl/dbh to zero
+        dwhh = numpy.zeros(self.Whh.shape)
+        dwxh = numpy.zeros(self.Wxh.shape)
+        dbh = numpy.zeros(self.bh.shape)
+
+        # calculate dl/dh for the last h
+        # dl/dh = dl/dy * dy/dh
+        dh = self.Why.T @ dy
+
+        # backpropagation through time
+        for t in reversed(range(n)):
+            # an intermediate value: dl/dh * (1 - h^2)
+            temp = ((1 - self.last_hs[t+1] ** 2) * dh)
+            # dl/db = dl/dh * (1 - h^2)
+            dbh += temp
+            # dl/dwhh = dl/dh * (1 - h^2) * h_{t-1}
+            dwhh += temp @ self.last_hs[t].T
+            # dl/dwxh = dl/dh * (1 - h^2) * x
+            dwxh += temp @ self.last_inputs[t].T
+            # next dl/dh = dl/dh * (1 - h^2) * Whh
+            dh = self.Whh.T @ temp
+
+        # clip to prevent exploding gradients
+        for d in [dwxh, dwhh, dwhy, dbh, dby]:
+            numpy.clip(d, -1, 1, out=d)
+
+        # update weights and biases using gradient descent
+        self.Whh -= learn_rate * dwhh
+        self.Wxh -= learn_rate * dwxh
+        self.Why -= learn_rate * dwhy
+        self.bh -= learn_rate * dbh
+        self.by -= learn_rate * dby</code></pre>
+                <p>A few things to note:</p>
+                <ul class="with-bullets">
+                    <li><p>We've merged \(\frac{\partial L}{\partial y} \cdot \frac{\partial y}{\partial h}\) into \(\frac{\partial L}{\partial h}\) for convenience.</p></li>
+                    <li><p>We’re constantly updating a <code>d_h</code> variable that holds the most recent \(\frac{\partial{L}}{\partial{h_{t+1}}}\), which we need to calculate \(\frac{\partial L}{\partial h_t}\).</p></li>
+                    <li><p>After finishing BPTT, we <code>numpy.clip()</code> gradient values that are below -1 or above 1. This helps mitigate the exploding gradient problem, which is when gradients become very large due to having lots of multiplied terms. Exploding or vanishing gradients are quite problematic for vanilla RNNs - more complex RNNs like LSTMs are generally better-equipped to handle them.</p></li>
+                    <li><p>Once all gradients are calculated, we update weights and biases using gradient descent.</p></li>
+                </ul>
+                <p>We’ve done it! Our RNN is complete.</p>
                 <h3>4.1.8 The Culmination</h3>
+                <p>It’s finally the moment we been waiting for - let’s test our RNN!</p>
+                <p>First, we’ll write a helper function to process data with our RNN:</p>
+                <pre><code>def process(data, backprop=True):
+    items = list(data.items())
+    random.shuffle(items)
+
+    loss = 0
+    num_correct = 0
+
+    for x, y in items:
+        inputs = create_inputs(x)
+        target = int(y)
+
+        # forward
+        out, _ = rnn.forward(inputs)
+        probs = softmax(out)
+
+        # calculate loss / accuracy
+        loss -= numpy.log(probs[target])
+        num_correct += int(numpy.argmax(probs) == target)
+
+        if backprop:
+            # build dl/dy
+            dl_dy = probs
+            dl_dy[target] -= 1
+
+            # backward
+            rnn.backprop(dl_dy)
+    # Convert NumPy scalar to Python scalar.
+    if isinstance(loss, numpy.ndarray):
+        loss = loss.item()
+    return loss / len(data), num_correct / len(data)</code></pre>
+                <p>Now, we can write the training loop:</p>
+                <pre><code>losses = []
+accuracies = []
+# training loop
+for epoch in range(500):
+    train_loss, train_acc = process(simple_text.train_data)
+    if (epoch + 1) % 20 == 0:
+        losses.append(train_loss)
+        accuracies.append(train_acc)
+        print('Epoch %d' % (epoch + 1))
+        print('Train: loss %.3f | accuracy: %.3f' %
+                (train_loss, train_acc))
+
+        test_loss, test_acc = process(
+            simple_text.test_data, backprop=False)
+        print('Test: loss %.3f | accuracy: %.3f' % (test_loss, test_acc))</code></pre>
+                <p>Running <a href="https://github.com/artinte/deep-learning/blob/develop/04_rnn/1_scratch/rnn_classify_stratch.py">rnn_classify_stratch.py</a> should output something like this:</p>
+                <pre><samp>Train: loss 0.011 | accuracy: 1.000
+Test: loss 0.016 | accuracy: 1.000
+Epoch 420
+Train: loss 0.009 | accuracy: 1.000
+Test: loss 0.012 | accuracy: 1.000
+Epoch 440
+Train: loss 0.007 | accuracy: 1.000
+Test: loss 0.010 | accuracy: 1.000
+Epoch 460
+Train: loss 0.006 | accuracy: 1.000
+Test: loss 0.009 | accuracy: 1.000
+Epoch 480
+Train: loss 0.005 | accuracy: 1.000
+Test: loss 0.007 | accuracy: 1.000
+Epoch 500
+Train: loss 0.005 | accuracy: 1.000
+Test: loss 0.006 | accuracy: 1.000</samp></pre>
+                <p>Not bad from a RNN we built ourselves.</p>
+                <p>We can visualize the training process:</p>
+                <img src="res/04/simple_rnn_visual.png" alt="Simple RNN Visualize">
                 <h3>4.1.9 The End</h3>
+                <p>That’s it! In this post, we completed a walkthrough of Recurrent Neural Networks, including what they are, how they work, why they’re useful, how to train them, and how to implement one. There’s still much more you can do, though:</p>
+                <ul class="with-bullets">
+                    <li><p>Learn about Long short-term memory networks, a more powerful and popular RNN architecture, or about Gated Recurrent Units (GRUs), a well-known variation of the LSTM.</p></li>
+                    <li><p>Experiment with bigger / better RNNs using proper ML libraries like Tensorflow, JAX, or PyTorch.</p></li>
+                    <li><p>Read about Bidirectional RNNs, which process sequences both forwards and backwards so more information is available to the output layer.</p></li>
+                    <li><p>Try out <a href="word_embed.html">Word Embeddings</a> like GloVe or Word2Vec, which can be used to turn words into more useful vector representations.</p></li>
+                    <li><p>Check out the Natural Language Toolkit (NLTK), a popular Python library for working with human language data.</p></li>
+                </ul>
+                <p>Thanks for reading!</p>
                 <div class="navigation">
                     <a href="dense_net.html">Prev: 3.6 DenseNet</a>
                     <a href="word_embed.html">Next: 4.2 Word Embeddings</a>
