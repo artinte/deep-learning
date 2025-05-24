@@ -75,10 +75,11 @@
                             <ul id="chapter6" class="child-chapters" style="display: none;">
                                 <li><a class="nav-link" href="probability_theory.html">6.1 Probability Theory</a></li>
                                 <li><a class="nav-link" href="gaussian_process.html">6.2 Gaussian Processes</a></li>
-                                <li><a class="nav-link" href="#">6.3 Mathematical Foundation</a></li>
-                                <li><a class="nav-link" href="#">6.4 Diffusion from Scratch</a></li>
-                                <li><a class="nav-link" href="#">6.5 Diffusion Probability Model</a></li>
-                                <li><a class="nav-link" href="#">6.6 Latent Diffusion</a></li>
+                                <li><a class="nav-link" href="diffusion_math.html">6.3 Mathematical Foundation</a></li>
+                                <li><a class="nav-link" href="diffusion_scratch.html">6.4 Diffusion from Scratch</a></li>
+                                <li><a class="nav-link" href="estimate_gradients.html">6.5 Estimating Gradients</a></li>
+                                <li><a class="nav-link" href="dd_prob_model.html">6.6 Diffusion Probability Model</a></li>
+                                <li><a class="nav-link" href="latent_diffusion.html">6.7 Latent Diffusion</a></li>
                             </ul>
                         </li>
                         <li class="nav-item">
@@ -148,7 +149,7 @@
                 <main class="col-md-8">
                     <h1>Deep Learning With PyTorch</h1>
 
-                    <p>This eBook not only focuses on the explanation of theoretical knowledge, but also pays more attention to engineering practice. By combining a large number of practical cases, especially how to train, optimize and deploy models, readers will be able to master how to use <a href="https://pytorch.org/">PyTorch</a> to complete various deep learning tasks.</p>
+                    <p>This <a href="https://artinte.github.io/deep-learning/">eBook</a> not only focuses on the explanation of theoretical knowledge, but also pays more attention to engineering practice. By combining a large number of practical cases, especially how to train, optimize and deploy models, readers will be able to master how to use <a href="https://pytorch.org/">PyTorch</a> to complete various deep learning tasks.</p>
                     <a href="https://drive.google.com/file/d/1cwNyRPQRTaUaIRcDPBoeaxt_VpOyZoM0/view?usp=sharing">
                         <img src="res/00/cover.png" alt="Textbook Cover" width="600" style="margin-bottom: 1em;">
                     </a>
@@ -206,6 +207,7 @@
                         <h3 id="section2-sub1">
                             <a href="linear_algebra.html" style="color: inherit;">2.1 Linear Algebra</a>
                         </h3>
+                        <p><a href="https://math.mit.edu/~gs/linearalgebra/ila6/indexila6.html">Introduction to Linear Algebra, Sixth Edition</a></p>
                         <h3 id="section2-sub2">
                             <a href="point_classify.html" style="color: inherit;">2.2 Points Classification</a>
                         </h3>
@@ -336,26 +338,36 @@
                         <h3 id="section6-sub1">
                             <a href="prob_theory.html" style="color: inherit;">6.1 Probability Theory</a>
                         </h3>
+                        <p>The text focuses on diverse applications from a variety of fields and societal contexts, including business, healthcare, sciences, sociology, political science, computing, and several others.</p>
+                        <p><a href="https://openstax.org/details/books/introductory-statistics-2e">Introductory Statistics 2e - OpenStax</a></p>
+
                         <h3 id="section6-sub2">
                             <a href="gaussian_process.html" style="color: inherit;">6.2 Gaussian Processes</a>
                         </h3>
                         <p><a href="https://d2l.ai/chapter_gaussian-processes/index.html">Gaussian Processes - Dive into Deep Learning</a></p>
                         <h3 id="section6-sub3">
-                            <a href="#" style="color: inherit;">6.3 Mathematical Foundation</a>
+                            <a href="diffusion_math.html" style="color: inherit;">6.3 Mathematical Foundation</a>
                         </h3>
                         <p><a href="https://scholar.harvard.edu/binxuw/classes/machine-learning-scratch/materials/foundation-diffusion-generative-models">Mathematical Foundation of Diffusion Generative Models</a></p>
                         <h3 id="section6-sub4">
-                            <a href="#" style="color: inherit;">6.4 Diffusion from Scratch</a>
+                            <a href="diffusion_scratch.html" style="color: inherit;">6.4 Diffusion from Scratch</a>
                         </h3>
                         <p><a href="https://scholar.harvard.edu/binxuw/classes/machine-learning-scratch/materials/stable-diffusion-scratch">Understanding Stable Diffusion from "Scratch"</a></p>
-                        <h3 id="section6-sub5">
-                            <a href="#" style="color: inherit;">6.5 Diffusion Probability Model</a>
+                        
+                        <h3 id="scetion6-sub5">
+                            <a href="estimate_gradients.html" style="color: inherit;">6.5 Estimating Gradients</a>
                         </h3>
-                        <p>We present high quality image synthesis results using diffusion probabilistic models, a class of latent variable models inspired by considerations from nonequilibrium thermodynamics.
-                        <p><a href="Denoising Diffusion Probabilistic Models">Denoising Diffusion Probabilistic Models</a></p>
+                        <p>We introduce a new generative model where samples are produced via Langevin dynamics using gradients of the data distribution estimated with score matching.</p>
+                        <p><a href="https://arxiv.org/abs/1907.05600">Generative Modeling by Estimating Gradients of the Data Distribution</a></p>
 
                         <h3 id="section6-sub6">
-                            <a href="latent_diffusion.html" style="color: inherit;">6.6 Latent Diffusion</a>
+                            <a href="dd_prob_model.html" style="color: inherit;">6.6 Diffusion Probability Model</a>
+                        </h3>
+                        <p>We present high quality image synthesis results using diffusion probabilistic models, a class of latent variable models inspired by considerations from nonequilibrium thermodynamics.
+                        <p><a href="https://arxiv.org/abs/2006.11239">Denoising Diffusion Probabilistic Models</a></p>
+
+                        <h3 id="section6-sub7">
+                            <a href="latent_diffusion.html" style="color: inherit;">6.7 Latent Diffusion</a>
                         </h3>
                         <p>To enable DM training on limited computational resources while retaining their quality and flexibility, we apply them in the latent space of powerful pretrained autoencoders.</p>
                         <p><a href="https://arxiv.org/abs/2112.10752">High-Resolution Image Synthesis with Latent Diffusion Models</a></p>
