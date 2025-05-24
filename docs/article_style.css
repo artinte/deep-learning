@@ -94,11 +94,12 @@ pre {
 }
 .highlight {
     background-color: #f0f0f0;
-    color: #333;
-    padding: 1px 3px;
+    color: #555555;
+    padding: 0px 2px;
     border-radius: 3px;
+    line-height: 1.2;
     display: inline-block;
-    margin: 0 1px;
+    margin: 0px 2px;
 }
 ul {
     list-style: none;

@@ -22,7 +22,7 @@
                 <p class="title-subtext">Train own word embeddings for a sentiment classification task!</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-17</p>
                 <p>This tutorial contains an introduction to word embeddings. we will train own word embeddings for a sentiment classification task, and then visualize them in the <a href="https://projector.tensorflow.org/">Embedding Projector</a> (shown in the image below).</p>
-                <img src="res/04/beautiful_embed.jpg" alt="Beautiful Embed">
+                <img src="res/04/beautiful_embed.jpg" alt="Beautiful Embed" width="600">
 
                 <h3>4.2.1 Representing Text as Numbers</h3>
                 <p>Machine learning models take vectors (arrays of numbers) as input. When working with text, the first thing you must do is come up with a strategy to convert strings to numbers (or to "vectorize" the text) before feeding it to the model. In this section, you will look at three strategies for doing so.</p>
@@ -45,7 +45,7 @@
                 <p>Word embeddings give us a way to use an efficient, dense representation in which similar words have a similar encoding.Importantly, you do not have to specify this encoding by hand. An embedding is a dense vector of floating point values (the length of the vector is a parameter you specify). Instead of specifying the values for the embedding manually, they are trainable parameters (weights learned by the model during training, in the same way a model learns weights for a dense layer).</p>
                 <p>It is common to see word embeddings that are 8-dimensional (for small datasets), up to 1024-dimensions when working with large datasets. A higher dimensional embedding can capture fine-grained relationships between words, but takes more data to learn.</p>
                 <a href="https://drive.google.com/file/d/1jT5Wztr4WRAwbom5DzENPI4VABmO-8oo/view?usp=sharing">
-                    <img src="res/04/simple_word_embed.png" alt="Simple Word Embedding" width="600">
+                    <img src="res/04/simple_word_embed.png" alt="Simple Word Embedding">
                 </a>
                 <p>Above is a diagram for a word embedding. Each word is represented as a 4-dimensional vector of floating point values. Another way to think of an embedding is as "lookup table". After these weights have been learned, you can encode each word by looking up the dense vector it corresponds to in the table.</p>
 
@@ -65,9 +65,18 @@ print(os.listdir(train_dir))</code></pre>
                 <p>The train directory also has additional folders which should be removed before creating training dataset.</p>
                 <pre><code>remove_dir = os.path.join(train_dir, 'unsup')
 shutil.rmtree(remove_dir)</code></pre>
+
+                <h3>4.2.3 Embedding Layer</h3>
+                <p>The Embedding layer can be understood as a lookup table that maps from integer indices (which stand for specific words) to dense vectors (their embeddings). The dimensionality (or width) of the embedding is a parameter you can experiment with to see what works well for your problem, much in the same way you would experiment with the number of neurons in a Dense layer.</p>
+
+                <h3>4.2.4 Preprocessing</h3>
+
+                <h3>4.2.5 Classification model</h3>
+
+                
                 <div class="navigation">
                     <a href="rnn_classify_scratch.html">Prev: 4.1 RNN from Stratch</a>
-                    <a href="lstm_and_gru.html">Next: 4.3 LTSM and GRU</a>
+                    <a href="word2vec.html">Next: 4.3 Word2Vec</a>
                 </div>
             </main>
 

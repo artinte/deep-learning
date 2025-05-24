@@ -313,7 +313,7 @@ rnn.backprop(dl_dy)</code></pre>
                     \(\frac{\partial{h_t}}{\partial{W_{hh}}} = (1 - h_t^2) \cdot h_{t-1}\)
                 </p>
                 <p class="highlight-math" style="text-align: center; overflow-x: auto;">
-                    \(\frac{partial{h_t}}{\partial{b_h}} = (1 - h_t^2)\)
+                    \(\frac{\partial{h_t}}{\partial{b_h}} = (1 - h_t^2)\)
                 </p>
                 <p>The last thing we need is \(\frac{\partial{y}}{\partial{h_t}}\). We can calculate this recursively:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">

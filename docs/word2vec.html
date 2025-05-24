@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="laptop_coding_48.png" type="image/png">
+    <title>Word2Vec</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="article_style.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="col-md-2 left-sidebar">
+
+            </nav>
+
+            <main class="col-md-8 content">
+                <h2 class="custom-title">4.3 Word2Vec</h2>
+                <p class="title-subtext">Implement a skip-gram word2vec model with negative sampling from scratch!</p>
+                <p style="color: #a0a0a0;">Created Date: 2025-05-24</p>
+                <p><span class="highlight">word2vec</span> is not a singular algorithm, rather, it is a family of model architectures and optimizations that can be used to learn word embeddings from large datasets. Embeddings learned through <sapn class="highlight">word2vec</sapn> have proven to be successful on a variety of downstream natural language processing tasks.</p>
+                <p class="comment">Note: This tutorial is based on <a href="https://arxiv.org/abs/1301.3781">Efficient estimation of word representations in vector space</a> and <a href="https://arxiv.org/abs/1310.4546">Distributed representations of words and phrases and their compositionality</a>. It is not an exact implementation of the papers. Rather, it is intended to illustrate the key ideas.</p>
+                <p>These papers proposed two methods for learning representations of words:</p>
+                <ul class="with-bullets">
+                    <li><p><strong>Continuous bag-of-words model</strong>: predicts the middle word based on surrounding context words. The context consists of a few words before and after the current (middle) word. This architecture is called a bag-of-words model as the order of words in the context is not important.</p></li>
+                    <li><p><strong>Continuous skip-gram model</strong>: predicts words within a certain range before and after the current word in the same sentence. A worked example of this is given below.</p></li>
+                </ul>
+                <p>We'll use the skip-gram approach in this tutorial. First, we'll explore skip-grams and other concepts using a single sentence for illustration. Next, we'll train your own word2vec model on a small dataset. This tutorial also contains code to export the trained embeddings and visualize them in the <a href="https://projector.tensorflow.org/">TensorFlow Embedding Projector</a>.</p>
+                <h3>4.3.1 Skip-gram</h3>
+                <p>While a bag-of-words model predicts a word given the neighboring context, a skip-gram model predicts the context (or neighbors) of a word, given the word itself. The model is trained on skip-grams, which are n-grams that allow tokens to be skipped (see the diagram below for an example). The context of a word can be represented through a set of skip-gram pairs of <span class="highlight">(target_word, context_word)</span> where <span class="highlight">context_word</span> appears in the neighboring context of <span class="highlight">target_word</span>.</p>
+                <p>Consider the following sentence of eight words:</p>
+                <pre><samp>The wide road shimmered in the hot sun.</samp></pre>
+                <p>The context words for each of the 8 words of this sentence are defined by a window size. The window size determines the span of words on either side of a <span class="highlight">target_word</span> that can be consider a <span class="highlight">context_word</span>. Below is a table of skip-grams for target words based on different window sizes.</p>
+                <p class="comment">Note: For this tutorial, a window size of n implies n words on each side with a total window span of \(2n + 1\) words across a word.</p>
+                <img src="res/04/word2vec_skipgram.png" alt="Skip-gram" width="600">
+                <p>The training objective of the skip-gram model is to maximize the probability of predicting context words given the target word. For a sequence of words \(w_1, w_2, \cdots , w_T\), the objective can be written as the average log probability:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\frac{1}{T}\sum_{t=1}^T \sum_{-c \le j \le c, j \ne 0} log(p(w_{t+j}|w_t))\)
+                </div>
+                <p>where \(c\) is the size of the training context. The basic skip-gram formulation defines this probability using the softmax function:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \( p(w_O \mid w_I) = \frac{exp({v_{w_O}'}^{\top} v_{w_I})}{\sum_{w=1}^W exp({v_w'}^{\top} v_{w_I})} \)
+                </div>
+                <p>where \(v_w\) and \(v_w'\) are the "input" and "output" vector representations of \(w\), and \(W\) is the number of words in the vacabulary. This formulation is impractical because the cost of computing \(\nabla log(p(w_O \mid w_I))\) is proportional to \(W\), which is often large \((10^5 - 10^7)\) terms.</p>
+                <p>The noise contrastive estimation (NCE) loss function is an efficient approximation for a full softmax. With an objective to learn word embeddings instead of modeling the word distribution, the NCE loss can be simplified to use negative sampling.</p>
+                <p>The simplified negative sampling objective for a target word is to distinguish the context word from <span class="highlight">num_ns</span> negative samples drawn from noise distribution \(P_n(w)\) of words. More precisely, an efficient approximation of full softmax over the vocabulary is, for a skip-gram pair, to pose the loss for a target word as a classification problem between the context word and num_ns negative samples.</p>
+                <p>A negative sample is defined as a <span class="highlight">(target_word, context_word)</span> pair such that the <span class="highlight">context_word</span> does not appear in the <span class="highlight">window_size</span> neighborhood of the <span class="highlight">target_word</span>. For the example sentence, these are a few potential negative samples (when <span class="highlight">window_size</span> is 2).</p>
+                <pre><samp>(hot, shimmered)
+(wide, hot)
+(wide, sun)</samp></pre>
+                <p>In the next section, you'll generate skip-grams and negative samples for a single sentence. You'll also learn about subsampling techniques and train a classification model for positive and negative training examples later in the tutorial.</p>
+                
+                <div class="navigation">
+                    <a href="word_embed.html">Prev: 4.2 Word Embeddings</a>
+                    <a href="lstm_and_gru.html">Next: 4.4 LSTM and GRU</a>
+                </div>
+            </main>
+
+            <aside class="col-md-2 right-sidebar">
+                <h5><a href="index.html#section4">Recurrent Network</a></h5>
+                <ul id="dynamic-sidebar" class="nav flex-column">
+                </ul>
+            </aside>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="article_script.js"></script>
+</body>
+
+</html>
