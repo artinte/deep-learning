@@ -1,5 +1,12 @@
 from matplotlib import pyplot
 import numpy
+import pathlib
+import sys
+
+project_root = pathlib.Path(__file__).resolve().parents[2]
+sys.path.append(str(project_root))
+
+from common import decision_boundary
 
 data = numpy.array([
     [133, 65, 0],
@@ -152,3 +159,12 @@ for i in range(0, 3):
     temp = numpy.array([x[i], y[i]])
     print((data[i][0], data[i][1]), 'is',
           'female' if network.feedforward(temp) < 0.5 else 'male')
+
+def predict(model, batch_x):
+    result = []
+    for x in batch_x:
+        result.append(model.feedforward(x))
+    return numpy.array(result)
+
+decision_boundary.plot_single(x_data, labels,
+                              lambda batch_x: predict(network, batch_x))
