@@ -8,6 +8,14 @@
     <title>Neural Network from Scratch</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="article_style.css" rel="stylesheet">
+    <style>
+        .inline-square {
+            margin-left: 5px;
+            width: 12px;
+            height: 12px;
+            display: inline-block;
+        }
+    </style>
 </head>
 
 <body>
@@ -19,10 +27,10 @@
 
             <main class="col-md-8 content">
                 <h2 class="custom-title">1.7 Neural Network from Scratch</h2>
-                <p class="title-subtext">A simple explanation of how they work and how to implement one from scratch in Python.</p>
+                <p class="title-subtext">A simple explanation of how neural networks work and how to implement one from scratch in Python.</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-10</p>
                 <p>Here’s something that might surprise you: neural networks aren’t that complicated! The term “neural network” gets used as a buzzword a lot, but in reality they’re often much simpler than people imagine.</p>
-                <p>This post is intended for complete beginners and assumes ZERO prior knowledge of machine learning. We’ll understand how neural networks work while implementing one from scratch in Python.</p>
+                <p>This post is intended for complete beginners and assumes ZERO prior knowledge of machine learning. You can read section 1.4 <a href="principle_learn.html">Principles of Deep Learning</a> to get a sense of what deep learning is. We’ll understand how neural networks work while implementing one from scratch in Python.</p>
                 <p>Let’s get started!</p>
                 <h3>1.7.1 Building Blocks: Neurons</h3>
                 <p>First, we have to talk about neurons, the basic unit of a neural network. A neuron takes inputs, does some math with them, and produces one output. Here’s what a 2-input neuron looks like:</p>
@@ -44,7 +52,7 @@
                 </div>
                 <p>The activation function is used to turn an unbounded input into an output that has a nice, predictable form. A commonly used activation function is the sigmoid function:</p>
                 <img src="res/02/sigmoid_func.png" alt="Sigmoid Function" width="600">
-                <p>The sigmoid function only outputs numbers in the range \((0, 1)\). You can think of it as compressing \((-\infty, +\infty)\) to \(0, 1\) - big negative numbers become \(~0\), and big positive numbers become \(~1\).</p>
+                <p>The sigmoid function only outputs numbers in the range \((0, 1)\). You can think of it as compressing \((-\infty, +\infty)\) to \((0, 1)\) - big negative numbers become \(~0\), and big positive numbers become \(~1\).</p>
                 <p>For more information, you can read section 2.4 <a href="activation_function.html">Activation Function</a>.</p>
                 <h4>1.7.1.1 A Simple Example</h4>
                 <p>Assume we have a 2-input neuron that uses the sigmoid activation function and has the following parameters:</p>
@@ -91,8 +99,8 @@ bias = 4
 x = numpy.array([2, 3])
 
 neuron = Neuron(weights, bias)
-# 0.9991
-print('Neuron output is', round(neuron.feedforward(x), 4))</code></pre>
+# 0.999
+print('Neuron output is', round(neuron.feedforward(x), 3))</code></pre>
                 <p>Recognize those numbers? That’s the example we just did! We get the same answer of 0.999.</p>
                 <h3>1.7.2 Combining Neurons into a Neural Network</h3>
                 <p>A neural network is nothing more than a bunch of neurons connected together. Here’s what a simple neural network might look like:</p>
@@ -111,7 +119,7 @@ print('Neuron output is', round(neuron.feedforward(x), 4))</code></pre>
                 <p>The output of the neural network for input \(x = [2, 3]\) is 0.7216. Pretty simple, right?</p>
                 <p>A neural network can have any number of layers with any number of neurons in those layers. The basic idea stays the same: feed the input(s) forward through the neurons in the network to get the output(s) at the end. For simplicity, we’ll keep using the network pictured above for the rest of this post.</p>
                 <h4>1.7.2.2 Coding a Neural Network: Feedforward</h4>
-                <p>Let’s implement feedforward for our neural network. File :</p>
+                <p>Let’s implement feedforward for our neural network. File <a href="https://github.com/artinte/deep-learning/blob/develop/01_basic/7_nn_stratch/feed_forward.py">feed_forward.py</a> implements the above process:</p>
                 <pre><code># ... code from previous section here
 
 class OurNeuralNetwork:
@@ -148,7 +156,7 @@ x = numpy.array([2, 3])
 print(round(network.feedforward(x), 4))</code></pre>
                 <p>We got 0.7216 again! Looks like it works.</p>
                 <h3>1.7.3 Training a Neural Network</h3>
-                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/01_basic/7_nn_stratch/simple_network.py">simple_network.py</a> documents a complete neural network that takes as input a person's height and weight and predicts the person's gender.</p>
+                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/01_basic/7_nn_stratch/simple_network_numpy.py">simple_network_numpy.py</a> documents a complete neural network that takes as input a person's height and weight and predicts the person's gender.</p>
                 <h4>1.7.3.1 Height-Weight Dataset</h4>
                 <p>Say we have the following measurements:</p>
                 <div class="d-flex justify-content-center align-items-center" style="overflow-x: auto; width: 100%;">
@@ -204,7 +212,7 @@ print(round(network.feedforward(x), 4))</code></pre>
                         </tbody>
                     </table>
                 </div>
-                <p>Only the first six data are displayed, 0 for famale, and 1 for male. All the data is shown in the figure below, blue represents males and red represents females:</p>
+                <p>Only the first seven data are displayed, 0 for famale, and 1 for male. All the data is shown in the figure below, blue represents males and red represents females:</p>
                 <img src="res/01/simple_dataset.png" alt="Simple Dataset" width="600">
                 <p>Let’s train our network to predict someone’s gender given their weight and height:</p>
                 <img src="res/01/network_gender.svg" alt="Network Gender">
@@ -224,8 +232,8 @@ Processed weight: [-15  12   2  -3   4  -3   2   7  -8 -18   2  -8 -13  12   7  
 Processed height: [-3  4  2 -2  2 -3 -4 -2 -4 -6  0  0 -2  0  0 -4  6  4  2  4]</samp></pre>
 
                 <h4>1.7.3.2 MSE Loss</h4>
-                <p>Before we train our network, we first need a way to quantify how “good” it’s doing so that it can try to do “better”. That’s what the loss is.</p>
-                <p>We’ll use the mean squared error (MSE) loss:</p>
+                <p>Before we train our network, we first need a way to quantify how "good" it's doing so that it can try to do "better". That's what the loss is.</p>
+                <p>We’ll use the <strong>mean squared error (MSE)</strong> loss:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(MSE = \frac{1}{n} \sum_{i=1}^{n}{(y_{true} - y_{pred})}^2\)
                 </div>

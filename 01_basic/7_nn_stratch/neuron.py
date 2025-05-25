@@ -25,5 +25,5 @@ bias = 4
 x = numpy.array([2, 3])
 
 neuron = Neuron(weights, bias)
-# 0.9991
-print('Neuron output is', round(neuron.feedforward(x), 4))
+# 0.999
+print('Neuron output is', round(neuron.feedforward(x), 3))
