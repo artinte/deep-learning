@@ -21,9 +21,18 @@
                 <h2 class="custom-title">6.5 Estimating Gradients</h2>
                 <p class="title-subtext">Generative Modeling by Estimating Gradients of the Data Distribution</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-24</p>
-                <p><a href="https://yang-song.net/blog/2021/score/">This blog</a> post focuses on a promising new direction for generative modeling. We can learn score functions (gradients of log probability density functions) on a large number of noise-perturbed data distributions, then generate samples with Langevin-type sampling.</p>
+                <p><a href="https://yang-song.net/blog/2021/score/">This blog</a> post focuses on a promising new direction for generative modeling. We can learn <strong>score functions</strong> (gradients of log probability density functions) on a large number of noise-perturbed data distributions, then generate samples with Langevin-type sampling.</p>
                 <p>The resulting generative models, often called score-based generative models, has several important advantages over existing model families: GAN-level sample quality without adversarial training, flexible model architectures, exact log-likelihood computation, and inverse problem solving without re-training models.</p>
                 <p>In this blog post, we will show you in more detail the intuition, basic concepts, and potential applications of score-based generative models.</p>
+                <h3>6.5.1 Introduction</h3>
+                <p>Existing generative modeling techniques can largely be grouped into two categories based on how they represent probability distributions.</p>
+                <ol>
+                    <li><p><strong>likelihood-based models</strong> - which directly learn the distribution’s probability density (or mass) function via (approximate) maximum likelihood. Typical likelihood-based models include autoregressive models, normalizing flow models, energy-based models (EBMs), and variational auto-encoders (VAEs).</p></li>
+                    <li><p><strong>implicit generative models</strong> - where the probability distribution is implicitly represented by a model of its sampling process. The most prominent example is generative adversarial networks (GANs), where new samples from the data distribution are synthesized by transforming a random Gaussian vector with a neural network.</p></li>
+                </ol>
+                <p>Likelihood-based models and implicit generative models, however, both have significant limitations. Likelihood-based models either require strong restrictions on the model architecture to ensure a tractable normalizing constant for likelihood computation, or must rely on surrogate objectives to approximate maximum likelihood training. Implicit generative models, on the other hand, often require adversarial training, which is notoriously unstable and can lead to mode collapse.</p>
+                <p>In this blog post, I will introduce another way to represent probability distributions that may circumvent several of these limitations. The key idea is to model the gradient of the log probability density function, a quantity often known as the (Stein) score function. Such score-based models are not required to have a tractable normalizing constant, and can be directly learned by score matching.</p>
+                
                 <div class="navigation">
                     <a href="gaussian_process.html">Prev: 6.4 Diffusion from Scratch</a>
                     <a href="dd_prob_model.html">Next: 6.6 Diffusion Probability Model</a>
