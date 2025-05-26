@@ -157,6 +157,7 @@ print(round(network.feedforward(x), 4))</code></pre>
                 <p>We got 0.7216 again! Looks like it works.</p>
                 <h3>1.7.3 Training a Neural Network</h3>
                 <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/01_basic/7_nn_stratch/simple_network_numpy.py">simple_network_numpy.py</a> documents a complete neural network that takes as input a person's height and weight and predicts the person's gender.</p>
+
                 <h4>1.7.3.1 Height-Weight Dataset</h4>
                 <p>Say we have the following measurements:</p>
                 <div class="d-flex justify-content-center align-items-center" style="overflow-x: auto; width: 100%;">
@@ -212,7 +213,7 @@ print(round(network.feedforward(x), 4))</code></pre>
                         </tbody>
                     </table>
                 </div>
-                <p>Only the first seven data are displayed, 0 for famale, and 1 for male. All the data is shown in the figure below, blue represents males and red represents females:</p>
+                <p>Only the first seven data are displayed, 0 for famale, and 1 for male. All the data is shown in the figure below, points of blue represents males and points of red represents females:</p>
                 <img src="res/01/simple_dataset.png" alt="Simple Dataset" width="600">
                 <p>Let’s train our network to predict someone’s gender given their weight and height:</p>
                 <img src="res/01/network_gender.svg" alt="Network Gender">
@@ -241,14 +242,59 @@ Processed height: [-3  4  2 -2  2 -3 -4 -2 -4 -6  0  0 -2  0  0 -4  6  4  2  4]<
                 <ul class="with-bullets">
                     <li><p>\(n\) is the number of samples, which is 20 (10 with males, and 10 with females).</p></li>
                     <li><p>\(y\) represents the variable being predicted, which is Gender.</p></li>
-                    <li><p>\(y_{true}\) is the true value of the variable (the “correct answer”). </p></li>
+                    <li><p>\(y_{true}\) is the true value of the variable (the "correct answer"). </p></li>
                     <li><p>\(y_{pred}\) is the predicted value of the variable. It’s whatever our network outputs.</p></li>
                 </ul>
                 <p>\({(y_{true} - y_{pred})}^2\) is known as the squared error. Our loss function is simply taking the average over all squared errors (hence the name mean squared error). The better our predictions are, the lower our loss will be!</p>
                 <p>Better predictions = Lower loss.</p>
                 <p><strong>Training a network = trying to minimize its loss.</strong></p>
                 <p>Let’s say our network always outputs 0 - in other words, it’s confident all humans are Female. What would our loss be?</p>
-                
+                <div class="d-flex justify-content-center align-items-center" style="overflow-x: auto; width: 100%;">
+                    <table class="table table-light text-center" style="width: 80%;">
+                        <thead>
+                            <tr>
+                                <th>\(y_{true}\)</th>
+                                <th>\(y_{pred}\)</th>
+                                <th>\({(y_{true} - y_{pred})}^2\)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                            </tr>
+                            <tr>
+                                <td>1</td>
+                                <td>0</td>
+                                <td>1</td>
+                            </tr>
+                            <tr>
+                                <td>1</td>
+                                <td>0</td>
+                                <td>1</td>
+                            </tr>
+                            <tr>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(MSE = \frac{1}{4}(0 + 1 + 1 + 0) = 0.5\)
+                </div>
+                <p>Here’s some code to calculate loss for us:</p>
+                <pre><code>def mse_loss(y_pred, y_true):
+    # y_true and y_pred are numpy arrays of the same length.
+    return ((y_pred - y_true)**2).mean()
+
+y_pred = numpy.array([0, 0, 0, 0])
+y_true = numpy.array([0, 1, 1, 0])
+# 0.5
+print(mse_loss(y_pred, y_true))</code></pre>
+                <p>Nice. Onwards!</p>
                 <p>For more information, you can read section 2.5 <a href="loss_function.html">Loss Function</a>.</p>
 
                 <h4>1.7.3.3 Calculating Derivative</h4>
@@ -275,9 +321,10 @@ Processed height: [-3  4  2 -2  2 -3 -4 -2 -4 -6  0  0 -2  0  0 -4  6  4  2  4]<
                 </div>
                 <p>Then the mean squared error loss is just squared error:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
-                    \(MSE = {(y_{true} - y_{pred})}^2 = {(1 - y_{pred})^2}\)
+                    \(MSE = {(y_{true} - y_{pred})}^2 = {(0 - y_{pred})^2}\)
                 </div>
                 <p>Another way to think about loss is as a function of weights and biases. Let’s label each weight and bias in our network:</p>
+                <img src="res/01/network_param.png" alt="Network with Parameters" width="600">
                 <p>Then, we can write loss as a multivariable function:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(L(w_1, w_2, w_3, w_4, w_5, w_6, b_1, b_2, b_3)\)
@@ -296,9 +343,9 @@ Processed height: [-3  4  2 -2  2 -3 -4 -2 -4 -6  0  0 -2  0  0 -4  6  4  2  4]<
                 </div>
                 <p>Now, let’s figure out what to do with \(\frac{\partial{y_{pred}}}{\partial{w_1}}\). Just like before, let \(h_1, h_2, o_1\) be the outputs of the neurons they represent. Then:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
-                    \(y_{pred} = o_1 = f(w_5 h_1) + w_6 h_2 + b_3\)
+                    \(y_{pred} = o_1 = f(w_5 h_1 + w_6 h_2 + b_3)\)
                 </div>
-                <p>\(f\) is the sigmoid activation function, remember? Since \(w_1\) only effects \(h_1\) (not \(h_2\), we can write:</p>
+                <p>\(f\) is the sigmoid activation function, remember? Since \(w_1\) only effects \(h_1\) (not \(h_2\)), we can write:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(\frac{\partial{y_{pred}}}{\partial{w_1}} = \frac{\partial{y_{pred}}}{\partial{h_1}} * \frac{\partial{h_1}}{\partial{w_1}}\)
                 </div>
@@ -317,10 +364,12 @@ Processed height: [-3  4  2 -2  2 -3 -4 -2 -4 -6  0  0 -2  0  0 -4  6  4  2  4]<
                 <p>We’ll use this nice form for \(f'(x)\) later.</p>
                 <p>We’re done! We’ve managed to break down \(\frac{\partial{L}}{\partial{w_1}}\) into several parts we can calculate:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
-                    \(\frac{\partial{L}}{\partial{w_1}} = \frac{\partial{L}}{\partial{y_{pred}}} * \frac{\partial{y_{pred}}}{\partial{h_1}} \frac{\partial{h_1}}{\partial{w_1}}\)
+                    \(\frac{\partial{L}}{\partial{w_1}} = \frac{\partial{L}}{\partial{y_{pred}}} * \frac{\partial{y_{pred}}}{\partial{h_1}} * \frac{\partial{h_1}}{\partial{w_1}}\)
                 </div>
                 <p>This system of calculating partial derivatives by working backwards is known as <strong>backpropagation</strong>, or “backprop”.</p>
                 <p>Phew. That was a lot of symbols - it’s alright if you’re still a bit confused. Let’s do an example to see this in action!</p>
+
+                <h4>1.7.3.4 Calculating Example</h4>
                 <p>We’re going to continue pretending only first sample is in our dataset:</p>
                 <p>Let’s initialize all the weights to 1 and all the biases to 0. If we do a feedforward pass through the network, we get:</p>
                 <p class="highlight-math" style="text-align: center; overflow-x: auto;">

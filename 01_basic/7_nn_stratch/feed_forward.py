@@ -47,3 +47,12 @@ network = OurNeuralNetwork()
 x = numpy.array([2, 3])
 # 0.7216
 print(round(network.feedforward(x), 4))
+
+def mse_loss(y_pred, y_true):
+    # y_true and y_pred are numpy arrays of the same length.
+    return ((y_pred - y_true)**2).mean()
+
+y_pred = numpy.array([0, 0, 0, 0])
+y_true = numpy.array([0, 1, 1, 0])
+# 0.5
+print(mse_loss(y_pred, y_true))
