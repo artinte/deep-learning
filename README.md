@@ -14,38 +14,38 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 ### 02 Fully Connected Network
 
 - 2.1 [Linear Algebra](https://artinte.github.io/deep-learning/linear_algebra.html)
-- 2.2 Points Classification
-- 2.3 MNIST Classification
-- 2.4 Activation Function
-- 2.5 Loss Function
-- 2.6 Optimizer
+- 2.2 [Points Classification](https://artinte.github.io/deep-learning/point_classify.html)
+- 2.3 [MNIST Classification](https://artinte.github.io/deep-learning/mnist_classify.html)
+- 2.4 [Activation Function](https://artinte.github.io/deep-learning/activation_function.html)
+- 2.5 [Loss Function](https://artinte.github.io/deep-learning/loss_function.html)
+- 2.6 [Optimizer](https://artinte.github.io/deep-learning/optimizer.html)
 
 ### 03 Convolutional Network
 
-- 3.1 CNN from Scratch
-- 3.2 AlexNet
-- 3.3 Inception Architecture
-- 3.4 ResNet
-- 3.5 U-Net
-- 3.6 DenseNet
+- 3.1 [CNN from Scratch](https://artinte.github.io/deep-learning/cnn_classify_stratch.html)
+- 3.2 [AlexNet](https://artinte.github.io/deep-learning/alex_net.html)
+- 3.3 [Inception Architecture](https://artinte.github.io/deep-learning/inception_arch.html)
+- 3.4 [ResNet](https://artinte.github.io/deep-learning/res_net.html)
+- 3.5 [U-Net](https://artinte.github.io/deep-learning/u_net.html)
+- 3.6 [DenseNet](https://artinte.github.io/deep-learning/dense_net.html)
 
 ### 04 Recurrent Network
 
-- 4.1 RNN from Scratch
-- 4.2 Word Embeddings
-- 4.3 Word2Vec
-- 4.4 LTSM and GRU
-- 4.5 Neural Machine Translation
-- 4.6 Attention-based NMT
+- 4.1 [RNN from Scratch](https://artinte.github.io/deep-learning/rnn_classify_scratch.html)
+- 4.2 [Word Embeddings](https://artinte.github.io/deep-learning/word_embed.html)
+- 4.3 [Word2Vec](https://artinte.github.io/deep-learning/word2vec.html)
+- 4.4 [LTSM and GRU](https://artinte.github.io/deep-learning/lstm_and_gru.html)
+- 4.5 [Neural Machine Translation](https://artinte.github.io/deep-learning/nmt_align.html)
+- 4.6 [Attention-based NMT](https://artinte.github.io/deep-learning/attention_nmt.html)
 
 ### 05 Transformer
 
-- 5.1 Attention Mechanism
-- 5.2 nn.Transformer
-- 5.3 Transformer from Stratch
-- 5.4 nanoGPT
-- 5.5 BERT
-- 5.6 Vision Transformer
+- 5.1 [Attention Mechanism](https://artinte.github.io/deep-learning/attention_mechanism.html)
+- 5.2 [nn.Transformer](https://artinte.github.io/deep-learning/nn_transformer.html)
+- 5.3 [Transformer from Stratch](https://artinte.github.io/deep-learning/transformer_stratch.html)
+- 5.4 [nanoGPT](https://artinte.github.io/deep-learning/nano_gpt.html)
+- 5.5 [BERT](https://artinte.github.io/deep-learning/bert.html)
+- 5.6 [Vision Transformer](https://artinte.github.io/deep-learning/vision_transformer.html)
 
 ### 06 Diffusion Model
 
