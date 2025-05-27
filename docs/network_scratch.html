@@ -370,25 +370,152 @@ print(mse_loss(y_pred, y_true))</code></pre>
                 <p>Phew. That was a lot of symbols - it’s alright if you’re still a bit confused. Let’s do an example to see this in action!</p>
 
                 <h4>1.7.3.4 Calculating Example</h4>
-                <p>We’re going to continue pretending only first sample is in our dataset:</p>
-                <p>Let’s initialize all the weights to 1 and all the biases to 0. If we do a feedforward pass through the network, we get:</p>
+                <p>We’re going to continue pretending only first sample [-15, -3, 0] is in our dataset. Let’s initialize all the weights to 1 and all the biases to 0. If we do a feedforward pass through the network, we get:</p>
                 <p class="highlight-math" style="text-align: center; overflow-x: auto;">
-                    \(h_1 = f(w_1 x_1 + w_2 x_2 + b_1) = f(-15 - 3 + 0) = \)
+                    \(h_1 = f(w_1 x_1 + w_2 x_2 + b_1) = f(-15 - 3 + 0) = 0\)
                 </p>
                 <p class="highlight-math" style="text-align: center; overflow-x: auto;">
-                    \(h_2 = f(w_3 x_1 + w_4 x_2 + b_2) = f(-15 - 3 + 0) = \)
+                    \(h_2 = f(w_3 x_1 + w_4 x_2 + b_2) = f(-15 - 3 + 0) = 0\)
                 </p>
                 <p class="highlight-math" style="text-align: center; overflow-x: auto;">
-                    \(o_1 = f(w_5 h_1 + w_6 h_2 + b_3) = \)
+                    \(o_1 = f(w_5 h_1 + w_6 h_2 + b_3) = f(0 + 0 + 0) = 0.5\)
                 </p>
+                <p>The network outputs \(y_{pred} = \), which doesn’t strongly favor Male (1) or Female (0). Let's calculate \(\frac{\partial L}{\partial w_1}\):</p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\frac{\partial{L}}{\partial{w_1}} = \frac{\partial{L}}{\partial{y_{pred}}} * \frac{\partial{y_{pred}}}{\partial{h_1}} * \frac{\partial{h_1}}{\partial{w_1}}\)
+                </p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\frac{\partial L}{\partial y_{pred}} = -2 \times (1 - y_{pred}) = -1\)
+                </p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\frac{\partial y_{pred}}{\partial h_1} = w_5 \times f'(w_5 h_1 + w_5 h_2 + b_3) = f(0) * (1 - f(0)) = 0.25\)
+                </p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\frac{\partial h_1}{\partial w_1} = x_1 \times f'(w_1 x_1 + w_2 x_2 + b_1) = -15 * f(-18) * (1 - f(-18)) = -2.2845e-07\)
+                </p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\frac{\partial L}{\partial w_1} = -1 * 0.25 * -2.2845e-07 = 5.71125e-8\)
+                </p>
+                <p class="comment">Reminder: we derived \(f'(x) = f(x) \times (1 - f(x)) for our sigmoid activation function earlier.\)</p>
+                <p>We did it! This tells us that if we were to increase \(w_1\), \(L\) would increase a tiny bit as a result.</p>
+
+                <h4>1.7.3.4 Stochastic Gradient Descent</h4>
+                <p>We have all the tools we need to train a neural network now! We’ll use an optimization algorithm called <a href="">stochastic gradient descent (SGD)</a> that tells us how to change our weights and biases to minimize loss. It’s basically just this update equation:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(w_1 \leftarrow w_1 - η \frac{\partial L}{\partial w_1}\)
+                </div>
+                <p>\(η\) is a constant called the learning rate that controls how fast we train. All we’re doing is subtracting \( η \frac{\partial L}{\partial w_1}\) from \(w_1\):</p>
+                <ul class="with-bullets">
+                    <li><p>If \(\frac{\partial L}{\partial w_1}\) is positive, \(w_1\) will decrease, which makes \(L\) decrease.</p></li>
+                    <li><p>If \(\frac{\partial L}{\partial w_1}\) is negative, \(w_1\) will increase, which makes \(L\) decrease.</p></li>
+                </ul>
+                <p>If we do this for every weight and bias in the network, the loss will slowly decrease and our network will improve.</p>
+                <p>Our training process will look like this:</p>
+                <ol>
+                    <li><p>Choose one sample from our dataset. This is what makes it stochastic gradient descent - we only operate on one sample at a time.</p></li>
+                    <li><p>Calculate all the partial derivatives of loss with respect to weights or biases (e.g. \(\frac{\partial L}{\partial w_1}, \frac{\partial L}{\partial w_2}\), etc).</p></li>
+                    <li><p>Use the update equation to update each weight and bias.</p></li>
+                    <li><p>Go back to step 1.</p></li>
+                </ol>
+                <p>Let’s see it in action!</p>
                 
-                <h4>1.7.3.4 Gradient Descent</h4>
-                <p>We have all the tools we need to train a neural network now! We’ll use an optimization algorithm called stochastic gradient descent (SGD) that tells us how to change our weights and biases to minimize loss. It’s basically just this update equation:</p>
-                <p></p>
                 <h4>1.7.3.5 Code: A Complete Network</h4>
                 <p>It’s finally time to implement a complete neural network:</p>
+                <pre><code>class OurNeuralNetwork:
+    '''
+    A neural network with:
+        - 2 inputs
+        - a hidden layer with 2 neurons (h1, h2)
+        - an output layer with 1 neuron (o1)
+    '''
+    def __init__(self):
+        rng = numpy.random.default_rng(0)
+        # weights
+        self.w1 = rng.random()
+        self.w2 = rng.random()
+        self.w3 = rng.random()
+        self.w4 = rng.random()
+        self.w5 = rng.random()
+        self.w6 = rng.random()
+        # biases
+        self.b1 = rng.random()
+        self.b2 = rng.random()
+        self.b3 = rng.random()
+    
+    def feedforward(self, x):
+        # x is a numpy array with 2 elements.
+        h1 = sigmoid(self.w1 * x[0] + self.w2 * x[1] + self.b1)
+        h2 = sigmoid(self.w3 * x[0] + self.w4 * x[1] + self.b2)
+        o1 = sigmoid(self.w5 * h1 + self.w6 * h2 + self.b3)
+        return o1
 
-                <h3>1.7.4 Now What?</h3>
+    def train(self, data, y_trues):
+        learn_rate = 0.1
+        epochs = 1000
+        loss_list = []
+        for epoch in range(epochs):
+            for x, y_true in zip(data, y_trues):
+                sum_h1 = self.w1 * x[0] + self.w2 * x[1] + self.b1
+                h1 = sigmoid(sum_h1)
+                sum_h2 = self.w3 * x[0] + self.w4 * x[1] + self.b2
+                h2 = sigmoid(sum_h2)
+                sum_o1 = self.w5 * h1 + self.w6 * h2 + self.b3
+                o1 = sigmoid(sum_o1)
+                y_pred = o1
+                
+                # Calculate partial derivatives.
+                d_l_d_ypred = -2 * (y_true - y_pred)
+                # neuron o1
+                d_ypred_d_w5 = h1 * deriv_sigmoid(sum_o1)
+                d_ypred_d_w6 = h2 * deriv_sigmoid(sum_o1)
+                d_ypred_d_b3 = deriv_sigmoid(sum_o1)
+                d_ypred_d_h1 = self.w5 * deriv_sigmoid(sum_o1)
+                d_ypred_d_h2 = self.w6 * deriv_sigmoid(sum_o1)
+                # neuron h1
+                d_h1_d_w1 = x[0] * deriv_sigmoid(sum_h1)
+                d_h1_d_w2 = x[1] * deriv_sigmoid(sum_h1)
+                d_h1_d_b1 = deriv_sigmoid(sum_h1)
+                # neuron h2
+                d_h2_d_w3 = x[0] * deriv_sigmoid(sum_h2)
+                d_h2_d_w4 = x[1] * deriv_sigmoid(sum_h2)
+                d_h2_d_b2 = deriv_sigmoid(sum_h2)
+                
+                # Update weights and biaes.
+                # neuron h1
+                self.w1 -= learn_rate * d_l_d_ypred * d_ypred_d_h1 * d_h1_d_w1
+                self.w2 -= learn_rate * d_l_d_ypred * d_ypred_d_h1 * d_h1_d_w2
+                self.b1 -= learn_rate * d_l_d_ypred * d_ypred_d_h1 * d_h1_d_b1
+                # neuron h2
+                self.w3 -= learn_rate * d_l_d_ypred * d_ypred_d_h2 * d_h2_d_w3
+                self.w4 -= learn_rate * d_l_d_ypred * d_ypred_d_h2 * d_h2_d_w4
+                self.b2 -= learn_rate * d_l_d_ypred * d_ypred_d_h2 * d_h2_d_b2
+                # neuron o1
+                self.w5 -= learn_rate * d_l_d_ypred * d_ypred_d_w5
+                self.w6 -= learn_rate * d_l_d_ypred * d_ypred_d_w6
+                self.b3 -= learn_rate * d_l_d_ypred * d_ypred_d_b3
+                
+            if epoch % 10 == 0:
+                y_preds = numpy.apply_along_axis(self.feedforward, 1, data)
+                loss = mse_loss(y_trues, y_preds)
+                loss_list.append(loss)
+        
+        return loss_list</code></pre>
+                <p>Our loss steadily decreases as the network learns:</p>
+                <img src="res/01/simple_network_loss.png" alt="Simple Network Loss" width="600">
+                <p>We can now use the network to predict genders:</p>
+                <pre><code>for i in range(0, 3):
+    temp = numpy.array([x[i], y[i]])
+    print((data[i][0], data[i][1]), 'is',
+          'female' if network.feedforward(temp) &lt; 0.5 else 'male')</code></pre>
+                <pre><samp>(np.int64(133), np.int64(65)) is female
+(np.int64(160), np.int64(72)) is male
+(np.int64(150), np.int64(70)) is male</samp></pre>
+
+                <img src="res/01/simple_nn_boundary.png" alt="Simple Network Boundary" width="600">
+
+                <h3>1.7.4 Torch implement</h3>
+                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/01_basic/7_nn_stratch/simple_network_torch.py">simple_network_torch.py</a></p>
+                <h3>1.7.5 Now What?</h3>
                 <p>You made it! A quick recap of what we did:</p>
                 <ul class="with-bullets">
                     <li><p>Introduced neurons, the building blocks of neural networks.</p></li>
@@ -407,6 +534,7 @@ print(mse_loss(y_pred, y_true))</code></pre>
                     <li><p>Discover other activation functions besides sigmoid, like Softmax.</p></li>
                     <li><p>Discover other optimizers besides SGD.</p></li>
                 </ul>
+                <p>Thanks for reading!</p>
                 <div class="navigation">
                     <a href="gradient_descent.html">Prev: 1.6 Gradient Descent</a>
                     <a href="linear_algebra.html">Next: 2.1 Linear Algebra</a>
