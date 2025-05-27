@@ -21,14 +21,58 @@
                 <h2 class="custom-title">3.1 CNN from Stratch</h2>
                 <p class="title-subtext">A simple guide to what CNNs are, how they work, and how to build one from scratch in Python.</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-11</p>
-                <p>There’s been a lot of buzz about Convolution Neural Networks (CNNs) in the past few years, especially because of how they’ve revolutionized the field of Computer Vision. In this post, we’ll build on a basic background knowledge of neural networks and explore what CNNs are, understand how they work, and build a real one from scratch (using only numpy) in Python.</p>
+                <p>There’s been a lot of buzz about Convolution Neural Networks (CNNs) in the past few years, especially because of how they’ve revolutionized the field of Computer Vision. In this post, we’ll build on a basic background knowledge of neural networks and explore what CNNs are, understand how they work, and build a real one from scratch (using only NumPy) in Python.</p>
                 <p>This post assumes only a basic knowledge of neural networks. Section 1.7 <a href="network_scratch.html">Neural Network from Scratch</a> covers everything you’ll need to know, so you might want to read that first.</p>
                 <p>Ready? Let’s jump in.</p>
                 <h3>3.1.1 Motivation</h3>
                 <p>A classic use case of CNNs is to perform image classification, e.g. looking at an image of a pet and deciding whether it’s a cat or a dog. It’s a seemingly simple task - why not just use a normal Neural Network?</p>
                 <p>Good question.</p>
                 <h5>Reason 1: Images are Big</h5>
-                <p>Images used for Computer Vision problems nowadays are often \(224 \cdot 224\) or larger. </p>
+                <p>Images used for Computer Vision problems nowadays are often \(224 \times 224\) or larger. Imagine building a neural network to process \(224 \times 224\) color images: including the 3 color channels (RGB) in the image, that comes out to \(224 \times 224 \times 3 = 150528\) input features!</p>
+                <p>A typical hidden layer in such a network might have 1024 nodes, so we'd have to train \(150528 \times 1024 = 150+\) million weights for the first layer alone. Our network would be huge and nearly impossible to train.</p>
+                <p>It’s not like we need that many weights, either. The nice thing about images is that we know pixels are most useful in the context of their neighbors. Objects in images are made up of small, localized features, like the circular iris of an eye or the square corner of a piece of paper. Doesn’t it seem wasteful for every node in the first hidden layer to look at every pixel?</p>
+                <h5>Reason 2: Positions can change</h5>
+                <p>If you trained a network to detect dogs, you’d want it to be able to a detect a dog regardless of where it appears in the image. Imagine training a network that works well on a certain dog image, but then feeding it a slightly shifted version of the same image. The dog would not activate the same neurons, so the network would react completely differently!</p>
+                <p>We’ll see soon how a CNN can help us mitigate these problems.</p>
+
+                <h3>3.1.2 Dataset</h3>
+                <p>In this post, we’ll tackle the "Hello, World!" of Computer Vision: the <a href="data_represent.html#mnist">MNIST</a> handwritten digit classification problem. It’s simple: given an image, classify it as a digit.</p>
+                <p>Each image in the MNIST dataset is \(28 \times 28\) and contains a centered, grayscale digit.</p>
+                <p>Truth be told, a normal neural network would actually work just fine for this problem. You could treat each image as a \(28 \times 28 = 784\) - dimensional vector, feed that to a 784-dim input layer, stack a few hidden layers, and finish with an output layer of 10 nodes, 1 for each digit.</p>
+                <p>This would only work because the MNIST dataset contains small images that are centered, so we wouldn’t run into the aforementioned issues of size or shifting. Keep in mind throughout the course of this post, however, that most real-world image classification problems aren’t this easy.</p>
+                <p>Enough buildup. Let’s get into CNNs!</p>
+
+                <h3>3.1.3 Convolutions</h3>
+                <p>What are Convolutional Neural Networks?</p>
+                <p>They’re basically just neural networks that use Convolutional layers, a.k.a. Conv layers, which are based on the mathematical operation of convolution. Conv layers consist of a set of filters, which you can think of as just 2d matrices of numbers. Here’s an example \(3 \times 3\) filter:</p>
+
+                <p>We can use an input image and a filter to produce an output image by convolving the filter with the input image. This consists of:</p>
+
+                <ol>
+                    <li><p>Overlaying the filter on top of the image at some location.</p></li>
+                    <li><p>Performing element-wise multiplication between the values in the filter and their corresponding values in the image.</p></li>
+                    <li><p>Summing up all the element-wise products. This sum is the output value for the destination pixel in the output image.</p></li>
+                    <li><p>Repeating for all locations.</p></li>
+                </ol>
+                <p class="comment">Side Note: We (along with many CNN implementations) are technically actually using cross-correlation instead of convolution here, but they do almost the same thing. I won’t go into the difference in this post because it’s not that important, but feel free to look this up if you’re curious.</p>
+                <p>That 4-step description was a little abstract, so let’s do an example. Consider this tiny 4x4 grayscale image and this \(3 \times 3\) filter:</p>
+                <h4>3.1.3.1 How is this useful?</h4>
+                <h4>3.1.3.2 Padding</h4>
+                <h4>3.1.3.3 Conv Layers</h4>
+                <h4>3.1.3.4 Implementing</h4>
+
+                <h3>3.1.4 Pooling</h3>
+
+                <h3>3.1.5 Softmax</h3>
+
+                <h3>3.1.6 Training Overview</h3>
+                
+                <h3>3.1.7 Backprop: Softmax</h3>
+                <h3>3.1.8 Backprop: Max Pooling</h3>
+                <h3>3.1.9 Backprop: Conv</h3>
+                <h3>3.1.10 Training a CNN</h3>
+                <h3>3.1.11 What Now?</h3>
+
                 <div class="navigation">
                     <a href="optimizer.html">Prev: 2.6 Optimizer</a>
                     <a href="alex_net.html">Next: 3.2 AlexNet</a>
