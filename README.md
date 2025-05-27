@@ -52,15 +52,15 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 - 6.1 [Probability Theory](https://artinte.github.io/deep-learning/prob_theory.html)
 - 6.2 [Gaussian Processes](https://artinte.github.io/deep-learning/gaussian_process.html)
 - 6.3 [Mathematical Foundation](https://artinte.github.io/deep-learning/diffusion_math.html)
-- 6.4 Diffusion from Scratch
-- 6.5 Estimating Gradients
-- 6.6 Diffusion Probability Model
-- 6.7 Latent Diffusion
+- 6.4 [Diffusion from Scratch](https://artinte.github.io/deep-learning/diffusion_scratch.html)
+- 6.5 [Estimating Gradients](https://artinte.github.io/deep-learning/estimate_gradients.html)
+- 6.6 [Diffusion Probability Model](https://artinte.github.io/deep-learning/dd_prob_model.html)
+- 6.7 [Latent Diffusion](https://artinte.github.io/deep-learning/latent_diffusion.html)
 
 ### 07 Text
 
-- 7.1 Translate text with Transformer
-- 7.2 Easy OCR
+- 7.1 [Translate text with Transformer](https://artinte.github.io/deep-learning/trans_transformer.html)
+- 7.2 [Easy OCR](https://artinte.github.io/deep-learning/easy_ocr.html)
 - 7.3 Language Modeling
 
 ### 08 Audio
