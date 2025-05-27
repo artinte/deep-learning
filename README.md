@@ -49,9 +49,9 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 
 ### 06 Diffusion Model
 
-- 6.1 Probability Theory
-- 6.2 Gaussian Processes
-- 6.3 Mathematical Foundation
+- 6.1 [Probability Theory](https://artinte.github.io/deep-learning/prob_theory.html)
+- 6.2 [Gaussian Processes](https://artinte.github.io/deep-learning/gaussian_process.html)
+- 6.3 [Mathematical Foundation](https://artinte.github.io/deep-learning/diffusion_math.html)
 - 6.4 Diffusion from Scratch
 - 6.5 Estimating Gradients
 - 6.6 Diffusion Probability Model
