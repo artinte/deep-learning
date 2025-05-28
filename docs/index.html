@@ -87,6 +87,8 @@
                             <ul id="chapter7" class="child-chapters" style="display: none;">
                                 <li><a class="nav-link" href="trans_transformer.html">7.1 Translate text with Transformer</a></li>
                                 <li><a class="nav-link" href="easy_ocr.html">7.2 Easy OCR</a></li>
+                                <li><a class="nav-link" href="language_model.html">7.3 Language Modeling</a></li>
+                                <li><a class="nav-link" href="chatbots.html">7.4 Chatbots</a></li>
                             </ul>
                         </li>
                         <li class="nav-item">
@@ -115,15 +117,29 @@
                         <li class="nav-item">
                             <a class="nav-link" href="#section10" onclick="toggleChildChapters(event, 'chapter10')">10 Reinforcement Learning</a>
                             <ul id="chapter10" class="child-chapters" style="display: none;">
-                                <li><a class="nav-link" href="#">10.1 DQN</a></li>
-                                <li><a class="nav-link" href="#">10.2 PPO</a></li>
+                                <li><a class="nav-link" href="#">10.1 Introduction RL Problems</a></li>
+                                <li><a class="nav-link" href="#">10.2 Dynamic Programming</a></li>
+                                <li><a class="nav-link" href="#">10.3 DQN</a></li>
+                                <li><a class="nav-link" href="#">10.4 PPO</a></li>
+                                <li><a class="nav-link" href="#">10.5 Function Approximation</a></li>
                             </ul>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#section11" onclick="toggleChildChapters(event, 'chapter11')">11 Extending PyTorch</a>
+                            <ul id="chapter11" class="child-chapters" style="display: none;">
+                                <li><a class="nav-link" href="#">11.1 Custom Operators</a></li>
+                                <li><a class="nav-link" href="#">11.2 Custom Functions</a></li>
+                                <li><a class="nav-link" href="#">11.3 Extending TorchScript</a></li>
+                            </ul>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#section12" onclick="toggleChildChapters(event, 'chapter12')">12 Deploying Models</a>
+                            <ul id="chapter12" class="child-chapters" style="display: none;">
+                                <li><a class="nav-link" href="#">12.1 ONNX</a></li>
+                                <li><a class="nav-link" href="#">12.2 TorchScript</a></li>
+                                <li><a class="nav-link" href="#">13.3 ExecuTorch</a></li>
+                                <li><a class="nav-link" href="#">13.4 TensorFlow Lite</a></li>
+                            </ul>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#section13" onclick="toggleChildChapters(event, 'chapter13')">13 Model Optimization</a>
@@ -136,12 +152,24 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#section14" onclick="toggleChildChapters(event, 'chapter14')">14 Distributed Training</a>
+                            <ul id="chapter14" class="child-chapters" style="display: none;">
+                                <li><a class="nav-link" href="#">14.1 Distributed Overview</a></li>
+                                <li><a class="nav-link" href="#">14.2 Single-Machine Model Parallel</a></li>
+                                <li><a class="nav-link" href="#">14.3 Distributed Data Parallel</a></li>
+                                <li><a class="nav-link" href="#">14.4 Fully Sharded Data Parallel</a></li>
+                                <li><a class="nav-link" href="#">14.5 Libuv TCPStore Backend</a></li>
+                            </ul>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#section15" onclick="toggleChildChapters(event, 'chapter15')">15 Graph Netural Network</a>
                         </li>
                         <ul id="chapter15" class="child-chapters" style="display: none;">
                             <li><a class="nav-link" href="graph_foundation.html">15.1 Graph Foundation</a></li>
+                            <li><a class="nav-link" href="#">15.2 Core Ideas</a></li>
+                            <li><a class="nav-link" href="#">15.3 Mainstream Models</a></li>
+                            <li><a class="nav-link" href="#">15.4 Geometric</a></li>
+                            <li><a class="nav-link" href="#">15.5 Node Classification</a></li>
+                            <li><a class="nav-link" href="#">15.6 Advanced Topics</a></li>
                         </ul>
                     </ul>
                 </nav>
@@ -381,16 +409,16 @@
                         <p><a href="https://www.tensorflow.org/text/tutorials/transformer">Neural machine translation with a Transformer and Keras</a></p>
 
                         <h3 id="section7-sub2">
-                            <a href="#" style="color: inherit;">7.2 Easy OCR</a>
+                            <a href="easy_ocr.html" style="color: inherit;">7.2 Easy OCR</a>
                         </h3>
                         <p><a href="https://github.com/JaidedAI/EasyOCR">EasyOCR: Ready-to-use OCR with 80+ supported languages</a></p>
 
                         <h3 id="section7-sub3">
-                            <a href="#" style="color: inherit;">7.3 Language Modeling</a>
+                            <a href="language_model.html" style="color: inherit;">7.3 Language Modeling</a>
                         </h3>
 
                         <h3 id="section7-sub4 ">
-                            <a href="#" style="color: inherit;">7.4 Chatbots</a>
+                            <a href="chatbots.html" style="color: inherit;">7.4 Chatbots</a>
                         </h3>
                         
                     </section>
@@ -454,22 +482,37 @@
                         <h2>10 Reinforcement Learning</h2>
                         <p><a href="https://github.com/dennybritz/reinforcement-learning">Implementation of Reinforcement Learning Algorithms</a></p>
                         <h3 id="section10-sub1">
-                            <a href="#" style="color: inherit;">10.1 DQN</a>
+                            <a href="#" style="color: inherit;">10.1 Introduction RL Problems</a>
                         </h3>
-                        <h3 id="section10-sub1">
-                            <a href="#" style="color: inherit;">10.1 DQN</a>
+                        <h3 id="section10-sub2">
+                            <a href="#" style="color: inherit;">10.2 Dynamic Programming</a>
+                        </h3>
+                        <h3 id="section10-sub3">
+                            <a href="#" style="color: inherit;">10.3 DQN</a>
                         </h3>
                         <p>This tutorial shows how to use PyTorch to train a Deep Q Learning (DQN) agent on the CartPole-v1 task from Gymnasium.</p>
                         <p><a href="https://docs.pytorch.org/tutorials/intermediate/reinforcement_q_learning.html">Reinforcement Learning (DQN) Tutorial</a></p>
-                        <h3 id="section10-sub2">
-                            <a href="#" style="color: inherit;">10.2 PPO</a>
+                        <h3 id="section10-sub4">
+                            <a href="#" style="color: inherit;">10.4 PPO</a>
                         </h3>
                         <p>This tutorial demonstrates how to use PyTorch and torchrl to train a parametric policy network to solve the Inverted Pendulum task from the OpenAI-Gym/Farama-Gymnasium control library.</p>
                         <p><a href="https://docs.pytorch.org/tutorials/intermediate/reinforcement_ppo.html">Reinforcement Learning (PPO) with TorchRL Tutorial</a></p>
+                        <h3 id="section10-sub5">
+                            <a href="#" style="color: inherit;">10.5 Function Approximation</a>
+                        </h3>
                     </section>
 
                     <section id="section11" class="content-section">
                         <h2>11 Extending PyTorch</h2>
+                        <h3 id="section11-sub1">
+                            <a href="#" style="color: inherit;">11.1 Custom Operators</a>
+                        </h3>
+                        <h3 id="section11-sub2">
+                            <a href="#" style="color: inherit;">11.2 Custom Functions</a>
+                        </h3>
+                        <h3 id="section11-sub3">
+                            <a href="#" style="color: inherit;">11.3 Extending TorchScript</a>
+                        </h3>
                     </section>
 
                     <section id="section12" class="content-section">
@@ -484,6 +527,9 @@
                             <a href="#" style="color: inherit;">12.3 ExecuTorch</a>
                         </h3>
                         <p><a href="https://docs.pytorch.org/executorch/stable/getting-started.html">Getting Started with ExecuTorch</a></p>
+                        <h3 id="section12-sub4">
+                            <a href="#" style="color: inherit;">12.4 TensorFlow Lite</a>
+                        </h3>
                     </section>
 
                     <section id="section13" class="content-section">
@@ -508,6 +554,21 @@
 
                     <section id="section14" class="content-section">
                         <h2>14 Distributed Training</h2>
+                        <h3 id="section14-sub1">
+                            <a href="#" style="color: inherit;">14.1 Distributed Overview</a>
+                        </h3>
+                        <h3 id="section14-sub2">
+                            <a href="#" style="color: inherit;">14.2 Single-Machine Model Parallel</a>
+                        </h3>
+                        <h3 id="section14-sub3">
+                            <a href="#" style="color: inherit;">14.3 Distributed Data Parallel</a>
+                        </h3>
+                        <h3 id="section14-sub4">
+                            <a href="#" style="color: inherit;">14.4 Fully Sharded Data Parallel</a>
+                        </h3>
+                        <h3 id="section14-sub5">
+                            <a href="#" style="color: inherit;">14.5 Libuv TCPStore Backend</a>
+                        </h3>
                     </section>
 
                     <section id="section15" class="content-section">
@@ -516,7 +577,21 @@
                             <a href="graph_foundation.html" style="color: inherit;">15.1 Graph Foundation</a>
                         </h3>
                         <p><a href="https://www.hello-algo.com/en/chapter_graph/">Graph - Hello Algo</a></p>
-
+                        <h3 id="section15-sub1">
+                            <a href="#" style="color: inherit;">15.2 Core Ideas</a>
+                        </h3>
+                        <h3 id="section15-sub1">
+                            <a href="#" style="color: inherit;">15.3 Mainstream Models</a>
+                        </h3>
+                        <h3 id="section15-sub1">
+                            <a href="#" style="color: inherit;">15.4 Geometric</a>
+                        </h3>
+                        <h3 id="section15-sub1">
+                            <a href="#" style="color: inherit;">15.5 Node Classification</a>
+                        </h3>
+                        <h3 id="section15-sub1">
+                            <a href="#" style="color: inherit;">15.6 Advanced Topics</a>
+                        </h3>
                     </section>
                 </main>
 

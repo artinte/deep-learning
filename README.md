@@ -61,8 +61,8 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 
 - 7.1 [Translate text with Transformer](https://artinte.github.io/deep-learning/trans_transformer.html)
 - 7.2 [Easy OCR](https://artinte.github.io/deep-learning/easy_ocr.html)
-- 7.3 Language Modeling
-- 7.4 Chatbots
+- 7.3 [Language Modeling](https://artinte.github.io/deep-learning/language_model.html)
+- 7.4 [Chatbots](https://artinte.github.io/deep-learning/chatbots.html)
 
 ### 08 Audio
 
@@ -85,8 +85,11 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 
 ### 10 Reinforcement Learning
 
-- 10.1 DQN
-- 10.2 PPO
+- 10.1 Introduction RL Problems
+- 10.2 Dynamic Programming
+- 10.3 DQN
+- 10.4 PPO
+- 10.5 Function Approximation
 
 ### 11 Extending PyTorch
 
@@ -114,8 +117,7 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 - 14.2 Single-Machine Model Parallel
 - 14.3 Distributed Data Parallel
 - 14.4 Fully Sharded Data Parallel
-- 14.5 Fully Sharded Data Parallel
-- 14.6 Libuv TCPStore Backend
+- 14.5 Libuv TCPStore Backend
 
 ### 15 Graph Netural Network
 
