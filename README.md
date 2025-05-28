@@ -62,6 +62,7 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 - 7.1 [Translate text with Transformer](https://artinte.github.io/deep-learning/trans_transformer.html)
 - 7.2 [Easy OCR](https://artinte.github.io/deep-learning/easy_ocr.html)
 - 7.3 Language Modeling
+- 7.4 Chatbots
 
 ### 08 Audio
 
@@ -95,12 +96,34 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 
 ### 12 Deploying Models
 
+- 12.1 ONNX
+- 12.2 TorchScript
+- 12.3 ExecuTorch
+- 12.4 TensorFlow Lite
+
 ### 13 Model Optimization
 
+- 13.1 LoRA
+- 13.2 Pruning
+- 13.3 Quantization
+- 13.4 Distillation
+
 ### 14 Distributed Training
+
+- 14.1 Distributed Overview
+- 14.2 Single-Machine Model Parallel
+- 14.3 Distributed Data Parallel
+- 14.4 Fully Sharded Data Parallel
+- 14.5 Fully Sharded Data Parallel
+- 14.6 Libuv TCPStore Backend
 
 ### 15 Graph Netural Network
 
 - 15.1 Graph Foundation
+- 15.2 Core Ideas
+- 15.3 Mainstream Models
+- 15.4 Geometric
+- 15.5 Node Classification
+- 15.6 Advanced Topics
 
 For more information, please visit website [Deep Learing with PyTorch](https://artinte.github.io/deep-learning/index.html).
