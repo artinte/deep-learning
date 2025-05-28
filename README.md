@@ -89,6 +89,10 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 
 ### 11 Extending PyTorch
 
+- 11.1 Custom Operators
+- 11.2 Custom Functions
+- 11.3 Extending TorchScript
+
 ### 12 Deploying Models
 
 ### 13 Model Optimization
