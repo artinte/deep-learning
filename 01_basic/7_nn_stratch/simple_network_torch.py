@@ -31,13 +31,6 @@ x = data[:, 0]
 y = data[:, 1]
 labels = data[:, 2]
 
-colors = ["red" if label == 0 else "blue" for label in labels]
-pyplot.scatter(x, y, c=colors)
-pyplot.xlabel("Weight (lb)")
-pyplot.ylabel("Height (in)")
-pyplot.grid(True)
-pyplot.show()
-
 avg_weight = torch.round(x.mean()).item()
 avg_height = torch.round(y.mean()).item()
 
@@ -83,5 +76,6 @@ for epoch in range(epochs):
 pyplot.plot(range(1, len(history) + 1), history)
 pyplot.xlabel("Epoch (x10)")
 pyplot.ylabel("MSE Loss")
+pyplot.subplots_adjust(left=0.13, right=0.95, top=0.96, bottom=0.12)
 pyplot.grid(True)
 pyplot.show()

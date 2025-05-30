@@ -124,7 +124,7 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 
 ### 15 Graph Netural Network
 
-- 15.1 Graph Foundation
+- 15.1 [Graph Foundation](https://artinte.github.io/deep-learning/graph_foundation.html)
 - 15.2 Core Ideas
 - 15.3 Mainstream Models
 - 15.4 Geometric

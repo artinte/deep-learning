@@ -1,5 +1,9 @@
+import torch
+
 # set some inputs
-x = -2; y = 5; z = -4
+x = -2
+y = 5
+z = -4
 
 # perform the forward pass
 q = x + y   # q becomes 3
@@ -19,3 +23,16 @@ df_dy = df_dq * dq_dy
 assert df_dx == -4
 assert df_dy == -4
 assert df_dz == 3
+
+x = torch.tensor(-2.0, requires_grad=True)
+y = torch.tensor(5.0, requires_grad=True)
+z = torch.tensor(-4.0, requires_grad=True)
+
+q = x + y
+f = q * z
+
+f.backward()
+
+assert x.grad.item() == -4
+assert y.grad.item() == -4
+assert z.grad.item() == 3

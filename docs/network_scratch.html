@@ -396,7 +396,7 @@ print(mse_loss(y_pred, y_true))</code></pre>
                 <p class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(\frac{\partial L}{\partial w_1} = -1 * 0.25 * -2.2845e-07 = 5.71125e-8\)
                 </p>
-                <p class="comment">Reminder: we derived \(f'(x) = f(x) \times (1 - f(x)) for our sigmoid activation function earlier.\)</p>
+                <p class="comment">Reminder: we derived \(f'(x) = f(x) \times (1 - f(x))\) for our sigmoid activation function earlier.</p>
                 <p>We did it! This tells us that if we were to increase \(w_1\), \(L\) would increase a tiny bit as a result.</p>
 
                 <h4>1.7.3.4 Stochastic Gradient Descent</h4>
@@ -515,6 +515,37 @@ print(mse_loss(y_pred, y_true))</code></pre>
 
                 <h3>1.7.4 Torch implement</h3>
                 <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/01_basic/7_nn_stratch/simple_network_torch.py">simple_network_torch.py</a></p>
+                <pre><code>class NeuralNet(torch.nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.hidden = torch.nn.Sequential(torch.nn.Linear(2, 2), torch.nn.Sigmoid())
+        self.output = torch.nn.Sequential(torch.nn.Linear(2, 1), torch.nn.Sigmoid())
+
+    def forward(self, x):
+        x = self.hidden(x)
+        x = self.output(x)
+        return x
+
+
+model = NeuralNet()
+criterion = torch.nn.MSELoss()
+optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
+
+history = []
+epochs = 1000
+for epoch in range(epochs):
+    preds = model(features)
+    loss = criterion(preds, targets)
+
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+
+    if epoch % 10 == 0:
+        history.append(loss.item())</code></pre>
+                
+                <img src="res/01/simple_net_torch.png" alt="Simple Network Torch" width="600">
+                
                 <h3>1.7.5 Now What?</h3>
                 <p>You made it! A quick recap of what we did:</p>
                 <ul class="with-bullets">
