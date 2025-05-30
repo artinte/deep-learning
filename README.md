@@ -66,9 +66,9 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 
 ### 08 Audio
 
-- 8.1 Speech Feature Extraction
-- 8.2 Automatic Speech Recognition
-- 8.3 Text-to-Speech
+- 8.1 [Speech Feature Extraction](https://artinte.github.io/deep-learning/speech_feature.html)
+- 8.2 [Automatic Speech Recognition](https://artinte.github.io/deep-learning/speech_recognition.html)
+- 8.3 [Text-to-Speech](https://artinte.github.io/deep-learning/text_to_speech.html)
 - 8.4 Speech Enhancement and Separation
 - 8.5 Voice Synthesis and Style Transfer
 - 8.6 Audio Source Separation
@@ -105,6 +105,7 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 - 12.2 TorchScript
 - 12.3 ExecuTorch
 - 12.4 TensorFlow Lite
+- 12.5 [TensorFlow.js](https://artinte.github.io/deep-learning/tensorflow_js.html)
 
 ### 13 Model Optimization
 
