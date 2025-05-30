@@ -24,10 +24,12 @@
 
                 <p>In this section we will develop expertise with an intuitive understanding of <strong>backpropagation</strong>, which is a way of computing gradients of expressions through recursive application of chain rule. Understanding of this process and its subtleties is critical for you to understand, and effectively develop, design and debug neural networks.</p>
                 <h3>1.6.1 Introduction</h3>
+
                 <p>Problem statement - The core problem studied in this section is as follows: We are given some function \(f(x)\) where \(x\) is a vector of inputs and we are interested in computing the gradient of \(f\) at \(x\) (i.e \(\nabla f(x)\)).</p>
                 <p>Motivation - Recall that the primary reason we are interested in this problem is that in the specific case of neural networks, \(f\) will correspond to the loss function (\(L\)) and the inputs \(x\) will consist of the training data and the neural network weights. For example, the loss could be the SVM loss function and the inputs are both the training data \((x_i, y_i), i = 1, \ldots, N\) and the weights and biases \(W, b\).</p>
                 <p>Note that (as is usually the case in Machine Learning) we think of the training data as given and fixed, and of the weights as variables we have control over. Hence, even though we can easily use backpropagation to compute the gradient on the input examples \(x_i\), in practice we usually only compute the gradient for the parameters (e.g. \(W, b\)) so that we can use it to perform a parameter update. However, as we will see later in the class the gradient on \(x_i\) can still be useful sometimes, for example for purposes of visualization and interpreting what the Neural Network might be doing.</p>
                 <p>If you are coming to this class and you’re comfortable with deriving gradients with chain rule, we would still like to encourage you to at least skim this section, since it presents a rarely developed view of backpropagation as backward flow in real-valued circuits and any insights you’ll gain may help you throughout the class.</p>
+
                 <h3>1.6.2 Simple expressions</h3>
                 <p>Lets start simple so that we can develop the notation and conventions for more complex expressions. Consider a simple multiplication function of two numbers \(f(x, y) = xy\). It is a matter of simple calculus to derive the partial derivative for either input:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
@@ -52,8 +54,55 @@
                 </div>
                 <p>That is, the (sub)gradient is 1 on the input that was larger and 0 on the other input. Intuitively, if the inputs are \(x = 4, y = 2\), then the max is 4, and the function is not sensitive to the setting of \(y\). That is, if we were to increase it by a tiny amount \(h\), the function would keep outputting 4, and therefore the gradient is zero: there is no effect.</p>
                 <p>Of course, if we were to change \(y\) by a large amount (e.g. larger than 2), then the value of \(f\) would change, but the derivatives tell us nothing about the effect of such large changes on the inputs of a function; They are only informative for tiny, infinitesimally small changes on the inputs, as indicated by the \(\lim_{h \to 0}\) in its definition.</p>
-                <h3>1.6.3 Compound expressions</h3>
 
+                <h3>1.6.3 Compound expressions</h3>
+                <p>Lets now start to consider more complicated expressions that involve multiple composed functions, such as \(f(x, y, z) = (x + y)z\). This expression is still simple enough to differentiate directly, but we’ll take a particular approach to it that will be helpful with understanding the intuition behind backpropagation.</p>
+                <p>In particular, note that this expression can be broken down into two expressions: \(q = x + y\) and \(f = qz\). Moreover, we know how to compute the derivatives of both expressions separately, as seen in the previous section. \(f\) is just multiplication of \(q\) and \(z\), so \(\frac{\partial f}{\partial q} = z\), \(\frac{\partial f}{\partial z} = q\),and \(q\) is addition of \(x\) and \(y\) so \(\frac{\partial q}{\partial y} = 1\).</p>
+                <p>However, we don't necessarily care about the gradient on the intermediate value \(q\) - the value of \(\frac{\partial f}{\partial q}\) is not useful. Instead, we are ultimately interested in the gradient of \(f\) with respect to its inputs \(x, y, z\).</p>
+                <p>The chain rule tells us that the correct way to "chain" these gradient expressions together is through multiplication. For example, \(\frac{\partial f}{\partial x} = \frac{\partial f}{\partial q} \cdot \frac{\partial q}{\partial x}\). In practice this is simply a multiplication of the two numbers that hold the two gradients. Lets see file <a href="https://github.com/artinte/deep-learning/blob/develop/01_basic/6_gradient/compound.py">compound.py</a> with an example:</p>
+                <pre><code># set some inputs
+x = -2
+y = 5
+z = -4
+
+# perform the forward pass
+q = x + y   # q becomes 3
+f = q * z   # f becomes -12
+
+# perform the backward pass (backpropagation) in reverse order:
+# first backprop through f = q * z
+df_dz = q   # df/dz = q, so gradient on z becomes 3
+df_dq = z   # df/dq = z, so gradient on q becomes -4
+dq_dx = 1.0
+dq_dy = 1.0
+
+# now backprop through q = x + y
+df_dx = df_dq * dq_dx   # the multiplication here is the chain rule
+df_dy = df_dq * dq_dy
+
+assert df_dx == -4
+assert df_dy == -4
+assert df_dz == 3</code></pre>
+                <p>We are left with the gradient in the variables <code>[df_dx, df_dy, df_dz]</code>, which tell us the sensitivity of the variables \(x, y, z\) on \(f\)! This is the simplest example of backpropagation. Going forward, we will use a more concise notation that omits the <code>df</code> prefix. For example, we will simply write <code>dq</code> instead of <code>df_dq</code>, and always assume that the gradient is computed on the final output.</p>
+                <p>This computation can also be nicely visualized with a circuit diagram:</p>
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <svg style="max-width: 420px" viewBox="0 0 420 220"><defs><marker id="arrowhead" refX="6" refY="2" markerWidth="6" markerHeight="4" orient="auto"><path d="M 0,0 V 4 L6,2 Z"></path></marker></defs><line x1="40" y1="30" x2="110" y2="30" stroke="black" stroke-width="1"></line><text x="45" y="24" font-size="16" fill="green">-2</text><text x="45" y="47" font-size="16" fill="red">-4</text><text x="35" y="24" font-size="16" text-anchor="end" fill="black">x</text><line x1="40" y1="100" x2="110" y2="100" stroke="black" stroke-width="1"></line><text x="45" y="94" font-size="16" fill="green">5</text><text x="45" y="117" font-size="16" fill="red">-4</text><text x="35" y="94" font-size="16" text-anchor="end" fill="black">y</text><line x1="40" y1="170" x2="110" y2="170" stroke="black" stroke-width="1"></line><text x="45" y="164" font-size="16" fill="green">-4</text><text x="45" y="187" font-size="16" fill="red">3</text><text x="35" y="164" font-size="16" text-anchor="end" fill="black">z</text><line x1="210" y1="65" x2="280" y2="65" stroke="black" stroke-width="1"></line><text x="215" y="59" font-size="16" fill="green">3</text><text x="215" y="82" font-size="16" fill="red">-4</text><text x="205" y="59" font-size="16" text-anchor="end" fill="black">q</text><circle cx="170" cy="65" fill="white" stroke="black" stroke-width="1" r="20"></circle><text x="170" y="70" font-size="20" fill="black" text-anchor="middle">+</text><line x1="110" y1="30" x2="150" y2="65" stroke="black" stroke-width="1" marker-end="url(#arrowhead)"></line><line x1="110" y1="100" x2="150" y2="65" stroke="black" stroke-width="1" marker-end="url(#arrowhead)"></line><line x1="190" y1="65" x2="210" y2="65" stroke="black" stroke-width="1" marker-end="url(#arrowhead)"></line><line x1="380" y1="117" x2="450" y2="117" stroke="black" stroke-width="1"></line><text x="385" y="111" font-size="16" fill="green">-12</text><text x="385" y="134" font-size="16" fill="red">1</text><text x="375" y="111" font-size="16" text-anchor="end" fill="black">f</text><circle cx="340" cy="117" fill="white" stroke="black" stroke-width="1" r="20"></circle><text x="340" y="127" font-size="20" fill="black" text-anchor="middle">*</text><line x1="280" y1="65" x2="320" y2="117" stroke="black" stroke-width="1" marker-end="url(#arrowhead)"></line><line x1="110" y1="170" x2="320" y2="117" stroke="black" stroke-width="1" marker-end="url(#arrowhead)"></line><line x1="360" y1="117" x2="380" y2="117" stroke="black" stroke-width="1" marker-end="url(#arrowhead)"></line></svg>
+                </div>
+                <p>Notice that backpropagation is a beautifully local process. Every gate in a circuit diagram gets some inputs and can right away compute two things: 1. its output value and 2. the local gradient of its output with respect to its inputs.</p>
+                <p>Notice that the gates can do this completely independently without being aware of any of the details of the full circuit that they are embedded in. However, once the forward pass is over, during backpropagation the gate will eventually learn about the gradient of its output value on the final output of the entire circuit. Chain rule says that the gate should take that gradient and multiply it into every gradient it normally computes for all of its inputs.</p>
+                <p class="comment">his extra multiplication (for each input) due to the chain rule can turn a single and relatively useless gate into a cog in a complex circuit such as an entire neural network.</p>
+
+                <p>Lets get an intuition for how this works by referring again to the example. The add gate received inputs [-2, 5] and computed output 3. Since the gate is computing the addition operation, its local gradient for both of its inputs is +1. The rest of the circuit computed the final value, which is -12.</p>
+                <p>During the backward pass in which the chain rule is applied recursively backwards through the circuit, the add gate (which is an input to the multiply gate) learns that the gradient for its output was -4. If we anthropomorphize the circuit as wanting to output a higher value (which can help with intuition), then we can think of the circuit as “wanting” the output of the add gate to be lower (due to negative sign), and with a force of 4.</p>
+                <p>To continue the recurrence and to chain the gradient, the add gate takes that gradient and multiplies it to all of the local gradients for its inputs (making the gradient on both \(x\) and \(y\): 1 * -4 = -4). Notice that this has the desired effect: If x,y were to decrease (responding to their negative gradient) then the add gate’s output would decrease, which in turn makes the multiply gate’s output increase.</p>
+                <p>Backpropagation can thus be thought of as gates communicating to each other (through the gradient signal) whether they want their outputs to increase or decrease (and how strongly), so as to make the final output value higher.</p>                
+
+                <h3>1.6.4 Sigmoid Example</h3>
+                <p>The gates we introduced above are relatively arbitrary. Any kind of differentiable function can act as a gate, and we can group multiple gates into a single gate, or decompose a function into multiple gates whenever it is convenient. Lets look at another expression that illustrates this point:</p>
+                                
+                <h3>1.6.5 Backprop in Practice</h3>
+
+                <h3>1.6.6 Gradients for Vectorized</h3>
                 <div class="navigation">
                     <a href="calculus.html">Prev: 1.5 Calculus</a>
                     <a href="network_scratch.html">Next: 1.7 Neural Network from Scratch</a>
