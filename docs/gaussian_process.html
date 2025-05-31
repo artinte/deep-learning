@@ -33,7 +33,7 @@
                 <p>We then introduce popular covariance functions, also known as kernels, which control the generalization properties of a Gaussian process. A GP with a given kernel defines a prior over functions. In the inference notebook, we will show how to use data to infer a posterior, in order to make predictions. This notebook contains from-scratch code for making predictions with a Gaussian process, as well as an introduction to GPyTorch.</p>
                 <p>In upcoming notebooks, we will introduce the numerics behind Gaussian processes, which is useful for scaling Gaussian processes but also a powerful general foundation for deep learning, and advanced use-cases such as hyperparameter tuning in deep learning. Our examples will make use of GPyTorch, which makes Gaussian processes scale, and is closely integrated with deep learning functionality and PyTorch.</p>
                 
-                <h3>18.1.1 Introduction to GP</h3>
+                <h3>6.2.1 Introduction to GP</h3>
                 <p>In many cases, machine learning amounts to estimating parameters from data. These parameters are often numerous and relatively uninterpretable — such as the weights of a neural network. Gaussian processes, by contrast, provide a mechanism for directly reasoning about the high-level properties of functions that could fit our data.</p>
                 <p>For example, we may have a sense of whether these functions are quickly varying, periodic, involve conditional independencies, or translation invariance. Gaussian processes enable us to easily incorporate these properties into our model, by directly specifying a Gaussian distribution over the function values that could fit our data.</p>
                 <p>Let’s get a feel for how Gaussian processes operate, by starting with some examples.</p>
@@ -41,7 +41,7 @@
                 <p>What are some features of the data? How quickly does it seem to varying? Do we have data points collected at regular intervals, or are there missing inputs? How would you imagine filling in the missing regions, or forecasting up until \(x = 25\)?</p>
                 <img src="res/06/gp_observed_data.png" alt="GP Observed Data" width="400">
                 <div class="navigation">
-                    <a href="probability_theory.html">Prev: 6.1 Probability Theory</a>
+                    <a href="prob_theory.html">Prev: 6.1 Probability Theory</a>
                     <a href="diffusion_math.html">Next: 6.3 Mathematical Foundation</a>
                 </div>
             </main>
