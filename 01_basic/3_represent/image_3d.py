@@ -30,6 +30,13 @@ x_test, y_test = mnist.mnist_read(
     os.path.join(base_dir, 't10k-images-idx3-ubyte'),
     os.path.join(base_dir, 't10k-labels-idx1-ubyte'))
 
+fig = pyplot.figure(figsize=(x_train[0].shape[0] / 10,
+                             x_train[0].shape[1] / 10))
+ax = fig.add_axes([0, 0, 1, 1])
+ax.imshow(x_train[0], cmap='gray_r', vmin=0, vmax=255)
+ax.axis('off')
+pyplot.show()
+
 images_show = []
 labels_show = []
 row = 5
