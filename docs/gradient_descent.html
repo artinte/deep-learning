@@ -127,10 +127,77 @@ assert df_dz == 3</code></pre>
                 <p class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(\frac{d\sigma(x)}{dx} = \frac{e^{-x}}{(1 + e^{-x})^2} = (\frac{1 + e^{-x} - 1}{1 + e^{-x}})(\frac{1}{1 + e^{-x}}) = (1 - \sigma(x))\sigma(x)\)
                 </p>
+                <p>As we see, the gradient turns out to simplify and becomes surprisingly simple. For example, the sigmoid expression receives the input 1.0 and computes the output 0.73 during the forward pass. The derivation above shows that the local gradient would simply be \((1 - 0.73) * 0.73 ~= 0.2\), as the circuit computed before (see the image above), except this way it would be done with a single, simple and efficient expression (and with less numerical issues). Therefore, in any real practical application it would be very useful to group these operations into a single gate. Lets see the backprop for this neuron in code:</p>
+                <pre><code>w = [2,-3,-3]
+x = [-1, -2]
+
+# forward pass
+dot = w[0]*x[0] + w[1]*x[1] + w[2]
+f = 1.0 / (1 + math.exp(-dot))
+
+# backward pass through the neuron (backpropagation)
+# gradient on dot variable, using the sigmoid gradient derivation
+ddot = (1 - f) * f
+# backprop into x
+dx = [w[0] * ddot, w[1] * ddot]
+# backprop into w
+dw = [x[0] * ddot, x[1] * ddot, 1.0 * ddot]
+print(numpy.round(dx, 4))
+print(numpy.round(dw, 4))</code></pre>
+                <p>Implementation protip: staged backpropagation. As shown in the code above, in practice it is always helpful to break down the forward pass into stages that are easily backpropped through. For example here we created an intermediate variable \(dot\) which holds the output of the dot product between <code>w</code> and <code>x</code>.</p>
+                <p>During backward pass we then successively compute (in reverse order) the corresponding variables (e.g. <code>ddot</code>, and ultimately <code>dw</code>, <code>dx</code>) that hold the gradients of those variables.</p>
+                <p>The point of this section is that the details of how the backpropagation is performed, and which parts of the forward function we think of as gates, is a matter of convenience. It helps to be aware of which parts of the expression have easy local gradients, so that they can be chained together with the least amount of code and effort.</p>
 
                 <h3>1.6.5 Backprop in Practice</h3>
+                <p>Lets see this with another example. Suppose that we have a function of the form:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(f(x, y) = \frac{x + \sigma(y)}{\sigma(x) + (x + y)^2}\)
+                </div>
+                <p>To be clear, this function is completely useless and it’s not clear why you would ever want to compute its gradient, except for the fact that it is a good example of backpropagation in practice. It is very important to stress that if you were to launch into performing the differentiation with respect to either x or y, you would end up with very large and complex expressions.</p>
+                <p>However, it turns out that doing so is completely unnecessary because we don’t need to have an explicit function written down that evaluates the gradient. We only have to know how to compute it. Here is how we would structure the forward pass of such expression:</p>
+                <pre><code>x = 3 # example values
+y = -4
+
+# forward pass
+sigy = 1.0 / (1 + math.exp(-y)) # sigmoid in numerator   #(1)
+num = x + sigy # numerator                               #(2)
+sigx = 1.0 / (1 + math.exp(-x)) # sigmoid in denominator #(3)
+xpy = x + y                                              #(4)
+xpysqr = xpy**2                                          #(5)
+den = sigx + xpysqr # denominator                        #(6)
+invden = 1.0 / den                                       #(7)
+f = num * invden # done!                                 #(8)</code></pre>
+                <p>Phew, by the end of the expression we have computed the forward pass. Notice that we have structured the code in such way that it contains multiple intermediate variables, each of which are only simple expressions for which we already know the local gradients.</p>
+                <p>Therefore, computing the backprop pass is easy: We’ll go backwards and for every variable along the way in the forward pass (<code>sigy, num, sigx, xpy, xpysqr, den, invden</code>) we will have the same variable, but one that begins with a <code>d</code>, which will hold the gradient of the output of the circuit with respect to that variable.</p>
+                <p>Additionally, note that every single piece in our backprop will involve computing the local gradient of that expression, and chaining it with the gradient on that expression with a multiplication. For each row, we also highlight which part of the forward pass it refers to:</p>
+                <pre><code># backprop f = num * invden
+dnum = invden # gradient on numerator                             #(8)
+dinvden = num                                                     #(8)
+# backprop invden = 1.0 / den 
+dden = (-1.0 / (den**2)) * dinvden                                #(7)
+# backprop den = sigx + xpysqr
+dsigx = (1) * dden                                                #(6)
+dxpysqr = (1) * dden                                              #(6)
+# backprop xpysqr = xpy**2
+dxpy = (2 * xpy) * dxpysqr                                        #(5)
+# backprop xpy = x + y
+dx = (1) * dxpy                                                   #(4)
+dy = (1) * dxpy                                                   #(4)
+# backprop sigx = 1.0 / (1 + math.exp(-x))
+dx += ((1 - sigx) * sigx) * dsigx # Notice += !! See notes below  #(3)
+# backprop num = x + sigy
+dx += (1) * dnum                                                  #(2)
+dsigy = (1) * dnum                                                #(2)
+# backprop sigy = 1.0 / (1 + math.exp(-y))
+dy += ((1 - sigy) * sigy) * dsigy                                 #(1)
+# done! phew</code></pre>
+                <p>Notice a few things:</p>
+                <p>Cache forward pass variables. To compute the backward pass it is very helpful to have some of the variables that were used in the forward pass. In practice you want to structure your code so that you cache these variables, and so that they are available during backpropagation. If this is too difficult, it is possible (but wasteful) to recompute them.</p>
+                <p>Gradients add up at forks. The forward expression involves the variables x,y multiple times, so when we perform backpropagation we must be careful to use += instead of = to accumulate the gradient on these variables (otherwise we would overwrite it). This follows the multivariable chain rule in Calculus, which states that if a variable branches out to different parts of the circuit, then the gradients that flow back to it will add.</p>
 
                 <h3>1.6.6 Gradients for Vectorized</h3>
+
+                <p>In the next section we will start to define neural networks, and backpropagation will allow us to efficiently compute the gradient of a loss function with respect to its parameters. In other words, we’re now ready to train neural nets, and the most conceptually difficult part of this class is behind us!</p>
                 <div class="navigation">
                     <a href="calculus.html">Prev: 1.5 Calculus</a>
                     <a href="network_scratch.html">Next: 1.7 Neural Network from Scratch</a>
