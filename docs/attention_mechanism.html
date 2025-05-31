@@ -22,14 +22,14 @@
                 <p class="title-subtext">An attention mechanism is a machine learning technique that directs deep learning models to prioritize (or attend to) the most relevant parts of input data.Innovation in attention mechanisms enabled the transformer architecture that yielded the modern large language models (LLMs) that power popular applications like ChatGPT.</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-19</p>
 
-                <p>As their name suggests, attention mechanisms are inspired by the ability of humans (and other animals) to selectively pay more attention to salient details and ignore details that are less important in the moment. Having access to all information but focusing on only the most relevant information helps to ensure that no meaningful details are lost while enabling efficient use of limited memory and time.</p>
-                <p>Mathematically speaking, an attention mechanism computes attention weights that reflect the relative importance of each part of an input sequence to the task at hand. It then applies those attention weights to increase (or decrease) the influence of each part of the input, in accordance with its respective importance. An attention model—that is, an artificial intelligence model that employs an attention mechanism—is trained to assign accurate attention weights through supervised learning or self-supervised learning on a large dataset of examples.</p>
-                <p>An example of the attention mechanism following long-distance dependencies in the encoder self-attention in layer 5 of 6. Many of the attention heads attend to a distant dependency of the verb 'making', completing the phrase 'making...more difficult'. Attentions here shown only for the word ‘making’. Different colors represent different heads. Best viewed in color.</p>
+                <p>As their name suggests, <strong>attention mechanisms</strong> are inspired by the ability of humans (and other animals) to selectively pay more attention to salient details and ignore details that are less important in the moment. Having access to all information but focusing on only the most relevant information helps to ensure that no meaningful details are lost while enabling efficient use of limited memory and time.</p>
+                <p>Mathematically speaking, an attention mechanism computes attention weights that reflect the relative importance of each part of an input sequence to the task at hand. It then applies those attention weights to increase (or decrease) the influence of each part of the input, in accordance with its respective importance. An attention model - that is, an artificial intelligence model that employs an attention mechanism — is trained to assign accurate attention weights through supervised learning or self-supervised learning on a large dataset of examples.</p>
+                <p>An example of the attention mechanism following long-distance dependencies in the encoder self-attention in layer 5 of 6. Many of the attention heads attend to a distant dependency of the verb 'making', completing the phrase 'making...more difficult'. Attentions here shown only for the word 'making'. Different colors represent different heads. Best viewed in color.</p>
                 <img src="res/05/attention_visual.jpg" width="600" alt="Make ... More Difficult">
     
                 <p>Attention mechanisms were originally introduced by <a href="nmt_align.html">Bahdanau</a> et al in 2014 as a technique to address the shortcomings of what were then state-of-the-art recurrent neural network (RNN) models used for machine translation. Subsequent research integrated attention mechanisms into the convolutional neural networks (CNNs) used for tasks such as image captioning and visual question answering.</p>
                 <p>In 2017, the seminal paper <a href="https://arxiv.org/abs/1706.03762">Attention is All You Need</a> introduced the transformer model, which eschews recurrence and convolutions altogether in favor of only attention layers and standard feedforward layers. The transformer architecture has since become the backbone of the cutting-edge models powering the ongoing era of generative AI.</p>
-                <p>While attention mechanisms are primarily associated with LLMs used for natural language processing (NLP) tasks, such as summarization, question answering, text generation and sentiment analysis, attention-based models are also used widely in other domains. Leading diffusion models used for image generation often incorporate an attention mechanism. In the field of computer vision, <a>vision transformers (ViTs)</a> have achieved superior results on tasks including object detection, image segmentation and visual question answering.</p>
+                <p>While attention mechanisms are primarily associated with LLMs used for natural language processing (NLP) tasks, such as summarization, question answering, text generation and sentiment analysis, attention-based models are also used widely in other domains. Leading diffusion models used for image generation often incorporate an attention mechanism. In the field of computer vision, <a href="vision_transformer.html">vision transformers (ViTs)</a> have achieved superior results on tasks including object detection, image segmentation and visual question answering.</p>
 
                 <h3>5.1.1 Queries, Keys, and Values</h3>
                 <p>So far all the networks we have reviewed crucially relied on the input being of a well-defined size. For instance, the images in ImageNet are of size \(224 \times 224\) pixels and CNNs are specifically tuned to this size. Even in natural language processing the input size for RNNs is well defined and fixed.</p>
@@ -45,8 +45,30 @@
                 </ul>
                 <p>Clearly we would not have introduced a simple database here if it wasn't for the purpose of explaining deep learning. Indeed, this leads to one of the most exciting concepts introduced in deep learning in the past decade: the <strong>attention mechanism</strong>.</p>
                 <p>We will cover the specifics of its application to machine translation later. For now, simply consider the following: denote by \(D = {(k_1, v_1), \cdots, (k_m, v_m)}\) a database of \(m\) tuples of keys and values. Moreover, denote by \(q\) a query. Then we can define the attention over \(D\) as:</p>
+
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(Attention(q, D) = \sum_{i=1}^{m} \alpha(q, k_i) v_i\)
+                </div>
+
                 <p>where \(\alpha(q, k_i) \in \mathbb{R} (i = 1, \cdots , m)\) are scalar attention weights. The operation itself is typically referred to as <strong>attention pooling</strong>. The name attention derives from the fact that the operation pays particular attention to the terms for which the weight \(\alpha\) is significant (i.e., large).</p>
                 <p>As such, the attention over \(D\) generates a linear combination of values contained in the database. In fact, this contains the above example as a special case where all but one weight is zero. We have a number of special cases:</p>
+                <ul class="comment">
+                    <li><p>The weights \(\alpha(q, k_i)\) are nonnegative. In this case the output of the attention mechanism is contained in the convex cone spanned by the values \(v_i\).</p></li>
+                    <li><p>The weights \(\alpha(q, k_i)\) form a convex combination, i.e. \(\sum_i \alpha(q, k_i) = 1\) and \(\alpha(q, k_i) \ge 0\) for all \(i\). This is the most common setting in deep learning.</p></li>
+                    <li><p>Exactly one of the weights \(\alpha(q, k_i)\) is 1, while all others are 0. This is akin to a traditional database query.</p></li>
+                    <li><p>All weights are equal, i.e. \(\alpha(q, k_i) = \frac{1}{m}\) for all \(i\). This amounts to averaging across the entire database, also called average pooling in deep learning.</p></li>
+                </ul>
+                <p>A common strategy for ensuring that the weights sum up to 1 is to normalize them via:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\alpha(q, k_i) = \frac{\alpha(q, k_i)}{\sum_j \alpha(q, k_j)}\)
+                </div>
+                <p>In particular, to ensure that the weights are also nonnegative, one can resort to exponentiation. This means that we can now pick any function \(\alpha(q, k)\) and then apply the softmax operation used for multinomial models to it via:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\alpha(q, k_i) = \frac{exp(\alpha(q, k_i))}{\sum_j exp(\alpha(q, k_j))}\)
+                </div>
+                <p>This operation is readily available in all deep learning frameworks. It is differentiable and its gradient never vanishes, all of which are desirable properties in a model. Note though, the attention mechanism introduced above is not the only option.</p>
+                <p>For instance, we can design a non-differentiable attention model that can be trained using reinforcement learning methods. As one would expect, training such a model is quite complex. Consequently the bulk of modern attention research follows the framework outlined in below figure. We thus focus our exposition on this family of differentiable mechanisms.</p>
+                <img src="res/05/query_kv.png" alt="Query - (Keys, Values)">
 
                 <div class="navigation">
                     <a href="attention_nmt.html">Prev: 4.6 Attention-based NMT</a>
