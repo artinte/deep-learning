@@ -77,7 +77,7 @@
                     \(\alpha(q, k) = exp(-\frac{1}{2} {\left| q - k \right|}^2)\)
                 </p>
                 <p class="highlight-math" style="text-align: center; overflow-x: auto;">
-                    \(\alpha(q, k) = 1 if \left| q - k \right| \le 1\)
+                    \(\alpha(q, k) = 1 \quad if \quad \left| q - k \right| \le 1\)
                 </p>
                 <p class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(\alpha(q, k) = max(0, 1 - \left| q - k \right|)\)
@@ -90,6 +90,13 @@
                 <p>All the kernels \(\alpha (k, q)\) defined in this section are translation and rotation invariant; that is, if we shift and rotate \(k\) and \(q\) in the same manner, the value of \(\alpha\) remains unchanged. For simplicity we thus pick scalar arguments \(k, q \in \mathbb{R}\) and pick the key \(k = 0\) as the origin. This yields:</p>
 
                 <img src="res/05/kernel_functions.png" alt="Kernel Functions" width="600">
+                <p>Different kernels correspond to different notions of range and smoothness. For instance, the boxcar kernel only attends to observations within a distance of 1 (or some otherwise defined hyperparameter) and does so indiscriminately.</p>
+                <p>To see Nadaraya–Watson estimation in action, let's define some training data. In the following we use the dependency:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(y_i = 2 sin(x_i) + x_i + \epsilon\)
+                </div>
+                <p>where \(\epsilon\) is drawn from a normal distribution with zero mean and unit variance. We draw 40 training examples.</p>
+                
 
                 <div class="navigation">
                     <a href="attention_nmt.html">Prev: 4.6 Attention-based NMT</a>
