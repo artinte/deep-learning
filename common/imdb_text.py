@@ -28,5 +28,3 @@ def get_dataset_dir():
     extract_file_dir = os.path.join(extract_dir, 'aclImdb')
     print('Successfully extracted to:', extract_file_dir)
     return extract_file_dir
-    train_dir = os.path.join(extract_file_dir, 'train')
-    print(os.listdir(train_dir))
