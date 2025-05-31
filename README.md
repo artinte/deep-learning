@@ -59,7 +59,7 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 
 ### 07 Text
 
-- 7.1 [Translate text with Transformer](https://artinte.github.io/deep-learning/trans_transformer.html)
+- 7.1 [Translate with Transformer](https://artinte.github.io/deep-learning/trans_transformer.html)
 - 7.2 [Easy OCR](https://artinte.github.io/deep-learning/easy_ocr.html)
 - 7.3 [Language Modeling](https://artinte.github.io/deep-learning/language_model.html)
 - 7.4 [Chatbots](https://artinte.github.io/deep-learning/chatbots.html)
@@ -69,9 +69,8 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 - 8.1 [Speech Feature Extraction](https://artinte.github.io/deep-learning/speech_feature.html)
 - 8.2 [Automatic Speech Recognition](https://artinte.github.io/deep-learning/speech_recognition.html)
 - 8.3 [Text-to-Speech](https://artinte.github.io/deep-learning/text_to_speech.html)
-- 8.4 Speech Enhancement and Separation
-- 8.5 Voice Synthesis and Style Transfer
-- 8.6 Audio Source Separation
+- 8.4 [Speech Separation]()
+- 8.5 Voice Synthesis
 
 ### 09 Image and Video
 
