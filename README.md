@@ -69,8 +69,8 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 - 8.1 [Speech Feature Extraction](https://artinte.github.io/deep-learning/speech_feature.html)
 - 8.2 [Automatic Speech Recognition](https://artinte.github.io/deep-learning/speech_recognition.html)
 - 8.3 [Text-to-Speech](https://artinte.github.io/deep-learning/text_to_speech.html)
-- 8.4 [Speech Separation]()
-- 8.5 Voice Synthesis
+- 8.4 [Speech Separation](https://artinte.github.io/deep-learning/speech_separation.html)
+- 8.5 [Voice Synthesis]()
 
 ### 09 Image and Video
 

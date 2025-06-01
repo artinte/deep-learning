@@ -40,6 +40,23 @@
                 <p>Suppose we observe the following dataset, of regression targets (outputs) \(y\), indexed by inputs \(x\). As an example, the targets could be changes in carbon dioxide concentrations, and the inputs could be the times at which these targets have been recorded.</p>
                 <p>What are some features of the data? How quickly does it seem to varying? Do we have data points collected at regular intervals, or are there missing inputs? How would you imagine filling in the missing regions, or forecasting up until \(x = 25\)?</p>
                 <img src="res/06/gp_observed_data.png" alt="GP Observed Data" width="400">
+                <p>In order to fit the data with a Gaussian process, we start by specifying a prior distribution over what types of functions we might believe to be reasonable. Here we show several sample functions from a Gaussian process. Does this prior look reasonable?</p>
+                <p>Note here we are not looking for functions that fit our dataset, but instead for specifying reasonable high-level properties of the solutions, such as how quickly they vary with inputs. Note that we will see code for reproducing all of the plots in this notebook, in the next notebooks on priors and inference.</p>
+                <img src="res/06/sample_prior_func.png" alt="Sample Prior Functions" width="400">
+                <p>Once we condition on data, we can use this prior to infer a posterior distribution over functions that could fit the data. Here we show sample posterior functions.</p>
+
+                <h3>6.2.2 GP Priors</h3>
+                <p>Understanding Gaussian processes (GPs) is important for reasoning about model construction and generalization, and for achieving state-of-the-art performance in a variety of applications, including active learning, and hyperparameter tuning in deep learning. GPs are everywhere, and it is in our interests to know what they are and how we can use them.</p>
+                <p>In this section, we introduce Gaussian process priors over functions. In the next notebook, we show how to use these priors to do posterior inference and make predictions. The next section can be viewed as “GPs in a nutshell”, quickly giving what you need to apply Gaussian processes in practice.</p>
+
+                <h3>6.2.2.1 Definition</h3>
+                <p>A Gaussian process is defined as a collection of random variables, any finite number of which have a joint Gaussian distribution. If a function \(f(x)\) is a Gaussian process, with mean function \(m(x)\) and covariance function or kernel \(k(x, x')\), \(f(x) ~ GP(m, k)\), then any collection of function values queried at any collection of input points \(x\) (times, spatial locations, image pixels, etc.), has a joint multivariate Gaussian distribution with mean vector \(u\) and covariance matrix \(K\):</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(f(x_1), \cdots, f(x_n) ~ N(u, k), where u_i = E[f(x_i)] = m(x_i) and K_{ij} = Cov(f(x_i), f(x_j)) = k(x_i, x_j).\)
+                </div>
+
+                <h3>6.2.3 GP Inference</h3>
+
                 <div class="navigation">
                     <a href="prob_theory.html">Prev: 6.1 Probability Theory</a>
                     <a href="diffusion_math.html">Next: 6.3 Mathematical Foundation</a>
