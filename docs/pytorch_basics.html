@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="laptop_coding_48.png" type="image/png">
-    <title>MNIST classification</title>
+    <title>PyTorch Basics</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="article_style.css" rel="stylesheet">
 </head>
@@ -18,9 +18,12 @@
             </nav>
 
             <main class="col-md-8 content">
-                <h2 class="custom-title">2.3 MNIST classification</h2>
-                <p class="title-subtext"></p>
+                <h2 class="custom-title">2.3 PyTroch Basics</h2>
+                <p class="title-subtext">Learn the PyTorch Basics!</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-10</p>
+                <p>Most machine learning workflows involve working with data, creating models, optimizing model parameters, and saving the trained models. This tutorial introduces you to a complete ML workflow implemented in PyTorch, with links to learn more about each of these concepts.</p>
+                <p>We’ll use the <a href="data_represent.html#mnist">MNIST</a> dataset to train a neural network that predicts if an input image belongs to one of the ten digit classes (0 through 9).</p>
+                <p>This tutorial assumes a basic familiarity with Python and <a href="principle_learn.html">Deep Learning concepts</a>.</p>
 
                 <h3>2.3.1 Quickstart</h3>
                 <p>This section runs through the API for common tasks in machine learning. Refer to the links in each section to dive deeper.</p>
@@ -28,6 +31,14 @@
                 <p><a href="">quick_start.py</a></p>
                 <pre><samp>Shape of X [N, C, H, W]: torch.Size([64, 1, 28, 28])
 Shape of y: torch.Size([64]) torch.int64</samp></pre>
+
+                <h3>2.3.2 Tensors</h3>
+                <h3>2.3.3 Datasets and DataLoaders</h3>
+                <h3>2.3.4 Transforms</h3>
+                <h3>2.3.5 Build Model</h3>
+                <h3>2.3.6 Automatic Differentiation</h3>
+                <h3>2.3.7 Optimization Loop</h3>
+                <h3>2.3.8 Save, Load and Use Model</h3>
                 <div class="navigation">
                     <a href="point_classify.html">Prev: 2.2 Points Classification</a>
                     <a href="activation_function.html">Next: 2.4 Activation Function</a>
