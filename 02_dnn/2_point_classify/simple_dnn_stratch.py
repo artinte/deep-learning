@@ -13,7 +13,7 @@ from common import decision_boundary
 X, y = sklearn.datasets.make_moons(200, noise=0.15)
 pyplot.scatter(X[:, 0], X[:, 1], s=40, c=y)
 pyplot.grid(True)
-pyplot.subplots_adjust(left=0.08, right=0.92, top=0.96, bottom=0.06)
+pyplot.subplots_adjust(left=0.1, right=0.95, top=0.96, bottom=0.06)
 pyplot.show()
 
 # Train the logistic regression classifier.
