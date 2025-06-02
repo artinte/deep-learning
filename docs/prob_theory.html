@@ -22,6 +22,77 @@
                 <p class="title-subtext"></p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-18</p>
 
+
+                <h3>6.1.1 Normal Distribution</h3>
+                <p>In probability theory and statistics, a normal distribution or Gaussian distribution is a type of continuous probability distribution for a real-valued random variable. The general form of its probability density function is:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(f(x) = \frac{1}{\sigma \sqrt{2\pi}} e^{-\frac{{(x - \mu)}^2}{2 {\sigma}^2}}\)
+                </div>
+                <p>The parameter \(\mu\) is the <a href="#mean_median">mean</a> or expectation of the distribution (and also its median and mode), while the parameter \({\sigma}^2\) is the <a href="deviation_variance">variance</a>. The standard deviation of the distribution is \(\sigma\) (sigma). A random variable with a Gaussian distribution is said to be normally distributed, and is called a normal deviate.</p>
+                <img src="res/06/normal_distribute.png" alt="Normal Distribution">
+                <p>The simplest case of a normal distribution is known as the standard normal distribution or unit normal distribution. This is a special case when \(\mu = 0\) and \({\sigma}^2 = 1\), and it is described by this probability density function (or density):</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\varphi(z) = \frac{1}{\sqrt{2\pi}} e^{-\frac{1}{2}z^2}\)
+                </div>
+                <p>The normal distribution is often referred to as \(N(\mu, {\sigma}^2)\) or \(\mathcal{N}(\mu, \sigma^2)\). Thus when a random variable \(X\) is normally distributed with mean \(\mu\) and stanard deviation \(\sigma\), one may write:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(X \sim \mathcal{N}(\mu, \sigma^2)\)
+                </div>
+                <h4 id="mean_median">6.1.1.1 Mean and Median</h4>
+                <p>The mean is the sum of all values divided by the number of values. For numbers \(x_1, x_2, \cdots , x_n\):</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\bar{x} = \frac{1}{n} \sum_{i=1}^{n} x_i\)
+                </div>
+                <p>The median is the middle number when the data is sorted.</p>
+                <ol class="comment">
+                    <li><p>If the number of data points is odd, the median is the middle value.</p></li>
+                    <li><p>If even, it is the average of the two middle values.</p></li>
+                </ol>
+                
+                <h4 id="deviation_variance">6.1.1.2 Standard Deviation and Variance</h4>
+                <p>Variance measures how spread out a set of numbers is. It's the average of the squared differences from the mean. You and your friends have just measured the heights of your dogs (in millimeters):</p>
+                <img src="res/06/height_dogs.jpg" alt="Statistics Dogs Graph" width="600">
+                <p>The heights (at the shoulders) are: 600 mm, 470 mm, 170 mm, 430 mm and 300 mm. Find out the Mean, the Variance, and the Standard Deviation.</p>
+                <p>Our first step is to find the Mean:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(Mean = \frac{600 + 470 + 170 + 430 + 300}{5} = \frac{1970}{5} = 394\)
+                </div>
+                <p>so the mean (average) height is 394 mm. Now we calculate each dog's difference from the Mean, let's plot this on the chart:</p>
+                <img src="res/06/dogs_deviation.jpg" alt="Statistics Dogs Deviation" width="600">
+                <p>To calculate the Variance, take each difference, square it, and then average the result:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(Variance = \frac{{206}^2 + {76}^2 + {(-224)}^2 + {36}^2 + {(-94)}^2}{5} = \frac{108520}{5} = 21704\)
+                </div>
+                <p>So the Variance is 21,704. And the Standard Deviation is just the square root of Variance, so:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(Deviation = \sqrt {21704} = 147\)
+                </div>
+                <p>And the good thing about the Standard Deviation is that it is useful. Now we can show which heights are within one Standard Deviation (147 mm) of the Mean:</p>
+                <img src="res/06/dogs_normal.jpg" alt="One Standard Deviation" width="600">
+                <p>So, using the Standard Deviation we have a "standard" way of knowing what is normal, and what is extra large or extra small.</p>
+                <p>Rottweilers are tall dogs. And Dachshunds are a bit short, right?</p>
+                <p>Our example has been for a Population (the 5 dogs are the only dogs we are interested in). But if the data is a Sample (a selection taken from a bigger Population), then the calculation changes!</p>
+                <ul class="with-bullets">
+                    <li><p>The Population: divide by \(N\) when calculating Variance (like we did)</p></li>
+                    <li><p>A Sample: divide by \(N - 1\) when calculating Variance</p></li>
+                </ul>
+                <p>The Population Standard Deviation:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\sigma = \sqrt {\frac{1}{N} \sum_{i=1}^N {(x_i - \mu)}^2}\)
+                </div>
+                <p>The Sample Standard Deviation:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(s = \sqrt {\frac{1}{N-1} \sum_{i=1}^N {(x_i - \bar x)}^2}\)
+                </div>
+                <p>If our 5 dogs are just a sample of a bigger population of dogs, we divide by 4 instead of 5 like this:</p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(Variance = \frac{108520}{4} = 27130\)
+                </p>
+
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(Deviation = \sqrt {27130} = 165\)
+                </p>
+
                 <div class="navigation">
                     <a href="vision_transformer.html">Prev: 5.6 Vision Transformer</a>
                     <a href="gaussian_process.html">Next: 6.2 Gaussian Processes</a>
