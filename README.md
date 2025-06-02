@@ -70,12 +70,12 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 - 8.2 [Automatic Speech Recognition](https://artinte.github.io/deep-learning/speech_recognition.html)
 - 8.3 [Text-to-Speech](https://artinte.github.io/deep-learning/text_to_speech.html)
 - 8.4 [Speech Separation](https://artinte.github.io/deep-learning/speech_separation.html)
-- 8.5 [Voice Synthesis]()
+- 8.5 [Voice Synthesis](https://artinte.github.io/deep-learning/voice_synthesis.html)
 
 ### 09 Image and Video
 
-- 9.1 Object Detection
-- 9.2 Transfer Learning
+- 9.1 [Object Detection](https://artinte.github.io/deep-learning/object_detection.html)
+- 9.2 [Transfer Learning](https://artinte.github.io/deep-learning/transfer_learning.html)
 - 9.3 FGSM Attack
 - 9.4 Spatial Transformer
 - 9.5 DeepFaceLab
