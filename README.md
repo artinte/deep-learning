@@ -84,7 +84,7 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 
 ### 10 Reinforcement Learning
 
-- 10.1 Introduction RL Problems
+- 10.1 [Introduction RL Problems](https://artinte.github.io/deep-learning/rl_introduction.html)
 - 10.2 Dynamic Programming
 - 10.3 DQN
 - 10.4 PPO
