@@ -34,10 +34,38 @@
                     \(G = \{V, E\}\)
                 </p>
                 <p>If vertices are viewed as nodes and edges as references (pointers) connecting the nodes, graphs can be seen as a data structure that extends from linked lists.</p>
-                <p>compared to linear relationships (linked lists) and divide-and-conquer relationships (trees), network relationships (graphs) are more complex due to their higher degree of freedom, as show below:</p>
-                
-                <h3>15.1.2 Basic Graph Operations</h3>
-                <h3>15.1.3 Graph Traversal</h3>
+                <p>Compared to linear relationships (linked lists) and divide-and-conquer relationships (trees), network relationships (graphs) are more complex due to their higher degree of freedom, as show below:</p>
+
+                <h3>15.1.2 Common Types</h3>
+                <p>Graphs can be divided into undirected graphs and directed graphs depending on whether edges have direction:</p>
+                <ul class="with-bullets">
+                    <li><p>In undirected graphs, edges represent a "bidirectional" connection between two vertices, for example, the "friends" in Facebook.</p></li>
+                    <li><p>In directed graphs, edges have directionality, that is, the edges \(A \rightarrow B\) and \(A \leftarrow B\) are independent of each other. For example, the "follow" and "followed" relationship on Instagram.</p></li>
+                </ul>
+                <p>Depending on whether all vertices are connected, graphs can be divided into connected graphs and disconnected graphs:</p>
+                <ul class="with-bullets">
+                    <li><p>For connected graphs, it is possible to reach any other vertex starting from an arbitrary vertex.</p></li>
+                    <li><p>For disconnected graphs, there is at least one vertex that cannot be reached from an arbitrary starting vertex.</p></li>
+                </ul>
+                <p>We can also add a weight variable to edges, For example, in Instagram, the system sorts your follower and following list by the level of interaction between you and other users (likes, views, comments, etc.). Such an interaction network can be represented by a weighted graph.</p>
+                <p>Graph data structures include the following commonly used terms.</p>
+
+                <h3>15.1.3 Representation of Graphs</h3>
+                <p>Common representations of graphs include "adjacency matrix" and "adjacency list". The following examples use undirected graphs.</p>
+                <h5>Adjacency matrix</h5>
+                <p>Let the number of vertices in the graph be \(n\), the adjacency matrix uses an \(n \times n\), matrix to represent the graph, where each row (column) represents a vertex, and the matrix elements represent edges, with 1 or 0 indicating whether there is an edge between two vertices.</p>
+                <p>Let the adjacency matrix be \(M\), and the list of vertices be \(V\), then the matrix element \(M[i, j] = 1\ )indicates there is an edge between vertex \(V[i]\) and \(V[j]\), conversely \(M[i, j] = 0\) indicates there is no edge between the two vertices.</p>
+                <p>Adjacency matrices have the following characteristics.</p>
+                <ul class="with-bullets>
+                    <li><p>A vertex cannot be connected to itself, so the elements on the main diagonal of the adjacency matrix are meaningless.</p></li>
+                    <li><p>For undirected graphs, edges in both directions are equivalent, thus the adjacency matrix is symmetric with regard to the main diagonal.</p></li>
+                    <li><p>By replacing the elements of the adjacency matrix from 1 and 0 to weights, we can represent weighted graphs.</p></li>
+                </ul>
+                <p>When representing graphs with adjacency matrices, it is possible to directly access matrix elements to obtain edges, resulting in efficient operations of addition, deletion, lookup, and modification, all with a time complexity of \(O(1)\). However, the space complexity of the matrix is \(O(n^2)\), which consumes more memory.</p>
+
+                <h3>15.1.4 Basic Graph Operations</h3>
+                <h3>15.1.5 Graph Traversal</h3>
+                <h4>15.1.5.1 Breadth-first Search</h4>
                 <div class="navigation">
                     <a href="#">Prev:</a>
                     <a href="#">Next:</a>
