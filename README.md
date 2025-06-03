@@ -79,7 +79,7 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 - 9.3 [FGSM Attack](https://artinte.github.io/deep-learning/fgsm_attack.html)
 - 9.4 [Spatial Transformer](https://artinte.github.io/deep-learning/spatial_transformer.html)
 - 9.5 [DeepFaceLab](https://artinte.github.io/deep-learning/deep_face_lab.html)
-- 9.6 DeepFaceLive
+- 9.6 [DeepFaceLive](https://artinte.github.io/deep-learning/deep_face_live.html)
 - 9.7 Segment Anything
 
 ### 10 Reinforcement Learning
