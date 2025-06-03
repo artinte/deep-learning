@@ -76,9 +76,9 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 
 - 9.1 [Object Detection](https://artinte.github.io/deep-learning/object_detection.html)
 - 9.2 [Transfer Learning](https://artinte.github.io/deep-learning/transfer_learning.html)
-- 9.3 FGSM Attack
-- 9.4 Spatial Transformer
-- 9.5 DeepFaceLab
+- 9.3 [FGSM Attack](https://artinte.github.io/deep-learning/fgsm_attack.html)
+- 9.4 [Spatial Transformer](https://artinte.github.io/deep-learning/spatial_transformer.html)
+- 9.5 [DeepFaceLab](https://artinte.github.io/deep-learning/deep_face_lab.html)
 - 9.6 DeepFaceLive
 - 9.7 Segment Anything
 
