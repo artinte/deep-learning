@@ -94,7 +94,7 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 
 - 11.1 [Custom Operators](https://artinte.github.io/deep-learning/custom_operator.html)
 - 11.2 [Custom Functions](https://artinte.github.io/deep-learning/custom_function.html)
-- 11.3 C++ and CUDA Extensions
+- 11.3 [C++ and CUDA Extensions](https://artinte.github.io/deep-learning/cpp_extension.html)
 - 11.4 Extending TorchScript
 - 11.5 Dispatcher
 
