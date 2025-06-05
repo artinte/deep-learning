@@ -88,11 +88,11 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 - 10.2 [Dynamic Programming](https://artinte.github.io/deep-learning/dynamic_program.html)
 - 10.3 [DQN](https://artinte.github.io/deep-learning/dqn.html)
 - 10.4 [PPO](https://artinte.github.io/deep-learning/ppo.html)
-- 10.5 Function Approximation
+- 10.5 [Function Approximation](https://artinte.github.io/deep-learning/function_appro.html)
 
 ### 11 Extending PyTorch
 
-- 11.1 Custom Operators
+- 11.1 [Custom Operators](https://artinte.github.io/deep-learning/custom_operator.html)
 - 11.2 Custom Functions
 - 11.3 C++ and CUDA Extensions
 - 11.4 Extending TorchScript
