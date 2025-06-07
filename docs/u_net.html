@@ -56,6 +56,10 @@
                 <h3>3.4.3 Training</h3>
                 <p>The input images and their corresponding segmentation maps are used to train the network with the stochastic gradient descent implementation of PyTorch. Due to the unpadded convolutions, the output image is smaller than the input by a constant border width. To minimize the overhead and make maximum use of the GPU memory, we favor large input tiles over a large batch size and hence reduce the batch to a single image. Accordingly we use a high momentum (0.99) such that a large number of the previously seen training samples determine the update in the current optimization step.</p>
                 <p>The energy function is computed by a pixel-wise soft-max over the final feature map combined with the cross entropy loss function. The soft-max is defined as \(p_k(x) = exp(a_k(x))/(\sum_{k'=1}^K exp(a_{k'}(x)))\) where \(a_k(x)\) denotes the activation in feature channel \(k\) at the pixel position \(x \in \Omega\) with \(\Omega \in \mathbb{Z}^2\).</p>
+
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(E = \sum_{x \in \Omega} w(x) log(p_{l(x)}(x))\)
+                </div>
                 
                 <h3>3.4.4 Experiments</h3>
 

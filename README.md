@@ -102,13 +102,13 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 
 - 12.1 [ONNX](https://artinte.github.io/deep-learning/onnx.html)
 - 12.2 [TorchScript](https://artinte.github.io/deep-learning/torch_script.html)
-- 12.3 ExecuTorch
+- 12.3 [ExecuTorch](https://artinte.github.io/deep-learning/execu_torch.html)
 - 12.4 [TensorFlow Lite](https://artinte.github.io/deep-learning/tensorflow_lite.html)
 - 12.5 [TensorFlow.js](https://artinte.github.io/deep-learning/tensorflow_js.html)
 
 ### 13 Model Optimization
 
-- 13.1 LoRA
+- 13.1 [LoRA](https://artinte.github.io/deep-learning/lora.html)
 - 13.2 Pruning
 - 13.3 Quantization
 - 13.4 Distillation
