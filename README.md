@@ -101,7 +101,7 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 ### 12 Deploying Models
 
 - 12.1 [ONNX](https://artinte.github.io/deep-learning/onnx.html)
-- 12.2 TorchScript
+- 12.2 [TorchScript](https://artinte.github.io/deep-learning/torch_script.html)
 - 12.3 ExecuTorch
 - 12.4 [TensorFlow Lite](https://artinte.github.io/deep-learning/tensorflow_lite.html)
 - 12.5 [TensorFlow.js](https://artinte.github.io/deep-learning/tensorflow_js.html)
