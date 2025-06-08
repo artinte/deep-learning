@@ -109,9 +109,9 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 ### 13 Model Optimization
 
 - 13.1 [LoRA](https://artinte.github.io/deep-learning/lora.html)
-- 13.2 Pruning
-- 13.3 Quantization
-- 13.4 Distillation
+- 13.2 [Pruning](https://artinte.github.io/deep-learning/pruning.html)
+- 13.3 [Quantization](https://artinte.github.io/deep-learning/quantization.html)
+- 13.4 [Distillation](https://artinte.github.io/deep-learning/distillation.html)
 
 ### 14 Distributed Training
 
