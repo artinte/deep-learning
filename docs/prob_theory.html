@@ -47,7 +47,7 @@
                     \(\bar{x} = \frac{1}{n} \sum_{i=1}^{n} x_i\)
                 </div>
                 <p>The median is the middle number when the data is sorted.</p>
-                <ol class="comment">
+                <ol class="with-bullets">
                     <li><p>If the number of data points is odd, the median is the middle value.</p></li>
                     <li><p>If even, it is the average of the two middle values.</p></li>
                 </ol>
@@ -97,8 +97,141 @@
                 </p>
 
                 <h3>6.1.2 Covariance Matrix</h3>
-                
-                
+                <p>Covariance is a statistical measure that tells us how two variables change together. In simpler terms, it indicates the direction of the linear relationship between two variables.</p>
+                <p>Here's a breakdown:</p>
+                <ul class="with-bullets">
+                    <li><p>Positive Covariance: If the covariance is positive, it means that when one variable tends to be above its average, the other variable also tends to be above its average. Similarly, when one is below average, the other also tends to be below average. They move in the same direction.</p></li>
+                    <li><p>Negative Covariance: If the covariance is negative, it means that when one variable tends to be above its average, the other variable tends to be below its average, and vice versa. They move in opposite directions.</p></li>
+                    <li><p>Zero Covariance (or close to zero): If the covariance is zero or very close to zero, it suggests there's no linear relationship between the two variables. They tend to move independently of each other.</p></li>
+                </ul>
+                <p class="comment">Covariance only tells you the direction of the relationship, not the strength. The magnitude of the covariance depends on the units of the variables, making it hard to compare covariances across different datasets. For strength, we use the correlation coefficient, which is a normalized version of covariance.</p>
+                <h5>Simple Example: Study Hours and Test Scores</h5>
+                <p>Let's say we want to see how the number of hours a student studies (Variable X) relates to their test score (Variable Y).</p>
+                <p>Here's some hypothetical data for 5 students:</p>
+                <div class="d-flex justify-content-center align-items-center" style="overflow-x: auto; width: 100%;">
+                    <table class="table table-light text-center" style="width: 80%;">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Hours Studied (X)</th>
+                                <th>Test Score (Y)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>2</td>
+                                <td>60</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>4</td>
+                                <td>75</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>6</td>
+                                <td>85</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>8</td>
+                                <td>90</td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td>5</td>
+                                <td>70</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>Formula for sample convariance:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(Cov(X, Y) = \frac{\sum_{i=1}^n (X_i - \bar X) (Y_i - \bar Y)}{n-1}\)
+                </div>
+                <p>Where:</p>
+                <ul class="with-bullets">
+                    <li><p>\(X_i\) is an individual ovservation of X.</p></li>
+                    <li><p>\(Y_i\) is an individual ovservation of Y.</p></li>
+                    <li><p>\(\bar X\) is the mean of X.</p></li>
+                    <li><p>\(\bar Y\) is the mean of Y.</p></li>
+                    <li><p>\(n\) is the number of observations.</p></li>
+                </ul>
+                <p>Let's calculate step-by-step.</p>
+                <p>Step 1 - Calculate the means (\(\bar X\) and \(\bar Y\)):</p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\bar X = (2 + 4 + 6 + 8 + 5) / 5 = 5\)
+                </p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\bar Y = (60 + 75 + 85 + 90 + 70) / 5 = 76\)
+                </p>
+                <p>Step 2 - Calculate the deviations from the mean for each observation:</p>
+
+                <div class="d-flex justify-content-center align-items-center" style="overflow-x: auto; width: 100%;">
+                    <table class="table table-light text-center" style="width: 80%;">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>\(X_i\)</th>
+                                <th>\(Y_i\)</th>
+                                <th>\(X_i - \bar X\)</th>
+                                <th>\(Y_i - \bar Y\)</th>
+                                <th>\((X_i - \bar X)(Y_i - \bar Y)\)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>2</td>
+                                <td>60</td>
+                                <td>(2 - 5) = -3</td>
+                                <td>(60 - 76) = - 16</td>
+                                <td>(-3) * (-16) = 48</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>4</td>
+                                <td>75</td>
+                                <td>(4 - 5) = -1</td>
+                                <td>(75 - 76) = -1</td>
+                                <td>(-1) * (-1) = 1</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>6</td>
+                                <td>85</td>
+                                <td>(6 - 5) = 1</td>
+                                <td>(85 - 76) = 9</td>
+                                <td>1 * 9 = 9</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>8</td>
+                                <td>90</td>
+                                <td>(8 - 5) = 3</td>
+                                <td>(90 - 76) = 14</td>
+                                <td>3 * 14 = 42</td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td>5</td>
+                                <td>70</td>
+                                <td>(5 - 5) = 0</td>
+                                <td>(70 - 76) = -6</td>
+                                <td>0 * (-6) = 0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>Step 3 - Sum the products of the deviations:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\sum (X_i - \bar X)(Y_i - \bar Y) = 48 + 1 + 9 + 42 + 0 = 100\)
+                </div>
+                <p>Step 4 - Divide by \(n - 1\), since we have 5 students:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(Cov(X, Y) = \frac{100}{4} = 25\)
+                </div>
 
                 <div class="navigation">
                     <a href="vision_transformer.html">Prev: 5.6 Vision Transformer</a>
