@@ -115,7 +115,7 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 
 ### 14 Distributed Training
 
-- 14.1 Distributed Overview
+- 14.1 [Distributed Overview](https://artinte.github.io/deep-learning/distrib_overview.html)
 - 14.2 Single-Machine Model Parallel
 - 14.3 Distributed Data Parallel
 - 14.4 Fully Sharded Data Parallel
