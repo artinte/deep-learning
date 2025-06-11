@@ -15,7 +15,7 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 
 - 2.1 [Linear Algebra](https://artinte.github.io/deep-learning/linear_algebra.html)
 - 2.2 [Points Classification](https://artinte.github.io/deep-learning/point_classify.html)
-- 2.3 [PyTroch Basics](https://artinte.github.io/deep-learning/pytorch_basics.html)
+- 2.3 [PyTorch Basics](https://artinte.github.io/deep-learning/pytorch_basics.html)
 - 2.4 [Activation Function](https://artinte.github.io/deep-learning/activation_function.html)
 - 2.5 [Loss Function](https://artinte.github.io/deep-learning/loss_function.html)
 - 2.6 [Optimizer](https://artinte.github.io/deep-learning/optimizer.html)
@@ -125,10 +125,9 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 ### 15 Graph Netural Network
 
 - 15.1 [Graph Foundation](https://artinte.github.io/deep-learning/graph_foundation.html)
-- 15.2 Core Ideas
-- 15.3 Mainstream Models
-- 15.4 Geometric
-- 15.5 Common Tasks
-- 15.6 Advanced Topics
+- 15.2 [Core Ideas](https://artinte.github.io/deep-learning/core_idea.html)
+- 15.3 [Mainstream Models](https://artinte.github.io/deep-learning/mainstream_model.html)
+- 15.4 [Common Tasks](https://artinte.github.io/deep-learning/common_task.html)
+- 15.5 [Advanced Topics](https://artinte.github.io/deep-learning/advanced_topic.html)
 
 For more information, please visit website [Deep Learing with PyTorch](https://artinte.github.io/deep-learning/index.html).
