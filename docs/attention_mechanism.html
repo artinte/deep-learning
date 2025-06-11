@@ -19,12 +19,12 @@
 
             <main class="col-md-8 content">
                 <h2 class="custom-title">5.1 Attention Mechanism</h2>
-                <p class="title-subtext">An attention mechanism is a machine learning technique that directs deep learning models to prioritize (or attend to) the most relevant parts of input data. Innovation in attention mechanisms enabled the transformer architecture that yielded the modern large language models (LLMs) that power popular applications like ChatGPT.</p>
+                <p class="title-subtext">An <strong>attention mechanism</strong> is a machine learning technique that directs deep learning models to prioritize (or attend to) the most relevant parts of input data. Innovation in attention mechanisms enabled the transformer architecture that yielded the modern <strong>large language models (LLMs)</strong> that power popular applications like <a href="https://chatgpt.com/">ChatGPT</a>.</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-19</p>
 
                 <p>As their name suggests, <strong>attention mechanisms</strong> are inspired by the ability of humans (and other animals) to selectively pay more attention to salient details and ignore details that are less important in the moment. Having access to all information but focusing on only the most relevant information helps to ensure that no meaningful details are lost while enabling efficient use of limited memory and time.</p>
                 <p>Mathematically speaking, an attention mechanism computes attention weights that reflect the relative importance of each part of an input sequence to the task at hand. It then applies those attention weights to increase (or decrease) the influence of each part of the input, in accordance with its respective importance. An attention model - that is, an artificial intelligence model that employs an attention mechanism — is trained to assign accurate attention weights through supervised learning or self-supervised learning on a large dataset of examples.</p>
-                <p>An example of the attention mechanism following long-distance dependencies in the encoder self-attention in layer 5 of 6. Many of the attention heads attend to a distant dependency of the verb 'making', completing the phrase 'making...more difficult'. Attentions here shown only for the word 'making'. Different colors represent different heads. Best viewed in color.</p>
+                <p>An example of the attention mechanism following long-distance dependencies in the encoder self-attention in layer 5 of 6. Many of the attention heads attend to a distant dependency of the verb <em>'making'</em>, completing the phrase <em>'making...more difficult'</em>. Attentions here shown only for the word <em>'making'</em>. Different colors represent different heads. Best viewed in color:</p>
                 <img src="res/05/attention_visual.jpg" width="600" alt="Make ... More Difficult">
     
                 <p>Attention mechanisms were originally introduced by <a href="nmt_align.html">Bahdanau</a> et al in 2014 as a technique to address the shortcomings of what were then state-of-the-art recurrent neural network (RNN) models used for machine translation. Subsequent research integrated attention mechanisms into the convolutional neural networks (CNNs) used for tasks such as image captioning and visual question answering.</p>
@@ -110,7 +110,9 @@
                 <p>As we would expect, the narrower the kernel, the narrower the range of large attention weights. It is also clear that picking the same width might not be ideal.</p>
                 <p>Nadaraya–Watson kernel regression is an early precursor of the current attention mechanisms. It can be used directly with little to no training or tuning, either for classification or regression. The attention weight is assigned according to the similarity (or distance) between query and key, and according to how many similar observations are available.</p>
                 <h3>5.1.3 Scoring Functions</h3>
-
+                <p>we used a number of different distance-based kernels, including a Gaussian kernel to model interactions between queries and keys. As it turns out, distance functions are slightly more expensive to compute than dot products.</p>
+                <img src="res/05/attention_output.png" alt="Attention Output" width="600">
+                <p style="text-align: center; color: #444444;">Weights are computed with \(\alpha\) and the softmax function</p>
                 <h5>Dot Product Attention</h5>
                 <p>Let’s review the attention function (without exponentiation) from the Gaussian kernel for a moment:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
@@ -123,7 +125,7 @@
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(a(\mathbf{q}, \mathbf{k}_i) = \mathbf{q}^\top \mathbf{k}_i / \sqrt{d}\)
                 </div>
-
+                
                 <p>Note that attention weights \(\alpha\) still need normalizing. We can simplify this further by using the softmax operation:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(\alpha(\mathbf{q}, \mathbf{k}_i) = \mathrm{softmax}(a(\mathbf{q}, \mathbf{k}_i)) = \frac{\exp(\mathbf{q}^\top \mathbf{k}_i / \sqrt{d})}{\sum_{j=1} \exp(\mathbf{q}^\top \mathbf{k}_j / \sqrt{d})}\)
@@ -142,9 +144,22 @@ Hello world &lt;blank&gt; &lt;blank&gt;</samp></pre>
 
                 <p>To illustrate how this function works, consider a minibatch of two examples of size \(2 \times 4\), where their valid lengths are \(2\) and \(3\), respectively. As a result of the masked softmax operation, values beyond the valid lengths for each pair of vectors are all masked as zero.</p>
                 <h5>Scaled Dot Product Attention</h5>
+                <p>Let’s return to the dot product attention. In general, it requires that both the query and the key have the same vector length, say \(d\), even though this can be addressed easily by replacing \(\mathbf{q}^\top \mathbf{k}\) with \(\mathbf{q}^\top \mathbf{M} \mathbf{k}\) where \(\mathbf{M}\) is a matrix suitably chosen for translating between both spaces. For now assume that the dimensions match.</p>
+                <p>In practice, we often think of minibatches for efficiency, such as computing attention for \(n\) queries and \(m\) key-value pairs, where queries and keys are of length \(d\) and values are of length \(v\). The scaled dot product attention of queries \(\mathbf Q\in\mathbb R^{n\times d}\), keys \(\mathbf K\in\mathbb R^{m\times d}\), and values \(\mathbf V\in\mathbb R^{m\times v}\) thus can be written as:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\mathrm{softmax}\left(\frac{\mathbf Q \mathbf K^\top }{\sqrt{d}}\right) \mathbf V \in \mathbb{R}^{n\times v}\)
+                </div>
+                <p>Note that when applying this to a minibatch, we need the batch matrix multiplication. In the following implementation of the scaled dot product attention, we use dropout for model regularization.</p>
 
                 <h5>Additive Attention</h5>
-
+                <p>When queries \(\mathbf{q}\) and keys \(\mathbf{k}\) are vectors of different dimension, we can either use a matrix to address the mismatch via \(\mathbf{q}^\top \mathbf{M} \mathbf{k}\), or we can use additive attention as the scoring function. Another benefit is that, as its name indicates, the attention is additive. This can lead to some minor computational savings.</p>
+                <p> Given a query \(\mathbf{q} \in \mathbb{R}^q\) and a key \(\mathbf{k} \in \mathbb{R}^k\), the additive attention scoring function (Bahdanau et al., 2014) is given by:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(a(\mathbf q, \mathbf k) = \mathbf w_v^\top \textrm{tanh}(\mathbf W_q\mathbf q + \mathbf W_k \mathbf k) \in \mathbb{R}\)
+                </div>
+                <p>where \(\mathbf W_q\in\mathbb R^{h\times q}\), \(\mathbf W_k\in\mathbb R^{h\times k}\), and \(\mathbf w_v\in\mathbb R^{h}\) are the learnable parameters. </p>
+                <p>This term is then fed into a softmax to ensure both nonnegativity and normalization. An equivalent interpretation of (11.3.7) is that the query and key are concatenated and fed into an MLP with a single hidden layer. Using \(\tanh\) as the activation function and disabling bias terms, we implement additive attention as follows:</p>
+                
                 <div class="navigation">
                     <a href="attention_nmt.html">Prev: 4.6 Attention-based NMT</a>
                     <a href="nn_transformer.html">Next: 5.2 nn.Transformer</a>
