@@ -120,8 +120,7 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 - 14.3 [Fully Sharded Data Parallel](https://artinte.github.io/deep-learning/fully_parallel.html)
 - 14.4 [Tensor Parallel](https://artinte.github.io/deep-learning/tensor_parallel.html)
 - 14.5 [Device Mesh](https://artinte.github.io/deep-learning/device_mesh.html)
-- 14.6 Remote Procedure Call
-- 
+- 14.6 [Remote Procedure Call](https://artinte.github.io/deep-learning/remote_call.html)
 
 ### 15 Graph Netural Network
 
@@ -129,7 +128,7 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 - 15.2 Core Ideas
 - 15.3 Mainstream Models
 - 15.4 Geometric
-- 15.5 Node Classification
+- 15.5 Common Tasks
 - 15.6 Advanced Topics
 
 For more information, please visit website [Deep Learing with PyTorch](https://artinte.github.io/deep-learning/index.html).
