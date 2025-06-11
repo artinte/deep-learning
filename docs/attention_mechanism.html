@@ -19,7 +19,7 @@
 
             <main class="col-md-8 content">
                 <h2 class="custom-title">5.1 Attention Mechanism</h2>
-                <p class="title-subtext">An attention mechanism is a machine learning technique that directs deep learning models to prioritize (or attend to) the most relevant parts of input data.Innovation in attention mechanisms enabled the transformer architecture that yielded the modern large language models (LLMs) that power popular applications like ChatGPT.</p>
+                <p class="title-subtext">An attention mechanism is a machine learning technique that directs deep learning models to prioritize (or attend to) the most relevant parts of input data. Innovation in attention mechanisms enabled the transformer architecture that yielded the modern large language models (LLMs) that power popular applications like ChatGPT.</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-19</p>
 
                 <p>As their name suggests, <strong>attention mechanisms</strong> are inspired by the ability of humans (and other animals) to selectively pay more attention to salient details and ignore details that are less important in the moment. Having access to all information but focusing on only the most relevant information helps to ensure that no meaningful details are lost while enabling efficient use of limited memory and time.</p>
@@ -95,8 +95,25 @@
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(y_i = 2 sin(x_i) + x_i + \epsilon\)
                 </div>
-                <p>where \(\epsilon\) is drawn from a normal distribution with zero mean and unit variance. We draw 40 training examples.</p>
-                
+                <p>where \(\epsilon\) is drawn from a <a href="normal_distrib">normal distribution</a> with zero mean and unit variance. We draw 40 training examples.</p>
+
+                <h5>Attention Pooling via Nadaraya–Watson Regression</h5>
+                <p>Now that we have data and kernels, all we need is a function that computes the kernel regression estimates. Note that we also want to obtain the relative kernel weights in order to perform some minor diagnostics.</p>
+                <p>Hence we first compute the kernel between all training features (covariates) <code>x_train</code> and all validation features <code>x_val</code>. This yields a matrix, which we subsequently normalize. When multiplied with the training labels <code>y_train</code> we obtain the estimates.</p>
+                <p>Recall attention pooling formula, Let each validation feature be a query, and each training feature–label pair be a key–value pair. As a result, the normalized relative kernel weights (<code>attention_w</code> below) are the attention weights.</p>
+                <p>The first thing that stands out is that all three nontrivial kernels (Gaussian, Boxcar, and Epanechikov) produce fairly workable estimates that are not too far from the true function.</p>
+                <p>Only the constant kernel that leads to the trivial estimate \(f(x) = \frac{1}{n} \sum_i y_i\) produces a rather unrealistic result. Let’s inspect the attention weighting a bit more closely:</p>
+
+                <h5>Adapting Attention Pooling</h5>
+                <p>We could replace the Gaussian kernel with one of a different width. That is, we could use \(\alpha(\mathbf{q}, \mathbf{k}) = \exp\left(-\frac{1}{2 \sigma^2} \|\mathbf{q} - \mathbf{k}\|^2 \right)\) where \(\sigma^2\) determines the width of the kernel. Let’s see whether this affects the outcomes.</p>
+                <p>Clearly, the narrower the kernel, the less smooth the estimate. At the same time, it adapts better to the local variations. Let’s look at the corresponding attention weights.</p>
+                <p>As we would expect, the narrower the kernel, the narrower the range of large attention weights. It is also clear that picking the same width might not be ideal.</p>
+                <p>Nadaraya–Watson kernel regression is an early precursor of the current attention mechanisms. It can be used directly with little to no training or tuning, either for classification or regression. The attention weight is assigned according to the similarity (or distance) between query and key, and according to how many similar observations are available.</p>
+                <h3>5.1.3 Scoring Functions</h3>
+
+                <h3>5.1.4 Multi-Head Attention</h3>
+
+                <h3>5.1.5 Self-Attention</h3>
 
                 <div class="navigation">
                     <a href="attention_nmt.html">Prev: 4.6 Attention-based NMT</a>
