@@ -66,9 +66,22 @@
                 <h3>15.1.4 Basic Graph Operations</h3>
                 <h3>15.1.5 Graph Traversal</h3>
                 <h4>15.1.5.1 Breadth-first Search</h4>
+                <p>Breadth-first search is a near-to-far traversal method, starting from a certain node, always prioritizing the visit to the nearest vertices and expanding outwards layer by layer. As shown in below figure, starting from the top left vertex, first traverse all adjacent vertices of that vertex, then traverse all adjacent vertices of the next vertex, and so on, until all vertices have been visited.</p>
+                <p>BFS is usually implemented with the help of a queue, as shown in the code below. The queue is "first in, first out", which aligns with the BFS idea of traversing "from near to far":</p>
+                <ol>
+                    <li><p>Add the starting vertex startVet to the queue and start the loop.</p></li>
+                    <li><p>In each iteration of the loop, pop the vertex at the front of the queue and record it as visited, then add all adjacent vertices of that vertex to the back of the queue.</p></li>
+                    <li><p>Repeat <span class="highlight">step 2</span> until all vertices have been visited.</p></li>
+                </ol>
+                <p>To prevent revisiting vertices, we use a hash set visited to record which nodes have been visited:</p>
+
+                <p><strong>Time complexity</strong>: All vertices will be enqueued and dequeued once, using \(O(|V|)\) time; in the process of traversing adjacent vertices, since it is an undirected graph, all edges will be visited 2 times, using \(O(2|E|)\) time; overall using \(O(|V| + |E|)\) time.</p>
+
+                <h4>15.1.5.2 Depth-first Search</h4>
+    
                 <div class="navigation">
-                    <a href="#">Prev: 14.5 Libuv TCPStore Backend</a>
-                    <a href="#">Next: 15.2 Core Ideas</a>
+                    <a href="remote_call.html">Prev: 14.6 Remote Procedure Call</a>
+                    <a href="core_idea.html">Next: 15.2 Core Ideas</a>
                 </div>
             </main>
 
