@@ -117,9 +117,9 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 
 - 14.1 [Distributed Overview](https://artinte.github.io/deep-learning/distrib_overview.html)
 - 14.2 [Distributed Data Parallel](https://artinte.github.io/deep-learning/distrib_parallel.html)
-- 14.3 Fully Sharded Data Parallel
-- 14.4 Tenser Parallel
-- 14.5 Device Mesh
+- 14.3 [Fully Sharded Data Parallel](https://artinte.github.io/deep-learning/fully_parallel.html)
+- 14.4 [Tensor Parallel](https://artinte.github.io/deep-learning/tensor_parallel.html)
+- 14.5 [Device Mesh](https://artinte.github.io/deep-learning/device_mesh.html)
 - 14.6 Remote Procedure Call
 - 
 
