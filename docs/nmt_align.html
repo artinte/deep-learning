@@ -21,7 +21,24 @@
                 <h2 class="custom-title">4.5 Neural Machine Translation</h2>
                 <p class="title-subtext">Neural Machine Translation by Jointly Learning to Align and Translate</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-19</p>
+                <p>Neural machine translation is a recently proposed approach to machine translation.  Unlike the traditional statistical machine translation, the neural machine translation aims at building a single neural network that can be jointly tuned to maximize the translation performance. The models proposed recently for neural machine translation often belong to a family of encoder–decoders and encode a source sentence into a fixed-length vector from which a decoder generates a translation.</p>
+                <p>In this paper, we conjecture that the use of a fixed-length vector is a bottleneck in improving the performance of this basic encoder–decoder architecture, and propose to extend this by allowing a model to automatically (soft-)search for parts of a source sentence that are relevant to predicting a target word, without having to form these parts as a hard segment explicitly. </p>
+                <p> With this new approach, we achieve a translation performance comparable to the existing state-of-the-art phrase-based system on the task of English-to-French translation. Furthermore, qualitative analysis reveals that the (soft-)alignments found by the model agree well with our intuition.</p>
 
+                <h3>4.5.1 Introduction</h3>
+
+                <h3>4.5.2 Background: Neural Machine Translation</h3>
+
+                <h5>RNN Encoder-Decoder</h5>
+                <p>Here, we describe briefly the underlying framework, called RNN Encoder–Decoder, proposed by Cho et al. (2014a) and Sutskever et al. (2014) upon which we build a novel architecture that learns to align and translate simultaneously.</p>
+                <p>In the Encoder–Decoder framework, an encoder reads the input sentence, a sequence of vectors </p>
+
+                <h3>4.5.3 Learning to Align And Translate</h3>
+
+                <h3>4.5.4 Experiment Settings</h3>
+
+                <h3>4.5.5 Results</h3>
+                
                 <div class="navigation">
                     <a href="lstm_and_gru.html">Prev: 4.4 LSTM and GRU</a>
                     <a href="attention_nmt.html">Next: 4.6 Attention-based NMT</a>
