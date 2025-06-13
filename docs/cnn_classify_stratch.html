@@ -98,9 +98,9 @@
                 <p style="text-align: center; color: #555555;">Figure 4 - A \(2 \times 2\) output image</p>
                 <p>To start, lets overlay our filter in the top left corner of the image:</p>
                 <table class="kernel">
-                    <tr><td class="highlight">0x-1</td><td class="highlight">50x0</td><td class="highlight">0x1</td><td>29</td></tr>
-                    <tr><td class="highlight">0x-2</td><td class="highlight">80x0</td><td class="highlight">31x2</td><td>2</td></tr>
-                    <tr><td class="highlight">-33</td><td class="highlight">90x0</td><td class="highlight">0x1</td><td>75</td></tr>
+                    <tr><td style="background-color: #fde4ff">0x-1</td><td style="background-color: #fde4ff">50x0</td><td style="background-color: #fde4ff">0x1</td><td>29</td></tr>
+                    <tr><td style="background-color: #fde4ff">0x-2</td><td style="background-color: #fde4ff">80x0</td><td style="background-color: #fde4ff">31x2</td><td>2</td></tr>
+                    <tr><td style="background-color: #fde4ff">-33</td><td style="background-color: #fde4ff">90x0</td><td style="background-color: #fde4ff">0x1</td><td>75</td></tr>
                     <tr><td>0</td><td>9</td><td>0</td><td>95</td></tr>
                 </table>
                 <p style="text-align: center; color: #555555;">Figure 5 - Overlay the filter on top of the image</p>
@@ -113,8 +113,32 @@
                     <tr><td>29</td><td>-192</td></tr>
                     <tr><td>-35</td><td>-22</td></tr>
                 </table>
+                <p style="text-align: center; color: #555555;">Figure 6 - Final Output</p>
+
                 <h4>3.1.3.1 How is this useful?</h4>
                 <p>Let’s zoom out for a second and see this at a higher level. What does convolving an image with a filter do? We can start by using the example \(3 \times 3\) filter we’ve been using, which is commonly known as the vertical Sobel filter:</p>
+                <img src="res/03/lena.jpg" alt="Lena">
+                <p>Here’s an example of what the vertical Sobel filter does:</p>
+                <img src="res/03/sobel_y.png" alt="Vertical Sobel">
+                <p style="text-align: center; color: #555555;">Figure 7 - An Image Convolved with the Vertical Sobel Filter</p>
+                <p>Similarly, there’s also a horizontal Sobel filter:</p>
+                <table class="kernel">
+                    <tr>
+                        <td>1</td><td>2</td><td>1</td>
+                    </tr>
+                    <tr>
+                        <td>0</td><td>0</td><td>0</td>
+                    </tr>
+                    <tr>
+                        <td>-1</td><td>-2</td><td>-1</td>
+                    </tr>
+                </table>
+                <p style="text-align: center; color: #555555;">Figure 8 - The Horizontal Sobel Filter</p>
+                <p>See what’s happening? Sobel filters are edge-detectors. The vertical Sobel filter detects vertical edges, and the horizontal Sobel filter detects horizontal edges. The output images are now easily interpreted: a bright pixel (one that has a high value) in the output image indicates that there’s a strong edge around there in the original image.</p>
+                <img src="res/03/sobel_x.png" alt="Horizontal Sobel">
+                <p style="text-align: center; color: #555555;">Figure 9 - An Image Convolved with the Horizontal Sobel Filter</p>
+                <p>Can you see why an edge-detected image might be more useful than the raw image? Think back to our MNIST handwritten digit classification problem for a second. A CNN trained on MNIST might look for the digit 1, for example, by using an edge-detection filter and checking for two prominent vertical edges near the center of the image. In general, convolution helps us look for specific localized image features (like edges) that we can use later in the network.</p>
+
                 <h4>3.1.3.2 Padding</h4>
                 <h4>3.1.3.3 Conv Layers</h4>
                 <h4>3.1.3.4 Implementing</h4>
