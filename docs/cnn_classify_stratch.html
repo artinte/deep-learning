@@ -8,6 +8,20 @@
     <title>CNN from Stratch</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="article_style.css" rel="stylesheet">
+    <style>
+        table.kernel {
+            border-collapse: collapse;
+            margin: 20px auto;
+        }
+        table.kernel td {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-weight: bold;
+            font-family: monospace;
+            border: 1px solid #333;
+        }
+    </style>
 </head>
 
 <body>
@@ -21,7 +35,7 @@
                 <h2 class="custom-title">3.1 CNN from Stratch</h2>
                 <p class="title-subtext">A simple guide to what CNNs are, how they work, and how to build one from scratch in Python.</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-11</p>
-                <p>There’s been a lot of buzz about Convolution Neural Networks (CNNs) in the past few years, especially because of how they’ve revolutionized the field of Computer Vision. In this post, we’ll build on a basic background knowledge of neural networks and explore what CNNs are, understand how they work, and build a real one from scratch (using only NumPy) in Python.</p>
+                <p>There’s been a lot of buzz about <strong>Convolution Neural Networks (CNNs)</strong> in the past few years, especially because of how they’ve revolutionized the field of Computer Vision. In this post, we’ll build on a basic background knowledge of neural networks and explore what CNNs are, understand how they work, and build a real one from scratch (using only <a href="https://numpy.org/">NumPy</a>) in Python.</p>
                 <p>This post assumes only a basic knowledge of neural networks. Section 1.7 <a href="network_scratch.html">Neural Network from Scratch</a> covers everything you’ll need to know, so you might want to read that first.</p>
                 <p>Ready? Let’s jump in.</p>
                 <h3>3.1.1 Motivation</h3>
@@ -37,6 +51,8 @@
 
                 <h3>3.1.2 Dataset</h3>
                 <p>In this post, we’ll tackle the "Hello, World!" of Computer Vision: the <a href="data_represent.html#mnist">MNIST</a> handwritten digit classification problem. It’s simple: given an image, classify it as a digit.</p>
+                <img src="res/03/mnist_examples.webp" width="600" alt="MNIST">
+                <p style="text-align: center; color: #555555;">Figure 1 - Sample Images from the MNIST Dataset</p>
                 <p>Each image in the MNIST dataset is \(28 \times 28\) and contains a centered, grayscale digit.</p>
                 <p>Truth be told, a normal neural network would actually work just fine for this problem. You could treat each image as a \(28 \times 28 = 784\) - dimensional vector, feed that to a 784-dim input layer, stack a few hidden layers, and finish with an output layer of 10 nodes, 1 for each digit.</p>
                 <p>This would only work because the MNIST dataset contains small images that are centered, so we wouldn’t run into the aforementioned issues of size or shifting. Keep in mind throughout the course of this post, however, that most real-world image classification problems aren’t this easy.</p>
@@ -44,8 +60,19 @@
 
                 <h3>3.1.3 Convolutions</h3>
                 <p>What are Convolutional Neural Networks?</p>
-                <p>They’re basically just neural networks that use Convolutional layers, a.k.a. Conv layers, which are based on the mathematical operation of convolution. Conv layers consist of a set of filters, which you can think of as just 2d matrices of numbers. Here’s an example \(3 \times 3\) filter:</p>
-
+                <p>They’re basically just neural networks that use <strong>Convolutional layers</strong>, a.k.a. Conv layers, which are based on the mathematical operation of convolution. Conv layers consist of a set of filters, which you can think of as just 2d matrices of numbers. Here’s an example \(3 \times 3\) filter:</p>
+                <table class="kernel">
+                    <tr>
+                        <td>-1</td><td>0</td><td>1</td>
+                    </tr>
+                    <tr>
+                        <td>-2</td><td>0</td><td>2</td>
+                    </tr>
+                    <tr>
+                        <td>-1</td><td>0</td><td>1</td>
+                    </tr>
+                </table>
+                <p style="text-align: center; color: #555555;">Figure 2 - A \(3 \times 3\) filter</p>
                 <p>We can use an input image and a filter to produce an output image by convolving the filter with the input image. This consists of:</p>
 
                 <ol>
@@ -55,8 +82,39 @@
                     <li><p>Repeating for all locations.</p></li>
                 </ol>
                 <p class="comment">Side Note: We (along with many CNN implementations) are technically actually using cross-correlation instead of convolution here, but they do almost the same thing. I won’t go into the difference in this post because it’s not that important, but feel free to look this up if you’re curious.</p>
-                <p>That 4-step description was a little abstract, so let’s do an example. Consider this tiny 4x4 grayscale image and this \(3 \times 3\) filter:</p>
+                <p>That 4-step description was a little abstract, so let’s do an example. Consider this tiny \(4 \times 4\) grayscale image and this \(3 \times 3\) filter:</p>
+                <table class="kernel">
+                    <tr><td>0</td><td>50</td><td>0</td><td>29</td></tr>
+                    <tr><td>0</td><td>80</td><td>31</td><td>2</td></tr>
+                    <tr><td>33</td><td>90</td><td>0</td><td>75</td></tr>
+                    <tr><td>0</td><td>9</td><td>0</td><td>95</td></tr>
+                </table>
+                <p style="text-align: center; color: #555555;">Figure 3 - A \(4 \times 4\) image</p>
+                <p>The numbers in the image represent pixel intensities, where 0 is black and 255 is white. We’ll convolve the input image and the filter to produce a 2x2 output image:</p>
+                <table class="kernel">
+                    <tr><td>?</td><td>?</td></tr>
+                    <tr><td>?</td><td>?</td></tr>
+                </table>
+                <p style="text-align: center; color: #555555;">Figure 4 - A \(2 \times 2\) output image</p>
+                <p>To start, lets overlay our filter in the top left corner of the image:</p>
+                <table class="kernel">
+                    <tr><td class="highlight">0x-1</td><td class="highlight">50x0</td><td class="highlight">0x1</td><td>29</td></tr>
+                    <tr><td class="highlight">0x-2</td><td class="highlight">80x0</td><td class="highlight">31x2</td><td>2</td></tr>
+                    <tr><td class="highlight">-33</td><td class="highlight">90x0</td><td class="highlight">0x1</td><td>75</td></tr>
+                    <tr><td>0</td><td>9</td><td>0</td><td>95</td></tr>
+                </table>
+                <p style="text-align: center; color: #555555;">Figure 5 - Overlay the filter on top of the image</p>
+                <p>Next, we perform element-wise multiplication between the overlapping image values and filter values. Here are the results, starting from the top left corner and going right, then down, we sum up all the results. That’s easy enough:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(0 + 0 + 0 + 0 + 0 + 62 - 33 + 0 + 0 = 29\)
+                </div>
+                <p>Finally, we place our result in the destination pixel of our output image. Since our filter is overlayed in the top left corner of the input image, our destination pixel is the top left pixel of the output image. We do the same thing to generate the rest of the output image:</p>
+                <table class="kernel">
+                    <tr><td>29</td><td>-192</td></tr>
+                    <tr><td>-35</td><td>-22</td></tr>
+                </table>
                 <h4>3.1.3.1 How is this useful?</h4>
+                <p>Let’s zoom out for a second and see this at a higher level. What does convolving an image with a filter do? We can start by using the example \(3 \times 3\) filter we’ve been using, which is commonly known as the vertical Sobel filter:</p>
                 <h4>3.1.3.2 Padding</h4>
                 <h4>3.1.3.3 Conv Layers</h4>
                 <h4>3.1.3.4 Implementing</h4>
