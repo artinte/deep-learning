@@ -152,7 +152,16 @@
                 <p style="text-align: center; color: #555555;">Figure 9 - A \(4 \times 4\) Input Convolved with a \(3 \times 3\) Filter to Produce a \(4 \times 4\) Output Using Same Padding</p>
                 <p>This is called "same" padding, since the input and output have the same dimensions. Not using any padding, which is what we’ve been doing and will continue to do for this post, is sometimes referred to as "valid" padding.</p>
                 <h4>3.1.3.3 Conv Layers</h4>
-                <h4>3.1.3.4 Implementing</h4>
+                <p>Now that we know how image convolution works and why it’s useful, let’s see how it’s actually used in CNNs. As mentioned before, CNNs include conv layers that use a set of filters to turn input images into output images. A conv layer’s primary parameter is the number of filters it has.</p>
+                <p>For our MNIST CNN, we'll use a small conv layer with 8 filters as the initial layer in our network. This means it’ll turn the \(28 \times 28\) input image into a \(26 \times 26 \times 8\) output volume:</p>
+                <a href="https://drive.google.com/file/d/1o7layeSLgybVtsly0NSkCJWNSde-Vi51/view?usp=sharing">
+                    <img src="res/03/simple_conv_layer.jpg" alt="Simple Conv Layer">
+                </a>
+                <p style="text-align: center; color: #555555;">Figure 9 - Simple Conv Layer</p>
+                <p class="comment">Reminder: The output is \(26 \times 26 \times 8\) and not \(28 \times 28 \times 8\) because we’re using valid padding, which decreases the input’s width and height by 2.</p>
+                <p>Each of the 8 filters in the conv layer produces a \(26 \times 26\) output, so stacked together they make up a \(26 \times 26 \times 8\) volume. All of this happens because of \(3 \times 3\) (filter size) \(\times\) 8 (number of filters) = only 72 weights!</p>
+
+                <h4>3.1.3.4 Implementing Convolution</h4>
 
                 <h3>3.1.4 Pooling</h3>
 
