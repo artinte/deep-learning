@@ -30,7 +30,52 @@
                     <li><p>Sampling from diffusion models.</p></li>
                 </ul>
                 <p>with concrete examples in low dimension data (2d) and apply them to high dimensional data (point cloud or images).</p>
-                
+
+                <h3>6.3.1 Mathematical Fundation</h3>
+                <p>This session is on diffusion generative models, an approach to generating samples from distributions; it differs substantially from other approaches, like generative adversarial networks (GANs) and variational autoencoders (VAEs). Notably, it was one of the core ingredients of OpenAI's recent DALL·E 2 system for converting natural language descriptions to detailed images.</p>
+                <p>Diffusion generative models use the following idea. Samples from some distribution (e.g. of images) are gradually corrupted with more and more noise until they become unrecognizable static—this is the 'diffusion'. We then learn to reverse this mapping, so that we can turn unrecognizable static into a sample from our distribution of interest. Because it's easy to sample unrecognizable static, the mapping allows us to easily sample from our target distribution.</p>
+                <p>We will focus on the absolute basics of diffusion generative modeling, and restrict ourselves mostly to toy examples involving analytically tractable distributions.</p>
+
+                <h4>6.3.1.1 Motivation</h4>
+                <p>Generative modeling is an area of statistics and machine learning that involves approximating the probability distribution from which a given set of data is sampled. By learning such a distribution (e.g. of pictures of faces), we can sample new data from it—e.g. a new image of a face.</p>
+                <p>There are different approaches to generative modeling, including using generative adversarial networks (GANs) and variational autoencoders (VAEs). One somewhat newer approach involves adding a large amount of noise to samples, and then learning to undo the noise.</p>
+                <p>In this way, we can learn to convert pure noise into samples from some distribution we're interested in. Because it's easy to generate all sorts of samples of pure noise, and each gets transformed by our noise-undoing-mapping to samples from our target distribution, we have a generative model.</p>
+
+                <p>There are various appealing features to this approach to generative modeling. One notable one is that we do not have to directly learn a probability distribution, but can instead learn a related function sometimes called the score. This is the gradient of the log of the probability density function.</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\mathbf{s}(\mathbf{x}) := \nabla_{\mathbf{x}} \log p(\mathbf{x})\)
+                </div>
+                <p>This allows us to avoid having to learn a normalization constant for our probability density, which is an often troublesome task.</p>
+
+                <h4>6.3.1.2 Forward Diffusion</h4>
+                <p>How do we add noise to distribution samples 'properly'? Although views on this have varied, recent work has unified different approaches. By and large, various ideas about how to do this amount to subjecting a given distribution sample to a kind of diffusion process. More generally, we can imagine applying some kind of stochastic process (defined by a stochastic differential equation, or SDE) to a distribution sample.</p>
+                <h5>Basics of diffusion</h5>
+                <p>Let's view the basics of diffusion. A one-dimensional diffusion process (on the real line) can be defined by the SDE</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\dot{x} = \sigma \cdot \eta(t)\)
+                </div>
+                <p>where \(sigma > 0\) is a constant, and \(\eta(t)\) denotes a Gaussion white noise term.</p>
+                <p>What does this even mean? We can make the above expression concrete by defining it to be the small \(\Delta t\) limit of the discrete process for which:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(x(t + \Delta t) = x(t) + \sigma \cdot  \sqrt{\Delta t} \cdot r\)
+                </div>
+                <p>where \(r \sim \mathcal{N}(0, 1)\) is a sample from a standard normal distribution. This is an example of an <a href="prob_theory.html#euler_maruyama_method">Euler-Maruyama time step</a>.</p>
+                <p>The above description of diffusion is useful for doing simulations. Given a number \(x\), we can use the above update rule to subject it to one time step of diffusion. But a complementary view describes how the probability density \(p(x, t)\), the probability of the system being at position \(x\) at time \(t\), changes over time.</p>
+                <p>In particular, \(p(x, t)\) changes according to the well-known diffusion equation:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\frac{\partial p(x, t)}{\partial t} = \frac{\sigma^2}{2} \cdot \frac{\partial^2 p(x, t)}{\partial x^2}\)
+                </div>
+                <p>You may be used to seeing this equation with a diffusion constant \(D\) instead of a parameter \(\sigma\). The conversion between them is that \(D = \frac{\sigma^2}{2}\).</p>
+                <p>The solution to the diffusion equation, given a delta function initial condition \(p(x, 0) = \delta(x - x_0)\) (that is, given that we are initially certain that the system is at location \(x_0\)) is the well-known <a href="prob_theory.html#heat_kernel">heat kernel</a>:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(p(x, t | x_0, 0) = \frac{1}{\sqrt{2 \pi \sigma^2 t}} \exp\left\{ - \frac{(x - x_0)^2}{2 \sigma^2 t}  \right\}\)
+                </div>
+                <p>Given an arbitrary initial condition \(p(x, 0) = p_0(x)\), the general solution of the diffusion equation is then:</p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(p(x, t) = \int_{-\infty}^{\infty} p(x, t | x_0, 0) p_0(x_0) dx_0\)
+                </p>
+
+                <h5>Basics of stochastic differential equations (SDEs)</h5>
                 <div class="navigation">
                     <a href="gaussian_process.html">Prev: 6.2 Gaussian Processes</a>
                     <a href="diffusion_scratch.html">Next: 6.4 Diffusion from Scratch</a>
