@@ -155,11 +155,12 @@
                         <li class="nav-item">
                             <a class="nav-link" href="#section14" onclick="toggleChildChapters(event, 'chapter14')">14 Distributed Training</a>
                             <ul id="chapter14" class="child-chapters" style="display: none;">
-                                <li><a class="nav-link" href="#">14.1 Distributed Overview</a></li>
-                                <li><a class="nav-link" href="#">14.2 Single-Machine Model Parallel</a></li>
-                                <li><a class="nav-link" href="#">14.3 Distributed Data Parallel</a></li>
-                                <li><a class="nav-link" href="#">14.4 Fully Sharded Data Parallel</a></li>
-                                <li><a class="nav-link" href="#">14.5 Libuv TCPStore Backend</a></li>
+                                <li><a class="nav-link" href="distrib_overview.html">14.1 Distributed Overview</a></li>
+                                <li><a class="nav-link" href="distrib_parallel.html">14.2 Distributed Data Parallel</a></li>
+                                <li><a class="nav-link" href="fully_parallel.html">14.3 Fully Sharded Data Parallel</a></li>
+                                <li><a class="nav-link" href="tensor_parallel.html">14.4 Tensor Parallel</a></li>
+                                <li><a class="nav-link" href="device_mesh.html">14.5 Device Mesh</a></li>
+                                <li><a class="nav-link" href="remote_call.html">14.6 Remote Procedure Call</a></li>
                             </ul>
                         </li>
                         <li class="nav-item">
@@ -167,11 +168,10 @@
                         </li>
                         <ul id="chapter15" class="child-chapters" style="display: none;">
                             <li><a class="nav-link" href="graph_foundation.html">15.1 Graph Foundation</a></li>
-                            <li><a class="nav-link" href="#">15.2 Core Ideas</a></li>
-                            <li><a class="nav-link" href="#">15.3 Mainstream Models</a></li>
-                            <li><a class="nav-link" href="#">15.4 Geometric</a></li>
-                            <li><a class="nav-link" href="#">15.5 Node Classification</a></li>
-                            <li><a class="nav-link" href="#">15.6 Advanced Topics</a></li>
+                            <li><a class="nav-link" href="core_idea.html">15.2 Core Ideas</a></li>
+                            <li><a class="nav-link" href="mainstream_model.html">15.3 Mainstream Models</a></li>
+                            <li><a class="nav-link" href="common_task.html">15.4 Common Tasks</a></li>
+                            <li><a class="nav-link" href="advanced_topic.html">15.5 Advanced Topics</a></li>
                         </ul>
                     </ul>
                 </nav>
@@ -469,7 +469,7 @@
                         </h3>
                         <p><a href="https://docs.pytorch.org/tutorials/intermediate/torchvision_tutorial.html">TorchVision Object Detection Finetuning Tutorial</a></p>
                         <h3 id="section9-sub2">
-                            <a href="#" style="color: inherit;">9.2 Transfer Learning</a>
+                            <a href="transfer_learning.html" style="color: inherit;">9.2 Transfer Learning</a>
                         </h3>
                         <p><a href="https://docs.pytorch.org/tutorials/beginner/transfer_learning_tutorial.html">Transfer Learning for Computer Vision Tutorial</a></p>
                         <h3 id="section9-sub3">
@@ -581,29 +581,29 @@
                         <h2>14 Distributed Training</h2>
                         
                         <h3 id="section14-sub1">
-                            <a href="#" style="color: inherit;">14.1 Distributed Overview</a>
+                            <a href="distrib_overview.html" style="color: inherit;">14.1 Distributed Overview</a>
                         </h3>
                         <p><a href="https://docs.pytorch.org/tutorials/beginner/dist_overview.html">PyTorch Distributed Overview</a></p>
                         <p><a href="https://docs.pytorch.org/tutorials/distributed/home.html">Distributed and Parallel Training Tutorials</a></p>
                         <h3 id="section14-sub2">
-                            <a href="#" style="color: inherit;">14.2 Distributed Data Parallel</a>
+                            <a href="distrib_parallel.html" style="color: inherit;">14.2 Distributed Data Parallel</a>
                         </h3>
                         <p><a href="https://docs.pytorch.org/tutorials/beginner/ddp_series_intro.html?utm_source=distr_landing&utm_medium=ddp_series_intro">Distributed Data Parallel in PyTorch - Video Tutorials</a></p>
                         <h3 id="section14-sub3">
-                            <a href="#" style="color: inherit;">14.3 Fully Sharded Data Parallel</a>
+                            <a href="fully_parallel.html" style="color: inherit;">14.3 Fully Sharded Data Parallel</a>
                         </h3>
                         <p><a href="https://pytorch.org/docs/stable/fsdp.html">FullyShardedDataParallel</a></p>
                         <p><a href="https://docs.pytorch.org/tutorials/intermediate/FSDP_tutorial.html?utm_source=distr_landing&utm_medium=FSDP_getting_started">Getting Started with Fully Sharded Data Parallel (FSDP2)</a></p>
                         <h3 id="section14-sub4">
-                            <a href="#" style="color: inherit;">14.4 Tenser Parallel</a>
+                            <a href="tensor_parallel.html" style="color: inherit;">14.4 Tenser Parallel</a>
                         </h3>
                         <p><a href="https://docs.pytorch.org/docs/stable/distributed.tensor.parallel.html">Tensor Parallelism - torch.distributed.tensor.parallel</a></p>
                         <h3 id="section14-sub5">
-                            <a href="#" style="color: inherit;">14.5 Device Mesh</a>
+                            <a href="device_mesh.html" style="color: inherit;">14.5 Device Mesh</a>
                         </h3>
                         <p><a href="https://docs.pytorch.org/tutorials/recipes/distributed_device_mesh.html">Getting Started with DeviceMesh</a></p>
                         <h3 id="section14-sub6">
-                            <a href="#" style="color: inherit;">14.6 Remote Procedure Call</a>
+                            <a href="remote_call.html" style="color: inherit;">14.6 Remote Procedure Call</a>
                         </h3>
                         <p><a href="https://docs.pytorch.org/tutorials/advanced/rpc_ddp_tutorial.html?utm_source=distr_landing&utm_medium=rpc_plus_ddp">Combining Distributed DataParallel with Distributed RPC Framework</a></p>
                     </section>
@@ -615,19 +615,16 @@
                         </h3>
                         <p><a href="https://www.hello-algo.com/en/chapter_graph/">Graph - Hello Algo</a></p>
                         <h3 id="section15-sub1">
-                            <a href="#" style="color: inherit;">15.2 Core Ideas</a>
+                            <a href="core_idea.html" style="color: inherit;">15.2 Core Ideas</a>
                         </h3>
                         <h3 id="section15-sub1">
-                            <a href="#" style="color: inherit;">15.3 Mainstream Models</a>
+                            <a href="mainstream_model.html" style="color: inherit;">15.3 Mainstream Models</a>
                         </h3>
                         <h3 id="section15-sub1">
-                            <a href="#" style="color: inherit;">15.4 Geometric</a>
+                            <a href="common_task.html" style="color: inherit;">15.4 Common Tasks</a>
                         </h3>
                         <h3 id="section15-sub1">
-                            <a href="#" style="color: inherit;">15.5 Node Classification</a>
-                        </h3>
-                        <h3 id="section15-sub1">
-                            <a href="#" style="color: inherit;">15.6 Advanced Topics</a>
+                            <a href="advanced_topic.html" style="color: inherit;">15.5 Advanced Topics</a>
                         </h3>
                     </section>
                 </main>
