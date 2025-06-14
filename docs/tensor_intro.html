@@ -184,7 +184,7 @@ a = torch.tensor([1.0, 2.0, 3.0, 4.0])
 assert torch.isclose(a.mean(), torch.tensor(2.5))
 assert torch.isclose(a.max(), torch.tensor(4.0))
 assert torch.isclose(a.min(), torch.tensor(1.0))</code></pre>
-                <h4>1.2.3.3 Broadcasting</h4>
+                <h4 id="broadcasting">1.2.3.3 Broadcasting</h4>
                 <p>It’s important to note here that all of the tensors in the previous code cell were of identical shape. What happens when we try to perform a binary operation on tensors if dissimilar shape? The following cell throws a run-time error:</p>
                 <pre><code>torch.rand(2, 3) * torch.rand(3, 2)</code></pre>
                 <p>In the general case, you cannot operate on tensors of different shape this way, even in a case like the cell above, where the tensors have an identical number of elements. The exception to the same-shapes rule is <strong>Tensor Broadcasting</strong>. Here’s an example:</p>

@@ -166,6 +166,21 @@
                 <p>Time to put what we’ve learned into code! We’ll implement a conv layer’s feedforward portion, which takes care of convolving filters with an input image to produce an output volume. For simplicity, we’ll assume filters are always 3x3 (which is not true - 5x5 and 7x7 filters are also very common).</p>
                 <p>Let’s start implementing a conv layer class:</p>
 
+                <p>The <code>Conv3x3</code> class takes only one argument: the number of filters. In the constructor, we store the number of filters and initialize a random filters array using NumPy’s randn() method.</p>
+                <p class="comment">Note: Diving by 9 during the initialization is more important than you may think. If the initial values are too large or too small, training the network will be ineffective.</p>
+                <p>Next, the actual convolution:</p>
+
+                <p><code>iterate_regions()</code> is a helper generator method that yields all valid \(3 \times 3\) image regions for us. This will be useful for implementing the backwards portion of this class later on.</p>
+
+                <p>The line of code that actually performs the convolutions is highlighted above. Let’s break it down:</p>
+                <ul class="with-bullets">
+                    <li><p>We have <code>im_region</code>, a \(3 \times 3\) array containing the relevant image region.</p></li>
+                    <li><p>We do <code>im_region * self.filters</code>, which uses numpy’s <a href="tensor_intro.html#broadcasting">broadcasting</a> feature to element-wise multiply the two arrays. The result is a 3d array with the same dimension as <code>self.filters</code>.</p></li>
+                    <li><p>We <a href="https://numpy.org/doc/stable/reference/generated/numpy.sum.html">numpy.sum()</a> the result of the previous step using <code>axis=(1, 2)</code>, which produces a 1d array of length <code>num_filters</code> where each element contains the convolution result for the corresponding filter.</p></li>
+                    <li><p>We assign the result to <code>output[i, j]</code>, which contains convolution results for pixel <code>(i, j)</code> in the output.</p></li>
+                </ul>
+                <p>The sequence above is performed for each pixel in the output until we obtain our final output volume! Let’s give our code a test run:</p>
+                
                 <h3>3.1.4 Pooling</h3>
 
                 <h3>3.1.5 Softmax</h3>
