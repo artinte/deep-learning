@@ -140,6 +140,17 @@
                 <p>Can you see why an edge-detected image might be more useful than the raw image? Think back to our MNIST handwritten digit classification problem for a second. A CNN trained on MNIST might look for the digit 1, for example, by using an edge-detection filter and checking for two prominent vertical edges near the center of the image. In general, convolution helps us look for specific localized image features (like edges) that we can use later in the network.</p>
 
                 <h4>3.1.3.2 Padding</h4>
+                <p>Remember convolving a \(4 \times 4\) input image with a \(3 \times 3\) filter earlier to produce a \(2 \times 2\) output image? Often times, we’d prefer to have the output image be the same size as the input image. To do this, we add zeros around the image so we can overlay the filter in more places. A \(3 \times 3\) filter requires 1 pixel of padding:</p>
+                <table class="kernel">
+                    <tr><td style="background-color: #fde4ff">0</td><td style="background-color: #fde4ff">0</td><td style="background-color: #fde4ff">0</td><td style="background-color: #fde4ff">0</td><td style="background-color: #fde4ff">0</td><td style="background-color: #fde4ff">0</td></tr>
+                    <tr><td style="background-color: #fde4ff">0</td><td>0</td><td>50</td><td>0</td><td>29</td><td style="background-color: #fde4ff">0</td></tr>
+                    <tr><td style="background-color: #fde4ff">0</td><td>0</td><td>80</td><td>31</td><td>2</td><td style="background-color: #fde4ff">0</td></tr>
+                    <tr><td style="background-color: #fde4ff">0</td><td>33</td><td>90</td><td>0</td><td>75</td><td style="background-color: #fde4ff">0</td></tr>
+                    <tr><td style="background-color: #fde4ff">0</td><td>0</td><td>9</td><td>0</td><td>95</td><td style="background-color: #fde4ff">0</td></tr>
+                    <tr><td style="background-color: #fde4ff">0</td><td style="background-color: #fde4ff">0</td><td style="background-color: #fde4ff">0</td><td style="background-color: #fde4ff">0</td><td style="background-color: #fde4ff">0</td><td style="background-color: #fde4ff">0</td></tr>
+                </table>
+                <p style="text-align: center; color: #555555;">Figure 9 - A \(4 \times 4\) Input Convolved with a \(3 \times 3\) Filter to Produce a \(4 \times 4\) Output Using Same Padding</p>
+                <p>This is called "same" padding, since the input and output have the same dimensions. Not using any padding, which is what we’ve been doing and will continue to do for this post, is sometimes referred to as "valid" padding.</p>
                 <h4>3.1.3.3 Conv Layers</h4>
                 <h4>3.1.3.4 Implementing</h4>
 
