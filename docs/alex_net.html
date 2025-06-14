@@ -48,6 +48,10 @@
                 <h3>3.2.3 The Architecture</h3>
                 <p>The architecture of our network is summarized in Figure 2. It contains eight learned layers - five convolutional and three fully-connected. Below, we describe some of the novel or unusual features of our network’s architecture. Sections 3.1-3.4 are sorted according to our estimation of their importance, with the most important first.</p>
                 <h4>3.2.3.1 ReLU Nonlinearity</h4>
+                <p>The standard way to model a neuron's output \(f\) as a function of its input \(x\) is with \(f(x) = tanh(x)\) or \(f(x) = \frac{1}{1 + e^{-x}}\).  In terms of training time with gradient descent, these saturating nonlinearities are much slower than the non-saturating nonlinearity \(f(x) = max(0, x)\). Following Nair and Hinton we refer to neurons with this nonlinearity as Rectified Linear Units (ReLUs).</p>
+                <p>Deep convolutional neural networks with ReLUs train several times faster than their equivalents with tanh units. This is demonstrated in Figure 1, which shows the number of iterations required to reach 25% training error on the CIFAR-10 dataset for a particular four-layer convolutional network. This plot shows that we would not have been able to experiment with such large neural networks for this work if we had used traditional saturating neuron models.</p>
+                <p>We are not the first to consider alternatives to traditional neuron models in CNNs. For example, Jarrett et al. claim that the nonlinearity \(f(x) = |tanh(x)|\) works particularly well with their type of contrast normalization followed by local average pooling on the Caltech-101 dataset.</p>
+                <p>However, on this dataset the primary concern is preventing overfitting, so the effect they are observing is different from the accelerated ability to fit the training set which we report when using ReLUs. Faster learning has a great influence on the performance of large models trained on large datasets.</p>
                 <h4>3.2.3.2 Training on Multiple GPUs</h4>
                 <h4>3.2.3.3 Local Response Normalization</h4>
                 <h4>3.2.3.4 Overlapping Pooling</h4>
@@ -63,6 +67,9 @@
                 <h3>3.2.4 Reducing Overfitting</h3>
                 <p>Our neural network architecture has 60 million parameters. Although the 1000 classes of ILSVRC make each training example impose 10 bits of constraint on the mapping from image to label, this turns out to be insufficient to learn so many parameters without considerable overfitting. Below, we describe the two primary ways in which we combat overfitting.</p>
                 <h3>3.2.4.1 Data Augmentation</h3>
+                <p>The easiest and most common method to reduce overfitting on image data is to artificially enlarge the dataset using label-preserving transformations. We employ two distinct forms of data augmentation, both of which allow transformed images to be produced from the original images with very little computation, so the transformed images do not need to be stored on disk.</p>
+                <p>In our implementation, the transformed images are generated in Python code on the CPU while the GPU is training on the previous batch of images. So these data augmentation schemes are, in effect, computationally free.</p>
+                <p>The first form of data augmentation consists of generating image translations and horizontal reflections. We do this by extracting random \(224 \times 224\) patches (and their horizontal reflections) from the \(256 \times 256\) images and training our network on these extracted patches.</p>
                 <h3>3.2.4.2 Dropout</h3>
                 <h3>3.2.5 Details of Learning</h3>
                 
