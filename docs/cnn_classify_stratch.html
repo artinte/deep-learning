@@ -118,9 +118,10 @@
                 <h4>3.1.3.1 How is this useful?</h4>
                 <p>Let’s zoom out for a second and see this at a higher level. What does convolving an image with a filter do? We can start by using the example \(3 \times 3\) filter we’ve been using, which is commonly known as the vertical Sobel filter:</p>
                 <img src="res/03/lena.jpg" alt="Lena">
+                <p style="text-align: center; color: #555555;">Figure 7 - Standard Test Image</p>
                 <p>Here’s an example of what the vertical Sobel filter does:</p>
                 <img src="res/03/sobel_y.png" alt="Vertical Sobel">
-                <p style="text-align: center; color: #555555;">Figure 7 - An Image Convolved with the Vertical Sobel Filter</p>
+                <p style="text-align: center; color: #555555;">Figure 8 - An Image Convolved with the Vertical Sobel Filter</p>
                 <p>Similarly, there’s also a horizontal Sobel filter:</p>
                 <table class="kernel">
                     <tr>
@@ -133,10 +134,10 @@
                         <td>-1</td><td>-2</td><td>-1</td>
                     </tr>
                 </table>
-                <p style="text-align: center; color: #555555;">Figure 8 - The Horizontal Sobel Filter</p>
+                <p style="text-align: center; color: #555555;">Figure 9 - The Horizontal Sobel Filter</p>
                 <p>See what’s happening? Sobel filters are edge-detectors. The vertical Sobel filter detects vertical edges, and the horizontal Sobel filter detects horizontal edges. The output images are now easily interpreted: a bright pixel (one that has a high value) in the output image indicates that there’s a strong edge around there in the original image.</p>
                 <img src="res/03/sobel_x.png" alt="Horizontal Sobel">
-                <p style="text-align: center; color: #555555;">Figure 9 - An Image Convolved with the Horizontal Sobel Filter</p>
+                <p style="text-align: center; color: #555555;">Figure 10 - An Image Convolved with the Horizontal Sobel Filter</p>
                 <p>Can you see why an edge-detected image might be more useful than the raw image? Think back to our MNIST handwritten digit classification problem for a second. A CNN trained on MNIST might look for the digit 1, for example, by using an edge-detection filter and checking for two prominent vertical edges near the center of the image. In general, convolution helps us look for specific localized image features (like edges) that we can use later in the network.</p>
 
                 <h4>3.1.3.2 Padding</h4>
@@ -149,7 +150,7 @@
                     <tr><td style="background-color: #fde4ff">0</td><td>0</td><td>9</td><td>0</td><td>95</td><td style="background-color: #fde4ff">0</td></tr>
                     <tr><td style="background-color: #fde4ff">0</td><td style="background-color: #fde4ff">0</td><td style="background-color: #fde4ff">0</td><td style="background-color: #fde4ff">0</td><td style="background-color: #fde4ff">0</td><td style="background-color: #fde4ff">0</td></tr>
                 </table>
-                <p style="text-align: center; color: #555555;">Figure 9 - A \(4 \times 4\) Input Convolved with a \(3 \times 3\) Filter to Produce a \(4 \times 4\) Output Using Same Padding</p>
+                <p style="text-align: center; color: #555555;">Figure 11 - A \(4 \times 4\) Input Convolved with a \(3 \times 3\) Filter to Produce a \(4 \times 4\) Output Using Same Padding</p>
                 <p>This is called "same" padding, since the input and output have the same dimensions. Not using any padding, which is what we’ve been doing and will continue to do for this post, is sometimes referred to as "valid" padding.</p>
                 <h4>3.1.3.3 Conv Layers</h4>
                 <p>Now that we know how image convolution works and why it’s useful, let’s see how it’s actually used in CNNs. As mentioned before, CNNs include conv layers that use a set of filters to turn input images into output images. A conv layer’s primary parameter is the number of filters it has.</p>
@@ -157,11 +158,13 @@
                 <a href="https://drive.google.com/file/d/1o7layeSLgybVtsly0NSkCJWNSde-Vi51/view?usp=sharing">
                     <img src="res/03/simple_conv_layer.jpg" alt="Simple Conv Layer">
                 </a>
-                <p style="text-align: center; color: #555555;">Figure 9 - Simple Conv Layer</p>
+                <p style="text-align: center; color: #555555;">Figure 12 - Simple Conv Layer</p>
                 <p class="comment">Reminder: The output is \(26 \times 26 \times 8\) and not \(28 \times 28 \times 8\) because we’re using valid padding, which decreases the input’s width and height by 2.</p>
                 <p>Each of the 8 filters in the conv layer produces a \(26 \times 26\) output, so stacked together they make up a \(26 \times 26 \times 8\) volume. All of this happens because of \(3 \times 3\) (filter size) \(\times\) 8 (number of filters) = only 72 weights!</p>
 
                 <h4>3.1.3.4 Implementing Convolution</h4>
+                <p>Time to put what we’ve learned into code! We’ll implement a conv layer’s feedforward portion, which takes care of convolving filters with an input image to produce an output volume. For simplicity, we’ll assume filters are always 3x3 (which is not true - 5x5 and 7x7 filters are also very common).</p>
+                <p>Let’s start implementing a conv layer class:</p>
 
                 <h3>3.1.4 Pooling</h3>
 
