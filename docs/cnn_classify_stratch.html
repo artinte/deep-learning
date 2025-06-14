@@ -180,10 +180,25 @@
                     <li><p>We assign the result to <code>output[i, j]</code>, which contains convolution results for pixel <code>(i, j)</code> in the output.</p></li>
                 </ul>
                 <p>The sequence above is performed for each pixel in the output until we obtain our final output volume! Let’s give our code a test run:</p>
-                
+
+                <p>Looks good so far.</p>
                 <h3>3.1.4 Pooling</h3>
+                <p>Neighboring pixels in images tend to have similar values, so conv layers will typically also produce similar values for neighboring pixels in outputs. As a result, much of the information contained in a conv layer’s output is redundant.</p>
+                <p>For example, if we use an edge-detecting filter and find a strong edge at a certain location, chances are that we’ll also find relatively strong edges at locations 1 pixel shifted from the original one. However, these are all the same edge! We’re not finding anything new.</p>
+                <p>Pooling layers solve this problem. All they do is reduce the size of the input it’s given by (you guessed it) pooling values together in the input. The pooling is usually done by a simple operation like <code>max</code>, <code>min</code>, or <code>average</code>. Here’s an example of a Max Pooling layer with a pooling size of 2:</p>
+                <p>To perform max pooling, we traverse the input image in 2x2 blocks (because pool size = 2) and put the max value into the output image at the corresponding pixel. That’s it!</p>
+                <p>Pooling divides the input’s width and height by the pool size. For our MNIST CNN, we’ll place a Max Pooling layer with a pool size of 2 right after our initial conv layer. The pooling layer will transform a 26x26x8 input into a 13x13x8 output:</p>
+                <p>We’ll implement a MaxPool2 class with the same methods as our conv class from the previous section:</p>
+                <p>This class works similarly to the <code>Conv3x3</code> class we implemented previously. The critical line is again highlighted: to find the max from a given image region, we use <a href="https://numpy.org/doc/stable/reference/generated/numpy.amax.html">numpy.amax()</a>, numpy’s array max method. We set <code>axis=(0, 1)</code> because we only want to maximize over the first two dimensions, height and width, and not the third <code>num_filters</code>.</p>
+                <p>Let’s test it!</p>
+                <p>Our MNIST CNN is starting to come together!</p>
+                <p>To complete our CNN, we need to give it the ability to actually make predictions. We’ll do that by using the standard final layer for a multiclass classification problem: the Softmax layer, a fully-connected (dense) layer that uses the Softmax function as its activation.</p>
 
                 <h3>3.1.5 Softmax</h3>
+                <p>We’ll use a softmax layer with 10 nodes, one representing each digit, as the final layer in our CNN. Each node in the layer will be connected to every input. After the softmax transformation is applied, the digit represented by the node with the highest probability will be the output of the CNN!</p>
+                <p>You might have just thought to yourself, why bother transforming the outputs into probabilities? Won’t the highest output value always have the highest probability? If you did, you’re absolutely right. We don’t actually need to use softmax to predict a digit - we could just pick the digit with the highest output from the network!</p>
+                <p>What softmax really does is help us quantify how sure we are of our prediction, which is useful when training and evaluating our CNN. More specifically, using softmax lets us use cross-entropy loss, which takes into account how sure we are of each prediction. Here’s how we calculate cross-entropy loss:</p>
+                
 
                 <h3>3.1.6 Training Overview</h3>
                 
