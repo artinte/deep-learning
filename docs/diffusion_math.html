@@ -85,6 +85,36 @@
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(x(t + \Delta t) = x(t) + f(x(t), t) \cdot \Delta t + g(x, t) \cdot \sqrt{\Delta t} \cdot r\)
                 </div>
+                <p>Where \(r \sim \mathcal{N}(0, 1)\) is a sample from a standard normal distribution. This is a more general Euler-Maruyama time step (although it is still not the most general form of it, given that we are only working in one dimension for now).</p>
+                <p>The analogue to the diffusion equation is the <a href="#">Fokker-Planck equation (FPE)</a>, which describes how \(p(x, t)\) evolves in time for a system described by an SDE. For the one-dimensional Ito-interpreted system written above, it is given by:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\frac{\partial p(x, t)}{\partial t} = - \frac{\partial}{\partial x} \left[ f(x, t) \cdot p(x, t) \right] + \frac{1}{2} \cdot \frac{\partial^2}{\partial x^2} \left[ g^2(x, t) \cdot p(x, t) \right]\)
+                </div>
+                <p>Most FPEs are difficult or impossible to solve analytically, so we may not be able to get exact solutions for \(p(x, t)\). Notable cases where we can solve for \(p(x, t)\) exactly include diffusion and <a href="#">Ornstein-Uhlenbeck-like processes (OU processes)</a>. OU processes are mean-reverting stochastic processes; a one-dimensional example is the SDE:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\dot{x} = \frac{1}{\tau} \left[ \mu - x \right] + \sigma \cdot \sqrt{\frac{2}{\tau}} \cdot \eta(t)\)
+                </div>
+                <p>Its solution (for an initial condition \(p(x, 0) = \delta(x - x_0)\)) is:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(p(x, t | x_0, 0) = \frac{1}{\sqrt{2 \pi {s(t)}^2}} \exp\left\{ - \frac{[ x - \mu(t) ]^2}{2 {s(t)}^2}  \right\}\)
+                </div>
+                <p>Where</p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\mu(t) = x_0 \cdot e^{-t/\tau} + \mu \cdot (1 - e^{-t/\tau})\)
+                </p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(s(t) = \sigma \cdot \sqrt{\frac{1 - e^{-2t/\tau}}{2/\tau}}\)
+                </p>
+                <p>In the long-time limit \((t \rightarrow \infty)\), we have:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(p(x, t | x_0, 0) \xrightarrow{t \to \infty} p_{ss}(x) = \frac{1}{\sqrt{2 \pi \sigma^2}} \exp\left\{ - \frac{(x - \mu)^2}{2 \sigma^2}  \right\}\)
+                </div>
+                <p>i.e. the steady-state solution \(p_{ss}(x)\) is a Gaussian with mean \(\mu\) and variance \(\sigma^2\).</p>
+                <p>The general solution to this OU process (given an initial distribution \(p(x, 0) = p_0(x)\)) is:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(p(x, t) = \int_{-\infty}^{\infty} p(x, t | x_0, 0) \cdot p_0(x_0) \cdot dx_0\)
+                </div>
+                <p>One thing that makes OU processes somewhat different from a strict diffusion process is that their long-time behavior loses all memory of their initial condition. That is, as \(t\) increases, \(p(x, t)\) depends less and less on \(p_0(x)\).</p>
                 <div class="navigation">
                     <a href="gaussian_process.html">Prev: 6.2 Gaussian Processes</a>
                     <a href="diffusion_scratch.html">Next: 6.4 Diffusion from Scratch</a>
