@@ -27,6 +27,15 @@
                 <p>Compared to GPT-3 175B fine-tuned with Adam, LoRA can reduce the number of trainable parameters by 10,000 times and the GPU memory requirement by 3 times. LoRA performs on-par or better than finetuning in model quality on RoBERTa, DeBERTa, GPT-2, and GPT-3, despite having fewer trainable parameters, a higher training throughput, and, unlike adapters, no additional inference latency.</p>
                 <p>We also provide an empirical investigation into rank-deficiency in language model adaptation, which sheds light on the efficacy of LoRA. We release a package that facilitates the integration of LoRA with PyTorch models and provide our implementations and model checkpoints for RoBERTa, DeBERTa, and GPT-2 at https://github.com/microsoft/LoRA.</p>
 
+                <h3>13.1.1 Introduction</h3>
+                <h3>13.1.2 Problem Statement</h3>
+                <h3>13.1.3 Aren't Existing Solutions Good Enough?</h3>
+                <h3>13.1.4 Our Method</h3>
+                <h4>13.1.4.1 Low-Rank-Parameterized Update Matrices</h4>
+                <h4>13.1.4.2 Applying LoRA to Transformer</h4>
+                <h3>13.1.5 Empirical Experiments</h3>
+                <h3>13.1.6 Related Works</h3>
+                <h3>13.1.7 Understanding the Low-Rank Updates</h3>
                 <div class="navigation">
                     <a href="tensorflow_js.html">Prev: 12.5 TensorFlow.js</a>
                     <a href="pruning.html">Next: 13.2 Pruning</a>
