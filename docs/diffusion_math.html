@@ -72,10 +72,19 @@
                 </div>
                 <p>Given an arbitrary initial condition \(p(x, 0) = p_0(x)\), the general solution of the diffusion equation is then:</p>
                 <p class="highlight-math" style="text-align: center; overflow-x: auto;">
-                    \(p(x, t) = \int_{-\infty}^{\infty} p(x, t | x_0, 0) p_0(x_0) dx_0\)
+                    \(p(x, t) = \int_{-\infty}^{\infty} p(x, t | x_0, 0) \cdot p_0(x_0) \cdot dx_0\)
                 </p>
 
                 <h5>Basics of stochastic differential equations (SDEs)</h5>
+                <p>Diffusion is just one particularly simple example of a stochastic process governed by an SDE. The most general one-dimensional SDE looks like</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\dot{x} = f(x, t) + g(x, t) \cdot \eta(t)\)
+                </div>
+                <p>Where \(f(x, t)\) and \(g(x, t)\) are functions, and \(\eta(t)\) is again a Gaussian white noise term. The function \(f(x, t)\) is the drift term, and describes how the average value of \(x(t)\) evolves with time. The term involving \(g(x, t)\) is the noise or diffusion term, and describes stochastic fluctuations in the value of \(x(t)\).</p>
+                <p>What does this even mean? Unlike in the case of diffusion, for which \(g(x, t)\) is a constant, there are additional mathematical subtleties associated with making the above expression well-defined. For our purposes, we can choose the convention known as the <a href="#">Ito interpretation</a>, which defines the above expression to be the small \(\Delta t\) limit of the discrete process:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(x(t + \Delta t) = x(t) + f(x(t), t) \cdot \Delta t + g(x, t) \cdot \sqrt{\Delta t} \cdot r\)
+                </div>
                 <div class="navigation">
                     <a href="gaussian_process.html">Prev: 6.2 Gaussian Processes</a>
                     <a href="diffusion_scratch.html">Next: 6.4 Diffusion from Scratch</a>
