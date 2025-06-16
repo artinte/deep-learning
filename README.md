@@ -81,6 +81,7 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 - 9.5 [DeepFaceLab](https://artinte.github.io/deep-learning/deep_face_lab.html)
 - 9.6 [DeepFaceLive](https://artinte.github.io/deep-learning/deep_face_live.html)
 - 9.7 [Segment Anything](https://artinte.github.io/deep-learning/segment_anything.html)
+- 9.8 [Intro to Autoencoders](https://artinte.github.io/deep-learning/intro_auto_encoder.html)
 
 ### 10 Reinforcement Learning
 
