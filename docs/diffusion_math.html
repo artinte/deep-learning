@@ -54,7 +54,7 @@
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(\dot{x} = \sigma \cdot \eta(t)\)
                 </div>
-                <p>where \(sigma > 0\) is a constant, and \(\eta(t)\) denotes a Gaussion white noise term.</p>
+                <p>where \(\sigma > 0\) is a constant, and \(\eta(t)\) denotes a Gaussion white noise term.</p>
                 <p>What does this even mean? We can make the above expression concrete by defining it to be the small \(\Delta t\) limit of the discrete process for which:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(x(t + \Delta t) = x(t) + \sigma \cdot  \sqrt{\Delta t} \cdot r\)
@@ -128,7 +128,7 @@
                 <p>Intuitively, diffusion causes things to spread out. We would expect the time-reverse of this process to cause things to come back together.</p>
                 <p>One stochastic process which concentrates things, rather than spreads them out, is an OU process. Might some kind of OU process be the time-reverse of 1D diffusion? It turns out that the OU process described by:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
-                    \dot{x} = \frac{x_0 - x}{T - t} + \sigma \cdot \eta(t)
+                    \(\dot{x} = \frac{x_0 - x}{T - t} + \sigma \cdot \eta(t)\)
                 </div>
                 <p>is the time-reverse of a diffusion process that begins concentrated at the point \(x_0\), and spreads out for an amount of time \(T\). In other words, this process compresses a Gaussian until it becomes a delta function centered at \(x_0\) at time \(T\).</p>
                 <p>The transition probability is also opposite:</p>
