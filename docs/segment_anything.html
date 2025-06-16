@@ -19,12 +19,29 @@
 
             <main class="col-md-8 content">
                 <h2 class="custom-title">9.7 Segment Anything</h2>
-                <p class="title-subtext"></p>
-                <p style="color: #a0a0a0;">Created Date: 2025-06-04</p>
+                <p class="title-subtext">SAM 2: Segment Anything in Images and Videos</p>
+                <p style="color: #a0a0a0;">Created Date: 2025-06-16</p>
+                <p>We present Segment Anything Model 2 (SAM 2), a foundation model towards solving promptable visual segmentation in images and videos. We build a data engine, which improves model and data via user interaction, to collect the largest video segmentation dataset to date.</p>
+                <p> Our model is a simple transformer architecture with streaming memory for real-time video processing. SAM 2 trained on our data provides strong performance across a wide range of tasks. In video segmentation, we observe better accuracy, using \(3\times\) fewer interactions than prior approaches. In image segmentation, our model is more accurate and \(6\times\) faster than the Segment Anything Model (SAM).</p>
+                <p>We believe that our data, model, and insights will serve as a significant milestone for video segmentation and related perception tasks. We are releasing our main model, dataset, as well as code for model training and our demo.</p>
+                <p>Demo: <a href="https://sam2.metademolab.com">https://sam2.metademolab.com</a></p>
+                <p>Code: <a href="https://github.com/facebookresearch/sam2">https://github.com/facebookresearch/sam2</a></p>
+                <p>Website: <a href="https://ai.meta.com/sam2">https://ai.meta.com/sam2</a></p>
+
+                <h3>9.7.1 Introduction</h3>
+                <h3>9.7.2 Related work</h3>
+                <h3>9.7.3 Task: Promptable Visual Segmentation</h3>
+                <h3>9.7.4 Model</h3>
+                <p>SAM 2 can be seen as a generalization of SAM to the video (and image) domain, taking point, box, and mask prompts on individual frames to define the spatial extent of the object to be segmented spatio-temporally. Spatially, the model behaves similarly to SAM. A promptable and light-weight mask decoder takes an image embedding and prompts (if any) and outputs a segmentation mask for the frame. Prompts can be iteratively added on a frame in order to refine the masks.</p>
+                
+                <h3>9.7.5 Data</h3>
+                <h3>9.7.6 Zero-shot Experiments</h3>
+                <h3>9.7.7 Comparison to State-of-the-art in Semi-supervised VOS</h3>
+                <h3>9.7.8 Conclusion</h3>
 
                 <div class="navigation">
                     <a href="deep_face_live.html">Prev: 9.6 DeepFaceLive</a>
-                    <a href="rl_introduction.html">Next: 10.1 Introduction RL Problems</a>
+                    <a href="intro_auto_encoder.html">Next: 9.8 Intro to Autoencoders</a>
                 </div>
             </main>
 
