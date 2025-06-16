@@ -22,7 +22,14 @@
                 <p class="title-subtext"></p>
                 <p style="color: #a0a0a0;">Created Date: 2025-06-16</p>
                 <p>This tutorial introduces autoencoders with three examples: the basics, image denoising, and anomaly detection.</p>
-                
+                <p>An autoencoder is a special type of neural network that is trained to copy its input to its output. For example, given an image of a handwritten digit, an autoencoder first encodes the image into a lower dimensional latent representation, then decodes the latent representation back to an image. An autoencoder learns to compress the data while minimizing the reconstruction error.</p>
+
+                <h3>9.8.1 First Example: Basic Autoencoder</h3>
+                <p>Define an autoencoder with two Dense layers: an encoder, which compresses the images into a 64 dimensional latent vector, and a decoder, that reconstructs the original image from the latent space.</p>
+                <h3>9.8.2 Second example: Image denoising</h3>
+                <h3>An autoencoder can also be trained to remove noise from images. In the following section, you will create a noisy version of the Fashion MNIST dataset by applying random noise to each image. You will then train an autoencoder using the noisy image as input, and the original image as the target.</h3>
+                <h3>9.8.3 Third example: Anomaly detection</h3>
+                <p></p>
                 <div class="navigation">
                     <a href="segment_anything.html">9.7 Segment Anything</a>
                     <a href="rl_introduction.html">Next: 10.1 Introduction RL Problems</a>
