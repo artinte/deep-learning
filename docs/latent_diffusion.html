@@ -43,7 +43,23 @@
 
                 <h4>6.7.3.1 Perceptual Image Compression</h4>
                 <p>Our perceptual compression model is based on previous work and consists of an autoencoder trained by combination of a perceptual loss and a patch-based adversarial objective. This ensures that the reconstructions are confined to the image manifold by enforcing local realism and avoids bluriness introduced by relying solely on pixel-space losses such as \(L_2\) or \(L_1\) objectives.</p>
-                <p>More precisely, given an image \(x \in \mathbb{R}^{H \times W \times 3}\) in RGB space, the encoder \(\varepsilon\) encodes \(x\) into a latent representation \(z = \varepsilon(x)\), and the decoder \(\mathcal{D}\) reconstructs the image from the latent, giving \(\tilde{x} = \mathcal{D}(z) = \mathcal{D}(\varepsilon(x))\), where </p>
+                <p>More precisely, given an image \(x \in \mathbb{R}^{H \times W \times 3}\) in RGB space, the encoder \(\varepsilon\) encodes \(x\) into a latent representation \(z = \varepsilon(x)\), and the decoder \(\mathcal{D}\) reconstructs the image from the latent, giving \(\tilde{x} = \mathcal{D}(z) = \mathcal{D}(\varepsilon(x))\), where \(z \in \mathbb{R}^{h \times w \times c}\). Importantly, the encoder downsamples the image by a factor \(f = \frac{H}{h} = \frac{W}{w}\), and we investigate different downsampling factors \(f = 2^m\), with \(m \in \mathbb{N}\).</p>
+                <p>In order to avoid arbitrarily high-variance latent spaces, we experiment with two different kinds of regularizations. The first variant, KL-reg., imposes a slight KL-penalty towards a standard normal on the learned latent, similar to a VAE, whereas VQ-reg. uses a vector quantization layer within the decoder.</p>
+                <p>This model can be interpreted as a VQGAN but with the quantization layer absorbed by the decoder. Because our subsequent DM is designed to work with the two-dimensional structure of our learned latent space \(z = \varepsilon(x)\),  we can use relatively mild compression rates and achieve very good reconstructions.</p>
+                <p>This is in contrast to previous works, which relied on an arbitrary 1D ordering of the learned space \(z\) to model its distribution autoregressively and thereby ignored much of the inherent structure of \(z\). Hence, our compression model preserves details of \(x\) better. The full objective and training details can be found in the supplement.</p>
+
+                <h4>6.7.3.2 Latent Diffusion Models</h4>
+                <p>Diffusion Models are probabilistic models designed to learn a data distribution \(p(x)\) by gradually denoising a normally distributed variable, which corresponds to learning the reverse process of a fixed Markov Chain of length \(T\).</p>
+                <p>For image synthesis, the most successful models rely on a reweighted variant of the variational lower bound on \(p(x)\), which mirrors denoising score-matching.</p>
+                <p>These models can be interpreted as an equally weighted sequence of denoising autoencoders \({\epsilon}_{\theta} (x_t, t)\); \(t = 1, \cdots , T\), which are trained to predict a denoised variant of their input \(x_t\), where \(x_t\) is a noisy version of the input \(x\). The corresponding objective can be simplified to:</p>
+
+                <p>with \(t\) uniformly sampled from \(1, \cdots , T\).</p>
+
+                <p>Generative Modeling of Latent Representations With our trained perceptual compression models consisting of \(\mathcal{E}\) and \(\mathcal{D}\), we now have access to an efficient, low-dimensional latent space in which high-frequency, imperceptible details are abstracted away. Compared to the high-dimensional pixel space, this space is more suitable for likelihood-based generative models, as they can now (i) focus on the important, semantic bits of the data and (ii) train in a lower dimensional, computationally much more efficient space.</p>
+                <p>Unlike previous work that relied on autoregressive, attention-based transformer models in a highly compressed, discrete latent space, we can take advantage of image-specific inductive biases that our model offers. This includes the ability to build the underlying UNet primarily from 2D convolutional layers, and further focusing the objective on the perceptually most relevant bits using the reweighted bound, which now reads:</p>
+
+                <h4>6.7.3.3 Conditioning Mechanisms</h4>
+                <p>Similar to other types of generative models diffusion models are in principle capable of modeling conditional distributions of the form \(p(z|y)\). This can be implemented with a conditional denoising autoencoder </p>
                 <h3>6.7.4 Experiments</h3>
 
                 <h3>6.7.5 Limitations & Societal Impact</h3>
