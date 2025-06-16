@@ -35,7 +35,15 @@
                 <h3>6.7.2 Related Work</h3>
 
                 <h3>6.7.3 Method</h3>
+                <p>To lower the computational demands of training diffusion models towards high-resolution image synthesis, we observe that although diffusion models allow to ignore perceptually irrelevant details by undersampling the corresponding loss terms, they still require costly function evaluations in pixel space, which causes huge demands in computation time and energy resources.</p>
+                <p>We propose to circumvent this drawback by introducing an explicit separation of the compressive from the generative learning phase. To achieve this, we utilize an autoencoding model which learns a space that is perceptually equivalent to the image space, but offers significantly reduced computational complexity.</p>
+                <p>Such an approach offers several advantages: (i) By leaving the high-dimensional image space, we obtain DMs which are computationally much more efficient because sampling is performed on a low-dimensional space.</p>
+                <p>(ii) We exploit the inductive bias of DMs inherited from their UNet architecture, which makes them particularly effective for data with spatial structure and therefore alleviates the need for aggressive, quality-reducing compression levels as required by previous approaches.</p>
+                <p>(iii) Finally, we obtain general-purpose compression models whose latent space can be used to train multiple generative models and which can also be utilized for other downstream applications such as single-image CLIP-guided synthesis.</p>
 
+                <h4>6.7.3.1 Perceptual Image Compression</h4>
+                <p>Our perceptual compression model is based on previous work and consists of an autoencoder trained by combination of a perceptual loss and a patch-based adversarial objective. This ensures that the reconstructions are confined to the image manifold by enforcing local realism and avoids bluriness introduced by relying solely on pixel-space losses such as \(L_2\) or \(L_1\) objectives.</p>
+                <p>More precisely, given an image \(x \in \mathbb{R}^{H \times W \times 3}\) in RGB space, the encoder \(\varepsilon\) encodes \(x\) into a latent representation \(z = \varepsilon(x)\), and the decoder \(\mathcal{D}\) reconstructs the image from the latent, giving \(\tilde{x} = \mathcal{D}(z) = \mathcal{D}(\varepsilon(x))\), where </p>
                 <h3>6.7.4 Experiments</h3>
 
                 <h3>6.7.5 Limitations & Societal Impact</h3>
