@@ -20,8 +20,22 @@
             <main class="col-md-8 content">
                 <h2 class="custom-title">6.6 Diffusion Probability Model</h2>
                 <p class="title-subtext">Denoising Diffusion Probabilistic Models</p>
-                <p style="color: #a0a0a0;">Created Date: 2025-05-24</p>
+                <p style="color: #a0a0a0;">Created Date: 2025-06-16</p>
+                <p>We present high quality image synthesis results using diffusion probabilistic models, a class of latent variable models inspired by considerations from nonequilibrium thermodynamics. Our best results are obtained by training on a weighted variational bound designed according to a novel connection between diffusion probabilistic models and denoising score matching with Langevin dynamics, and our models naturally admit a progressive lossy decompression scheme that can be interpreted as a generalization of autoregressive decoding.</p>
+                <p>On the unconditional CIFAR10 dataset, we obtain an Inception score of 9.46 and a state-of-the-art FID score of 3.17. On 256x256 LSUN, we obtain sample quality similar to ProgressiveGAN.</p>
+
+                <h3>6.6.1 Introduction</h3>
+                <p>Deep generative models of all kinds have recently exhibited high quality samples in a wide variety of data modalities. Generative adversarial networks (GANs), autoregressive models, flows, and variational autoencoders (VAEs) have synthesized striking image and audio samples, and there have been remarkable advances in energy-based modeling and score matching that have produced images comparable to those of GANs.</p>
+                <p>This paper presents progress in diffusion probabilistic models. A diffusion probabilistic model (which we will call a "diffusion model" for brevity) is a parameterized Markov chain trained using variational inference to produce samples matching the data after finite time.</p>
+                <p>Transitions of this chain are learned to reverse a diffusion process, which is a Markov chain that gradually adds noise to the data in the opposite direction of sampling until signal is destroyed. When the diffusion consists of small amounts of Gaussian noise, it is sufficient to set the sampling chain transitions to conditional Gaussians too, allowing for a particularly simple neural network parameterization.</p>
                 
+                <h3>6.6.2 Background</h3>
+
+                <h3>6.6.3 Diffusion models and denoising autoencoders</h3>
+
+                <h3>6.6.4 Experiments</h3>
+                <h3>6.6.5 Related Work</h3>
+                <h3>6.6.6 Conclusion</h3>
                 <div class="navigation">
                     <a href="estimate_gradients.html">Prev: 6.5 Estimating Gradients</a>
                     <a href="latent_diffusion.html">Next: 6.7 Latent Diffusion</a>
