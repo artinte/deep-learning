@@ -19,9 +19,27 @@
 
             <main class="col-md-8 content">
                 <h2 class="custom-title">6.7 Latent Diffusion</h2>
-                <p class="title-subtext"></p>
-                <p style="color: #a0a0a0;">Created Date: 2025-05-24</p>
+                <p class="title-subtext">High-Resolution Image Synthesis with Latent Diffusion Models</p>
+                <p style="color: #a0a0a0;">Created Date: 2025-06-16</p>
+                <p>By decomposing the image formation process into a sequential application of denoising autoencoders, diffusion models (DMs) achieve state-of-the-art synthesis results on image data and beyond. Additionally, their formulation allows for a guiding mechanism to control the image generation process without retraining.</p>
+                <p>However, since these models typically operate directly in pixel space, optimization of powerful DMs often consumes hundreds of GPU days and inference is expensive due to sequential evaluations.</p>
+                <p>To enable DM training on limited computational resources while retaining their quality and flexibility, we apply them in the latent space of powerful pretrained autoencoders. In contrast to previous work, training diffusion models on such a representation allows for the first time to reach a near-optimal point between complexity reduction and detail preservation, greatly boosting visual fidelity.</p>
+                <p>By introducing cross-attention layers into the model architecture, we turn diffusion models into powerful and flexible generators for general conditioning inputs such as text or bounding boxes and high-resolution synthesis becomes possible in a convolutional manner.</p>
+                <p>Our latent diffusion models (LDMs) achieve new state-of-the-art scores for image inpainting and class-conditional image synthesis and highly competitive performance on various tasks, including text-to-image synthesis, unconditional image generation and super-resolution, while significantly reducing computational requirements compared to pixel-based DMs.</p>
 
+                <h3>6.7.1 Introduction</h3>
+                <p>Image synthesis is one of the computer vision fields with the most spectacular recent development, but also among those with the greatest computational demands. Especially high-resolution synthesis of complex, natural scenes is presently dominated by scaling up likelihood-based models, potentially containing billions of parameters in autoregressive (AR) transformers.</p>
+                <p>In contrast, the promising results of GANs have been revealed to be mostly confined to data with comparably limited variability as their adversarial learning procedure does not easily scale to modeling complex, multi-modal distributions. Recently, diffusion models, which are built from a hierarchy of denoising autoencoders, have shown to achieve impressive results in image synthesis and beyond, and define the state-of-the-art in class-conditional image synthesis and super-resolution.</p>
+                <p>Moreover, even unconditional DMs can readily be applied to tasks such as inpainting and colorization or stroke-based synthesis, in contrast to other types of generative models. Being likelihood-based models, they do not exhibit mode-collapse and training instabilities as GANs and, by heavily exploiting parameter sharing, they can model highly complex distributions of natural images without involving billions of parameters as in AR models.</p>
+                <p>Democratizing High-Resolution Image Synthesis DMs belong to the class of likelihood-based models, whose mode-covering behavior makes them prone to spend excessive amounts of capacity (and thus compute resources) on modeling imperceptible details of the data.</p>
+                <h3>6.7.2 Related Work</h3>
+
+                <h3>6.7.3 Method</h3>
+
+                <h3>6.7.4 Experiments</h3>
+
+                <h3>6.7.5 Limitations & Societal Impact</h3>
+                <h3>6.7.6 Conclusion</h3>
                 <div class="navigation">
                     <a href="dd_prob_model.html">Prev: 6.5 Diffusion Probability Model</a>
                     <a href="trans_transformer.html">Next: 7.1 Translate text with Transformer</a>
