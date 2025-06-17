@@ -35,8 +35,22 @@
 
                 <h3>10.3.3 DQN Algorithm</h3>
                 <p>Our environment is deterministic, so all equations presented here are also formulated deterministically for the sake of simplicity. In the reinforcement learning literature, they would also contain expectations over stochastic transitions in the environment.</p>
-                <p>Our aim will be to train a policy that tries to maximize the discounted, cumulative reward \(R_{t_0} = \sum_{t = t_0}^{\infty} {\gamma}^{t - t_0} \cdot r_t\), where \(R_{t_0}\) is also known as the return.</p>
-
+                <p>Our aim will be to train a policy that tries to maximize the discounted, cumulative reward \(R_{t_0} = \sum_{t = t_0}^{\infty} {\gamma}^{t - t_0} \cdot r_t\), where \(R_{t_0}\) is also known as the return. The discount, \(\gamma\), should be a constant between 0 and 1 that ensures the sum converges. A lower \(\gamma\) makes rewards from the uncertain far future less important for our agent than the ones in the near future that it can be fairly confident about. It also encourages agents to collect reward closer in time than equivalent rewards that are temporally far away in the future.</p>
+                <p>The main idea behind Q-learning is that if we had a function \(Q^*: State \times Action \rightarrow \mathbb{R}\), that could tell us what our return would be, if we were to take an action in a given state, then we could easily construct a policy that maximizes our rewards:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    
+                </div>
+                <p>However, we don’t know everything about the world, so we don’t have access to \(Q^*\). But, since neural networks are universal function approximators, we can simply create one and train it to resemble \(Q^*\).</p>
+                <p>For our training update rule, we’ll use a fact that every \(Q\) function for some policy obeys the Bellman equation:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    
+                </div>
+                <p>The difference between the two sides of the equality is known as the temporal difference error,:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    
+                </div>
+                <p>To minimize this error, we will use the Huber loss. The Huber loss acts like the mean squared error when the error is small, but like the mean absolute error when the error is large - this makes it more robust to outliers when the estimates of \(Q\) are very noisy. We calculate this over a batch of transitions, \(B\), sampled from the replay memory:</p>
+                
                 <div class="navigation">
                     <a href="dynamic_program.html">Prev: 10.2 Dynamic Programming</a>
                     <a href="ppo.html">Next: 10.4 PPO</a>
