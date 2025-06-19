@@ -22,6 +22,41 @@
                 <p class="title-subtext"></p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-28</p>
 
+                <h3>7.3.1 Llama Quick Start</h3>
+
+                <h4>7.3.1.1 Install Required Libraries</h4>
+                <pre><samp>pip3 install transformers accelerate sentencepiece</samp></pre>
+
+                <h4>7.3.1.2 Choose a Model</h4>
+                <pre><code>model_name = 'NousResearch/Llama-2-7b-chat-hf'</code></pre>
+
+
+                <h4>7.3.1.3 Load the Tokenizer and Model</h4>
+                <p>How to estimate the model size:</p>
+                <ul class="with-bullets">
+                    <li><p>The model has about 7 billion (7B) parameters.</p></li>
+                    <li><p>Using 16-bit floating point precision means each parameter takes 2 bytes.</p></li>
+                    <li><p>Calculate total size: 7,000,000,000 parameters × 2 bytes = 14,000,000,000 bytes ≈ 13 GB</p></li>
+                </ul>
+
+                <pre><samp>model.safetensors.index.json: 100%|███████████████████████████████████| 26.8k/26.8k
+model-00002-of-00002.safetensors: 100%|███████████████████████████████████| 3.50G/3.50G
+model-00001-of-00002.safetensors: 100%|███████████████████████████████████| 10.0G/10.0G
+                </samp></pre>
+
+                <h4>7.3.1.4 Build a Prompt</h4>
+                <p>The LLaMA Chat models expect prompts wrapped in [INST] ... [/INST] tags:</p>
+                <pre><code>prompt = "<s>[INST] Explain what a black hole is in one sentence. [/INST]"</code></pre>
+                <p>You can also include a system prompt for better alignment:</p>
+                <pre><samp>prompt = (
+                    "&lt;s&gt;[INST] &lt;&lt;SYS&gt;&gt;\n"
+                    "You are a helpful, intelligent assistant.\n"
+                    "&lt;&lt;/SYS&gt;&gt;\n"
+                    "Explain what a black hole is in one sentence.\n[/INST]"
+                )</samp></pre>
+                <h4>7.3.1.5 Generate Text</h4>
+
+
                 <div class="navigation">
                     <a href="easy_ocr.html">Prev: 7.2 Easy OCR</a>
                     <a href="chatbots.html">Next: 7.4 Chatbots</a>

@@ -1,7 +1,7 @@
 import torch
 from transformers import LlamaForCausalLM, LlamaTokenizer
 
-model_name = "NousResearch/Llama-2-7b-chat-hf"
+model_name = 'NousResearch/Llama-2-7b-chat-hf'
 
 tokenizer = LlamaTokenizer.from_pretrained(model_name)
 model = LlamaForCausalLM.from_pretrained(model_name, torch_dtype=torch.bfloat16, device_map="auto")
