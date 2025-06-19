@@ -7,6 +7,7 @@ import threading
 
 deps = {
     'data/conv_mlp': 'https://github.com/SHI-Labs/Convolutional-MLPs.git@092bf711c7401dd5be03af7121ee58b3419fb9f7',
+    'data/nanoGPT': 'https://github.com/karpathy/nanoGPT.git@93a43d9a5c22450bbf06e78da2cb6eeef084b717',
 }
 
 
