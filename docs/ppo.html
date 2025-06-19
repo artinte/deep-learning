@@ -19,9 +19,44 @@
 
             <main class="col-md-8 content">
                 <h2 class="custom-title">10.4 PPO</h2>
-                <p class="title-subtext"></p>
-                <p style="color: #a0a0a0;">Created Date: 2025-06-05</p>
+                <p class="title-subtext">Reinforcement Learning (PPO) with TorchRL Tutorial</p>
+                <p style="color: #a0a0a0;">Created Date: 2025-06-19</p>
+                <p>This tutorial demonstrates how to use PyTorch and <code>torchrl</code> to train a parametric policy network to solve the Inverted Pendulum task from the OpenAI-Gym/Farama-Gymnasium control library.</p>
+                <p>Proximal Policy Optimization (PPO) is a policy-gradient algorithm where a batch of data is being collected and directly consumed to train the policy to maximise the expected return given some proximality constraints. You can think of it as a sophisticated version of REINFORCE, the foundational policy-optimization algorithm. For more information, see the Proximal Policy Optimization Algorithms paper.</p>
+                <p>PPO is usually regarded as a fast and efficient method for online, on-policy reinforcement algorithm. TorchRL provides a loss-module that does all the work for you, so that you can rely on this implementation and focus on solving your problem rather than re-inventing the wheel every time you want to train a policy.</p>
+                <p>For completeness, here is a brief overview of what the loss computes, even though this is taken care of by our ClipPPOLoss module—the algorithm works as follows: </p>
+                <ol>
+                    <li><p>we will sample a batch of data by playing the policy in the environment for a given number of steps.</p></li>
+                    <li><p>Then, we will perform a given number of optimization steps with random sub-samples of this batch using a clipped version of the REINFORCE loss.</p></li>
+                    <li><p>The clipping will put a pessimistic bound on our loss: lower return estimates will be favored compared to higher ones.</p></li>
+                </ol>
+                <p>The precise formula of the loss is:</p>
 
+                <p>There are two components in that loss: in the first part of the minimum operator, we simply compute an importance-weighted version of the REINFORCE loss (for example, a REINFORCE loss that we have corrected for the fact that the current policy configuration lags the one that was used for the data collection). The second part of that minimum operator is a similar loss where we have clipped the ratios when they exceeded or were below a given pair of thresholds.</p>
+
+                <p>This loss ensures that whether the advantage is positive or negative, policy updates that would produce significant shifts from the previous configuration are being discouraged.</p>
+
+                <p>This tutorial is structured as follows:</p>
+                <ol>
+                    <li><p>First, we will define a set of hyperparameters we will be using for training.</p></li>
+                    <li><p>Next, we will focus on creating our environment, or simulator, using TorchRL’s wrappers and transforms.</p></li>
+                    <li><p>Next, we will design the policy network and the value model, which is indispensable to the loss function. These modules will be used to configure our loss module.</p></li>
+                    <li><p>Next, we will create the replay buffer and data loader.</p></li>
+                    <li><p>Finally, we will run our training loop and analyze the results.</p></li>
+                </ol>
+                <p>Throughout this tutorial, we’ll be using the tensordict library. TensorDict is the lingua franca of TorchRL: it helps us abstract what a module reads and writes and care less about the specific data description and more about the algorithm itself.</p>
+
+                <h3>10.4.1 Define Hyperparameters</h3>
+                <h3>10.4.2 Define an environment</h3>
+                <h3>10.4.3 Policy</h3>
+                <h3>10.4.4 Value Network</h3>
+                <h3>10.4.5 Data Collector</h3>
+                <h3>10.4.6 Replay Buffer</h3>
+                <h3>10.4.7 Loss Function</h3>
+                <h3>10.4.8 Training Loop</h3>
+                <h3>10.4.9 Result</h3>
+                <h3>10.4.10 Conslusion and Next Steps</h3>
+                
                 <div class="navigation">
                     <a href="dqn.html">Prev: 10.3 DQN</a>
                     <a href="function_appro.html">Next: 10.5 Function Approximation</a>
