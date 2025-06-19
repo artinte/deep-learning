@@ -42,7 +42,26 @@
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(log p(y|x) = \sum_{j=1}^m log p(y_i|y \lt j, s)\)
                 </div>
-                
+                <p>A natural choice to model such a decomposition in the decoder is to use a recurrent neural network (RNN) architecture, which most of the recent NMT work such as Kalchbrenner and Blunsom, 2013. They, however, differ in terms of which RNN architectures are used for the decoder and how the encoder computes the source sentence representation s.</p>
+                <p>In this work, following Sutskever et al., 2014, we use the stacking LSTM architecture for our NMT systems, as illustrated with \(\mathbb{D}\) being our parallel training corpus.</p>
+
+                <h3>4.6.3 Attention-based Models</h3>
+                <p>Our various attention-based models are classifed into two broad categories, global and local. These classes differ in terms of whether the "attention" is placed on all source positions or on only a few source positions. We illustrate these two model types in Figure 2 and 3 respectively.</p>
+                <p>Common to these two types of models is the fact that at each time step t in the decoding phase, both approaches first take as input the hidden state \(h_t\) at the top layer of a stacking LSTM.</p>
+                <p>The goal is then to derive a context vector \(c_t\) that captures relevant source-side information to help predict the current target word \(y_t\). While these models differ in how the context vector \(c_t\) is derived, they share the same subsequent steps.</p>
+                <p>Specifically, given the target hidden state \(h_t\) and the source-side context vector \(c_t\), we employ a simple concatenation layer to combine the information from both vectors to produce an attentional hidden state as follows:</p>
+
+                <h4>4.6.3.1 Global Attention</h4>
+
+                <h4>4.6.3.2 Local Attention</h4>
+
+                <h4>4.6.3.3 Input-feeding Approach</h4>
+
+                <h3>4.6.4 Experiments</h3>
+
+                <h3>4.6.5 Analysis</h3>
+
+                <h3>4.6.6 Conclusion</h3>
             
                 <div class="navigation">
                     <a href="nmt_align.html">Prev: 4.5 Neural Machine Translation</a>
