@@ -25,6 +25,22 @@
                 <p>DenseNets have several compelling advantages: they alleviate the vanishing-gradient problem, strengthen feature propagation, encourage feature reuse, and substantially reduce the number of parameters. We evaluate our proposed architecture on four highly competitive object recognition benchmark tasks (CIFAR-10, CIFAR-100, SVHN, and ImageNet). DenseNets obtain significant improvements over the state-of-the-art on most of them, whilst requiring less computation to achieve high performance.</p>
     
                 <h3>3.5.1 Introduction</h3>
+                <p>Convolutional neural networks (CNNs) have become the dominant machine learning approach for visual object recognition. Although they were originally introduced over 20 years ago, improvements in computer hardware and network structure have enabled the training of truly deep CNNs only recently.</p>
+                <p>The original LeNet5 consisted of 5 layers, VGG featured 19, and only last year Highway Networks and Residual Networks (ResNets) have surpassed the 100-layer barrier.</p>
+                <p>As CNNs become increasingly deep, a new research problem emerges: as information about the input or gradient passes through many layers, it can vanish and "wash out" by the time it reaches the end (or beginning) of the network. Many recent publications address this or related problems. ResNets and Highway Networks bypass signal from one layer to the next via identity connections.</p>
+                <p>Stochastic depth shortens ResNets by randomly dropping layers during training to allow better information and gradient flow. FractalNets repeatedly combine several parallel layer sequences with different number of convolutional blocks to obtain a large nominal depth, while maintaining many short paths in the network.</p>
+                <p>Although these different approaches vary in network topology and training procedure, they all share a key characteristic: they create short paths from early layers to later layers.</p>
+
+
+                <h3>3.5.2 Related Work</h3>
+
+                <h3>3.5.3 DenseNets</h3>
+
+                <h3>3.5.4 Experiments</h3>
+                
+                <h3>3.5.5 Discussion</h3>
+
+                <h3>3.5.6 Conclusion</h3>
                 
                 <div class="navigation">
                     <a href="u_net.html">Prev: 3.5 U-Net</a>
