@@ -1,7 +1,8 @@
 import torch
 from transformers import LlamaForCausalLM, LlamaTokenizer
 
-model_name = 'NousResearch/Llama-2-7b-chat-hf'
+# model_name = 'NousResearch/Llama-2-7b-chat-hf'
+model_name = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
 
 tokenizer = LlamaTokenizer.from_pretrained(model_name)
 model = LlamaForCausalLM.from_pretrained(model_name, torch_dtype=torch.bfloat16, device_map="auto")
@@ -20,4 +21,3 @@ output = model.generate(
 
 generated_text = tokenizer.decode(output[0], skip_special_tokens=True)
 print(generated_text)
-    
