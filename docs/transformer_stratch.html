@@ -45,9 +45,9 @@
                 <p>In addition to the two sub-layers in each encoder layer, the decoder inserts a third sub-layer, which performs multi-head attention over the output of the encoder stack. Similar to the encoder, we employ residual connections around each of the sub-layers, followed by layer normalization.</p>
                 <p>We also modify the self-attention sub-layer in the decoder stack to prevent positions from attending to subsequent positions. This masking, combined with fact that the output embeddings are offset by one position, ensures that the predictions for position i can depend only on the known outputs at positions less than i.</p>
 
-                <h5> Attention</h5>
+                <h5>Attention</h5>
 
-                <h4>An attention function can be described as mapping a query and a set of key-value pairs to an output, where the query, keys, values, and output are all vectors. The output is computed as a weighted sum of the values, where the weight assigned to each value is computed by a compatibility function of the query with the corresponding key.</h4>
+                <p>An attention function can be described as mapping a query and a set of key-value pairs to an output, where the query, keys, values, and output are all vectors. The output is computed as a weighted sum of the values, where the weight assigned to each value is computed by a compatibility function of the query with the corresponding key.</p>
                 <p>We call our particular attention “Scaled Dot-Product Attention”. The input consists of queries and keys of dimension \(d_k\), and values of dimension \(d_v\). We compute the dot products of the query with all keys, divide each by \(\sqrt{d_k}\), and apply a softmax function to obtain the weights on the values.</p>
                 <p>In practice, we compute the attention function on a set of queries simultaneously, packed together into a matrix Q, The keys and values are also packed together into matrices K and V. We compute the matrix of outputs as:</p>
                 <h5>Applications of Attention in our Model</h5>
@@ -79,11 +79,17 @@
                 <h4>5.3.3.2 A First Example</h4>
 
                 <h3>5.3.4 Part 3: A Real World Example</h3>
+                <p>Now we consider a real-world example using the Multi30k German-English Translation task. This task is much smaller than the WMT task considered in the paper, but it illustrates the whole system. We also show how to use multi-gpu processing to make it really fast.</p>
+                
                 <h4>5.3.4.1 Data Loading</h4>
+                <p>We will load the dataset using torchtext and spacy for tokenization.</p>
+                <p>Batching matters a ton for speed. We want to have very evenly divided batches, with absolutely minimal padding. To do this we have to hack a bit around the default torchtext batching. This code patches their default batching to make sure we search over enough sentences to find tight batches.</p>
                 <h4>5.3.4.2 Iterators</h4>
                 <h4>5.3.4.3 Training the System</h4>
+                <p>Once trained we can decode the model to produce a set of translations. Here we simply translate the first sentence in the validation set. This dataset is pretty small so the translations with greedy search are reasonably accurate.</p>
 
                 <h3>5.3.5 Additional Components: BPE, Search, Averaging</h3>
+                
 
                 <h3>5.3.6 Conclusion</h3>
                 
