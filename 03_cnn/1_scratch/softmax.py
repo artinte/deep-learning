@@ -15,7 +15,6 @@ class Softmax:
         - input can be any array with any dimensions.
         '''
         input = input.flatten()
-        input_len, nodes = self.weights.shape
         
         totals = numpy.dot(input, self.weights) + self.bias
         exp = numpy.exp(totals)

@@ -420,7 +420,7 @@ Step400: loss = 2.3025, accuracy = 0.12</samp></pre>
                 <p>We’ll follow this pattern to train our CNN. There are also two major implementation-specific ideas we’ll use:</p>
                 <ul class="with-bullets">
                     <li><p>During the forward phase, each layer will cache any data (like inputs, intermediate values, etc) it’ll need for the backward phase. This means that any backward phase must be preceded by a corresponding forward phase.</p></li>
-                    <li><p>During the backward phase, each layer will receive a gradient and also return a gradient. It will receive the gradient of loss with respect to its outputs \(\frac{\partial L}{\partial out}\) and return the gradient of loss with respect to its inputs \(\frac{\partial L}{\partial in}\)</p></li>
+                    <li><p>During the backward phase, each layer will receive a gradient and also return a gradient. It will receive the gradient of loss with respect to its outputs \(\frac{\partial L}{\partial out}\) and return the gradient of loss with respect to its inputs \(\frac{\partial L}{\partial in}\).</p></li>
                 </ul>
                 <p>These two ideas will help keep our training implementation clean and organized. The best way to see why is probably by looking at code. Training our CNN will ultimately look something like this:</p>
                 <pre><code># Feed forward
@@ -445,7 +445,19 @@ gradient = conv.backprop(gradient)</code></pre>
                 </div>
                 <p>where \(p_c\) is the predicted probability for the correct class \(c\) (in other words, what digit our current image actually is).</p>
 
-            
+                <p>The first thing we need to calculate is the input to the Softmax layer’s backward phase, \(\frac{\partial L}{\partial {out}_s}\), where \({out}_s\) s the output from the Softmax layer: a vector of 10 probabilities. This is pretty easy, since only \(p_i\) shows up in the loss equation:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\frac{\partial L}{\partial {out}_s (i)} = \begin{cases}
+                        \ -\frac{1}{p_i} & \text{if } i = c \\
+                        \ 0 & \text{if } i \neq c
+                    \end{cases}\)</div>
+                <p>That’s our initial gradient you saw referenced above:</p>
+                <pre><code># Calculate initial gradient
+gradient = np.zeros(10)
+gradient[label] = -1 / out[label]</code></pre>
+                
+                <p>We’re almost ready to implement our first backward phase - we just need to first perform the forward phase caching we discussed earlier:</p>
+
 
                 <h3>3.1.8 Backprop: Max Pooling</h3>
                 <h3>3.1.9 Backprop: Conv</h3>
