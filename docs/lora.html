@@ -46,11 +46,36 @@
 
                 <h5>A Generalization of Full Fine-tuning</h5>
                 <p>A more general form of fine-tuning allows the training of a subset of the pre-trained parameters. LoRA takes a step further and does not require the accumulated gradient update to weight matrices to have full-rank during adaptation.</p>
-                <p>This means that when applying LoRA to all weight matrices and training all biases, we roughly recover the expressive ness of full fine-tuning by setting the LoRA rank \(r\) to the rank of the pre-trained weight matrices. In other words, as we increase the number of trainable parameters, training LoRA roughly converges to training the original model, while adapter-based methods converges to an MLP and prefix-based </p>
+                <p>This means that when applying LoRA to all weight matrices and training all biases, we roughly recover the expressive ness of full fine-tuning by setting the LoRA rank \(r\) to the rank of the pre-trained weight matrices. In other words, as we increase the number of trainable parameters, training LoRA roughly converges to training the original model, while adapter-based methods converges to an MLP and prefix-based methods to a model that cannot take long input sequences.</p>
+
+                <h5>No Additional Inference Latency</h5>
+                <p>When deployed in production, we can explicitly compute and store \(W = W_0 + BA\) and perform inference as usual. Note that both \(W_0\) and \(BA\) are in \(\mathbb{R}^{d \times k}\). When we need to switch to another downstream task, we can recover \(W_0\) by subtracting \(BA\) and then adding a different \(B'A'\), a quick operation with very little memory overhead. Critically, this guarantees that we do not introduce any additional latency during inference compared to a fine-tuned model by construction.</p>
+
                 <h4>13.1.4.2 Applying LoRA to Transformer</h4>
+                <p>In principle, we can apply LoRA to any subset of weight matrices in a neural network to reduce the number of trainable parameters. In the Transformer architecture, there are four weight matrices in the self-attention module \((W_q, W_k, W_v, W_o)\) and two in the MLP module. We treat \(W_q\) (or \(W_k\), \(W_v\)) as a single matrix of dimension \(d_{model} \times d_{model}\), even though the output dimension is usually sliced into attention heads.</p>
+                <p>We limit our study to only adapting the attention weights for downstream tasks and freeze the MLP modules (so they are not trained in downstream tasks) both for simplicity and parameter-efficiency.We further study the effect on adapting different types of attention weight matrices in a Transformer in Section 7.1. We leave the empirical investigation of adapting the MLP layers, LayerNorm layers, and biases to a future work.</p>
+
+                <h5>Practical Benefits and Limitations</h5>
+                <p>The most significant benefit comes from the reduction in memory and storage usage. For a large Transformer trained with Adam, we reduce that VRAM usage by up to 2/3 if \(r \ll d_{model}\) as we do not need to store the optimizer states for the frozen parameters.</p>
+                <p>LoRA also has its limitations. For example, it is not straightforward to batch inputs to different tasks with different A and B in a single forward pass, if one chooses to absorb A and B into W to eliminate additional inference latency. Though it is possible to not merge the weights and dynamically choose the LoRA modules to use for samples in a batch for scenarios where latency is not critical.</p>
+                
                 <h3>13.1.5 Empirical Experiments</h3>
                 <h3>13.1.6 Related Works</h3>
+
+                <h5>Transformer Language Models</h5>
+
                 <h3>13.1.7 Understanding the Low-Rank Updates</h3>
+
+                <h3>13.1.8 Conclusion and Future Work</h3>
+                <p>Fine-tuning enormous language models is prohibitively expensive in terms of the hardware required and the storage/switching cost for hosting independent instances for different tasks. We propose LoRA, an efficient adaptation strategy that neither introduces inference latency nor reduces input sequence length while retaining high model quality.</p>
+                <p>Importantly, it allows for quick task-switching when deployed as a service by sharing the vast majority of the model parameters. While we focused on Transformer language models, the proposed principles are generally applicable to any neural networks with dense layers.</p>
+                <p>There are many directions for future works:</p>
+                <ol>
+                    <li><p>LoRA can be combined with other efficient adaptation methods, potentially providing orthogonal improvement.</p></li>
+                    <li><p>The mechanism behind fine-tuning or LoRA is far from clear – how are features learned during pre-training transformed to do well on downstream tasks? We believe that LoRA makes it more tractable to answer this than full finetuning.</p></li>
+                    <li><p>We mostly depend on heuristics to select the weight matrices to apply LoRA to. Are there more principled ways to do it?</p></li>
+                    <li><p>Finally, the rank-deficiency of \(\Delta W\) suggests that \(W\) could be rank-deficient as well, which can also be a source of inspiration for future works.</p></li>
+                </ol>
                 <div class="navigation">
                     <a href="tensorflow_js.html">Prev: 12.5 TensorFlow.js</a>
                     <a href="pruning.html">Next: 13.2 Pruning</a>
