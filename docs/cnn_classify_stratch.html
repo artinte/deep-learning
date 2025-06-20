@@ -402,7 +402,7 @@ for i, (image, label) in enumerate(zip(x_test[:400], y_test[:400])):
         loss = 0
         num_correct = 0</code></pre>
 
-                <p>Running <div class="highlight">cnn_forward.py</div> gives us output similar to this:</p>
+                <p>Running <span class="highlight">cnn_forward.py</span> gives us output similar to this:</p>
 
                 <pre><samp>Step100: loss = 2.302, accuracy = 0.12
 Step200: loss = 2.3025, accuracy = 0.09
@@ -412,9 +412,41 @@ Step400: loss = 2.3025, accuracy = 0.12</samp></pre>
                 <p>This makes sense: with random weight initialization, you’d expect the CNN to be only as good as random guessing. Random guessing would yield 10% accuracy (since there are 10 classes) and a cross-entropy loss of \(−ln(0.1) \approx 2.302\), which is what we get!</p>
 
                 <h3>3.1.6 Training Overview</h3>
-                <p></p>
-                
+                <p>Training a neural network typically consists of two phases:</p>
+                <ol>
+                    <li><p>A forward phase, where the input is passed completely through the network.</p></li>
+                    <li><p>A backward phase, where gradients are backpropagated (backprop) and weights are updated.</p></li>
+                </ol>
+                <p>We’ll follow this pattern to train our CNN. There are also two major implementation-specific ideas we’ll use:</p>
+                <ul class="with-bullets">
+                    <li><p>During the forward phase, each layer will cache any data (like inputs, intermediate values, etc) it’ll need for the backward phase. This means that any backward phase must be preceded by a corresponding forward phase.</p></li>
+                    <li><p>During the backward phase, each layer will receive a gradient and also return a gradient. It will receive the gradient of loss with respect to its outputs \(\frac{\partial L}{\partial out}\) and return the gradient of loss with respect to its inputs \(\frac{\partial L}{\partial in}\)</p></li>
+                </ul>
+                <p>These two ideas will help keep our training implementation clean and organized. The best way to see why is probably by looking at code. Training our CNN will ultimately look something like this:</p>
+                <pre><code># Feed forward
+out = conv.forward((image / 255) - 0.5)
+out = pool.forward(out)
+out = softmax.forward(out)
+
+# Calculate initial gradient
+gradient = np.zeros(10)
+
+# Backprop
+gradient = softmax.backprop(gradient)
+gradient = pool.backprop(gradient)
+gradient = conv.backprop(gradient)</code></pre>
+
+                <p>See how nice and clean that looks? Now imagine building a network with 50 layers instead of 3 - it’s even more valuable then to have good systems in place.</p>
+
                 <h3>3.1.7 Backprop: Softmax</h3>
+                <p>We’ll start our way from the end and work our way towards the beginning, since that’s how backprop works. First, recall the cross-entropy loss:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(L = -ln(p_c)\)
+                </div>
+                <p>where \(p_c\) is the predicted probability for the correct class \(c\) (in other words, what digit our current image actually is).</p>
+
+            
+
                 <h3>3.1.8 Backprop: Max Pooling</h3>
                 <h3>3.1.9 Backprop: Conv</h3>
                 <h3>3.1.10 Training a CNN</h3>
