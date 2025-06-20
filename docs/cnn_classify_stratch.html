@@ -21,6 +21,11 @@
             font-family: monospace;
             border: 1px solid #333;
         }
+        .container {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
     </style>
 </head>
 
@@ -164,7 +169,7 @@
                 <a href="https://drive.google.com/file/d/1o7layeSLgybVtsly0NSkCJWNSde-Vi51/view?usp=sharing">
                     <img src="res/03/simple_conv_layer.jpg" alt="Simple Conv Layer">
                 </a>
-                <p style="text-align: center; color: #555555;">Figure 12 - Simple Conv Layer</p>
+                <p style="text-align: center; color: #555555;">Figure 13 - Simple Conv Layer</p>
                 <p class="comment">Reminder: The output is \(26 \times 26 \times 8\) and not \(28 \times 28 \times 8\) because we’re using valid padding, which decreases the input’s width and height by 2.</p>
                 <p>Each of the 8 filters in the conv layer produces a \(26 \times 26\) output, so stacked together they make up a \(26 \times 26 \times 8\) volume. All of this happens because of \(3 \times 3\) (filter size) \(\times\) 8 (number of filters) = only 72 weights!</p>
 
@@ -231,14 +236,33 @@ assert output.shape == (26, 26, 8)</code></pre>
 
                 <p>Looks good so far.</p>
 
-                <h3>3.1.4 Pooling</h3>
+                <h3 id="pooling">3.1.4 Pooling</h3>
                 <p>Neighboring pixels in images tend to have similar values, so conv layers will typically also produce similar values for neighboring pixels in outputs. As a result, much of the information contained in a conv layer’s output is redundant.</p>
                 <p>For example, if we use an edge-detecting filter and find a strong edge at a certain location, chances are that we’ll also find relatively strong edges at locations 1 pixel shifted from the original one. However, these are all the same edge! We’re not finding anything new.</p>
                 <p>Pooling layers solve this problem. All they do is reduce the size of the input it’s given by (you guessed it) pooling values together in the input. The pooling is usually done by a simple operation like <code>max</code>, <code>min</code>, or <code>average</code>. Here’s an example of a Max Pooling layer with a pooling size of 2:</p>
+                <div class="container">
+                    <table class="kernel">
+                        <tr><td>0</td><td>50</td><td>0</td><td>29</td></tr>
+                        <tr><td>0</td><td>80</td><td>31</td><td>2</td></tr>
+                        <tr><td>33</td><td>90</td><td>0</td><td>75</td></tr>
+                        <tr><td>0</td><td>9</td><td>0</td><td>95</td></tr>
+                    </table>
+                    <table class="kernel">
+                        <tr><td>80</td><td>31</td></tr>
+                        <tr><td>90</td><td>95</td></tr>
+                    </table>
+                </div>
+                <p style="text-align: center; color: #555555;">Figure 14 - Max Pooling</p>
+
                 <p>To perform max pooling, we traverse the input image in 2x2 blocks (because pool size = 2) and put the max value into the output image at the corresponding pixel. That’s it!</p>
                 <p>Pooling divides the input’s width and height by the pool size. For our MNIST CNN, we’ll place a Max Pooling layer with a pool size of 2 right after our initial conv layer. The pooling layer will transform a 26x26x8 input into a 13x13x8 output:</p>
-                <p>We’ll implement a MaxPool2 class with the same methods as our conv class from the previous section:</p>
+                <img src="res/03/max_pool.svg" alt="Max Pooling" width="600">
+                <p style="text-align: center; color: #555555;">Figure 15 - Max Pooling Layer</p>
+
+                <p>File <a href="">max_pool.py</a> implement a MaxPool2 class with the same methods as our conv class from the previous section:</p>
+
                 <p>This class works similarly to the <code>Conv3x3</code> class we implemented previously. The critical line is again highlighted: to find the max from a given image region, we use <a href="https://numpy.org/doc/stable/reference/generated/numpy.amax.html">numpy.amax()</a>, numpy’s array max method. We set <code>axis=(0, 1)</code> because we only want to maximize over the first two dimensions, height and width, and not the third <code>num_filters</code>.</p>
+                
                 <p>Let’s test it!</p>
                 <p>Our MNIST CNN is starting to come together!</p>
                 <p>To complete our CNN, we need to give it the ability to actually make predictions. We’ll do that by using the standard final layer for a multiclass classification problem: the Softmax layer, a fully-connected (dense) layer that uses the Softmax function as its activation.</p>
