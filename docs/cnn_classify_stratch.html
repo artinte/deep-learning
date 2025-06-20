@@ -55,15 +55,15 @@
                 <p>We’ll see soon how a CNN can help us mitigate these problems.</p>
 
                 <h3>3.1.2 Dataset</h3>
-                <p>In this post, we’ll tackle the "Hello, World!" of Computer Vision: the <a href="data_represent.html#mnist">MNIST</a> handwritten digit classification problem. It’s simple: given an image, classify it as a digit.</p>
+                <p>In this post, we’ll tackle the <em>"Hello, World!"</em> of Computer Vision: the <a href="data_represent.html#mnist">MNIST</a> handwritten digit classification problem. It’s simple: given an image, classify it as a digit.</p>
                 <img src="res/03/mnist_examples.webp" width="600" alt="MNIST">
-                <p style="text-align: center; color: #555555;">Figure 1 - Sample Images from the MNIST Dataset</p>
+                <p style="text-align: center; color: #555555;">Figure 2 - Sample Images from the MNIST Dataset</p>
                 <p>Each image in the MNIST dataset is \(28 \times 28\) and contains a centered, grayscale digit.</p>
-                <p>Truth be told, a normal neural network would actually work just fine for this problem. You could treat each image as a \(28 \times 28 = 784\) - dimensional vector, feed that to a 784-dim input layer, stack a few hidden layers, and finish with an output layer of 10 nodes, 1 for each digit.</p>
+                <p>Truth be told, a <a href="pytorch_basics.html#build_model">normal neural network</a> would actually work just fine for this problem. You could treat each image as a \(28 \times 28 = 784\) - dimensional vector, feed that to a 784-dim input layer, stack a few hidden layers, and finish with an output layer of 10 nodes, 1 for each digit.</p>
                 <p>This would only work because the MNIST dataset contains small images that are centered, so we wouldn’t run into the aforementioned issues of size or shifting. Keep in mind throughout the course of this post, however, that most real-world image classification problems aren’t this easy.</p>
                 <p>Enough buildup. Let’s get into CNNs!</p>
 
-                <h3>3.1.3 Convolutions</h3>
+                <h3 id="convolution">3.1.3 Convolutions</h3>
                 <p>What are Convolutional Neural Networks?</p>
                 <p>They’re basically just neural networks that use <strong>Convolutional layers</strong>, a.k.a. Conv layers, which are based on the mathematical operation of convolution. Conv layers consist of a set of filters, which you can think of as just 2d matrices of numbers. Here’s an example \(3 \times 3\) filter:</p>
                 <table class="kernel">
@@ -77,7 +77,7 @@
                         <td>-1</td><td>0</td><td>1</td>
                     </tr>
                 </table>
-                <p style="text-align: center; color: #555555;">Figure 2 - A \(3 \times 3\) filter</p>
+                <p style="text-align: center; color: #555555;">Figure 3 - A \(3 \times 3\) filter</p>
                 <p>We can use an input image and a filter to produce an output image by convolving the filter with the input image. This consists of:</p>
 
                 <ol>
@@ -86,7 +86,7 @@
                     <li><p>Summing up all the element-wise products. This sum is the output value for the destination pixel in the output image.</p></li>
                     <li><p>Repeating for all locations.</p></li>
                 </ol>
-                <p class="comment">Side Note: We (along with many CNN implementations) are technically actually using cross-correlation instead of convolution here, but they do almost the same thing. I won’t go into the difference in this post because it’s not that important, but feel free to look this up if you’re curious.</p>
+                <p class="comment">Side Note: We (along with many CNN implementations) are technically actually using <a href="https://en.wikipedia.org/wiki/Cross-correlation">cross-correlation</a> instead of convolution here, but they do almost the same thing. I won’t go into the difference in this post because it’s not that important, but feel free to look this up if you’re curious.</p>
                 <p>That 4-step description was a little abstract, so let’s do an example. Consider this tiny \(4 \times 4\) grayscale image and this \(3 \times 3\) filter:</p>
                 <table class="kernel">
                     <tr><td>0</td><td>50</td><td>0</td><td>29</td></tr>
@@ -94,13 +94,13 @@
                     <tr><td>33</td><td>90</td><td>0</td><td>75</td></tr>
                     <tr><td>0</td><td>9</td><td>0</td><td>95</td></tr>
                 </table>
-                <p style="text-align: center; color: #555555;">Figure 3 - A \(4 \times 4\) image</p>
+                <p style="text-align: center; color: #555555;">Figure 4 - A \(4 \times 4\) image</p>
                 <p>The numbers in the image represent pixel intensities, where 0 is black and 255 is white. We’ll convolve the input image and the filter to produce a 2x2 output image:</p>
                 <table class="kernel">
                     <tr><td>?</td><td>?</td></tr>
                     <tr><td>?</td><td>?</td></tr>
                 </table>
-                <p style="text-align: center; color: #555555;">Figure 4 - A \(2 \times 2\) output image</p>
+                <p style="text-align: center; color: #555555;">Figure 5 - A \(2 \times 2\) output image</p>
                 <p>To start, lets overlay our filter in the top left corner of the image:</p>
                 <table class="kernel">
                     <tr><td style="background-color: #fde4ff">0x-1</td><td style="background-color: #fde4ff">50x0</td><td style="background-color: #fde4ff">0x1</td><td>29</td></tr>
@@ -108,8 +108,8 @@
                     <tr><td style="background-color: #fde4ff">-33</td><td style="background-color: #fde4ff">90x0</td><td style="background-color: #fde4ff">0x1</td><td>75</td></tr>
                     <tr><td>0</td><td>9</td><td>0</td><td>95</td></tr>
                 </table>
-                <p style="text-align: center; color: #555555;">Figure 5 - Overlay the filter on top of the image</p>
-                <p>Next, we perform element-wise multiplication between the overlapping image values and filter values. Here are the results, starting from the top left corner and going right, then down, we sum up all the results. That’s easy enough:</p>
+                <p style="text-align: center; color: #555555;">Figure 6 - Overlay the filter on top of the image</p>
+                <p>Next, we perform element-wise multiplication between the overlapping image values and filter values. Here are the results, starting from the top left corner and going right, then down. We sum up all the results, hat’s easy enough:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(0 + 0 + 0 + 0 + 0 + 62 - 33 + 0 + 0 = 29\)
                 </div>
@@ -118,15 +118,15 @@
                     <tr><td>29</td><td>-192</td></tr>
                     <tr><td>-35</td><td>-22</td></tr>
                 </table>
-                <p style="text-align: center; color: #555555;">Figure 6 - Final Output</p>
+                <p style="text-align: center; color: #555555;">Figure 7 - Final Output</p>
 
-                <h4>3.1.3.1 How is this useful?</h4>
-                <p>Let’s zoom out for a second and see this at a higher level. What does convolving an image with a filter do? We can start by using the example \(3 \times 3\) filter we’ve been using, which is commonly known as the vertical Sobel filter:</p>
+                <h4>3.1.3.1 How is This Useful?</h4>
+                <p>Let’s zoom out for a second and see this at a higher level. What does convolving an image with a filter do? We can start by using the example \(3 \times 3\) filter we’ve been using, which is commonly known as the vertical <strong>Sobel filter</strong>:</p>
                 <img src="res/03/lena.jpg" alt="Lena">
-                <p style="text-align: center; color: #555555;">Figure 7 - Standard Test Image</p>
-                <p>Here’s an example of what the vertical Sobel filter does:</p>
+                <p style="text-align: center; color: #555555;">Figure 8 - Standard Test Image</p>
+                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/03_cnn/1_scratch/sobel_filter.py">sobel_filter.py</a> is an example of what the vertical Sobel filter does:</p>
                 <img src="res/03/sobel_y.png" alt="Vertical Sobel">
-                <p style="text-align: center; color: #555555;">Figure 8 - An Image Convolved with the Vertical Sobel Filter</p>
+                <p style="text-align: center; color: #555555;">Figure 9 - An Image Convolved with the Vertical Sobel Filter</p>
                 <p>Similarly, there’s also a horizontal Sobel filter:</p>
                 <table class="kernel">
                     <tr>
@@ -139,13 +139,13 @@
                         <td>-1</td><td>-2</td><td>-1</td>
                     </tr>
                 </table>
-                <p style="text-align: center; color: #555555;">Figure 9 - The Horizontal Sobel Filter</p>
+                <p style="text-align: center; color: #555555;">Figure 10 - The Horizontal Sobel Filter</p>
                 <p>See what’s happening? Sobel filters are edge-detectors. The vertical Sobel filter detects vertical edges, and the horizontal Sobel filter detects horizontal edges. The output images are now easily interpreted: a bright pixel (one that has a high value) in the output image indicates that there’s a strong edge around there in the original image.</p>
                 <img src="res/03/sobel_x.png" alt="Horizontal Sobel">
                 <p style="text-align: center; color: #555555;">Figure 10 - An Image Convolved with the Horizontal Sobel Filter</p>
                 <p>Can you see why an edge-detected image might be more useful than the raw image? Think back to our MNIST handwritten digit classification problem for a second. A CNN trained on MNIST might look for the digit 1, for example, by using an edge-detection filter and checking for two prominent vertical edges near the center of the image. In general, convolution helps us look for specific localized image features (like edges) that we can use later in the network.</p>
 
-                <h4>3.1.3.2 Padding</h4>
+                <h4 id="padding">3.1.3.2 Padding</h4>
                 <p>Remember convolving a \(4 \times 4\) input image with a \(3 \times 3\) filter earlier to produce a \(2 \times 2\) output image? Often times, we’d prefer to have the output image be the same size as the input image. To do this, we add zeros around the image so we can overlay the filter in more places. A \(3 \times 3\) filter requires 1 pixel of padding:</p>
                 <table class="kernel">
                     <tr><td style="background-color: #fde4ff">0</td><td style="background-color: #fde4ff">0</td><td style="background-color: #fde4ff">0</td><td style="background-color: #fde4ff">0</td><td style="background-color: #fde4ff">0</td><td style="background-color: #fde4ff">0</td></tr>
