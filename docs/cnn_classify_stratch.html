@@ -259,15 +259,55 @@ assert output.shape == (26, 26, 8)</code></pre>
                 <img src="res/03/max_pool.svg" alt="Max Pooling" width="600">
                 <p style="text-align: center; color: #555555;">Figure 15 - Max Pooling Layer</p>
 
-                <p>File <a href="">max_pool.py</a> implement a MaxPool2 class with the same methods as our conv class from the previous section:</p>
+                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/03_cnn/1_scratch/max_pool.py">max_pool.py</a> implement a MaxPool2 class with the same methods as our conv class from the previous section:</p>
+                <pre><code>class MaxPool2:
+    # A Max Pooling layer with a 2x2 filter.
+    
+    def iterate_regions(self, image):
+        '''
+        Generates non-overlapping 2x2 image regions to pool over.
+        - image is a 2d numpy array
+        '''
+        h, w, _ = image.shape
+        new_h = h // 2
+        new_w = w // 2
 
-                <p>This class works similarly to the <code>Conv3x3</code> class we implemented previously. The critical line is again highlighted: to find the max from a given image region, we use <a href="https://numpy.org/doc/stable/reference/generated/numpy.amax.html">numpy.amax()</a>, numpy’s array max method. We set <code>axis=(0, 1)</code> because we only want to maximize over the first two dimensions, height and width, and not the third <code>num_filters</code>.</p>
-                
-                <p>Let’s test it!</p>
+        for i in range(new_h):
+            for j in range(new_w):
+                im_region = image[(i * 2):(i * 2 + 2), (j * 2):(j * 2 + 2)]
+                yield im_region, i, j
+
+    def forward(self, input):
+        '''
+        Performs a forward pass of the maxpool layer using the given input.
+        Returns a 3d numpy array with dimensions (h / 2, w / 2, num_filters).
+        - input is a 3d numpy array with dimensions (h, w, num_filters)
+        '''
+        h, w, num_filters = input.shape
+        output = numpy.zeros((h // 2, w // 2, num_filters))
+        
+        for im_region, i, j in self.iterate_regions(input):
+            <div class="highlight">output[i, j] = numpy.amax(im_region, axis=(0, 1))</div>
+    
+        return output</code></pre>
+
+                <p>This class works similarly to the <code>Conv3x3</code> class we implemented previously. The critical line is again highlighted: to find the max from a given image region, we use <a href="https://numpy.org/doc/stable/reference/generated/numpy.amax.html">numpy.amax()</a>, NumPy's array max method. We set <code>axis=(0, 1)</code> because we only want to maximize over the first two dimensions, height and width, and not the third <code>num_filters</code>.</p>
+                <p>Let’s test it:</p>
+                <pre><code>(x_train, y_train), (x_test, y_test) = mnist.load()
+
+conv = Conv3x3(8)
+pool = MaxPool2()
+
+output = conv.forward(x_train[0])
+output = pool.forward(output)
+assert output.shape == (13, 13, 8)</code></pre>
+
                 <p>Our MNIST CNN is starting to come together!</p>
-                <p>To complete our CNN, we need to give it the ability to actually make predictions. We’ll do that by using the standard final layer for a multiclass classification problem: the Softmax layer, a fully-connected (dense) layer that uses the Softmax function as its activation.</p>
 
                 <h3>3.1.5 Softmax</h3>
+
+                <p>To complete our CNN, we need to give it the ability to actually make predictions. We’ll do that by using the standard final layer for a multiclass classification problem: the Softmax layer, a fully-connected (dense) layer that uses the Softmax function as its activation.</p>
+
                 <p>We’ll use a softmax layer with 10 nodes, one representing each digit, as the final layer in our CNN. Each node in the layer will be connected to every input. After the softmax transformation is applied, the digit represented by the node with the highest probability will be the output of the CNN!</p>
                 <p>You might have just thought to yourself, why bother transforming the outputs into probabilities? Won’t the highest output value always have the highest probability? If you did, you’re absolutely right. We don’t actually need to use softmax to predict a digit - we could just pick the digit with the highest output from the network!</p>
                 <p>What softmax really does is help us quantify how sure we are of our prediction, which is useful when training and evaluating our CNN. More specifically, using softmax lets us use cross-entropy loss, which takes into account how sure we are of each prediction. Here’s how we calculate cross-entropy loss:</p>
