@@ -315,11 +315,44 @@ assert output.shape == (13, 13, 8)</code></pre>
 
                 <h4>3.1.5.2 Cross-Entropy Loss</h4>
                 <p>You might have just thought to yourself, why bother transforming the outputs into probabilities? Won’t the highest output value always have the highest probability? If you did, you’re absolutely right. We don’t actually need to use softmax to predict a digit - we could just pick the digit with the highest output from the network!</p>
-                <p>What softmax really does is help us quantify how sure we are of our prediction, which is useful when training and evaluating our CNN. More specifically, using softmax lets us use cross-entropy loss, which takes into account how sure we are of each prediction. Here’s how we calculate cross-entropy loss:</p>
+                <p>What softmax really does is help us quantify how sure we are of our prediction, which is useful when training and evaluating our CNN. More specifically, using softmax lets us use cross-entropy loss, which takes into account how sure we are of each prediction. Here’s how we calculate <a href="loss_function.html#cross_entropy_loss">cross-entropy loss</a>:</p>
+
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(L = -ln(p_c)\)
                 </div>
 
+                <p>where \(c\) is the correct class (in our case, the correct digit), \(p_c\) is the predicted probability for class \(c\), and \(ln\) is the natural log. As always, a lower loss is better. For example, in the best case, we’d have:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(p_c = 1, L = -ln(1) = 0\)
+                </div>
+                <p>In a more realistic case, we might have:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(p_c = 0.8, L = -ln(0.8) \approx 0.223\)
+                </div>
+                <p>We’ll be seeing cross-entropy loss again later on in this post, so keep it in mind!</p>
+
+                <h4>3.1.5.3 Implementing Softmax</h4>
+                <p>You know the drill by now - File <a>softmax.py</a> implement a <code>Softmax</code> layer class:</p>
+                <pre><code>class Softmax:
+    # A standard fully-connected layer with softmax activation.
+    
+    def __init__(self, input_len, nodes):
+        # We divide by input_len to reduce the variance of our initial values.
+        self.weights = numpy.random.randn(input_len, nodes) / input_len
+        self.bias = numpy.zeros(nodes)
+    
+    def forward(self, input):
+        '''
+        Performs a forward pass of the softmax layer using the given input.
+        Returns a 1d numpy array containing the respective probability values.
+        - input can be any array with any dimensions.
+        '''
+        input = input.flatten()
+        input_len, nodes = self.weights.shape
+        
+        totals = numpy.dot(input, self.weights) + self.bias
+        exp = numpy.exp(totals)
+        return exp / numpy.sum(exp, axis=0)</code></pre>
 
                 <h3>3.1.6 Training Overview</h3>
                 
