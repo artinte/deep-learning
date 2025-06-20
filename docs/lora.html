@@ -37,7 +37,16 @@
                 <h4>13.1.4.1 Low-Rank-Parameterized Update Matrices</h4>
                 <p>A neural network contains many dense layers which perform matrix multiplication. The weight matrices in these layers typically have full-rank. When adapting to a specific task, Aghajanyan et al. (2020) shows that the pre-trained language models have a low "instrisic dimension" and can still learn efficiently despite a random projection to a smaller subspace.</p>
                 <p>Inspired by this, we hypothesize the updates to the weights also have a low "intrinsic rank" during adaptation. For a pre-trained weight matrix \(W_0 \in \mathbb{R}^{d \times k}\), we constrain its update by representing the latter with a low-rank decomposition \(W_0 + \Delta W = W_0 + BA\), where \(B \in \mathbb{R}^{d \times r}, \(A \in \mathbb{R}^{r \times k}\), and the rank \(r \le min(d, k)\).</p>
-                <p>During training, \(W_0\) 0 is frozen and does not receive gradient updates, while \(A\) and \(B\) contain trainable parameters. Note both</p>
+                <p>During training, \(W_0\) is frozen and does not receive gradient updates, while \(A\) and \(B\) contain trainable parameters. Note both \(W_0\) and \(\Delta W = BA\) are multiplied with the same input, and their respective output vectors are summed coordinate-wise. For \(h = W_0 x\), our modified forward pass yields:</p>
+                <div>
+                    \(h = W_0 x + \Delta x = W_0 x + B A x\)
+                </div>
+                
+                <p>We illustrate our reparametrization in Figure 1. We use a random Gaussian initialization for \(A\) and zero for B, so \(\Delta W = B A\) is zero at the beginning of training. We then scale \(\Delta W x\) by \(\frac{\alpha}{r}\), where \(\alpha\) is a constant in \(r\). When optimizing with Adam, tuning \(\alpha\) is roughly the same as tuning the learning rate if we scale the initialization appropriately.  As a result, we simply set \(\alpha\) to the first \(r\) we try and do not tune it. This scaling helps to reduce the need to retune hyperparameters when we vary \(r\) (Yang & Hu, 2021).</p>
+
+                <h5>A Generalization of Full Fine-tuning</h5>
+                <p>A more general form of fine-tuning allows the training of a subset of the pre-trained parameters. LoRA takes a step further and does not require the accumulated gradient update to weight matrices to have full-rank during adaptation.</p>
+                <p>This means that when applying LoRA to all weight matrices and training all biases, we roughly recover the expressive ness of full fine-tuning by setting the LoRA rank \(r\) to the rank of the pre-trained weight matrices. In other words, as we increase the number of trainable parameters, training LoRA roughly converges to training the original model, while adapter-based methods converges to an MLP and prefix-based </p>
                 <h4>13.1.4.2 Applying LoRA to Transformer</h4>
                 <h3>13.1.5 Empirical Experiments</h3>
                 <h3>13.1.6 Related Works</h3>
