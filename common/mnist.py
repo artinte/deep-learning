@@ -10,6 +10,8 @@ sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
 
 from common import download
 
+mnist_url = 'https://github.com/artinte/tiny-datasets/raw/develop/mnist.zip'
+
 def mnist_read(images_path, labels_path):
     labels = []
     with open(labels_path, 'rb') as file:
@@ -35,7 +37,7 @@ def mnist_read(images_path, labels_path):
     return numpy.array(images), numpy.array(labels)
 
 def load():
-    url = 'https://github.com/artinte/tiny-datasets/raw/develop/mnist.zip'
+    url = mnist_url
 
     file_path = download.download(
         url, sha1_hash='1f2d5ca7b198c0b293014eb59e9064509d7315b1')

@@ -332,7 +332,7 @@ assert output.shape == (13, 13, 8)</code></pre>
                 <p>We’ll be seeing cross-entropy loss again later on in this post, so keep it in mind!</p>
 
                 <h4>3.1.5.3 Implementing Softmax</h4>
-                <p>You know the drill by now - File <a>softmax.py</a> implement a <code>Softmax</code> layer class:</p>
+                <p>You know the drill by now - File <a href="https://github.com/artinte/deep-learning/blob/develop/03_cnn/1_scratch/softmax.py">softmax.py</a> implement a <code>Softmax</code> layer class:</p>
                 <pre><code>class Softmax:
     # A standard fully-connected layer with softmax activation.
     
@@ -354,7 +354,65 @@ assert output.shape == (13, 13, 8)</code></pre>
         exp = numpy.exp(totals)
         return exp / numpy.sum(exp, axis=0)</code></pre>
 
+                <p>There’s nothing too complicated here. A few highlights:</p>
+                <ul class="with-bullets">
+                    <li><p><code>flatten()</code> the input to make it easier to work with, since we no longer need its shape.</p></li>
+                    <li><p><code>numpy.dot()</code> multiplies <code>input</code> and <code>self.weights</code> element-wise and then sums the results.</p></li>
+                    <li><p><code>numpy.exp()</code> calculates the exponentials used for Softmax.</p></li>
+                </ul>
+
+                <p>We’ve now completed the entire forward pass of our CNN! File <a href="https://github.com/artinte/deep-learning/blob/develop/03_cnn/1_scratch/cnn_forward.py">cnn_forward.py</a> putting it together:</p>
+                <pre><code>(x_train, y_train), (x_test, y_test) = mnist.load()
+
+conv = Conv3x3(8)                   # 28x28x1 -> 26x26x8
+pool = MaxPool2()                   # 26x26x8 -> 13x13x8
+softmax = Softmax(13 * 13 * 8, 10)  # 13x13x8 -> 10
+
+def forward(input, label):
+    '''
+    Completes a forward pass of the CNN and calculates the accuracy and
+    cross-entropy loss.
+    - image is a 2d numpy array
+    - label is a digit
+    '''
+    
+    # We transform the image from [0, 255] to [-0.5, 0.5] to make it easier
+    # to work with. This is standard practice.
+    out = conv.forward(input / 255 - 0.5)
+    out = pool.forward(out)
+    out = softmax.forward(out)
+
+    # Calculate cross-entropy loss and accuracy. np.log() is the natural log.
+    loss = -numpy.log(out[label])
+    acc = 1 if numpy.argmax(out) == label else 0
+    
+    return out, loss, acc
+
+loss = 0
+num_correct = 0
+
+for i, (image, label) in enumerate(zip(x_test[:400], y_test[:400])):
+    out, l, acc = forward(image, label)
+    loss += l
+    num_correct += acc
+    
+    if (i + 1) % 100 == 0:
+        print('Step' + str(i + 1) + ': loss = ' + str(round(loss / 100, 4)) +
+                ', accuracy = ' + str(num_correct / 100))
+        loss = 0
+        num_correct = 0</code></pre>
+
+                <p>Running <div class="highlight">cnn_forward.py</div> gives us output similar to this:</p>
+
+                <pre><samp>Step100: loss = 2.302, accuracy = 0.12
+Step200: loss = 2.3025, accuracy = 0.09
+Step300: loss = 2.302, accuracy = 0.14
+Step400: loss = 2.3025, accuracy = 0.12</samp></pre>
+
+                <p>This makes sense: with random weight initialization, you’d expect the CNN to be only as good as random guessing. Random guessing would yield 10% accuracy (since there are 10 classes) and a cross-entropy loss of \(−ln(0.1) \approx 2.302\), which is what we get!</p>
+
                 <h3>3.1.6 Training Overview</h3>
+                <p></p>
                 
                 <h3>3.1.7 Backprop: Softmax</h3>
                 <h3>3.1.8 Backprop: Max Pooling</h3>
