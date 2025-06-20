@@ -23,8 +23,8 @@
         }
         .container {
             display: flex;
+            justify-content: center;
             align-items: flex-start;
-            gap: 10px;
         }
     </style>
 </head>
@@ -160,7 +160,7 @@
                     <tr><td style="background-color: #fde4ff">0</td><td>0</td><td>9</td><td>0</td><td>95</td><td style="background-color: #fde4ff">0</td></tr>
                     <tr><td style="background-color: #fde4ff">0</td><td style="background-color: #fde4ff">0</td><td style="background-color: #fde4ff">0</td><td style="background-color: #fde4ff">0</td><td style="background-color: #fde4ff">0</td><td style="background-color: #fde4ff">0</td></tr>
                 </table>
-                <p style="text-align: center; color: #555555;">Figure 12 - A \(4 \times 4\) Input Convolved with a \(3 \times 3\) Filter to Produce a \(4 \times 4\) Output Using Same Padding</p>
+                <p style="text-align: center; color: #555555;">Figure 12 - A \(4 \times 4\) Input Convolved with a \(3 \times 3\) Filter</p>
                 <p>This is called <em>"same"</em> padding, since the input and output have the same dimensions. Not using any padding, which is what we’ve been doing and will continue to do for this post, is sometimes referred to as <em>"valid"</em> padding.</p>
 
                 <h4>3.1.3.3 Conv Layers</h4>
@@ -306,12 +306,20 @@ assert output.shape == (13, 13, 8)</code></pre>
 
                 <h3>3.1.5 Softmax</h3>
 
-                <p>To complete our CNN, we need to give it the ability to actually make predictions. We’ll do that by using the standard final layer for a multiclass classification problem: the Softmax layer, a fully-connected (dense) layer that uses the Softmax function as its activation.</p>
+                <p>To complete our CNN, we need to give it the ability to actually make predictions. We’ll do that by using the standard final layer for a multiclass classification problem: the Softmax layer, a fully-connected (dense) layer that uses the <a href="activation_function.html#softmax">softmax function</a> as its activation.</p>
 
+                <h4>3.1.5.1 Usage</h4>
                 <p>We’ll use a softmax layer with 10 nodes, one representing each digit, as the final layer in our CNN. Each node in the layer will be connected to every input. After the softmax transformation is applied, the digit represented by the node with the highest probability will be the output of the CNN!</p>
+                <img src="res/03/softmax_layer.svg" alt="Softmax Layer" width="600">
+                <p style="text-align: center; color: #555555;">Figure 16 - Softmax Layer</p>
+
+                <h4>3.1.5.2 Cross-Entropy Loss</h4>
                 <p>You might have just thought to yourself, why bother transforming the outputs into probabilities? Won’t the highest output value always have the highest probability? If you did, you’re absolutely right. We don’t actually need to use softmax to predict a digit - we could just pick the digit with the highest output from the network!</p>
                 <p>What softmax really does is help us quantify how sure we are of our prediction, which is useful when training and evaluating our CNN. More specifically, using softmax lets us use cross-entropy loss, which takes into account how sure we are of each prediction. Here’s how we calculate cross-entropy loss:</p>
-                
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(L = -ln(p_c)\)
+                </div>
+
 
                 <h3>3.1.6 Training Overview</h3>
                 
