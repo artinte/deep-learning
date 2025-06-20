@@ -43,6 +43,11 @@
                 <p>Good question.</p>
                 <h5>Reason 1: Images are Big</h5>
                 <p>Images used for Computer Vision problems nowadays are often \(224 \times 224\) or larger. Imagine building a neural network to process \(224 \times 224\) color images: including the 3 color channels (RGB) in the image, that comes out to \(224 \times 224 \times 3 = 150528\) input features!</p>
+                <a href="https://drive.google.com/file/d/1Z7J_Ket1rn0kQNP-w_QkH0YDYPY9wFbE/view?usp=sharing">
+                    <img src="res/03/224x224.jpg" alt="224x224">
+                </a>
+                <p style="text-align: center; color: #555555;">Figure 1 - Image of Size \(224 \times 224 \times 3\)</p>
+
                 <p>A typical hidden layer in such a network might have 1024 nodes, so we'd have to train \(150528 \times 1024 = 150+\) million weights for the first layer alone. Our network would be huge and nearly impossible to train.</p>
                 <p>It’s not like we need that many weights, either. The nice thing about images is that we know pixels are most useful in the context of their neighbors. Objects in images are made up of small, localized features, like the circular iris of an eye or the square corner of a piece of paper. Doesn’t it seem wasteful for every node in the first hidden layer to look at every pixel?</p>
                 <h5>Reason 2: Positions can change</h5>
