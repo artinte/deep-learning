@@ -213,7 +213,7 @@
         output = numpy.zeros((h - 2, w - 2, self.num_filters))
 
         for im_region, i, j in self.iterate_regions(input):
-            <div class="highlight">output[i, j] = numpy.sum(im_region * self.filters, axis=(1, 2))</div>
+            <span class="highlight">output[i, j] = numpy.sum(im_region * self.filters, axis=(1, 2))</span>
 
         return output</code></pre>
 
@@ -287,7 +287,7 @@ assert output.shape == (26, 26, 8)</code></pre>
         output = numpy.zeros((h // 2, w // 2, num_filters))
         
         for im_region, i, j in self.iterate_regions(input):
-            <div class="highlight">output[i, j] = numpy.amax(im_region, axis=(0, 1))</div>
+            <span class="highlight">output[i, j] = numpy.amax(im_region, axis=(0, 1))</span>
     
         return output</code></pre>
 
@@ -448,8 +448,8 @@ gradient = conv.backprop(gradient)</code></pre>
                 <p>The first thing we need to calculate is the input to the Softmax layer’s backward phase, \(\frac{\partial L}{\partial {out}_s}\), where \({out}_s\) s the output from the Softmax layer: a vector of 10 probabilities. This is pretty easy, since only \(p_i\) shows up in the loss equation:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(\frac{\partial L}{\partial {out}_s (i)} = \begin{cases}
-                        \ -\frac{1}{p_i} & \text{if } i = c \\
-                        \ 0 & \text{if } i \neq c
+                        -\frac{1}{p_i} & \text{if } i = c \\
+                        0 & \text{if } i \neq c
                     \end{cases}\)</div>
                 <p>That’s our initial gradient you saw referenced above:</p>
                 <pre><code># Calculate initial gradient
@@ -457,7 +457,41 @@ gradient = np.zeros(10)
 gradient[label] = -1 / out[label]</code></pre>
                 
                 <p>We’re almost ready to implement our first backward phase - we just need to first perform the forward phase caching we discussed earlier:</p>
+                <pre><code>class Softmax:
+    # ...
+    def forward(self, input):
+        <span class="highlight">self.last_input_shape = input.shape</span>
+        input = input.flatten()
+        <span class="highlight">self.last_input = input</span>
 
+        totals = numpy.dot(input, self.weights) + self.bias
+        <span class="highlight">self.last_totals = totals</span>
+
+        exp = numpy.exp(totals)
+        return exp / numpy.sum(exp, axis=0)</code></pre>
+
+                <p>We cache 3 things here that will be useful for implementing the backward phase:</p>
+                <ul class="with-bullets">
+                    <li><p>The <code>input</code>’s shape before we flatten it.</p></li>
+                    <li><p>The <code>input</code> after we flatten it.</p></li>
+                    <li><p>The <code>totals</code>, which are the values passed in to the softmax activation.</p></li>
+                </ul>
+                <p>With that out of the way, we can start deriving the gradients for the backprop phase. We’ve already derived the input to the Softmax backward phase: \(\frac{\partial L}{\partial {out}_s}\). One fact we can use about \(\frac{\partial L}{\partial {out}_s}\) is that it’s only nonzero for \(c\), the correct class. That means that we can ignore everything but \({out}_s(c)!\)</p>
+                <p>First, let’s calculate the gradient of \({out}_s(c)\) with respect to the totals (the values passed in to the softmax activation). Let \(t_i\) be the total for class \(i\). Then we can write \({out}_s(c)\) as:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \({out}_s(c) = \frac{e^{t_c}}{\sum_{i=0}^{9} e^{t_i}} = \frac{e^{t_c}}{S}\)</div>
+                </div>
+                <p>Where \(S = \sum_i e^{t_i}\)</p>
+                <p>Now, consider some class \(k\) such that \(k \ne c\), and use <a href="calculus.html#chain_rule">chain rule</a> to derive:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\frac{\partial {out}_s(c)}{\partial t_k} = -\frac{e^{t_c} e^{t_k}}{S^2}\)</div>
+                </div>
+                <p>Remember, that was assuming \(k \ne c\). Now let’s do the derivation for \(c\), this time using Quotient Rule (because we have an \(e^{t_c}\) in the numerator of \(out_s(c)\)):</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\frac{\partial {out}_s(c)}{\partial t_c}  = \frac{e^{t_c}(S - e^{t_c})}{S^2}\)</div>
+                </div>
+                <p>For a detailed derivation, please refer to the <a href="activation_function.html#softmax">Softmax</a> section. That was the hardest bit of calculus in this entire post - it only gets easier from here! Let’s start implementing this:</p>
+                
 
                 <h3>3.1.8 Backprop: Max Pooling</h3>
                 <h3>3.1.9 Backprop: Conv</h3>
