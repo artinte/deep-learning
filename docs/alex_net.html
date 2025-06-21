@@ -225,6 +225,14 @@
                 <p class="comment">However, over time, local response normalization has been largely abandoned. Many experiments showed that removing LRN had little or no negative impact, and in some cases, it even improved performance.</p>
 
                 <h4>3.2.3.4 Overlapping Pooling</h4>
+                <p>Pooling layers in CNNs summarize the outputs of neighboring groups of neurons in the same kernel map. Traditionally, the neighborhoods summarized by adjacent pooling units do not overlap. To be more precise, a pooling layer can be thought of as consisting of a grid of pooling units spaced \(s\) pixels apart, each summarizing a neighborhood of size \(z \times z\) centered at the location of the pooling unit.</p>
+                <p>If we set \(s = z\), we obtain traditional local pooling as commonly employed in CNNs. If we set \(s \lt z\), we obtain <strong>overlapping pooling</strong>. This is what we use throughout our network, with \(s = 2\) and \(z = 3\). This scheme reduces the top-1 and top-5 error rates by 0.4% and 0.3%, respectively, as compared with the non-overlapping scheme \(s = 2\), \(z = 2\), which produces output of equivalent dimensions. We generally observe during training that models with overlapping pooling find it slightly more difficult to overfit.</p>
+
+                <a href="https://drive.google.com/file/d/1gY8K5W5dlr3JJv6GVE0gCZjaDahpJLD7/view?usp=sharing">
+                    <img src="res/03/overlap_pooling.png" alt="Overlapping Pooling">
+                </a>
+                <p style="text-align: center; color: #555555;">Figure 4 - Overlapping Pooling</p>
+
                 <h4>3.2.3.5 Overall Architecture</h4>
                 <p>Now we are ready to describe the overall architecture of our CNN. As depicted in Figure 2, the net contains eight layers with weights; the first five are convolutional and the remaining three are fully-connected. The output of the last fully-connected layer is fed to a 1000-way softmax which produces a distribution over the 1000 class labels.</p>
                 <p>Our network maximizes the multinomial logistic regression objective, which is equivalent to maximizing the average across training cases of the log-probability of the correct label under the prediction distribution.</p>
