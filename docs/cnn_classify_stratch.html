@@ -502,9 +502,6 @@ gradient[label] = -1 / out[label]</code></pre>
         '''
         # We know only 1 element of dl_dout will be nonzero.
         for i, gradient in enumerate(dl_dout):
-            if gradient == 0:
-                continue
-
             t_exp = numpy.exp(self.last_totals)
 
             S = numpy.sum(t_exp)
@@ -533,17 +530,18 @@ gradient[label] = -1 / out[label]</code></pre>
                 <p>Using chain rule, putting this into code is a little less straightforward:</p>
                 <pre><code>class Softmax:
     def backprop(self, dl_dout):
-        # ...
-        # Gradients of totals against weights and bias.
-        dt_dw = self.last_input
-        dt_db = 1
-        dt_dinputs = self.weights
-        # Graidents of the loss against totals.
-        dl_dt = gradient * dout_dt
-        # Gradients of loss against weights and bias.
-        dl_dw = dt_dw[numpy.newaxis].T @ dl_dt[numpy.newaxis]
-        dl_db = dl_dt * dt_db
-        dl_dinputs = dt_dinputs @ dl_dt</code></pre>
+        for i, gradient in enumerate(dl_dout):
+            # ...
+            # Gradients of totals against weights and bias.
+            dt_dw = self.last_input
+            dt_db = 1
+            dt_dinputs = self.weights
+            # Graidents of the loss against totals.
+            dl_dt = gradient * dout_dt
+            # Gradients of loss against weights and bias.
+            dl_dw = dt_dw[numpy.newaxis].T @ dl_dt[numpy.newaxis]
+            dl_db = dl_dt * dt_db
+            dl_dinputs = dt_dinputs @ dl_dt</code></pre>
                 <p>First, we pre-calculate <code>dl_dt</code> since we’ll use it several times. Then, we calculate each gradient:</p>
                 <ul class="with-bullets">
                     <li><p><code>dl_dw</code>: We need 2d arrays to do matrix multiplication, but <code>dt_dw</code> and <code>dl_dt</code> are 1d arrays. <code>numpy.newaxis</code> lets us easily create a new axis of length one, so we end up multiplying matrices with dimensions \((input_len, 1)\) and \((1, nodes)\). Thus, the final result for <code>dl_dw</code> will have shape \((input_len, nodes)\), which is the same as <code>self.weights</code>!</p></li>
@@ -553,17 +551,36 @@ gradient[label] = -1 / out[label]</code></pre>
                 <p>With all the gradients computed, all that’s left is to actually train the Softmax layer! We’ll update the weights and bias using <a href="optimizer.html#sgd">Stochastic Gradient Descent (SGD)</a> and then return <code>dl_dinputs</code>:</p>
                 <pre><code>class Softmax:
     def backprop(self, dl_dout, learn_rate):
-        # ...
-        # Update weights and bias.
-        self.weights -= learn_rate * dl_dw
-        self.bias -= learn_rate * dl_db
+        for i, gradient in enumerate(dl_dout):
+            # ...
+            # Update weights and bias.
+            self.weights -= learn_rate * dl_dw
+            self.bias -= learn_rate * dl_db
 
         return dl_dinputs.reshape(self.last_input_shape)</code></pre>
                 <p>Notice that we added a <code>learn_rate</code> parameter that controls how fast we update our weights. Also, we have to <code>reshape()</code> before returning <code>dl_dinputs</code> because we flattened the input during our forward pass:</p>
                 <p>Reshaping to <code>last_input_shape</code> ensures that this layer returns gradients for its input in the same format that the input was originally given to it.</p>
 
                 <p>We’ve finished our first backprop implementation! Let’s quickly test it to see if it’s any good. We’ll start implementing a <code>train()</code> method in our <a href="https://github.com/artinte/deep-learning/blob/develop/03_cnn/1_scratch/cnn_training.py">cnn_training.py</a> file:</p>
+                <pre><code>def train(iamge, label, lr=0.005):
+    '''
+    Completes a full training step on the given image and label.
+    Returns the cross-entropy loss and accuracy.
+    - image is a 2d numpy array
+    - label is a digit
+    - lr is the learning rate
+    '''
+    out, loss, acc = forward(iamge, label)
 
+    # Calculate initial gradient.
+    gradient = numpy.zeros(10)
+    gradient[label] = -1 / out[label]
+    
+    gradient = softmax.backprop(gradient, lr)
+    # gradient = pool.backprop(gradient)
+    # gradient = conv.backprop(gradient, lr)
+
+    return loss, acc</code></pre>
 
                 <p>Running this gives results similar to:</p>
                 <pre><samp>Step 100: loss = 2.2088, accuracy = 0.22
@@ -576,7 +593,43 @@ Step 700: loss = 1.5719, accuracy = 0.69
 Step 800: loss = 1.4217, accuracy = 0.7
 Step 900: loss = 1.3351, accuracy = 0.77
 Step 1000: loss = 1.3272, accuracy = 0.75</samp></pre>
+                <p>The loss is going down and the accuracy is going up - our CNN is already learning!</p>
+
                 <h3>3.1.8 Backprop: Max Pooling</h3>
+                <p>A Max Pooling layer can’t be trained because it doesn’t actually have any weights, but we still need to implement a <code>backprop()</code> method for it to calculate gradients. We’ll start by adding forward phase caching again. All we need to cache this time is the input:</p>
+                <pre><code>class MaxPool2:
+    # ...
+    def forward(self, input):
+        self.last_input = input</code></pre>
+
+                <p>During the forward pass, the Max Pooling layer takes an input volume and halves its width and height dimensions by picking the max values over 2x2 blocks. The backward pass does the opposite: we’ll double the width and height of the loss gradient by assigning each gradient value to where the original max value was in its corresponding 2x2 block.</p>
+                <p>Each gradient value is assigned to where the original max value was, and every other value is zero.</p>
+
+                <p>Why does the backward phase for a max pooling layer work like this? Think about what \(\frac{\partial L}{\partial inputs}\) intuitively should be. An input pixel that isn’t the max value in its 2x2 block would have zero marginal effect on the loss, because changing that value slightly wouldn’t change the output at all!</p>
+                <p>In other words, \(\frac{\partial L}{\partial inputs} = 0\) for non-max pixels. On the other hand, an input pixel that is the max value would have its value passed through to the output, so \(\frac{\partial output}{\partial input} = 1\) meaning \(\frac{\partial L}{\partial input} = \frac{\partial L}{\partial output}\).</p>
+                <p>We can implement this pretty quickly using the <code>iterate_regions()</code> helper method:</p>
+                <pre><code>class MaxPool2:
+    # ...
+    def backprop(self, dl_dout):
+    '''
+    Performs a backward pass of the maxpool layer.
+    Returns the loss gradient for this layer's inputs.
+    - dl_dout is the loss gradient for this layer's outputs.
+    '''
+    dl_dinput = numpy.zeros(self.last_input.shape)
+    for im_region, i, j in self.iterate_regions(self.last_input):
+        h, w, f = im_region.shape
+        amax = numpy.amax(im_region, axis=(0, 1))
+        
+        for i2 in range(h):
+            for j2 in range(w):
+                for f2 in range(f):
+                    # If this pixel was the max value, copy the gradient to it.
+                    if im_region[i2, j2, f2] == amax[f2]:
+                        <span class="highlight">dl_dinput[i * 2 + i2, j * 2 + j2, f2] = dl_dout[i, j, f2]</span>
+    return dl_dinput</code></pre>
+                
+
                 <h3>3.1.9 Backprop: Conv</h3>
                 <h3>3.1.10 Training a CNN</h3>
                 <h3>3.1.11 What Now?</h3>
