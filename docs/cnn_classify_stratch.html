@@ -628,11 +628,148 @@ Step 1000: loss = 1.3272, accuracy = 0.75</samp></pre>
                     if im_region[i2, j2, f2] == amax[f2]:
                         <span class="highlight">dl_dinput[i * 2 + i2, j * 2 + j2, f2] = dl_dout[i, j, f2]</span>
     return dl_dinput</code></pre>
-                
+
+                <p>For each pixel in each 2x2 image region in each filter, we copy the gradient from <code>dl_dout</code> to <code>dl_dinput</code> if it was the max value during the forward pass.</p>
 
                 <h3>3.1.9 Backprop: Conv</h3>
+                <p>We’re finally here: backpropagating through a Conv layer is the core of training a CNN. </p>
+                <p>We’re primarily interested in the loss gradient for the filters in our conv layer, since we need that to update our filter weights. We already have \(\frac{\partial L}{\partial out}\) or the conv layer, so we just need \(\frac{\partial out}{\partial filters}\). To calculate that, we ask ourselves this: how would changing a filter’s weight affect the conv layer’s output?</p>
+                <p>The reality is that changing any filter weights would affect the entire output image for that filter, since every output pixel uses every pixel weight during convolution. To make this even easier to think about, let’s just think about one output pixel at a time: how would modifying a filter change the output of one specific output pixel?</p>
+
+                <p>Here’s a super simple example to help think about this question:</p>
+                <div class="container">
+                    <table class="kernel">
+                        <tr><td>0</td><td>7</td><td>0</td></tr>
+                        <tr><td>0</td><td>80</td><td>31</td></tr>
+                        <tr><td>33</td><td>14</td><td>0</td></tr>
+                    </table>
+                    <table class="kernel">
+                        <tr><td>0</td><td>0</td><td>0</td></tr>
+                        <tr><td>0</td><td>0</td><td>0</td></tr>
+                        <tr><td>0</td><td>0</td><td>0</td></tr>
+                    </table>
+                    <table class="kernel">
+                        <tr><td>0</td></tr>
+                    </table>
+                </div>
+                <p style="text-align: center; color: #555555;">Figure 17 - Produce a \(1 \times 1\) Output</p>
+                <p>We have a \(3 \times 3\) image convolved with a \(3 \times 3\) filter of all zeros to produce a \(1 \times 1\) output. What if we increased the center filter weight by 1? The output would increase by the center image value 80:</p>
+                <div class="container">
+                    <table class="kernel">
+                        <tr><td>0</td><td>7</td><td>0</td></tr>
+                        <tr><td>0</td><td>80</td><td>31</td></tr>
+                        <tr><td>33</td><td>14</td><td>0</td></tr>
+                    </table>
+                    <table class="kernel">
+                        <tr><td>0</td><td>0</td><td>0</td></tr>
+                        <tr><td>0</td><td>1</td><td>0</td></tr>
+                        <tr><td>0</td><td>0</td><td>0</td></tr>
+                    </table>
+                    <table class="kernel">
+                        <tr><td>80</td></tr>
+                    </table>
+                </div>
+
+                <p>Similarly, increasing any of the other filter weights by 1 would increase the output by the value of the corresponding image pixel! This suggests that the derivative of a specific output pixel with respect to a specific filter weight is just the corresponding image pixel value. Doing the math confirms this:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \[
+                    \begin{align}
+                    out(i, j) = convolve(image, filter) \\
+                    = \sum_{x=0}^3 \sum_{y=0}^3 image(i + x, j + y) * filter(x, y) \\
+                    \frac{\partial out(i, j)}{\partial filter(x, y)} = image(i + x, j + y)
+                    \end{align}
+                    \]
+                </div>
+                <p>We can put it all together to find the loss gradient for specific filter weights:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">    
+                    \(\frac{\partial L}{\partial filter(x, y)} = \sum_{i} \sum_{j} \frac{\partial L}{\partial out(i, j)} * \frac{\partial out(i, j)}{\partial filter(x, y)}\)
+                </div>
+                <p>We’re ready to implement backprop for our conv layer:</p>
+                <pre><code>class Conv3x3:
+    # ...
+    def backprop(self, dl_dout, learn_rate):
+        '''
+        Performs a backward pass of the conv layer.
+        - dl_dout is the loss gradient for this layer's outputs.
+        - learn_rate is a float.
+        '''
+        dl_dfilters = numpy.zeros(self.filters.shape)
+        for im_region, i, j in self.iterate_regions(self.last_input):
+            for f in range(self.num_filters):
+                dl_dfilters[f] += im_region * dl_dout[i, j, f]
+        
+        # Update filters.
+        self.filters -= learn_rate * dl_dfilters
+        
+        # We aren't returning anything here since we use Conv3x3 as
+        # the first layer in our CNN. Otherwise, we'd need to return
+        # the loss gradient for this layer's inputs, just like every
+        # other layer in our CNN.
+        return None</code></pre>
+                <p>We apply our derived equation by iterating over every image region / filter and incrementally building the loss gradients. Once we’ve covered everything, we update <code>self.filters</code> using SGD just as before.</p>
+                <p>With that, we’re done! We’ve implemented a full backward pass through our CNN. Time to test it out...</p>
+
                 <h3>3.1.10 Training a CNN</h3>
+                <p>We’ll train our CNN for a few epochs, track its progress during training, and then test it on a separate test set. Here’s the full code:</p>
+                <pre><code># Train the model.
+loss = 0
+num_correct = 0
+
+for epoch in range(10):
+    print('Epoch ' + str(epoch + 1))
+
+    for i, (image, label) in enumerate(zip(x_train[:5000], y_train[:5000])):
+        if (i + 1) % 500 == 0:
+            print('Step ' + str(i + 1) + ': loss = ' + str(round(loss / 500, 4)) +
+                ', accuracy = ' + str(num_correct / 500))
+            loss = 0
+            num_correct = 0
+        
+        l, acc = train(image, label)
+        loss += l
+        num_correct += acc
+
+# Test the model.
+loss = 0
+num_correct = 0
+for i, (image, label) in enumerate(zip(x_test[:400], y_test[:400])):
+    _, l, acc = forward(image, label)
+    loss += l
+    num_correct += acc
+
+print('Test loss:', round(loss / 400, 4))
+print('Test accuracy:', num_correct / 400)</code></pre>
+                <p>Example output from running the code:</p>
+                <pre><samp>Epoch 1
+Step 100: loss = 2.2685, accuracy = 0.14
+Step 200: loss = 2.2279, accuracy = 0.22
+Step 300: loss = 2.1314, accuracy = 0.36
+Step 400: loss = 1.9805, accuracy = 0.51
+Step 500: loss = 1.8408, accuracy = 0.47
+...
+Step 4500: loss = 0.1929, accuracy = 0.948
+Step 5000: loss = 0.1723, accuracy = 0.956
+Epoch 10
+Step 500: loss = 0.1845, accuracy = 0.948
+Step 1000: loss = 0.2391, accuracy = 0.928
+Step 1500: loss = 0.2536, accuracy = 0.938
+Step 2000: loss = 0.1368, accuracy = 0.962
+Step 2500: loss = 0.1488, accuracy = 0.952
+Step 3000: loss = 0.1878, accuracy = 0.952
+Step 3500: loss = 0.1767, accuracy = 0.952
+Step 4000: loss = 0.1863, accuracy = 0.948
+Step 4500: loss = 0.1864, accuracy = 0.952
+Step 5000: loss = 0.1702, accuracy = 0.956
+Test loss: 0.2451
+Test accuracy: 0.9325</samp></pre>
                 <h3>3.1.11 What Now?</h3>
+                <p>We’re done! We did a full walkthrough of Convolutional Neural Networks, including what they are, how they work, why they’re useful, and how to train them. This is just the beginning, though. There’s a lot more you could do:</p>
+                <ul class="with-bullets">
+                    <li><p>Rewrite the above process using PyTorch.</p></li>
+                    <li><p>Read about the ImageNet project and its famous Computer Vision contest, the ImageNet Large Scale Visual Recognition Challenge (ILSVRC).</p></li>
+                    <li><p>Read about <a href="alex_net.html">AlexNet</a>, the first CNN to win the ILSVRC contest.</p></li>
+                    <li><p>Read about <a href="res_net.html">ResNet</a>, which introduced skip connections to allow for even deeper CNNs.</p></li>
+                </ul>
 
                 <div class="navigation">
                     <a href="optimizer.html">Prev: 2.6 Optimizer</a>
