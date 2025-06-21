@@ -46,7 +46,7 @@ for i, (image, label) in enumerate(zip(x_test[:400], y_test[:400])):
     num_correct += acc
     
     if (i + 1) % 100 == 0:
-        print('Step' + str(i + 1) + ': loss = ' + str(round(loss / 100, 4)) +
+        print('Step ' + str(i + 1) + ': loss = ' + str(round(loss / 100, 4)) +
               ', accuracy = ' + str(num_correct / 100))
         loss = 0
         num_correct = 0

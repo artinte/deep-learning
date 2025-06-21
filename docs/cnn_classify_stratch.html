@@ -531,7 +531,51 @@ gradient[label] = -1 / out[label]</code></pre>
                     \(t = w * input + b\)
                 </div>
                 <p>Using chain rule, putting this into code is a little less straightforward:</p>
+                <pre><code>class Softmax:
+    def backprop(self, dl_dout):
+        # ...
+        # Gradients of totals against weights and bias.
+        dt_dw = self.last_input
+        dt_db = 1
+        dt_dinputs = self.weights
+        # Graidents of the loss against totals.
+        dl_dt = gradient * dout_dt
+        # Gradients of loss against weights and bias.
+        dl_dw = dt_dw[numpy.newaxis].T @ dl_dt[numpy.newaxis]
+        dl_db = dl_dt * dt_db
+        dl_dinputs = dt_dinputs @ dl_dt</code></pre>
+                <p>First, we pre-calculate <code>dl_dt</code> since we’ll use it several times. Then, we calculate each gradient:</p>
+                <ul class="with-bullets">
+                    <li><p><code>dl_dw</code>: We need 2d arrays to do matrix multiplication, but <code>dt_dw</code> and <code>dl_dt</code> are 1d arrays. <code>numpy.newaxis</code> lets us easily create a new axis of length one, so we end up multiplying matrices with dimensions \((input_len, 1)\) and \((1, nodes)\). Thus, the final result for <code>dl_dw</code> will have shape \((input_len, nodes)\), which is the same as <code>self.weights</code>!</p></li>
+                    <li><p><code>dl_db</code>: This one straightforward, since <code>dt_db</code> is 1.</p></li>
+                    <li><p><code>dl_dinputs</code>: We multiply matrices with dimensions \((input_len, nodes)\) and \((nodes, 1)\) to get a result with length <code>input_len</code>.</p></li>
+                </ul>
+                <p>With all the gradients computed, all that’s left is to actually train the Softmax layer! We’ll update the weights and bias using <a href="optimizer.html#sgd">Stochastic Gradient Descent (SGD)</a> and then return <code>dl_dinputs</code>:</p>
+                <pre><code>class Softmax:
+    def backprop(self, dl_dout, learn_rate):
+        # ...
+        # Update weights and bias.
+        self.weights -= learn_rate * dl_dw
+        self.bias -= learn_rate * dl_db
 
+        return dl_dinputs.reshape(self.last_input_shape)</code></pre>
+                <p>Notice that we added a <code>learn_rate</code> parameter that controls how fast we update our weights. Also, we have to <code>reshape()</code> before returning <code>dl_dinputs</code> because we flattened the input during our forward pass:</p>
+                <p>Reshaping to <code>last_input_shape</code> ensures that this layer returns gradients for its input in the same format that the input was originally given to it.</p>
+
+                <p>We’ve finished our first backprop implementation! Let’s quickly test it to see if it’s any good. We’ll start implementing a <code>train()</code> method in our <a href="https://github.com/artinte/deep-learning/blob/develop/03_cnn/1_scratch/cnn_training.py">cnn_training.py</a> file:</p>
+
+
+                <p>Running this gives results similar to:</p>
+                <pre><samp>Step 100: loss = 2.2088, accuracy = 0.22
+Step 200: loss = 2.0672, accuracy = 0.38
+Step 300: loss = 1.8912, accuracy = 0.56
+Step 400: loss = 1.7211, accuracy = 0.68
+Step 500: loss = 1.6354, accuracy = 0.68
+Step 600: loss = 1.6632, accuracy = 0.59
+Step 700: loss = 1.5719, accuracy = 0.69
+Step 800: loss = 1.4217, accuracy = 0.7
+Step 900: loss = 1.3351, accuracy = 0.77
+Step 1000: loss = 1.3272, accuracy = 0.75</samp></pre>
                 <h3>3.1.8 Backprop: Max Pooling</h3>
                 <h3>3.1.9 Backprop: Conv</h3>
                 <h3>3.1.10 Training a CNN</h3>
