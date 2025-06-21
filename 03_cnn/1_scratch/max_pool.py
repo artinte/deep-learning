@@ -32,6 +32,7 @@ class MaxPool2:
         Returns a 3d numpy array with dimensions (h / 2, w / 2, num_filters).
         - input is a 3d numpy array with dimensions (h, w, num_filters)
         '''
+        self.last_input = input
         h, w, num_filters = input.shape
         output = numpy.zeros((h // 2, w // 2, num_filters))
         
@@ -39,6 +40,25 @@ class MaxPool2:
             output[i, j] = numpy.amax(im_region, axis=(0, 1))
       
         return output
+
+    def backprop(self, dl_dout):
+        '''
+        Performs a backward pass of the maxpool layer.
+        Returns the loss gradient for this layer's inputs.
+        - dl_dout is the loss gradient for this layer's outputs.
+        '''
+        dl_dinput = numpy.zeros(self.last_input.shape)
+        for im_region, i, j in self.iterate_regions(self.last_input):
+            h, w, f = im_region.shape
+            amax = numpy.amax(im_region, axis=(0, 1))
+            
+            for i2 in range(h):
+                for j2 in range(w):
+                    for f2 in range(f):
+                        # If this pixel was the max value, copy the gradient to it.
+                        if im_region[i2, j2, f2] == amax[f2]:
+                            dl_dinput[i * 2 + i2, j * 2 + j2, f2] = dl_dout[i, j, f2]
+        return dl_dinput
 
 (x_train, y_train), (x_test, y_test) = mnist.load()
 

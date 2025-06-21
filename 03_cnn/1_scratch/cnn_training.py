@@ -53,21 +53,37 @@ def train(iamge, label, lr=0.005):
     gradient[label] = -1 / out[label]
     
     gradient = softmax.backprop(gradient, lr)
+    gradient = pool.backprop(gradient)
+    gradient = conv.backprop(gradient, lr)
     
     return loss, acc
 
 
-# train
+# Train the model.
 loss = 0
 num_correct = 0
 
-for i, (image, label) in enumerate(zip(x_train[:1000], y_train[:1000])):
-    if (i + 1) % 100 == 0:
-        print('Step ' + str(i + 1) + ': loss = ' + str(round(loss / 100, 4)) +
-              ', accuracy = ' + str(num_correct / 100))
-        loss = 0
-        num_correct = 0
-    
-    l, acc = train(image, label)
+for epoch in range(10):
+    print('Epoch ' + str(epoch + 1))
+
+    for i, (image, label) in enumerate(zip(x_train[:5000], y_train[:5000])):
+        if (i + 1) % 500 == 0:
+            print('Step ' + str(i + 1) + ': loss = ' + str(round(loss / 500, 4)) +
+                ', accuracy = ' + str(num_correct / 500))
+            loss = 0
+            num_correct = 0
+        
+        l, acc = train(image, label)
+        loss += l
+        num_correct += acc
+
+# Test the model.
+loss = 0
+num_correct = 0
+for i, (image, label) in enumerate(zip(x_test[:400], y_test[:400])):
+    _, l, acc = forward(image, label)
     loss += l
     num_correct += acc
+
+print('Test loss:', round(loss / 400, 4))
+print('Test accuracy:', num_correct / 400)

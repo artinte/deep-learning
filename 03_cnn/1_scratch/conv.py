@@ -34,6 +34,7 @@ class Conv3x3:
         Returns a 3d numpy array with dimensions (h, w, num_filters).
         - input is a 2d numpy array
         '''
+        self.last_input = input
         h, w = input.shape
         output = numpy.zeros((h - 2, w - 2, self.num_filters))
 
@@ -42,6 +43,27 @@ class Conv3x3:
 
         return output
 
+    def backprop(self, dl_dout, learn_rate):
+        '''
+        Performs a backward pass of the conv layer.
+        - dl_dout is the loss gradient for this layer's outputs.
+        - learn_rate is a float.
+        '''
+        dl_dfilters = numpy.zeros(self.filters.shape)
+        for im_region, i, j in self.iterate_regions(self.last_input):
+            for f in range(self.num_filters):
+                dl_dfilters[f] += im_region * dl_dout[i, j, f]
+        
+        # Update filters.
+        self.filters -= learn_rate * dl_dfilters
+        
+        # We aren't returning anything here since we use Conv3x3 as
+        # the first layer in our CNN. Otherwise, we'd need to return
+        # the loss gradient for this layer's inputs, just like every
+        # other layer in our CNN.
+        return None
+
+        
 (x_train, y_train), (x_test, y_test) = mnist.load()
 
 conv = Conv3x3(8)
