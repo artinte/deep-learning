@@ -203,11 +203,17 @@
                 <p>An illustration of the architecture of our CNN, explicitly showing the delineation of responsibilities between the two GPUs. One GPU runs the layer-parts at the top of the figure while the other runs the layer-parts at the bottom. </p>
                 
                 <h4>3.2.3.1 ReLU Nonlinearity</h4>
-                <p>The standard way to model a neuron's output \(f\) as a function of its input \(x\) is with \(f(x) = tanh(x)\) or \(f(x) = \frac{1}{1 + e^{-x}}\).  In terms of training time with gradient descent, these saturating nonlinearities are much slower than the non-saturating nonlinearity \(f(x) = max(0, x)\). Following Nair and Hinton we refer to neurons with this nonlinearity as Rectified Linear Units (ReLUs).</p>
-                <p>Deep convolutional neural networks with ReLUs train several times faster than their equivalents with tanh units. This is demonstrated in Figure 1, which shows the number of iterations required to reach 25% training error on the CIFAR-10 dataset for a particular four-layer convolutional network. This plot shows that we would not have been able to experiment with such large neural networks for this work if we had used traditional saturating neuron models.</p>
-                <p>We are not the first to consider a lternatives to traditional neuron models in CNNs. For example, Jarrett et al. claim that the nonlinearity \(f(x) = |tanh(x)|\) works particularly well with their type of contrast normalization followed by local average pooling on the Caltech-101 dataset.</p>
+                <p>The standard way to model a neuron's output \(f\) as a function of its input \(x\) is with \(f(x) = tanh(x)\) or \(f(x) = \frac{1}{1 + e^{-x}}\).  In terms of training time with gradient descent, these saturating nonlinearities are much slower than the non-saturating nonlinearity \(f(x) = max(0, x)\). Following Nair and Hinton, we refer to neurons with this nonlinearity as <a href="activation_function.html#relu">Rectified Linear Units (ReLUs)</a>.</p>
+                <p>Deep convolutional neural networks with ReLUs train several times faster than their equivalents with tanh units.</p>
+                <p>We are not the first to consider alternatives to traditional neuron models in CNNs. For example, Jarrett et al. claim that the nonlinearity \(f(x) = |tanh(x)|\) works particularly well with their type of contrast normalization followed by local average pooling on the Caltech-101 dataset.</p>
                 <p>However, on this dataset the primary concern is preventing overfitting, so the effect they are observing is different from the accelerated ability to fit the training set which we report when using ReLUs. Faster learning has a great influence on the performance of large models trained on large datasets.</p>
+    
                 <h4>3.2.3.2 Training on Multiple GPUs</h4>
+                <p>A single GTX 580 GPU has only 3GB of memory, which limits the maximum size of the networks that can be trained on it. It turns out that 1.2 million training examples are enough to train networks which are too big to fit on one GPU.</p>
+                <p>Therefore we spread the net across two GPUs. Current GPUs are particularly well-suited to cross-GPU parallelization, as they are able to read from and write to one another’s memory directly, without going through host machine memory.</p>
+
+                <p class="comment">For teaching purposes, we will not implement the architecture using two GPUs. Instead, we will train it on a single GPU, with 5 convolutional layers and 3 fully connected layers, similar to the architecture shown above, using ReLU activation functions.</p>
+
                 <h4>3.2.3.3 Local Response Normalization</h4>
                 <h4>3.2.3.4 Overlapping Pooling</h4>
                 <h4>3.2.3.5 Overall Architecture</h4>
