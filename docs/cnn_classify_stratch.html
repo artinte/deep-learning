@@ -669,6 +669,7 @@ Step 1000: loss = 1.3272, accuracy = 0.75</samp></pre>
                         <tr><td>80</td></tr>
                     </table>
                 </div>
+                <p style="text-align: center; color: #555555;">Figure 18 - Increase Center Filter Weight by 1</p>
 
                 <p>Similarly, increasing any of the other filter weights by 1 would increase the output by the value of the corresponding image pixel! This suggests that the derivative of a specific output pixel with respect to a specific filter weight is just the corresponding image pixel value. Doing the math confirms this:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
@@ -765,12 +766,13 @@ Test accuracy: 0.9325</samp></pre>
                 <h3>3.1.11 What Now?</h3>
                 <p>We’re done! We did a full walkthrough of Convolutional Neural Networks, including what they are, how they work, why they’re useful, and how to train them. This is just the beginning, though. There’s a lot more you could do:</p>
                 <ul class="with-bullets">
-                    <li><p>Rewrite the above process using PyTorch.</p></li>
+                    <li><p>Excecise: rewrite the above process using PyTorch.</p></li>
                     <li><p>Read about the ImageNet project and its famous Computer Vision contest, the ImageNet Large Scale Visual Recognition Challenge (ILSVRC).</p></li>
                     <li><p>Read about <a href="alex_net.html">AlexNet</a>, the first CNN to win the ILSVRC contest.</p></li>
                     <li><p>Read about <a href="res_net.html">ResNet</a>, which introduced skip connections to allow for even deeper CNNs.</p></li>
                 </ul>
 
+                <p>Thanking for reading!</p>
                 <div class="navigation">
                     <a href="optimizer.html">Prev: 2.6 Optimizer</a>
                     <a href="alex_net.html">Next: 3.2 AlexNet</a>
