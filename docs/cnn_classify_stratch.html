@@ -447,10 +447,10 @@ gradient = conv.backprop(gradient)</code></pre>
 
                 <p>The first thing we need to calculate is the input to the Softmax layer’s backward phase, \(\frac{\partial L}{\partial {out}_s}\), where \({out}_s\) s the output from the Softmax layer: a vector of 10 probabilities. This is pretty easy, since only \(p_i\) shows up in the loss equation:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
-                    \(\frac{\partial L}{\partial {out}_s (i)} = \begin{cases}
+                    \[\frac{\partial L}{\partial {out}_s (i)} = \begin{cases}
                         -\frac{1}{p_i} & \text{if } i = c \\
                         0 & \text{if } i \neq c
-                    \end{cases}\)</div>
+                    \end{cases}\]</div>
                 <p>That’s our initial gradient you saw referenced above:</p>
                 <pre><code># Calculate initial gradient
 gradient = np.zeros(10)
@@ -479,8 +479,9 @@ gradient[label] = -1 / out[label]</code></pre>
                 <p>With that out of the way, we can start deriving the gradients for the backprop phase. We’ve already derived the input to the Softmax backward phase: \(\frac{\partial L}{\partial {out}_s}\). One fact we can use about \(\frac{\partial L}{\partial {out}_s}\) is that it’s only nonzero for \(c\), the correct class. That means that we can ignore everything but \({out}_s(c)!\)</p>
                 <p>First, let’s calculate the gradient of \({out}_s(c)\) with respect to the totals (the values passed in to the softmax activation). Let \(t_i\) be the total for class \(i\). Then we can write \({out}_s(c)\) as:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
-                    \({out}_s(c) = \frac{e^{t_c}}{\sum_{i=0}^{9} e^{t_i}} = \frac{e^{t_c}}{S}\)</div>
+                    \({out}_s(c) = \frac{e^{t_c}}{\sum_{i=0}^{9} e^{t_i}} = \frac{e^{t_c}}{S}\)
                 </div>
+
                 <p>Where \(S = \sum_i e^{t_i}\)</p>
                 <p>Now, consider some class \(k\) such that \(k \ne c\), and use <a href="calculus.html#chain_rule">chain rule</a> to derive:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
@@ -488,9 +489,37 @@ gradient[label] = -1 / out[label]</code></pre>
                 </div>
                 <p>Remember, that was assuming \(k \ne c\). Now let’s do the derivation for \(c\), this time using Quotient Rule (because we have an \(e^{t_c}\) in the numerator of \(out_s(c)\)):</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
-                    \(\frac{\partial {out}_s(c)}{\partial t_c}  = \frac{e^{t_c}(S - e^{t_c})}{S^2}\)</div>
+                    \(\frac{\partial {out}_s(c)}{\partial t_c}  = \frac{e^{t_c}(S - e^{t_c})}{S^2}\)
                 </div>
                 <p>For a detailed derivation, please refer to the <a href="activation_function.html#softmax">Softmax</a> section. That was the hardest bit of calculus in this entire post - it only gets easier from here! Let’s start implementing this:</p>
+                <pre><code>class Softmax:
+    # ...
+    def backprop(self, dl_dout, learn_rate):
+        '''
+        Performs a backward pass of the softmax layer.
+        Returns the loss gradient for this layer's inputs.
+        - dl_dout is the loss gradient for this layer's outputs.
+        '''
+        # We know only 1 element of dl_dout will be nonzero.
+        for i, gradient in enumerate(dl_dout):
+            if gradient == 0:
+                continue
+
+            t_exp = numpy.exp(self.last_totals)
+
+            S = numpy.sum(t_exp)
+
+            # Gradient of the softmax  function.
+            dout_dt = -t_exp[i] * t_exp / (S * S)
+            dout_dt[i] += t_exp[i] * (S - t_exp[i]) / (S * S)</code></pre>
+
+                <p>Remember how \(\frac{\partial L}{\partial {out}_s}\) is only nonzero for the correct class, \(c\)? We start by looking for \(c\) by looking for a nonzero gradient in <code>dl_dout</code>. Once we find that, we calculate the gradient \(\frac{\partial {out}_s(i)}{\partial t}\) (<code>dout_dtotals</code>) using the result we derived above:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \[\frac{\partial {out}_s(k)}{\partial t} = \begin{cases}
+                        -\frac{e^{t_c} e^{t_k}}{S^2} & \text{if } k \neq c \\
+                        \frac{e^{t_c} (S - e^{t_c})}{S^2} & \text{if } k = c
+                    \end{cases}\]
+                </div>
                 
 
                 <h3>3.1.8 Backprop: Max Pooling</h3>
