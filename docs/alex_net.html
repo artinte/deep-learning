@@ -214,7 +214,16 @@
 
                 <p class="comment">For teaching purposes, we will not implement the architecture using two GPUs. Instead, we will train it on a single GPU, with 5 convolutional layers and 3 fully connected layers, similar to the architecture shown above, using ReLU activation functions.</p>
 
-                <h4>3.2.3.3 Local Response Normalization</h4>
+                <h4 style="color: gray;">3.2.3.3 Local Response Normalization</h4>
+                <p>ReLUs have the desirable property that they do not require input normalization to prevent them from saturating. If at least some training examples produce a positive input to a ReLU, learning will happen in that neuron.</p>
+                <p>However, we still find that the following local normalization scheme aids generalization. Denoting by \(a_{x, y}^i\) the activity of a neuron computed by applying kernel \(i\) at position \(x, y\) and then applying the ReLU nonlinearity, the response-normalized activity \(b_{x, y}^i\) is given by the expression:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(b_{x, y}^i = a_{x, y}^i / {(k + \alpha \sum_{j=max(0, i-n/2)}^{min(N-1, i+n/2)} {(a_{x, y}^j)}^2)}^{\beta}\)
+                </div>
+                <p>where the sum runs over \(n\) "adjacent" kernel maps at the same spatial position, and \(N\) is the total number of kernels in the layer.</p>
+
+                <p class="comment">However, over time, local response normalization has been largely abandoned. Many experiments showed that removing LRN had little or no negative impact, and in some cases, it even improved performance.</p>
+
                 <h4>3.2.3.4 Overlapping Pooling</h4>
                 <h4>3.2.3.5 Overall Architecture</h4>
                 <p>Now we are ready to describe the overall architecture of our CNN. As depicted in Figure 2, the net contains eight layers with weights; the first five are convolutional and the remaining three are fully-connected. The output of the last fully-connected layer is fed to a 1000-way softmax which produces a distribution over the 1000 class labels.</p>
