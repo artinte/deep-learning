@@ -485,7 +485,7 @@ gradient[label] = -1 / out[label]</code></pre>
                 <p>Where \(S = \sum_i e^{t_i}\)</p>
                 <p>Now, consider some class \(k\) such that \(k \ne c\), and use <a href="calculus.html#chain_rule">chain rule</a> to derive:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
-                    \(\frac{\partial {out}_s(c)}{\partial t_k} = -\frac{e^{t_c} e^{t_k}}{S^2}\)</div>
+                    \(\frac{\partial {out}_s(c)}{\partial t_k} = -\frac{e^{t_c} e^{t_k}}{S^2}\)
                 </div>
                 <p>Remember, that was assuming \(k \ne c\). Now let’s do the derivation for \(c\), this time using Quotient Rule (because we have an \(e^{t_c}\) in the numerator of \(out_s(c)\)):</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
@@ -520,7 +520,17 @@ gradient[label] = -1 / out[label]</code></pre>
                         \frac{e^{t_c} (S - e^{t_c})}{S^2} & \text{if } k = c
                     \end{cases}\]
                 </div>
-                
+                <p>Let’s keep going. We ultimately want the gradients of loss against weights, biases, and input:</p>
+                <ol>
+                    <li><p>We’ll use the weights gradient \(\frac{\partial L}{\partial w}\) to update our layer's weights.</p></li>
+                    <li><p>We’ll use the biases gradient \(\frac{\partial L}{\partial b}\) to update our layer’s biases.</p></li>
+                    <li><p>We’ll return the input gradient \(\frac{\partial L}{\partial input}\) from our <code>backprop()</code> method so the next layer can use it. This is the return gradient we talked about in the Training Overview section!</p></li>
+                </ol>
+                <p>To calculate those 3 loss gradients, we first need to derive 3 more results: the gradients of totals against weights, biases, and input. The relevant equation here is:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(t = w * input + b\)
+                </div>
+                <p>Using chain rule, putting this into code is a little less straightforward:</p>
 
                 <h3>3.1.8 Backprop: Max Pooling</h3>
                 <h3>3.1.9 Backprop: Conv</h3>
