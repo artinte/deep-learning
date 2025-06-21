@@ -198,7 +198,9 @@
                 <h3 id="section3">3.2.3 The Architecture</h3>
                 <p>The architecture of our network is summarized in Figure 3. It contains eight learned layers - five convolutional and three fully-connected. Below, we describe some of the novel or unusual features of our network’s architecture. Sections 3.1 - 3.4 are sorted according to our estimation of their importance, with the most important first.</p>
 
-                
+                <img src="res/03/arch_alexnet.png" alt="Architecture of AlexNet" width="600">
+                <p style="text-align: center; color: #555555;">Figure 3 - Architecture of AlexNet</p>
+                <p>An illustration of the architecture of our CNN, explicitly showing the delineation of responsibilities between the two GPUs. One GPU runs the layer-parts at the top of the figure while the other runs the layer-parts at the bottom. </p>
                 
                 <h4>3.2.3.1 ReLU Nonlinearity</h4>
                 <p>The standard way to model a neuron's output \(f\) as a function of its input \(x\) is with \(f(x) = tanh(x)\) or \(f(x) = \frac{1}{1 + e^{-x}}\).  In terms of training time with gradient descent, these saturating nonlinearities are much slower than the non-saturating nonlinearity \(f(x) = max(0, x)\). Following Nair and Hinton we refer to neurons with this nonlinearity as Rectified Linear Units (ReLUs).</p>
