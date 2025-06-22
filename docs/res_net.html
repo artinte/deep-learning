@@ -88,7 +88,7 @@
                 <p>We can fairly compare plain/residual networks that simultaneously have the same number of parameters, depth, width, and computational cost (except for the negligible element-wise addition).</p>
 
                 <p>The dimensions of \(x\) and \(\mathcal{F}\) must be equal in <a href="#eq1">above equation</a>. If this is not the case (e.g., when changing the input/output channels), we can perform a linear projection \(W_s\) by the shortcut connections to match the dimensions:</p>
-                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;" id="eq2">
                     \(y = \mathcal{F}(x, \{W_i\}) + W_s x\)
                 </div>
                 <p>We can also use a square matrix \(W_s\) in <a href="#eq1">above equation</a>. But we will show by experiments that the identity mapping is sufficient for addressing the degradation problem and is economical, and thus \(W_s\) is only used when matching dimensions.</p>
@@ -110,9 +110,19 @@
                     <li><p>If the feature map size is halved, the number of filters is doubled so as to preserve the time complexity per layer.</p></li>
                 </ol>
                 <p>We perform downsampling directly by convolutional layers that have a stride of 2. The network ends with a global average pooling layer and a 1000-way fully-connected layer with softmax. The total number of weighted layers is 34 in Fig. 3 (middle).</p>
+                <img src="res/03/example_arch.png" alt="Example Architecture" width="600">
+                <p style="text-align: center; color: #555555;">Figure 3 - Example Network Architectures for ImageNet</p>
+
                 <p>It is worth noticing that our model has fewer filters and lower complexity than VGG nets. Our 34-layer baseline has 3.6 billion FLOPs (multiply-adds), which is only 18% of VGG-19 (19.6 billion FLOPs).</p>
 
                 <h5>Residual Network</h5>
+                <p>Based on the above plain network, we insert shortcut connections (Fig. 3, right) which turn the network into its counterpart residual version. The <a href="#eq1">identity shortcuts equation</a> can be directly used when the input and output are of the same dimensions (solid line shortcuts in Fig. 3).</p>
+                <p>When the dimensions increase (dotted line shortcuts in Fig. 3), we consider two options:</p>
+                <ol>
+                    <li><p>The shortcut still performs identity mapping, with extra zero entries padded for increasing dimensions. This option introduces no extra parameter;</p></li>
+                    <li><p>The <a href="#eq2">projection shortcut equation</a> is used to match dimensions (done by 1×1 convolutions). For both options, when the shortcuts go across feature maps of two sizes, they are performed with a stride of 2.</p></li>
+                </ol>
+
                 <h4>3.3.3.4 Implementation</h4>
                 <h3>3.3.4 Experiments</h3>
                 <h4>3.3.4.1 ImageNet Classification</h4>
