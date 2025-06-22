@@ -53,7 +53,8 @@
                 <p>The extremely deep representations also have excellent generalization performance on other recognition tasks, and lead us to further win the 1st places on: ImageNet detection, ImageNet localization, COCO detection, and COCO segmentation in ILSVRC & COCO 2015 competitions. This strong evidence shows that the residual learning principle is generic, and we expect that it is applicable in other vision and non-vision problems.</p>
                 
                 <h3>3.3.2 Related Work</h3>
-                <p class="comment">Include residual representations and Shortcut connections, You don't need to understand too much, because residual learning is a very simple mechanism.</p>
+                <p>In this section, we will introduce the related work of residual learning, including residual representations and shortcut connections.</p>
+                <p class="comment">You don't need to understand too much, because residual learning is a very simple mechanism.</p>
 
                 <h5>Residual Representations</h5>
                 <p>In image recognition, VLAD is a representation that encodes by the residual vectors with respect to a dictionary, and Fisher Vector can be formulated as a probabilistic version of VLAD. Both of them are powerful shallow representations for image retrieval and classification. For vector quantization, encoding residual vectors is shown to be more effective than encoding original vectors.</p>
@@ -65,20 +66,36 @@
                 <p>Concurrent with our work, "highway networks" present shortcut connections with gating functions. These gates are data-dependent and have parameters, in contrast to our identity shortcuts that are parameter-free. When a gated shortcut is "closed" (approaching zero), the layers in highway networks represent non-residual functions. On the contrary, our formulation always learns residual functions; our identity shortcuts are never closed, and all information is always passed through, with additional residual functions to be learned. In addition, highway networks have not demonstrated accuracy gains with extremely increased depth (e.g., over 100 layers).</p>
 
                 <h3>3.3.3 Deep Residual Learning</h3>
-                
+                <p>In this section, we will introduce the deep residual learning framework, which is the core of ResNet. We will explain what residual learning is, how to implement it with code, and how to apply it to different network architectures.</p>
+
                 <h4>3.3.3.1 Residual Learning</h4>
-                <p>Let us consider \(\matchcal{H}(x)\) as an underlying mapping to be fit by a few stacked layers (not necessarily the entire net), with \(x\) denoting the inputs to the first of these layers. If one hypothesizes that multiple nonlinear layers can asymptotically approximate complicated functions, then it is equivalent to hypothesize that they can asymptotically approximate the residual functions, i.e., \(\mathcal{H}(x) - x\) (assuming that the input and output are of the same dimensions).</p>
-                <p>So rather than expect stacked layers to approximate \(\matchcal{H}\), we explicitly let these layers approximate a residual function \(\mathcal{F}(x) := \mathcal{H}(x) - x\). The original function thus becomes \(\mathcal{F}(x) +x\).  Although both forms should be able to asymptotically approximate the desired functions (as hypothesized), the ease of learning might be different.</p>
+                <p>Let us consider \(\mathcal{H}(x)\) as an underlying mapping to be fit by a few stacked layers (not necessarily the entire net), with \(x\) denoting the inputs to the first of these layers. If one hypothesizes that multiple nonlinear layers can asymptotically approximate complicated functions, then it is equivalent to hypothesize that they can asymptotically approximate the residual functions, i.e., \(\mathcal{H}(x) - x\) (assuming that the input and output are of the same dimensions).</p>
+                <p>So rather than expect stacked layers to approximate \(\mathcal{H}\), we explicitly let these layers approximate a residual function \(\mathcal{F}(x) := \mathcal{H}(x) - x\). The original function thus becomes \(\mathcal{F}(x) +x\).  Although both forms should be able to asymptotically approximate the desired functions (as hypothesized), the ease of learning might be different.</p>
                 <p>This reformulation is motivated by the counterintuitive phenomena about the degradation problem. As we discussed in the introduction, if the added layers can be constructed as identity mappings, a deeper model should have training error no greater than its shallower counterpart.</p>
                 <p>The degradation problem suggests that the solvers might have difficulties in approximating identity mappings by multiple nonlinear layers. With the residual learning reformulation, if identity mappings are optimal, the solvers may simply drive the weights of the multiple nonlinear layers toward zero to approach identity mappings.</p>
 
                 <p>In real cases, it is unlikely that identity mappings are optimal, but our reformulation may help to precondition the problem. If the optimal function is closer to an identity mapping than to a zero mapping, it should be easier for the solver to find the perturbations with reference to an identity mapping, than to learn the function as a new one. We show by experiments that the learned residual functions ingeneral have small responses, suggesting that identity mappings provide reasonable preconditioning.</p>
                 
                 <h4>3.3.3.2 Identity Mapping by Shortcuts</h4>
-                <p>We adopt residual learning to every few stacked layers. A building block is shown in Fig. 2. Formally, in this paper we consider a building block defined as:</p>
+                <p>We adopt residual learning to every few stacked layers. A building block is shown in (Fig. 1). Formally, in this paper we consider a building block defined as:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;" id="eq1">
+                    \(y = \mathcal{F}(x, \{W_i\}) + x\)
+                </div>
 
-                <p>Here \(x\) and \(y\) y are the input and output vectors of the layers considered. The function \(\mathcal{F}(x, \{W_i\})\) represents the residual mapping to be learned. For the example in Fig. 2 that has two layers, \(\mathcal{F} = W_2 \cdot \sigma(W_1 x)\) in which \(\sigma\) denotes ReLU and the biases are omitted for simplifying notations. The operation \(\mathcal{F} +x\) is performed by a shortcut connection and element-wise addition. We adopt the second nonlinearity after the addition (i.e., \(\sigma(y)\), see Fig. 2).</p>
-                
+                <p>Here \(x\) and \(y\) are the input and output vectors of the layers considered. The function \(\mathcal{F}(x, \{W_i\})\) represents the residual mapping to be learned. For the example in (Fig. 1) that has two layers, \(\mathcal{F} = W_2 \cdot \sigma(W_1 x)\) in which \(\sigma\) denotes ReLU and the biases are omitted for simplifying notations. The operation \(\mathcal{F} +x\) is performed by a shortcut connection and element-wise addition. We adopt the second nonlinearity after the addition (i.e., \(\sigma(y)\), see Fig. 1).</p>
+
+                <p>The shortcut connections introduce neither extra parameter nor computation complexity. This is not only attractive in practice but also important in our comparisons between plain and residual networks.</p>
+                <p>We can fairly compare plain/residual networks that simultaneously have the same number of parameters, depth, width, and computational cost (except for the negligible element-wise addition).</p>
+
+                <p>The dimensions of \(x\) and \(\mathcal{F}\) must be equal in <a href="#eq1">above equation</a>. If this is not the case (e.g., when changing the input/output channels), we can perform a linear projection \(W_s\) by the shortcut connections to match the dimensions:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(y = \mathcal{F}(x, \{W_i\}) + W_s x\)
+                </div>
+                <p>We can also use a square matrix \(W_s\) in <a href="#eq1">above equation</a>. But we will show by experiments that the identity mapping is sufficient for addressing the degradation problem and is economical, and thus \(W_s\) is only used when matching dimensions.</p>
+                <p>The form of the residual function \(\mathcal{F}\) is flexible. Experiments in this paper involve a function \(\mathcal{F}\) that has two or three layers (Fig. 2), while more layers are possible.</p>
+
+                <p>We also note that although the above notations are about fully-connected layers for simplicity, they are applicable to convolutional layers. The function \(\mathcal{F}(x, {W_i})\) can represent multiple convolutional layers. The element-wise addition is performed on two feature maps, channel by channel.</p>
+
                 <h4>3.3.3.3 Network Architectures</h4>
                 <p>We have tested various plain/residual nets, and have observed consistent phenomena. To provide instances for discussion, we describe two models for ImageNet as follows.</p>
 
