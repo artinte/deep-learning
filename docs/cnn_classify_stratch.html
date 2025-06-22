@@ -674,11 +674,11 @@ Step 1000: loss = 1.3272, accuracy = 0.75</samp></pre>
                 <p>Similarly, increasing any of the other filter weights by 1 would increase the output by the value of the corresponding image pixel! This suggests that the derivative of a specific output pixel with respect to a specific filter weight is just the corresponding image pixel value. Doing the math confirms this:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \[
-                    \begin{align}
-                    out(i, j) = convolve(image, filter) \\
-                    = \sum_{x=0}^3 \sum_{y=0}^3 image(i + x, j + y) * filter(x, y) \\
-                    \frac{\partial out(i, j)}{\partial filter(x, y)} = image(i + x, j + y)
-                    \end{align}
+                    \begin{flalign*}
+                    & out(i, j) = convolve(image, filter) \\
+                    & = \sum_{x=0}^3 \sum_{y=0}^3 image(i + x, j + y) * filter(x, y) \\
+                    & \frac{\partial out(i, j)}{\partial filter(x, y)} = image(i + x, j + y)
+                    \end{flalign*}
                     \]
                 </div>
                 <p>We can put it all together to find the loss gradient for specific filter weights:</p>

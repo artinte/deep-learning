@@ -246,7 +246,7 @@
                 <h3 id="section4">3.2.4 Reducing Overfitting</h3>
                 <p>Our neural network architecture has 60 million parameters. Although the 1000 classes of ILSVRC make each training example impose 10 bits of constraint on the mapping from image to label, this turns out to be insufficient to learn so many parameters without considerable overfitting. Below, we describe the two primary ways in which we combat overfitting.</p>
 
-                <h3>3.2.4.1 Data Augmentation</h3>
+                <h4>3.2.4.1 Data Augmentation</h4>
                 <p>The easiest and most common method to reduce overfitting on image data is to artificially enlarge the dataset using label-preserving transformations. We employ two distinct forms of data augmentation, both of which allow transformed images to be produced from the original images with very little computation, so the transformed images do not need to be stored on disk.</p>
                 <p>In our implementation, the transformed images are generated in Python code on the CPU while the GPU is training on the previous batch of images. So these data augmentation schemes are, in effect, computationally free.</p>
                 <p>The first form of data augmentation consists of generating image translations and horizontal reflections. We do this by extracting random \(224 \times 224\) patches (and their horizontal reflections) from the \(256 \times 256\) images and training our network on these extracted patches.</p>
@@ -255,15 +255,44 @@
 
                 <p>The second form of data augmentation consists of altering the intensities of the RGB channels in training images. Specifically, we perform PCA on the set of RGB pixel values throughout the ImageNet training set. To each training image, we add multiples of the found principal components, with magnitudes proportional to the corresponding eigenvalues times a random variable drawn from a Gaussian with mean zero and standard deviation 0.1. Therefore to each RGB image pixel \(I_{xy} = {[I_{xy}^R, I_{xy}^G, I_{xy}^B]}^T\) we add the following quantity:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
-                    \({[p_1, p_2, p_3][\alpha_1 \lambda_1, \alpha_2 \lambda_2, \alpha_3 \lambda_3\]}^T\)
+                    \({[p_1, p_2, p_3][\alpha_1 \lambda_1, \alpha_2 \lambda_2, \alpha_3 \lambda_3]}^T\)
                 </div>
                 <p>where \(p_i\) and \(\lambda_i\) are \(i\)th eigenvector and eigenvalue of the \(3 \times 3\) covariance matrix of RGB pixel values, respectively, and \(a_i\) is the aforementioned random variable. Each \(a_i\) is drawn only once for all the pixels of a particular training image until that image is used for training again, at which point it is re-drawn.</p>
                 <p>This scheme approximately captures an important property of natural images, namely, that object identity is invariant to changes in the intensity and color of the illumination. This scheme reduces the top-1 error rate by over 1%.</p>
 
-                <h3>3.2.4.2 Dropout</h3>
+                <h4>3.2.4.2 Dropout</h4>
+                <p>Combining the predictions of many different models is a very successful way to reduce test errors, but it appears to be too expensive for big neural networks that already take several days to train. There is, however, a very efficient version of model combination that only costs about a factor of two during training.</p>
+                <p>The recently-introduced technique, called <em>"dropout"</em>, consists of setting to zero the output of each hidden neuron with probability 0.5. The neurons which are "dropout out" in this way do not contribute to the forward pass and do not participate in backpropagation.</p>
+                <p>So every time an input is presented, the neural network samples a different architecture, but all these architectures share weights. This technique reduces complex co-adaptations of neurons, since a neuron cannot rely on the presence of particular other neurons.</p>
+                <p>It is, therefore, forced to learn more robust features that are useful in conjunction with many different random subsets of the other neurons. At test time, we use all the neurons but multiply their outputs by 0.5, which is a reasonable approximation to taking the geometric mean of the predictive distributions produced by the exponentially-many dropout networks.</p>
+                <p>We use dropout in the first two fully-connected layers of Figure 3. Without dropout, our network exhibits substantial overfitting. Dropout roughly doubles the number of iterations required to converge.</p>
+
                 <h3>3.2.5 Details of Learning</h3>
+                <p>We trained our models using stochastic gradient descent with a batch size of 128 examples, momentum of 0.9, and weight decay of 0.0005. We found that this small amount of weight decay was important for the model to learn.</p>
+                <p>In other words, weight decay here is not merely a regularizer: it reduces the model’s training error. The update rule for weight \(w\) was:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \[
+                    \begin{flalign*}
+                    & v_{i+1} := 0.9 \cdot v_i - 0.0005 \cdot \epsilon \cdot w_i - \epsilon \cdot {\left[ \frac{\partial L}{\partial w}|w_i \right]}_{D_i} \\
+                    & w_{i+1} := w_i + v_{i+1}
+                    \end{flalign*}
+                    \]
+                </div>
+                <p>where \(i\) is the iteration index, \(v\) is the momentum variable, \(\epsilon\) is the learning rate, and \({\left[ \frac{\partial L}{\partial w}|w_i \right]}_{D_i}\) is the average over the \(i\)th batch \(D_i\) of the derivative of the objective with respect to \(w\), evaluated at \(w_i\).</p>
+                <p>We initialized the weights in each layer from a zero-mean Gaussian distribution with standard deviation 0.01. We initialized the neuron biases in the second, fourth, and fifth convolutional layers, as well as in the fully-connected hidden layers, with the constant 1. This initialization accelerates the early stages of learning by providing the ReLUs with positive inputs. We initialized the neuron biases in the remaining layers with the constant 0.</p>
+                <p>We used an equal learning rate for all layers, which we adjusted manually throughout training. The heuristic which we followed was to divide the learning rate by 10 when the validation error rate stopped improving with the current learning rate. The learning rate was initialized at 0.01 and reduced three times prior to termination. We trained the network for roughly 90 cycles through the training set of 1.2 million images, which took five to six days on two NVIDIA GTX 580 3GB GPUs.</p>
                 
                 <h3 id="section6">3.2.6 Results</h3>
+                <p>Our network achieves top-1 and top-5 test set error rates of 37.5% and 17.0% on ILSVRC-2010. The best performance achieved during the ILSVRC-2010 competition was 47.1% and 28.2% with an approach that averages the predictions produced from six sparse-coding models trained on different features, and since then the best published results are 45.7% and 25.7% with an approach that averages the predictions of two classifiers trained on Fisher Vectors (FVs) computed from two types of densely-sampled features.</p>
+                <p>In short, the model achieved excellent performance at the time and attracted widespread attention to deep neural networks. The three authors soon founded a company, which was later acquired by Google for a high price.</p>
+                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/03_cnn/2_alex_net/alexnet_torch.py">alexnet_torch.py</a> uses PyTorch to quickly implement a similar convolutional architecture. Since the ImageNet dataset is too large, the MNIST dataset is used instead.</p>
+
+
+                <h3>3.1.7 Discussion</h3>
+                <p>Our results show that a large, deep convolutional neural network is capable of achieving record-breaking results on a highly challenging dataset using purely supervised learning. It is notable that our network’s performance degrades if a single convolutional layer is removed. For example, removing any of the middle layers results in a loss of about 2% for the top-1 performance of the network. So the depth really is important for achieving our results.</p>
+                <p>To simplify our experiments, we did not use any unsupervised pre-training even though we expect that it will help, especially if we obtain enough computational power to significantly increase the size of the network without obtaining a corresponding increase in the amount of labeled data.</p>
+                <p>Thus far, our results have improved as we have made our network larger and trained it longer but we still have many orders of magnitude to go in order to match the infero-temporal pathway of the human visual system.</p>
+                <p>Ultimately we would like to use very large and deep convolutional nets on video sequences where the temporal structure provides very helpful information that is missing or far less obvious in static images.</p>
                 <div class="navigation">
                     <a href="cnn_classify_stratch.html">Prev: 3.1 CNN from Stratch</a>
                     <a href="res_net.html">Next: 3.3 ResNet</a>

@@ -32,7 +32,6 @@ class AlexNet(torch.nn.Module):
 
         self.classifier = torch.nn.Sequential(
             torch.nn.Dropout(),
-            # assuming input size is 224x224
             torch.nn.Linear(256 * 6 * 6, 4096),
             torch.nn.ReLU(inplace=True),
             torch.nn.Dropout(),
@@ -83,7 +82,6 @@ if __name__ == '__main__':
             loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
-            print('Loss:', loss.item())
 
         print(f'Epoch [{epoch+1}/10], Loss: {loss.item():.4f}')
 
