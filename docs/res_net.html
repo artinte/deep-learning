@@ -24,7 +24,7 @@
                 <p><em>Deeper neural networks are more difficult to train</em>. We present a <strong>residual learning framework</strong> to ease the training of networks that are substantially deeper than those used previously. We explicitly reformulate the layers as learning residual functions with reference to the layer inputs, instead of learning unreferenced functions. We provide comprehensive empirical evidence showing that these residual networks are easier to optimize, and can gain accuracy from considerably increased depth. On the ImageNet dataset we evaluate residual nets with a depth of up to 152 layers - \(8 \times\) deeper than <a href="https://arxiv.org/abs/1409.1556">VGG nets</a> but still having lower complexity. An ensemble of these residual nets achieves 3.57% error on the ImageNet test set. This result won the 1st place on the ILSVRC 2015 classification task. We also present analysis on CIFAR-10 with 100 and 1000 layers.</p>
                 <p>The depth of representations is of central importance for many visual recognition tasks. Solely due to our extremely deep representations, we obtain a 28% relative improvement on the COCO object detection dataset. Deep residual nets are foundations of our submissions to ILSVRC & COCO 2015 competitions, where we also won the 1st places on the tasks of ImageNet detection, ImageNet localization, COCO detection, and COCO segmentation.</p>
 
-                <h3>3.1 Introduction</h3>
+                <h3>3.3.1 Introduction</h3>
                 <p>Deep convolutional neural networks have led to a series of breakthroughs for image classification. Deep networks naturally integrate low/mid/high-level features and classifiers in an end-to-end multi-layer fashion, and the "levels" of features can be enriched by the number of stacked layers (depth).</p>
                 <p>Recent evidence reveals that network depth is of crucial importance, and the leading results on the challenging ImageNet dataset all exploit "very deep" models, with a depth of sixteen to thirty. Many other non-trivial visual recognition tasks have also greatly benefited from very deep models.</p>
 
@@ -93,6 +93,10 @@
                 </div>
                 <p>We can also use a square matrix \(W_s\) in <a href="#eq1">above equation</a>. But we will show by experiments that the identity mapping is sufficient for addressing the degradation problem and is economical, and thus \(W_s\) is only used when matching dimensions.</p>
                 <p>The form of the residual function \(\mathcal{F}\) is flexible. Experiments in this paper involve a function \(\mathcal{F}\) that has two or three layers (Fig. 2), while more layers are possible.</p>
+                <a href="https://drive.google.com/file/d/1IvhYiuAHYdb-KYoL66SsRqhZJR2kK38B/view?usp=sharing">
+                    <img src="res/03/residual_function.jpg" alt="Residual Function" >
+                </a>
+                <p style="text-align: center; color: #555555;">Figure 2 - Residual Function</p>
 
                 <p>We also note that although the above notations are about fully-connected layers for simplicity, they are applicable to convolutional layers. The function \(\mathcal{F}(x, {W_i})\) can represent multiple convolutional layers. The element-wise addition is performed on two feature maps, channel by channel.</p>
 
@@ -100,6 +104,13 @@
                 <p>We have tested various plain/residual nets, and have observed consistent phenomena. To provide instances for discussion, we describe two models for ImageNet as follows.</p>
 
                 <h5>Plain Network</h5>
+                <p>Our plain baselines (Fig. 3, middle) are mainly inspired by the philosophy of VGG nets (Fig. 3, left). The convolutional layers mostly have \(3 \times 3\) filters and follow two simple design rules:</p>
+                <ol>
+                    <li><p>For the same output feature map size, the layers have the same number of filters;</p></li>
+                    <li><p>If the feature map size is halved, the number of filters is doubled so as to preserve the time complexity per layer.</p></li>
+                </ol>
+                <p>We perform downsampling directly by convolutional layers that have a stride of 2. The network ends with a global average pooling layer and a 1000-way fully-connected layer with softmax. The total number of weighted layers is 34 in Fig. 3 (middle).</p>
+                <p>It is worth noticing that our model has fewer filters and lower complexity than VGG nets. Our 34-layer baseline has 3.6 billion FLOPs (multiply-adds), which is only 18% of VGG-19 (19.6 billion FLOPs).</p>
 
                 <h5>Residual Network</h5>
                 <h4>3.3.3.4 Implementation</h4>
