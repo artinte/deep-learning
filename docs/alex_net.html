@@ -285,7 +285,7 @@
                 <h3 id="section6">3.2.6 Results</h3>
                 <p>Our network achieves top-1 and top-5 test set error rates of 37.5% and 17.0% on ILSVRC-2010. The best performance achieved during the ILSVRC-2010 competition was 47.1% and 28.2% with an approach that averages the predictions produced from six sparse-coding models trained on different features, and since then the best published results are 45.7% and 25.7% with an approach that averages the predictions of two classifiers trained on Fisher Vectors (FVs) computed from two types of densely-sampled features.</p>
                 <p>In short, the model achieved excellent performance at the time and attracted widespread attention to deep neural networks. The three authors soon founded a company, which was later acquired by Google for a high price.</p>
-                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/03_cnn/2_alex_net/alexnet_torch.py">alexnet_torch.py</a> uses PyTorch to quickly implement a similar convolutional architecture. Since the ImageNet dataset is too large, the MNIST dataset is used instead. <code>AlexNet</code> is the core class:</p>
+                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/03_cnn/2_alexnet/alexnet_torch.py">alexnet_torch.py</a> uses PyTorch to quickly implement a similar convolutional architecture. Since the ImageNet dataset is too large, the MNIST dataset is used instead. <code>AlexNet</code> is the core class:</p>
                 <pre><code>class AlexNet(torch.nn.Module):
     def __init__(self, num_classes=1000):
         super(AlexNet, self).__init__()
