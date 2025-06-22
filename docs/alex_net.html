@@ -245,10 +245,21 @@
 
                 <h3 id="section4">3.2.4 Reducing Overfitting</h3>
                 <p>Our neural network architecture has 60 million parameters. Although the 1000 classes of ILSVRC make each training example impose 10 bits of constraint on the mapping from image to label, this turns out to be insufficient to learn so many parameters without considerable overfitting. Below, we describe the two primary ways in which we combat overfitting.</p>
+
                 <h3>3.2.4.1 Data Augmentation</h3>
                 <p>The easiest and most common method to reduce overfitting on image data is to artificially enlarge the dataset using label-preserving transformations. We employ two distinct forms of data augmentation, both of which allow transformed images to be produced from the original images with very little computation, so the transformed images do not need to be stored on disk.</p>
                 <p>In our implementation, the transformed images are generated in Python code on the CPU while the GPU is training on the previous batch of images. So these data augmentation schemes are, in effect, computationally free.</p>
                 <p>The first form of data augmentation consists of generating image translations and horizontal reflections. We do this by extracting random \(224 \times 224\) patches (and their horizontal reflections) from the \(256 \times 256\) images and training our network on these extracted patches.</p>
+                <p>This increases the size of our training set by a factor of 2048, though the resulting training examples are, of course, highly interdependent. Without this scheme, our network suffers from substantial overfitting, which would have forced us to use much smaller networks.</p>
+                <p>At test time, the network makes a prediction by extracting five \(224 \times 224\) patches (the four corner patches and the center patch) as well as their horizontal reflections (hence ten patches in all), and averaging the predictions made by the network’s softmax layer on the ten patches.</p>
+
+                <p>The second form of data augmentation consists of altering the intensities of the RGB channels in training images. Specifically, we perform PCA on the set of RGB pixel values throughout the ImageNet training set. To each training image, we add multiples of the found principal components, with magnitudes proportional to the corresponding eigenvalues times a random variable drawn from a Gaussian with mean zero and standard deviation 0.1. Therefore to each RGB image pixel \(I_{xy} = {[I_{xy}^R, I_{xy}^G, I_{xy}^B]}^T\) we add the following quantity:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \({[p_1, p_2, p_3][\alpha_1 \lambda_1, \alpha_2 \lambda_2, \alpha_3 \lambda_3\]}^T\)
+                </div>
+                <p>where \(p_i\) and \(\lambda_i\) are \(i\)th eigenvector and eigenvalue of the \(3 \times 3\) covariance matrix of RGB pixel values, respectively, and \(a_i\) is the aforementioned random variable. Each \(a_i\) is drawn only once for all the pixels of a particular training image until that image is used for training again, at which point it is re-drawn.</p>
+                <p>This scheme approximately captures an important property of natural images, namely, that object identity is invariant to changes in the intensity and color of the illumination. This scheme reduces the top-1 error rate by over 1%.</p>
+
                 <h3>3.2.4.2 Dropout</h3>
                 <h3>3.2.5 Details of Learning</h3>
                 
