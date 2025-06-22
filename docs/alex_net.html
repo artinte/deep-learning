@@ -285,8 +285,56 @@
                 <h3 id="section6">3.2.6 Results</h3>
                 <p>Our network achieves top-1 and top-5 test set error rates of 37.5% and 17.0% on ILSVRC-2010. The best performance achieved during the ILSVRC-2010 competition was 47.1% and 28.2% with an approach that averages the predictions produced from six sparse-coding models trained on different features, and since then the best published results are 45.7% and 25.7% with an approach that averages the predictions of two classifiers trained on Fisher Vectors (FVs) computed from two types of densely-sampled features.</p>
                 <p>In short, the model achieved excellent performance at the time and attracted widespread attention to deep neural networks. The three authors soon founded a company, which was later acquired by Google for a high price.</p>
-                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/03_cnn/2_alex_net/alexnet_torch.py">alexnet_torch.py</a> uses PyTorch to quickly implement a similar convolutional architecture. Since the ImageNet dataset is too large, the MNIST dataset is used instead.</p>
+                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/03_cnn/2_alex_net/alexnet_torch.py">alexnet_torch.py</a> uses PyTorch to quickly implement a similar convolutional architecture. Since the ImageNet dataset is too large, the MNIST dataset is used instead. <code>AlexNet</code> is the core class:</p>
+                <pre><code>class AlexNet(torch.nn.Module):
+    def __init__(self, num_classes=1000):
+        super(AlexNet, self).__init__()
+        self.features = torch.nn.Sequential(
+            # first conv layer
+            torch.nn.Conv2d(3, 64, kernel_size=11, stride=4, padding=2),
+            torch.nn.ReLU(inplace=True),
+            torch.nn.MaxPool2d(kernel_size=3, stride=2, padding=0),
+            # second conv layer
+            torch.nn.Conv2d(64, 192, kernel_size=5, stride=1, padding=2),
+            torch.nn.ReLU(inplace=True),
+            torch.nn.MaxPool2d(kernel_size=3, stride=2, padding=0),
+            # third conv layer
+            torch.nn.Conv2d(192, 384, kernel_size=3, padding=1),
+            torch.nn.ReLU(inplace=True),
+            # fourth conv layer
+            torch.nn.Conv2d(384, 256, kernel_size=3, padding=1),
+            torch.nn.ReLU(inplace=True),
+            # fifth conv layer
+            torch.nn.Conv2d(256, 256, kernel_size=3, padding=1),
+            torch.nn.ReLU(inplace=True),
+            torch.nn.MaxPool2d(kernel_size=3, stride=2),
+        )
 
+        self.classifier = torch.nn.Sequential(
+            torch.nn.Dropout(),
+            torch.nn.Linear(256 * 6 * 6, 4096),
+            torch.nn.ReLU(inplace=True),
+            torch.nn.Dropout(),
+            torch.nn.Linear(4096, 4096),
+            torch.nn.ReLU(inplace=True),
+            torch.nn.Linear(4096, num_classes),
+        )
+
+    def forward(self, x):
+        x = self.features(x)
+        x = torch.flatten(x, 1)
+        x = self.classifier(x)
+        return x</code></pre>
+    
+                <p>You can run <span class="highlight">alexnet_torch.py</span> script, the process are as follows:</p>
+                <pre><samp>Epoch [1/5], Loss: 0.0909
+Epoch [2/5], Loss: 0.0422
+Epoch [3/5], Loss: 0.0452
+Epoch [4/5], Loss: 0.0760
+Epoch [5/5], Loss: 0.0806
+Accuracy of the model: 99.12%
+                </samp></pre>
+                <p>In the end, we achieved an accuracy of <em>99.12%</em>.</p>
 
                 <h3>3.1.7 Discussion</h3>
                 <p>Our results show that a large, deep convolutional neural network is capable of achieving record-breaking results on a highly challenging dataset using purely supervised learning. It is notable that our network’s performance degrades if a single convolutional layer is removed. For example, removing any of the middle layers results in a loss of about 2% for the top-1 performance of the network. So the depth really is important for achieving our results.</p>

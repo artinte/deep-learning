@@ -10,20 +10,16 @@ class AlexNet(torch.nn.Module):
             torch.nn.Conv2d(3, 64, kernel_size=11, stride=4, padding=2),
             torch.nn.ReLU(inplace=True),
             torch.nn.MaxPool2d(kernel_size=3, stride=2, padding=0),
-
             # second conv layer
             torch.nn.Conv2d(64, 192, kernel_size=5, stride=1, padding=2),
             torch.nn.ReLU(inplace=True),
             torch.nn.MaxPool2d(kernel_size=3, stride=2, padding=0),
-
             # third conv layer
             torch.nn.Conv2d(192, 384, kernel_size=3, padding=1),
             torch.nn.ReLU(inplace=True),
-
             # fourth conv layer
             torch.nn.Conv2d(384, 256, kernel_size=3, padding=1),
             torch.nn.ReLU(inplace=True),
-
             # fifth conv layer
             torch.nn.Conv2d(256, 256, kernel_size=3, padding=1),
             torch.nn.ReLU(inplace=True),
@@ -49,32 +45,42 @@ class AlexNet(torch.nn.Module):
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-transform = torchvision.transforms.Compose([
-    torchvision.transforms.Resize((224, 224)),
-    torchvision.transforms.Grayscale(
-        num_output_channels=3),  # AlexNet expects 3 channels
-    torchvision.transforms.ToTensor(),
-    torchvision.transforms.Normalize((0.5,), (0.5,))
-])
+transform = torchvision.transforms.Compose(
+    [
+        torchvision.transforms.Resize((224, 224)),
+        torchvision.transforms.Grayscale(
+            num_output_channels=3
+        ),  # AlexNet expects 3 channels
+        torchvision.transforms.ToTensor(),
+        torchvision.transforms.Normalize((0.5,), (0.5,)),
+    ]
+)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     train_set = torchvision.datasets.MNIST(
-        root='./data', train=True, download=True, transform=transform)
+        root="./data", train=True, download=True, transform=transform
+    )
     train_loader = torch.utils.data.DataLoader(
-        train_set, batch_size=64, shuffle=True, num_workers=2)
+        train_set, batch_size=128, shuffle=True, num_workers=2
+    )
     test_set = torchvision.datasets.MNIST(
-        root='./data', train=False, download=True, transform=transform)
+        root="./data", train=False, download=True, transform=transform
+    )
     test_loader = torch.utils.data.DataLoader(
-        test_set, batch_size=64, shuffle=False, num_workers=2)
+        test_set, batch_size=128, shuffle=False, num_workers=2
+    )
 
     net = AlexNet(num_classes=10).to(device)
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(net.parameters(), lr=0.001)
 
-    for epoch in range(10):  # example for 10 epochs
+    print(net)
+
+    epochs = 5
+    for epoch in range(epochs):  # example for 10 epochs
         net.train()
         # Assuming train_loader is defined and provides batches of images and labels
-        for images, labels in train_loader:
+        for idx, (images, labels) in enumerate(train_loader):
             images, labels = images.to(device), labels.to(device)
 
             optimizer.zero_grad()
@@ -83,12 +89,15 @@ if __name__ == '__main__':
             loss.backward()
             optimizer.step()
 
-        print(f'Epoch [{epoch+1}/10], Loss: {loss.item():.4f}')
+            if (idx + 1) % 50 == 0:
+                print(f"Loss: {loss.item():.4f}")
+
+        print(f"Epoch [{epoch+1}/{epochs}], Loss: {loss.item():.4f}")
 
     net.eval()
     correct = 0
     total = 0
-    with torch.no_grad:
+    with torch.no_grad():
         for images, labels in test_loader:
             images, labels = images.to(device), labels.to(device)
             outputs = net(images)
@@ -96,4 +105,4 @@ if __name__ == '__main__':
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
 
-    print(f'Accuracy of the model: {100 * correct / total:.2f}%')
+    print(f"Accuracy of the model: {100 * correct / total:.2f}%")
