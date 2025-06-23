@@ -66,6 +66,19 @@
                 <p>The dimensions also tell us the bottleneck of our model. Note that because \(x_t\) is a one-hot vector, multiplying it with \(U\) is essentially the same as selecting a column of U, so we don’t need to perform the full multiplication. Then, the biggest matrix multiplication in our network is \(V_{s_t}\). That’s why we want to keep our vocabulary size small if possible.</p>
                 <p>Armed with this, it’s time to start our implementation.</p>
                 <h4>4.4.3.1 Initialization</h4>
+
+                <h3>4.4.4 Long Short-Term Memory Unit</h3>
+                <p>The Long Short-Term Memory (LSTM) unit was initially proposed by Hochreiter and Schmidhuber. Since then, a number of minor modifications to the original LSTM unit have been made. We follow the implementation of LSTM as used in Graves.</p>
+                <p>Unlike to the recurrent unit which simply computes a weighted sum of the input signal and applies a nonlinear function, each \(j\)-th LSTM unit maintains a memory \(c_t^j\) at time \(t\). The output \(h_t^j\), or the activation, of the LSTM unit is then:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(h_t^j = o_t^j tanh(c_t^j)\)
+                </div>
+                <p>where \(o_t^j\) is an output gate that modulates the amount of memory content exposure. The output gate is computed by:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\)
+                </div>
+
+                <h3>4.4.5 </h3>
                 <div class="navigation">
                     <a href="word2vec.html">Prev: 4.3 Word2Vec</a>
                     <a href="nmt_align.html">Next: 4.5 Neural Machine Translation</a>
