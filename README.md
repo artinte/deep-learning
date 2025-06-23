@@ -40,11 +40,12 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 ### 05 Transformer
 
 - 5.1 [Attention Mechanism](https://artinte.github.io/deep-learning/attention_mechanism.html)
-- 5.2 [nn.Transformer](https://artinte.github.io/deep-learning/nn_transformer.html)
-- 5.3 [Transformer from Stratch](https://artinte.github.io/deep-learning/transformer_stratch.html)
-- 5.4 [nanoGPT](https://artinte.github.io/deep-learning/nano_gpt.html)
-- 5.5 [BERT](https://artinte.github.io/deep-learning/bert.html)
-- 5.6 [Vision Transformer](https://artinte.github.io/deep-learning/vision_transformer.html)
+- 5.2 [Attention Is All You Need](https://artinte.github.io/deep-learning/transformer_paper.html)
+- 5.3 [nn.Transformer](https://artinte.github.io/deep-learning/nn_transformer.html)
+- 5.4 [Transformer from Stratch](https://artinte.github.io/deep-learning/transformer_stratch.html)
+- 5.5 [nanoGPT](https://artinte.github.io/deep-learning/nano_gpt.html)
+- 5.6 [BERT](https://artinte.github.io/deep-learning/bert.html)
+- 5.7 [Vision Transformer](https://artinte.github.io/deep-learning/vision_transformer.html)
 
 ### 06 Diffusion Model
 
