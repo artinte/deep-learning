@@ -19,8 +19,33 @@
 
             <main class="col-md-8 content">
                 <h2 class="custom-title">9.2 Transfer Learning</h2>
-                <p class="title-subtext"></p>
-                <p style="color: #a0a0a0;">Created Date: 2025-06-02</p>
+                <p class="title-subtext">Transfer Learning for Computer Vision Tutorial</p>
+                <p style="color: #a0a0a0;">Created Date: 2025-06-23</p>
+
+                <p>In this tutorial, you will learn how to train a convolutional neural network for image classification using transfer learning. You can read more about the transfer learning at cs231n notes</p>
+                
+                <p>In practice, very few people train an entire Convolutional Network from scratch (with random initialization), because it is relatively rare to have a dataset of sufficient size. Instead, it is common to pretrain a ConvNet on a very large dataset (e.g. ImageNet, which contains 1.2 million images with 1000 categories), and then use the ConvNet either as an initialization or a fixed feature extractor for the task of interest.</p>
+
+                <p>These two major transfer learning scenarios look as follows:</p>
+                <ul class="with-bullets">
+                    <li><p>Finetuning the ConvNet: Instead of random initialization, we initialize the network with a pretrained network, like the one that is trained on imagenet 1000 dataset. Rest of the training looks as usual.</p></li>
+                    <li><p>ConvNet as fixed feature extractor: Here, we will freeze the weights for all of the network except that of the final fully connected layer. This last fully connected layer is replaced with a new one with random weights and only this layer is trained.</p></li>
+                </ul>
+
+                <h3>9.2.1 Load Data</h3>
+                <p>We will use torchvision and torch.utils.data packages for loading the data.</p>
+                <p>The problem we’re going to solve today is to train a model to classify ants and bees. We have about 120 training images each for ants and bees. There are 75 validation images for each class. Usually, this is a very small dataset to generalize upon, if trained from scratch. Since we are using transfer learning, we should be able to generalize reasonably well.</p>
+                <p>This dataset is a very small subset of imagenet.</p>
+
+                <h3>9.2.2 Training the Model</h3>
+
+                <h3>9.2.3 Finetuning the ConvNet</h3>
+
+                <h3>9.2.4 ConvNet as Fixed Feature Extractor</h3>
+
+                <h3>9.2.5 Inference on Custom Images</h3>
+
+                <h3>9.2.6 Further Learning</h3>
 
                 <div class="navigation">
                     <a href="object_detection.html">Prev: 9.1 Object Detection</a>
