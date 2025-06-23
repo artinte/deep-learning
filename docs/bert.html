@@ -32,9 +32,28 @@
                 <p>Unlike left-to-right language model pre-training, the MLM objective enables the representation to fuse the left and the right context, which allows us to pretrain a deep bidirectional Transformer. In addition to the masked language model, we also use a "next sentence prediction" task that jointly pretrains text-pair representations. The contributions of our paper are as follows:</p>
                 <ul class="with-bullets">
                     <li><p>We demonstrate the importance of bidirectional pre-training for language representations. Unlike Radford et al. (2018), which uses unidirectional language models for pre-training, BERT uses masked language models to enable pretrained deep bidirectional representations. This is also in contrast to Peters et al. (2018a), which uses a shallow concatenation of independently trained left-to-right and right-to-left LMs.</p></li>
-                    
+                    <li><p>We show that pre-trained representations reduce the need for many heavily-engineered task-specific architectures. BERT is the first finetuning based representation model that achieves state-of-the-art performance on a large suite of sentence-level and token-level tasks, outperforming many task-specific architectures.</p></li>
+                    <li><p>BERT advances the state of the art for eleven NLP tasks.</p></li>
                 </ul>
+                
                 <h3>5.5.2 Related Work</h3>
+                <p>There is a long history of pre-training general language representations, and we briefly review the most widely-used approaches in this section.</p>
+
+                <h4>5.5.2.1 Unsupervised Feature-based Approaches</h4>
+                <p>Learning widely applicable representations of words has been an active area of research for decades, including non-neural and neural methods. Pre-trained word embeddings are an integral part of modern NLP systems, offering significant improvements over embeddings learned from scratch.</p>
+                <p>To pretrain word embedding vectors, left-to-right language modeling objectives have been used, as well as objectives to discriminate correct from incorrect words in left and right context.</p>
+                <p>These approaches have been generalized to coarser granularities, such as sentence embeddings or paragraph embeddings. To train sentence representations, prior work has used objectives to rank candidate next sentences, left-to-right generation of next sentence words given a representation of the previous sentence, or denoising auto-encoder derived objectives.</p>
+                <p>ELMo and its predecessor generalize traditional word embedding research along a different dimension. They extract context-sensitive features from a left-to-right and a right-to-left language model. The contextual representation of each token is the concatenation of the left-to-right and right-to-left representations.</p>
+                <p>When integrating contextual word embeddings with existing task-specific architectures, ELMo advances the state of the art for several major NLP benchmarks including question answering, sentiment analysis, and named entity recognition.</p>
+
+                <h4>5.5.2.2 Unsupervised Fine-tuning Approaches</h4>
+                <p>As with the feature-based approaches, the first works in this direction only pre-trained word embedding parameters from unlabeled text.</p>
+                <p>More recently, sentence or document encoders which produce contextual token representations have been pre-trained from unlabeled text and fine-tuned for a supervised downstream task.</p>
+                <p>The advantage of these approaches is that few parameters need to be learned from scratch. At least partly due to this advantage, OpenAI GPT achieved previously state-of-the-art results on many sentence-level tasks from the GLUE benchmark.  Left-to-right language modeling and auto-encoder objectives have been used for pre-training such models.</p>
+
+                <h4>5.5.2.3 Transfer Learning from Supervised Data</h4>
+                <p>There has also been work showing effective transfer from supervised tasks with large datasets, such as natural language inference and machine translation. Computer vision research has also demonstrated the importance of transfer learning from large pre-trained models, where an effective recipe is to fine-tune models pre-trained with ImageNet.</p>
+                
                 <h3>5.5.3 BERT</h3>
                 <h3>5.5.4 Experiments</h3>
                 <h3>5.5.5 Ablation Studies</h3>
