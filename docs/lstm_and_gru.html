@@ -19,8 +19,8 @@
 
             <main class="col-md-8 content">
                 <h2 class="custom-title">4.4 LTSM and GRU</h2>
-                <p class="title-subtext"></p>
-                <p style="color: #a0a0a0;">Created Date: 2025-05-17</p>
+                <p class="title-subtext">Empirical Evaluation of Gated Recurrent Neural Networks on Sequence Modeling</p>
+                <p style="color: #a0a0a0;">Created Date: 2025-06-23</p>
 
                 <h3 id="language_model">4.4.1 Language Modeling</h3>
                 <p>Our goal is to build a Language Model using a Recurrent Neural Network. Here’s what that means. Let’s say we have sentence of \(m\) words. A language model allows us to predict the probability of observing the sentence (in a given dataset) as:</p>
@@ -75,10 +75,35 @@
                 </div>
                 <p>where \(o_t^j\) is an output gate that modulates the amount of memory content exposure. The output gate is computed by:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
-                    \(\)
+                    \(o_t^j = \sigma {(W_o x_t + U_o h_{t-1} + V_o c_t)}^j\)
                 </div>
+                <p>where \(sigma\) is a logistic sigmoid function. \(V_o\) is a diagonal matrix.</p>
+                <p>The memory cell \(c_t^j\) is updated by partially forgetting the existing memory and adding a new memory content \({\tilde {c}}_t^j\):</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(c_t^j = f_t^j c_{t-1}^j + i_t^j {\tilde {c}}_t^j\)
+                </div>
+                <p>where the new memory content is:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \({\tilde {c}}_t^j = tanh{(W_c x_t + U_c h_{t-1})}^j\)
+                </div>
+                <p>The extent to which the existing memory is forgotten is modulated by a forget gate \(f_t^j\), and the degree to which the new memory content is added to the memory cell is modulated by an input gate \(i_t^j\). Gates are computed by</p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(f_t^j = \sigma {(W_f x_t + U_f h_{t-1} + V_f c_{t-1})}^j\)
+                </p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(i_t^j = \sigma {(W_i x_t + U_i h_{t-1} + V_i c_{t-1})}^j\)
+                </p>
+                <p>Note tha \(V_f\) and \(V_i\) are diagonal matrices.</p>
 
-                <h3>4.4.5 </h3>
+                <p>Unlike to the traditional recurrent unit which overwrites its content at each time-step, an LSTM unit is able to decide whether to keep the existing memory via the introduced gates. Intuitively, if the LSTM unit detects an important feature from an input sequence at early stage, it easily carries this information (the existence of the feature) over a long distance, hence, capturing potential long-distance dependencies.</p>
+                
+                <h3>4.4.5 Gated Recurrent Unit</h3>
+                <p>A gated recurrent unit (GRU) was proposed by Cho et al. [2014] to make each recurrent unit to adaptively capture dependencies of different time scales. Similarly to the LSTM unit, the GRU has gating units that modulate the flow of information inside the unit, however, without having a separate memory cells.</p>
+                <p>The activation \(h_t^j\) of the GRU at time \(t\) is a linear interpolation between the previous activation \(h_{t-1}^j\) and the candidate activation \({\tilde {h}}_t^j\):</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    
+                </div>
+                
                 <div class="navigation">
                     <a href="word2vec.html">Prev: 4.3 Word2Vec</a>
                     <a href="nmt_align.html">Next: 4.5 Neural Machine Translation</a>
