@@ -19,8 +19,35 @@
 
             <main class="col-md-8 content">
                 <h2 class="custom-title">13.4 Distillation</h2>
-                <p class="title-subtext"></p>
-                <p style="color: #a0a0a0;">Created Date: 2025-06-08</p>
+                <p class="title-subtext">Knowledge Distillation Tutorial</p>
+                <p style="color: #a0a0a0;">Created Date: 2025-06-23</p>
+                <p>Knowledge distillation is a technique that enables knowledge transfer from large, computationally expensive models to smaller ones without losing validity. This allows for deployment on less powerful hardware, making evaluation faster and more efficient.</p>
+                <p>In this tutorial, we will run a number of experiments focused at improving the accuracy of a lightweight neural network, using a more powerful network as a teacher. The computational cost and the speed of the lightweight network will remain unaffected, our intervention only focuses on its weights, not on its forward pass. Applications of this technology can be found in devices such as drones or mobile phones. In this tutorial, we do not use any external packages as everything we need is available in torch and torchvision.</p>
+                <p>In this tutorial, you will learn:</p>
+                <ul class="with-bullets">
+                    <li><p>How to modify model classes to extract hidden representations and use them for further calculations;</p></li>
+                    <li><p>How to modify regular train loops in PyTorch to include additional losses on top of, for example, cross-entropy for classification;</p></li>
+                    <li><p>How to improve the performance of lightweight models by using more complex models as teachers.</p></li>
+                </ul>
+
+                <h3>13.4.1 Prerequisites</h3>
+
+                <h3>13.4.2 Loading CIFAR-10</h3>
+
+                <h3>13.4.3 Defining Model Classes and Utility Functions</h3>
+
+                <h3>13.4.4 Cross-Entropy Runs</h3>
+
+                <h3>13.4.5 Knowledge Distillation Run</h3>
+
+                <h3>13.4.6 Cosine Loss Minimization Run</h3>
+
+                <h3>13.4.7 Intermediate Regressor Run</h3>
+
+                <h3>13.4.8 Conclusion</h3>
+                <p>None of the methods above increases the number of parameters for the network or inference time, so the performance increase comes at the little cost of calculating gradients during training. In ML applications, we mostly care about inference time because training happens before the model deployment. If our lightweight model is still too heavy for deployment, we can apply different ideas, such as post-training quantization.</p>
+                <p>Additional losses can be applied in many tasks, not just classification, and you can experiment with quantities like coefficients, temperature, or number of neurons. Feel free to tune any numbers in the tutorial above, but keep in mind, if you change the number of neurons / filters chances are a shape mismatch might occur.</p>
+                
 
                 <div class="navigation">
                     <a href="quantization.html">Prev: 13.3 Quantization</a>
