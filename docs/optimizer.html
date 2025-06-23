@@ -20,7 +20,17 @@
             <main class="col-md-8 content">
                 <h2 class="custom-title">2.6 Optimizer</h2>
                 <p class="title-subtext"></p>
-                <p style="color: #a0a0a0;">Created Date: 2025-05-10</p>
+                <p style="color: #a0a0a0;">Created Date: 2025-06-23</p>
+
+                <h3>2.6.1 Basic Usage</h3>
+                <p>To use torch.optim you have to construct an optimizer object that will hold the current state and will update the parameters based on the computed gradients.</p>
+                <p>To construct an Optimizer you have to give it an iterable containing the parameters (all should be Parameter s) or named parameters (tuples of (str, Parameter)) to optimize. Then, you can specify optimizer-specific options such as the learning rate, weight decay, etc. Example:</p>
+                <pre><code>optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
+optimizer = optim.Adam([var1, var2], lr=0.0001)</code></pre>
+
+                <h3 id="sgd">2.6.1 Stochastic Gradient Descent (SGD)</h3>
+
+                <h3>2.6.2 Adam</h3>
 
                 <div class="navigation">
                     <a href="loss_function.html">Prev: 2.5 Loss Function</a>
