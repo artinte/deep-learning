@@ -62,11 +62,12 @@
                             <a class="nav-link" href="#section5" onclick="toggleChildChapters(event, 'chapter5')">05 Transformer</a>
                             <ul id="chapter5" class="child-chapters" style="display: none;">
                                 <li><a class="nav-link" href="attention_mechanism.html">5.1 Attention Mechanism</a></li>
-                                <li><a class="nav-link" href="nn_transformer.html">5.2 nn.Transformer</a></li>
-                                <li><a class="nav-link" href="transformer_stratch.html">5.3 Transformer from Stratch</a></li>
-                                <li><a class="nav-link" href="nano_gpt.html">5.4 nanoGPT</a></li>
-                                <li><a class="nav-link" href="bert.html">5.5 BERT</a></li>
-                                <li><a class="nav-link" href="vision_transformer.html">5.6 Vision Transformer</a></li>
+                                <li><a class="nav-link" href="transformer_paper.html">5.2 Attention Is All You Need</a></li>
+                                <li><a class="nav-link" href="nn_transformer.html">5.3 nn.Transformer</a></li>
+                                <li><a class="nav-link" href="transformer_stratch.html">5.4 Transformer from Stratch</a></li>
+                                <li><a class="nav-link" href="nano_gpt.html">5.5 nanoGPT</a></li>
+                                <li><a class="nav-link" href="bert.html">5.6 BERT</a></li>
+                                <li><a class="nav-link" href="vision_transformer.html">5.7 Vision Transformer</a></li>
                             </ul>
                         </li>
                         <li class="nav-item">
@@ -349,27 +350,36 @@
                         </h3>
                         <p><a href="https://www.ibm.com/think/topics/attention-mechanism">What is an attention mechanism?</a></p>
                         <p><a href="https://d2l.ai/chapter_attention-mechanisms-and-transformers/index.html">Attention Mechanisms and Transformers</a></p>
+
                         <h3 id="section5-sub2">
-                            <a href="nn_transformer.html" style="color: inherit;">5.2 nn.Transformer</a>
+                            <a href="transformer_paper.html" style="color: inherit;">5.2 Attention Is All You Need</a>
+                        </h3>
+                        <p>We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train.</p>
+                        <p><a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a></p>
+                        
+                        <h3 id="section5-sub3">
+                            <a href="nn_transformer.html" style="color: inherit;">5.3 nn.Transformer</a>
                         </h3>
                         <p><a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a></p>
                         <p><a href="https://d2l.ai/chapter_attention-mechanisms-and-transformers/index.html">Attention Mechanisms and Transformers</a></p>
-                        <h3 id="section5-sub3">
-                            <a href="transformer_stratch.html" style="color: inherit;">5.3 Transformer from Stratch</a>
+
+                        <h3 id="section5-sub4">
+                            <a href="transformer_stratch.html" style="color: inherit;">5.4 Transformer from Stratch</a>
                         </h3>
                         <p><a href="https://nlp.seas.harvard.edu/annotated-transformer/">The Annotated Transformer</a></p>
-                        <h3 id="section5-sub4">
-                            <a href="nano_gpt.html" style="color: inherit;">5.4 nanoGPT</a>
+
+                        <h3 id="section5-sub5">
+                            <a href="nano_gpt.html" style="color: inherit;">5.5 nanoGPT</a>
                         </h3>
                         <p><a href="https://github.com/karpathy/nanoGPT">The simplest, fastest repository for training/finetuning medium-sized GPTs</a></p>
 
-                        <h3 id="section5-sub5">
-                            <a href="bert.html" style="color: inherit;">5.5 BERT</a>
+                        <h3 id="section5-sub6">
+                            <a href="bert.html" style="color: inherit;">5.6 BERT</a>
                         </h3>
                         <p>We introduce a new language representation model called <strong>BERT</strong>, which stands for Bidirectional Encoder Representations from Transformers. Unlike recent language representation models, BERT is designed to pre-train deep bidirectional representations from unlabeled text by jointly conditioning on both left and right context in all layers.</p>
                         <p><a href="https://arxiv.org/abs/1810.04805">BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding</a></p>
-                        <h3 id="section5-sub6">
-                            <a href="vision_transformer.html" style="color: inherit;">5.6 Vision Transformer</a>
+                        <h3 id="section5-sub7">
+                            <a href="vision_transformer.html" style="color: inherit;">5.7 Vision Transformer</a>
                         </h3>
                         <p>In vision, attention is either applied in conjunction with convolutional networks, or used to replace certain components of convolutional networks while keeping their overall structure in place. We show that this reliance on CNNs is not necessary and a pure transformer applied directly to sequences of image patches can perform very well on image classification tasks.</p>
                         <p><a href="https://arxiv.org/abs/2010.11929">An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale</a></p>
@@ -578,6 +588,7 @@
                         </h3>
                         <p><strong>Knowledge distillation</strong> is a technique that enables knowledge transfer from large, computationally expensive models to smaller ones without losing validity. This allows for deployment on less powerful hardware, making evaluation faster and more efficient.</p>
                         <p><a href="https://docs.pytorch.org/tutorials/beginner/knowledge_distillation_tutorial.html">Knowledge Distillation Tutorial</a></p>
+                        <p><a href="https://arxiv.org/abs/1503.02531">Distilling the Knowledge in a Neural Network</a></p>
                     </section>
 
                     <section id="section14" class="content-section">
