@@ -44,7 +44,7 @@
                     <li><p><code>device</code>: Determines the device to run the workload on. Can be either CPU or GPU depending on availability.</p></li>
                 </ul>
                 <p>Our test function is similar, but it will be invoked with <code>test_loader</code> to load images from the test set.</p>
-                <img src="res/13/train_separate.png" alt="Train Separately">
+                <img src="res/13/train_separate.png" alt="Train Separately" width="600">
                 
                 <p>Train both networks with Cross-Entropy. The student will be used as a baseline:</p>
                 <p>For reproducibility, we need to set the torch manual seed. We train networks using different methods, so to compare them fairly, it makes sense to initialize the networks with the same weights. Start by training the teacher network using cross-entropy:</p>
