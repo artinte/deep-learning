@@ -20,10 +20,9 @@ train_dataset = torchvision.datasets.CIFAR10(
 test_dataset = torchvision.datasets.CIFAR10(
     root='./data', train=False, download=True, transform=transforms_cifar)
 
-# Deeper neural network class to be used as teacher.
-
 
 class DeepNN(torch.nn.Module):
+    # Deeper neural network class to be used as teacher.
     def __init__(self, num_classes=10):
         super(DeepNN, self).__init__()
         self.features = torch.nn.Sequential(
@@ -51,10 +50,9 @@ class DeepNN(torch.nn.Module):
         x = self.classifier(x)
         return x
 
-# Lightweight neural network class to be used as student:
 
-
-class LightNN(nn.Module):
+class LightNN(torch.nn.Module):
+    # Lightweight neural network class to be used as student
     def __init__(self, num_classes=10):
         super(LightNN, self).__init__()
         self.features = torch.nn.Sequential(
@@ -79,9 +77,88 @@ class LightNN(nn.Module):
         return x
 
 
+def train(model, train_loader, epochs, learnint_rate, device):
+    criterion = torch.nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=learnint_rate)
+    
+    model.train()
+    
+    for epoch in range(epochs): 
+        running_loss = 0.0
+        for inputs, labels in train_loader:
+            # inputs: A collection of batch_size images
+            # labels: A vector of dimensionality batch_size with integers denoting class of each image
+            inputs, labels = inputs.to(device), labels.to(device)
+            
+            optimizer.zero_grad()
+            outputs = model.forward(inputs)
+            
+            # outputs: Output of the network for the collection of images.
+            # A tensor of dimensionality batch_size x num_classes
+            # labels: The actual labels of the images. Vector of dimensionality batch_size
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step
+            
+            running_loss += loss.item()
+        
+        print(f'Epoch [{epoch + 1}/{epochs}], Loss: {running_loss / len(train_loader):.4f}')
+
+def test(model, test_loader, device):
+    model.to(device)
+    model.eval()
+
+    correct = 0
+    total = 0
+    
+    with torch.no_grad():
+        for inputs, labels in test_loader:
+            inputs, labels = inputs.to(device), labels.to(device)
+            
+            outputs = model.forward(inputs)
+            _, predicted = torch.max(outputs.data, 1)
+            
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+    
+    accuracy = 100 * correct / total
+    print(f'Accuracy of the model on the test set: {accuracy:.2f}%')
+    return accuracy
+
+
 if __name__ == '__main__':
     # Dataloaders
     train_loader = torch.utils.data.DataLoader(
         train_dataset, batch_size=128, shuffle=True, num_workers=2)
     test_loader = torch.utils.data.DataLoader(
         test_dataset, batch_size=128, shuffle=False, num_workers=2)
+    
+    torch.manual_seed(42)
+    nn_deep = DeepNN(num_classes=10).to(device)
+    train(nn_deep, train_loader, epochs=10, learnint_rate=0.001, device=device)
+    test_accuracy_deep = test(nn_deep, test_loader, device=device)
+    
+    # Initialize the lightweight neural network.
+    torch.manual_seed(42)
+    nn_light = LightNN(num_classes=10).to(device)
+    
+    torch.manual_seed(42)
+    new_nn_light = LightNN(num_classes=10).to(device)
+    
+    # Print the norm of the first layer of the initial lightweight model
+    print("Norm of 1st layer of nn_light:", torch.norm(nn_light.features[0].weight).item())
+    # Print the norm of the first layer of the new lightweight model
+    print("Norm of 1st layer of new_nn_light:", torch.norm(new_nn_light.features[0].weight).item())
+    
+    total_params_deep = "{:,}".format(sum(p.numel() for p in nn_deep.parameters()))
+    print(f"DeepNN parameters: {total_params_deep}")
+    total_params_light = "{:,}".format(sum(p.numel() for p in nn_light.parameters()))
+    print(f"LightNN parameters: {total_params_light}")
+    
+    train(nn_light, train_loader, epochs=10, learning_rate=0.001, device=device)
+    test_accuracy_light_ce = test(nn_light, test_loader, device)
+    
+    print(f"Teacher accuracy: {test_accuracy_deep:.2f}%")
+    print(f"Student accuracy: {test_accuracy_light_ce:.2f}%")
+    
+
