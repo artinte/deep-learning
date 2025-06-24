@@ -65,8 +65,20 @@
                 <p>This is valuable information. Remember that \(U\), \(V\) and \(W\) are the parameters of our network we want to learn from data. Thus, we need to learn a total of \(2HC + H^2\) parameters. In the case of \(C = 8000\) and \(H = 100\) that’s 1,610,000.</p>
                 <p>The dimensions also tell us the bottleneck of our model. Note that because \(x_t\) is a one-hot vector, multiplying it with \(U\) is essentially the same as selecting a column of U, so we don’t need to perform the full multiplication. Then, the biggest matrix multiplication in our network is \(V_{s_t}\). That’s why we want to keep our vocabulary size small if possible.</p>
                 <p>Armed with this, it’s time to start our implementation.</p>
+                
                 <h4>4.4.3.1 Initialization</h4>
+                <p>We start by declaring a RNN class an initializing our parameters. I’m calling this class <code>RNNNumpy</code>. Initializing the parameters \(U\), \(V\) and \(W\) is a bit tricky. We can’t just initialize them to 0’s because that would result in symmetric calculations in all our layers. We must initialize them randomly. Because proper initialization seems to have an impact on training results there has been lot of research in this area. It turns out that the best initialization depends on the activation function (\(tanh\ in our case), and one recommended approach is to initialize the weights randomly in the interval from:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \([-\frac{1}{\sqrt{n}}, \frac{1}{\sqrt{n}}]\)
+                </div>
+                <p>where \(n\) is the number of incoming connections from the previous layer. This may sound overly complicated, but don’t worry too much it. As long as you initialize your parameters to small random values it typically works out fine.</p>
+                <p>Above, <code>word_dim</code> is the size of our vocabulary, and <code>hidden_dim</code> is the size of our hidden layer (we can pick it). Don’t worry about the <code>bptt_truncate</code> parameter for now, we’ll explain what that is later.</p>
 
+                <h4>4.4.3.2 Forward Propagation</h4>
+                <p>Next, let’s implement the forward propagation, predicting word probabilities, defined by our equations above:</p>
+
+                <p>We not only return the calculated outputs, but also the hidden states. We will use them later to calculate the gradients, and by returning them here we avoid duplicate computation. Each \(o_t\) is a vector of probabilities representing the words in our vocabulary, but sometimes, for example when evaluating our model, all we want is the next word with the highest probability. We call this function <code>predict</code>.</code></p>
+                
                 <h3>4.4.4 Long Short-Term Memory Unit</h3>
                 <p>The Long Short-Term Memory (LSTM) unit was initially proposed by Hochreiter and Schmidhuber. Since then, a number of minor modifications to the original LSTM unit have been made. We follow the implementation of LSTM as used in Graves.</p>
                 <p>Unlike to the recurrent unit which simply computes a weighted sum of the input signal and applies a nonlinear function, each \(j\)-th LSTM unit maintains a memory \(c_t^j\) at time \(t\). The output \(h_t^j\), or the activation, of the LSTM unit is then:</p>
