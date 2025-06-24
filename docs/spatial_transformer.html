@@ -42,12 +42,43 @@
                 <p>The rest of the paper is organised as follows: Sect. 2 discusses some work related to our own, we introduce the formulation and implementation of the spatial transformer in Sect. 3, and finally give the results of experiments in Sect. 4. Additional experiments and implementation details are given in Appendix A.</p>
                 
                 <h3>9.4.2 Related Work</h3>
+
+                <h3>9.4.3 Spatial Transformers</h3>
                 <p>In this section we describe the formulation of a spatial transformer. This is a differentiable module which applies a spatial transformation to a feature map during a single forward pass, where the transformation is conditioned on the particular input, producing a single output feature map.</p>
                 <p>For multi-channel inputs, the same warping is applied to each channel. For simplicity, in this section we consider single transforms and single outputs per transformer, however we can generalise to multiple transformations, as shown in experiments.</p>
 
                 <p>The spatial transformer mechanism is split into three parts, shown in Fig. 2. In order of computation, first a localisation network (Sect. 3.1) takes the input feature map, and through a number of hidden layers outputs the parameters of the spatial transformation that should be applied to the feature map – this gives a transformation conditional on the input.</p>
                 <p>Then, the predicted transformation parameters are used to create a sampling grid, which is a set of points where the input map should be sampled to produce the transformed output. This is done by the grid generator, described in Sect. 3.2. Finally, the feature map and the sampling grid are taken as inputs to the sampler, producing the output map sampled from the input at the grid points (Sect. 3.3).</p>
                 <p>The combination of these three components forms a spatial transformer and will now be described in more detail in the following sections.</p>
+
+                <h4>9.4.3.1 Localisation Network</h4>
+                <p>The localisation network takes the input feature map \(U \in \mathbb{R}^{H \times W \times C}\) with width \(W\), height \(H\) and \(C\) channels and outputs \(\theta\), the parameters of the transformation \(\mathcal{T}_{\theta}\) to be applied to the feature map:</p>
+
+                <p>The size of \(\theta\) can vary depending on the transformation type that is parameterised, e.g. for an affine transformation \(\theta\) is 6-dimensional as in (10).</p>
+                <p>The localisation network function \(f_{loc}()\) can take any form, such as a fully-connected network or a convolutional network, but should include a final regression layer to produce the transformation parameters \(\theta\).</p>
+
+                <h4>9.4.3.2 Parameterised Sampling Grid</h4>
+                <p>To perform a warping of the input feature map, each output pixel is computed by applying a sampling kernel centered at a particular location in the input feature map (this is described fully in the next section). By pixel we refer to an element of a generic feature map, not necessarily an image.</p>
+                <p>In general, the output pixels are defined to lie on a regular grid \(G = \{G_i\}\) of pixels \(G_i = (x_i^t, y_i^t)\), forming an output feature map \(V \in \mathbb{R}^{H' \times W' \times C}, where \(H'\) and \(W'\) are the height and width of the grid, and \(C\) C is the number of channels, which is the same in the input and output.</p>
+                
+
+                <h4>9.4.3.3 Differentiable Image Sampling</h4>
+                <p>To perform a spatial transformation of the input feature map, a sampler must take the set of sampling points \(\mathcal{T}_{\theta}(G)\), along with the input feature map \(U\) and produce the sampled output feature map \(V\).</p>
+                
+
+                <h4>9.4.3.4 Spatial Transformer Networks</h4>
+                <p>The combination of the localisation network, grid generator, and sampler form a spatial transformer (Fig. 2). This is a self-contained module which can be dropped into a CNN architecture at any point, and in any number, giving rise to spatial transformer networks. This module is computationally very fast and does not impair the training speed, causing very little time overhead when used naively, and even speedups in attentive models due to subsequent downsampling that can be applied to the output of the transformer.</p>
+                <p>Placing spatial transformers within a CNN allows the network to learn how to actively transform the feature maps to help minimise the overall cost function of the network during training. The knowledge of how to transform each training sample is compressed and cached in the weights of the localisation network (and also the weights of the layers previous to a spatial transformer) during training.</p>
+                <p>For some tasks, it may also be useful to feed the output of the localisation network, \(\theta\), forward to the rest of the network, as it explicitly encodes the transformation, and hence the pose, of a region or object.</p>
+
+                
+
+                <h3>9.4.4 Experiments</h3>
+
+                <h3>9.4.5 Conclusion</h3>
+                <p>In this paper we introduced a new self-contained module for neural networks – the spatial transformer. This module can be dropped into a network and perform explicit spatial transformations of features, opening up new ways for neural networks to model data, and is learnt in an end-to-end fashion, without making any changes to the loss function. While CNNs provide an incredibly strong baseline, we see gains in accuracy using spatial transformers across multiple tasks, resulting in state-of-the-art performance.</p>
+
+                <p>Furthermore, the regressed transformation parameters from the spatial transformer are available as an output and could be used for subsequent tasks. While we only explore feed-forward networks in this work, early experiments show spatial transformers to be powerful in recurrent models, and useful for tasks requiring the disentangling of object reference frames, as well as easily extendable to 3D transformations.</p>
                 
                 <div class="navigation">
                     <a href="fgsm_attack.html">Prev: 9.3 FGSM Attack</a>
