@@ -19,9 +19,36 @@
 
             <main class="col-md-8 content">
                 <h2 class="custom-title">9.4 Spatial Transformer</h2>
-                <p class="title-subtext"></p>
-                <p style="color: #a0a0a0;">Created Date: 2025-06-03</p>
+                <p class="title-subtext">Spatial Transformer Networks</p>
+                <p style="color: #a0a0a0;">Created Date: 2025-06-24</p>
 
+                <p>Convolutional Neural Networks define an exceptionally powerful class of models, but are still limited by the lack of ability to be spatially invariant to the input data in a computationally and parameter efficient manner. In this work we introduce a new learnable module, the <strong>Spatial Transformer</strong>, which explicitly allows the spatial manipulation of data within the network.</p>
+                <p>This differentiable module can be inserted into existing convolutional architectures, giving neural networks the ability to actively spatially transform feature maps, conditional on the feature map itself, without any extra training supervision or modification to the optimisation process. We show that the use of spatial transformers results in models which learn invariance to translation, scale, rotation and more generic warping, resulting in state-of-the-art performance on several benchmarks, and for a number of classes of transformations.</p>
+
+                <h3>9.4.1 Introduction</h3>
+                <p>Over recent years, the landscape of computer vision has been drastically altered and pushed forward through the adoption of a fast, scalable, end-to-end learning framework, the Convolutional Neural Network (CNN).  Though not a recent invention, we now see a cornucopia of CNN-based models achieving state-of-the-art results in classification, localisation, semantic segmentation, and action recognition tasks, amongst others.</p>
+                <p>A desirable property of a system which is able to reason about images is to disentangle object pose and part deformation from texture and shape. The introduction of local max-pooling layers in CNNs has helped to satisfy this property by allowing a network to be somewhat spatially invariant to the position of features.</p>
+                <p>However, due to the typically small spatial support for max-pooling (e.g. 2 × 2 pixels) this spatial invariance is only realised over a deep hierarchy of max-pooling and convolutions, and the intermediate feature maps (convolutional layer activations) in a CNN are not actually invariant to large transformations of the input data. This limitation of CNNs is due to having only a limited, pre-defined pooling mechanism for dealing with variations in the spatial arrangement of data.</p>
+                
+                <p>In this work we introduce a <em>Spatial Transformer</em> module, that can be included into a standard neural network architecture to provide spatial transformation capabilities. The action of the spatial transformer is conditioned on individual data samples, with the appropriate behaviour learnt during training for the task in question (without extra supervision).</p>
+                <p>Unlike pooling layers, where the receptive fields are fixed and local, the spatial transformer module is a dynamic mechanism that can actively spatially transform an image (or a feature map) by producing an appropriate transformation for each input sample. The transformation is then performed on the entire feature map (non-locally) and can include scaling, cropping, rotations, as well as non-rigid deformations.</p>
+                <p>This allows networks which include spatial transformers to not only select regions of an image that are most relevant (attention), but also to transform those regions to a canonical, expected pose to simplify recognition in the following layers. Notably, spatial transformers can be trained with standard back-propagation, allowing for end-to-end training of the models they are injected in.</p>
+                <p>Spatial transformers can be incorporated into CNNs to benefit multifarious tasks, for example:</p>
+                <ol>
+                    <li><p>image classification: suppose a CNN is trained to perform multi-way classification of images according to whether they contain a particular digit – where the position and size of the digit may vary significantly with each sample (and are uncorrelated with the class); a spatial transformer that crops out and scale-normalizes the appropriate region can simplify the subsequent classification task, and lead to superior classification performance, see Fig. 1;</p></li>
+                    <li><p>co-localisation: given a set of images containing different instances of the same (but unknown) class, a spatial transformer can be used to localise them in each image;</p></li>
+                    <li><p>spatial attention: a spatial transformer can be used for tasks requiring an attention mechanism, such as in [14, 39], but is more flexible and can be trained purely with backpropagation without reinforcement learning. A key benefit of using attention is that transformed (and so attended), lower resolution inputs can be used in favour of higher resolution raw inputs, resulting in increased computational efficiency.</p></li>
+                </ol>
+                <p>The rest of the paper is organised as follows: Sect. 2 discusses some work related to our own, we introduce the formulation and implementation of the spatial transformer in Sect. 3, and finally give the results of experiments in Sect. 4. Additional experiments and implementation details are given in Appendix A.</p>
+                
+                <h3>9.4.2 Related Work</h3>
+                <p>In this section we describe the formulation of a spatial transformer. This is a differentiable module which applies a spatial transformation to a feature map during a single forward pass, where the transformation is conditioned on the particular input, producing a single output feature map.</p>
+                <p>For multi-channel inputs, the same warping is applied to each channel. For simplicity, in this section we consider single transforms and single outputs per transformer, however we can generalise to multiple transformations, as shown in experiments.</p>
+
+                <p>The spatial transformer mechanism is split into three parts, shown in Fig. 2. In order of computation, first a localisation network (Sect. 3.1) takes the input feature map, and through a number of hidden layers outputs the parameters of the spatial transformation that should be applied to the feature map – this gives a transformation conditional on the input.</p>
+                <p>Then, the predicted transformation parameters are used to create a sampling grid, which is a set of points where the input map should be sampled to produce the transformed output. This is done by the grid generator, described in Sect. 3.2. Finally, the feature map and the sampling grid are taken as inputs to the sampler, producing the output map sampled from the input at the grid points (Sect. 3.3).</p>
+                <p>The combination of these three components forms a spatial transformer and will now be described in more detail in the following sections.</p>
+                
                 <div class="navigation">
                     <a href="fgsm_attack.html">Prev: 9.3 FGSM Attack</a>
                     <a href="deep_face_lab.html">Next: 9.5 DeepFaceLab</a>
