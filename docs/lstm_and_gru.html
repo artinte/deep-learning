@@ -77,9 +77,42 @@
                 <h4>4.4.3.2 Forward Propagation</h4>
                 <p>Next, let’s implement the forward propagation, predicting word probabilities, defined by our equations above:</p>
 
-                <p>We not only return the calculated outputs, but also the hidden states. We will use them later to calculate the gradients, and by returning them here we avoid duplicate computation. Each \(o_t\) is a vector of probabilities representing the words in our vocabulary, but sometimes, for example when evaluating our model, all we want is the next word with the highest probability. We call this function <code>predict</code>.</code></p>
+                <p>We not only return the calculated outputs, but also the hidden states. We will use them later to calculate the gradients, and by returning them here we avoid duplicate computation. Each \(o_t\) is a vector of probabilities representing the words in our vocabulary, but sometimes, for example when evaluating our model, all we want is the next word with the highest probability. We call this function <code>predict</code>.</p>
+
+                <p>Let’s try our newly implemented methods and see an example output:</p>
+
+                <p>For each word in the sentence (45 above), our model made 8000 predictions representing probabilities of the next word. Note that because we initialized \(U\), \(V\), \(W\) to random values these predictions are completely random right now. The following gives the indices of the highest probability predictions for each word:</p>
+
+                <h4>4.4.3.3 Calculating the Loss</h4>
+                <p>To train our network we need a way to measure the errors it makes. We call this the loss function \(L\), and our goal is find the parameters \(U\), \(V\) and \(W\) that minimize the loss function for our training data. A common choice for the loss function is the cross-entropy loss. If we have \(N\) training examples (words in our text) and \(C\) classes (the size of our vocabulary) then the loss with respect to our predictions \(o\) and the true labels \(y\) is given by:</p>
+
+                <p>The formula looks a bit complicated, but all it really does is sum over our training examples and add to the loss based on how off our prediction are. The further away \(y\) (the correct words) and \(o\) (our predictions), the greater the loss will be. We implement the function calculate_loss:</p>
+                <p>Let’s take a step back and think about what the loss should be for random predictions. That will give us a baseline and make sure our implementation is correct. We have \(C\) words in our vocabulary, so each word should be (on average) predicted with probability \(\frac{1}{C}\), which would yield a loss of \(L = -\frac{1}{N} N log \frac{1}{C} = log C\):</p>
+
+                <p>Pretty close! Keep in mind that evaluating the loss on the full dataset is an expensive operation and can take hours if you have a lot of data!</p>
+
+                <h4>4.4.3.4 Backpropagation Through Time (BPTT)</h4>
+                <p>Remember that we want to find the parameters \(U\), \(V\) and \(W\) that minimize the total loss on the training data. The most common way to do this is SGD, Stochastic Gradient Descent. The idea behind SGD is pretty simple. We iterate over all our training examples and during each iteration we nudge the parameters into a direction that reduces the error. These directions are given by the gradients on the loss:</p>
+
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\frac{\partial L}{\partial U}, \frac{\partial L}{\partial V}, \frac{\partial L}{\partial W}\)
+                </div>
+                <p>SGD also needs a learning rate, which defines how big of a step we want to make at each iteration step. SGD is the most popular optimization method not only for Neural Networks, but also for many other Machine Learning algorithms. As such there has been a lot of research on how to optimize SGD using batching, parallelism and adaptive learning rates. Even though the basic idea is simple, implementing SGD in a really efficient way can become very complex. If you want to learn more about SGD this is a good place to start. Due to its popularity there are a wealth of tutorials floating around the web, and I don’t want to duplicate them here. I’ll implement a simple version of SGD that should be understandable even without a background in optimization.</p>
+
+                <p>But how do we calculate those gradients we mentioned above? In a traditional Neural Network we do this through the backpropagation algorithm. In RNNs we use a slightly modified version of the this algorithm called Backpropagation Through Time (BPTT). Because the parameters are shared by all time steps in the network, the gradient at each output depends not only on the calculations of the current time step, but also the previous time steps. If you know calculus, it really is just applying the chain rule. The next part of the tutorial will be all about BPTT, so I won’t go into detailed derivation here. For a general introduction to backpropagation check out this and this post. For now you can treat BPTT as a black box. It takes as input a training example \((x, y)\) and returns the gradients \(\frac{\partial L}{\partial U}, \frac{\partial L}{\partial V}, \frac{\partial L}{\partial W}\).</p>
+
+                <h4>4.4.3.5 Gradient Checking</h4>
+                <p>Whenever you implement backpropagation it is good idea to also implement gradient checking, which is a way of verifying that your implementation is correct. The idea behind gradient checking is that derivative of a parameter is equal to the slope at the point, which we can approximate by slightly changing the parameter and then dividing by the change:</p>
+
+                <p>We then compare the gradient we calculated using backpropagation to the gradient we estimated with the method above. If there’s no large difference we are good. The approximation needs to calculate the total loss for every parameter, so that gradient checking is very expensive (remember, we had more than a million parameters in the example above). So it’s a good idea to perform it on a model with a smaller vocabulary.</p>
+
+                <h4>4.4.3.5 SGD Implementation</h4>
+                <p>Now that we are able to calculate the gradients for our parameters we can implement SGD. I like to do this in two steps: 1. A function sdg_step that calculates the gradients and performs the updates for one batch. 2. An outer loop that iterates through the training set and adjusts the learning rate.</p>
+
+                <h3>4.4.4 Generating Text</h3>
                 
-                <h3>4.4.4 Long Short-Term Memory Unit</h3>
+                
+                <h3>4.4.5 Long Short-Term Memory Unit</h3>
                 <p>The Long Short-Term Memory (LSTM) unit was initially proposed by Hochreiter and Schmidhuber. Since then, a number of minor modifications to the original LSTM unit have been made. We follow the implementation of LSTM as used in Graves.</p>
                 <p>Unlike to the recurrent unit which simply computes a weighted sum of the input signal and applies a nonlinear function, each \(j\)-th LSTM unit maintains a memory \(c_t^j\) at time \(t\). The output \(h_t^j\), or the activation, of the LSTM unit is then:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
@@ -109,7 +142,7 @@
 
                 <p>Unlike to the traditional recurrent unit which overwrites its content at each time-step, an LSTM unit is able to decide whether to keep the existing memory via the introduced gates. Intuitively, if the LSTM unit detects an important feature from an input sequence at early stage, it easily carries this information (the existence of the feature) over a long distance, hence, capturing potential long-distance dependencies.</p>
                 
-                <h3>4.4.5 Gated Recurrent Unit</h3>
+                <h3>4.4.6 Gated Recurrent Unit</h3>
                 <p>A gated recurrent unit (GRU) was proposed by Cho et al. [2014] to make each recurrent unit to adaptively capture dependencies of different time scales. Similarly to the LSTM unit, the GRU has gating units that modulate the flow of information inside the unit, however, without having a separate memory cells.</p>
                 <p>The activation \(h_t^j\) of the GRU at time \(t\) is a linear interpolation between the previous activation \(h_{t-1}^j\) and the candidate activation \({\tilde {h}}_t^j\):</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
