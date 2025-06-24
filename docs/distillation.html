@@ -35,14 +35,55 @@
                 <h3>13.4.2 Loading CIFAR-10</h3>
 
                 <h3>13.4.3 Defining Model Classes and Utility Functions</h3>
+                <p>We employ 2 functions to help us produce and evaluate the results on our original classification task. One function is called \(train\) and takes the following arguments:</p>
+                <ul class="with-bullets">
+                    <li><p><code>model</code>: A model instance to train (update its weights) via this function.</p></li>
+                    <li><p><code>train_loader</code>: We defined our <code>train_loader</code> above, and its job is to feed the data into the model.</p></li>
+                    <li><p><code>epochs</code>: How many times we loop over the dataset.</p></li>
+                    <li><p><code>learning_rate</code>: The learning rate determines how large our steps towards convergence should be. Too large or too small steps can be detrimental.</p></li>
+                    <li><p><code>device</code>: Determines the device to run the workload on. Can be either CPU or GPU depending on availability.</p></li>
+                </ul>
+                <p>Our test function is similar, but it will be invoked with <code>test_loader</code> to load images from the test set.</p>
+                <img src="res/13/train_separate.png" alt="Train Separately">
+                
+                <p>Train both networks with Cross-Entropy. The student will be used as a baseline:</p>
+                <p>For reproducibility, we need to set the torch manual seed. We train networks using different methods, so to compare them fairly, it makes sense to initialize the networks with the same weights. Start by training the teacher network using cross-entropy:</p>
+                <pre><code>torch.manual_seed(42)
+nn_deep = DeepNN(num_classes=10).to(device)
+train(nn_deep, train_loader, epochs=10, learning_rate=0.001, device=device)
+test_accuracy_deep = test(nn_deep, test_loader, device)
+
+# Instantiate the lightweight network:
+torch.manual_seed(42)
+nn_light = LightNN(num_classes=10).to(device)</code></pre>
+                
+                <pre><samp>Epoch [1/10], Loss: 1.3524
+Epoch [2/10], Loss: 0.8909
+Epoch [3/10], Loss: 0.6941
+Epoch [4/10], Loss: 0.5536
+Epoch [5/10], Loss: 0.4357
+Epoch [6/10], Loss: 0.3340
+Epoch [8/10], Loss: 0.1819
+Epoch [9/10], Loss: 0.1522
+Epoch [10/10], Loss: 0.1241
+Accuracy of the model on the test set: 75.55%</samp></pre>
+    
 
                 <h3>13.4.4 Cross-Entropy Runs</h3>
 
+                <h3>14.4.5 Distillation Principle</h3>
+
                 <h3>13.4.5 Knowledge Distillation Run</h3>
+
+                <img src="res/13/output_loss.png" alt="Distillation Output Loss" width="600">
 
                 <h3>13.4.6 Cosine Loss Minimization Run</h3>
 
+                <img src="res/13/cosine_loss.png" alt="Consine Loss Distillation" width="600">
+
                 <h3>13.4.7 Intermediate Regressor Run</h3>
+
+                <img src="res/13/fitnets_knowledge.png" alt="Fitnets Knowledge Distillation" width="600">
 
                 <h3>13.4.8 Conclusion</h3>
                 <p>None of the methods above increases the number of parameters for the network or inference time, so the performance increase comes at the little cost of calculating gradients during training. In ML applications, we mostly care about inference time because training happens before the model deployment. If our lightweight model is still too heavy for deployment, we can apply different ideas, such as post-training quantization.</p>
