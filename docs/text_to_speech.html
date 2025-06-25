@@ -22,6 +22,24 @@
                 <p class="title-subtext"></p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-31</p>
 
+                <h3>8.3.3 HiFi-GAN</h3>
+                <p>HiFi-GAN consists of one generator and two discriminators: multi-scale and multi-period discriminators. The generator and discriminators are trained adversarially, along with two additional losses for improving training stability and model performance.</p>
+    
+                <h4>8.3.3.1 Generator</h4>
+                <p>The generator is a fully convolutional neural network. It uses a mel-spectrogram as input and upsamples it through transposed convolutions until the length of the output sequence matches the temporal resolution of raw waveforms. Every transposed convolution is followed by a multi-receptive field fusion (MRF) module, which we describe in the next paragraph. Figure 1 shows the architecture of the generator. As in previous work (Mathieu et al., 2015, Isola et al., 2017, Kumar et al., 2019), noise is not given to the generator as an additional input.</p>
+
+                <h5>Multi-Receptive Field Fusion</h5>
+                <p>We design the multi-receptive field fusion (MRF) module for our generator, which observes patterns of various lengths in parallel. Specifically, MRF module returns the sum of outputs from multiple residual blocks. Different kernel sizes and dilation rates are selected for each residual block to form diverse receptive field patterns.</p>
+                <p>The architectures of MRF module and a residual block are shown in Figure 1. We left some adjustable parameters in the generator; the hidden dimension \(h_u\), kernel size \(k_u\) of the transposed convolutions, kernel sizes \(k_r\), and dilation rates \(D_r\) of MRF modules can be regulated to match one’s own requirement in a trade-off between synthesis efficiency and sample quality.</p>
+
+                <h4>8.3.3.2 Discriminator</h4>
+                <p>Identifying long-term dependencies is the key for modeling realistic speech audio. For example, a phoneme duration can be longer than 100 ms, resulting in high correlation between more than 2,200 adjacent samples in the raw waveform.</p>
+                <p>This problem has been addressed in the previous work (Donahue et al., 2018) by increasing receptive fields of the generator and discriminator. We focus on another crucial problem that has yet been resolved; as speech audio consists of sinusoidal signals with various periods, the diverse periodic patterns underlying in the audio data need to be identified.</p>
+
+                <p>To this end, we propose the multi-period discriminator (MPD) consisting of several sub-discriminators each handling a portion of periodic signals of input audio. Additionally, to capture consecutive patterns and long-term dependencies, we use the multi-scale discriminator (MSD) proposed in MelGAN (Kumar et al., 2019), which consecutively evaluates audio samples at different levels. We conducted simple experiments to show the ability of MPD and MSD to capture periodic patterns, and the results can be found in Appendix B.</p>
+
+                <p></p>
+
                 <div class="navigation">
                     <a href="speech_recognition.html">Prev: 8.2 Automatic Speech Recognition</a>
                     <a href="speech_separation.html">Next: 8.4 Speech Separation</a>
