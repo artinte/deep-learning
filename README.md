@@ -3,13 +3,13 @@
 This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the explanation of theoretical knowledge, but also pays more attention to engineering practice. By combining a large number of practical cases, especially how to train, optimize and deploy models, readers will be able to master how to use [PyTorch](https://pytorch.org/) to complete various deep learning tasks.
 
 ### 01 Tensor and Gradient Basics
-- [ ] 1.1 [Install PyTorch](https://artinte.github.io/deep-learning/pytorch_install.html)
-- [ ] 1.2 [Introduction to Tensors](https://artinte.github.io/deep-learning/tensor_intro.html)
+- [x] 1.1 [Install PyTorch](https://artinte.github.io/deep-learning/pytorch_install.html)
+- [x] 1.2 [Introduction to Tensors](https://artinte.github.io/deep-learning/tensor_intro.html)
 - [ ] 1.3 [Data Representation](https://artinte.github.io/deep-learning/data_represent.html)
 - [ ] 1.4 [Principles of Deep Learning](https://artinte.github.io/deep-learning/principle_learn.html)
-- [ ] 1.5 [Calculus](https://artinte.github.io/deep-learning/calculus.html)
+- [x] 1.5 [Calculus](https://artinte.github.io/deep-learning/calculus.html)
 - [ ] 1.6 [Gradient Descent](https://artinte.github.io/deep-learning/gradient_descent.html)
-- [ ] 1.7 [Neural Network from Scratch](https://artinte.github.io/deep-learning/network_scratch.html)
+- [x] 1.7 [Neural Network from Scratch](https://artinte.github.io/deep-learning/network_scratch.html)
 
 ### 02 Fully Connected Network
 
