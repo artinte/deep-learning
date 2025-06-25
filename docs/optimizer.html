@@ -30,6 +30,48 @@ optimizer = optim.Adam([var1, var2], lr=0.0001)</code></pre>
 
                 <h3 id="sgd">2.6.1 Stochastic Gradient Descent (SGD)</h3>
 
+                <p><strong>Stochastic Gradient Descent (SGD)</strong> is an optimization algorithm used to minimize a loss function by updating the model’s parameters \(\theta\) in the direction of the negative gradient. It is a stochastic (randomized) version of standard gradient descent that updates parameters using only one data point at a time, rather than the entire dataset.</p>
+                <p>The update rule is:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\theta = \theta - \eta \nabla_\theta L_i(\theta)\)
+                </div>
+                <p>where \(\eta\) is the learning rate, \(\eta\) is learning rate, \(\nabla_\theta L_i(\theta)\) is the gradient of the loss function \(L\) with respect to the parameters \(\theta\) for the \(i\)-th data point.</p>
+
+                <p>File <a href="#">simple_sgd.py</a> show a simple example:</p>
+                <pre><code># training data
+x = 1
+y = 2
+w = 0
+leanring_rate = 0.1
+
+y_pred = w * x
+loss = (y_pred - y) ** 2
+dw = 2 * (w * x - y) * x
+w = w - leanring_rate * dw
+
+print(f"w: {w}, loss: {loss}")</code></pre>
+
+                <pre><samp>w: 0.4, loss: 4</samp></pre>
+
+                <p>In PyTorch, you can use the <code>torch.optim.SGD</code> class to implement SGD.</p>
+                <pre><code># implementation with torch
+x = torch.tensor(1.0)
+y = torch.tensor(2.0)
+# weight parameter with gradient tracking
+w_torch = torch.tensor(0.0, requires_grad=True)
+# define optimizer
+optimizer = torch.optim.SGD([w_torch], lr=0.1)
+
+# forward pass
+y_pred = w_torch * x
+loss = (y_pred - y) ** 2
+
+# backward pass
+loss.backward()
+optimizer.step()
+
+assert torch.isclose(w_torch, torch.tensor(w), atol=1e-6)</code></pre>
+
                 <h3>2.6.2 Adam</h3>
 
                 <div class="navigation">
