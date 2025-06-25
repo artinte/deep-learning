@@ -34,6 +34,7 @@ pyplot.grid(True)
 pyplot.subplots_adjust(left=0.08, right=0.92, top=0.96, bottom=0.06)
 pyplot.show()</code></pre>
                 <img src="res/02/make_moons.png" alt="Make Moons" width="600">
+                <p style="text-align: center; color: #555555;">Figure 1 - A Mool-Shaped Dataset with Two Classes</p>
                 <p>The dataset we generated has two classes, plotted as red and blue points. You can think of the blue dots as male patients and the red dots as female patients, with the x- and y- axis being medical measurements.</p>
                 <p>Our goal is to train a Machine Learning classifier that predicts the correct class (male of female) given the x- and y- coordinates. Note that the data is not linearly separable, we can’t draw a straight line that separates the two classes. This means that linear classifiers, such as Logistic Regression, won’t be able to fit the data unless you hand-engineer non-linear features (such as polynomials) that work well for the given dataset.</p>
                 <p>In fact, that’s one of the major advantages of Neural Networks. You don’t need to worry about feature engineering. The hidden layer of a neural network will learn features for you.</p>
@@ -45,6 +46,7 @@ clf = sklearn.linear_model.LogisticRegressionCV()
 clf.fit(X, y)
 decision_boundary.plot_single(X, y, lambda x: clf.predict(x))</code></pre>
                 <img src="res/02/logistic_regression.png" alt="Logistic Regression" width="600">
+                <p style="text-align: center; color: #555555;">Figure 2 - Logistic Regression</p>
                 <p>The graph shows the decision boundary learned by our Logistic Regression classifier. It separates the data as good as it can using a straight line, but it’s unable to capture the "moon shape" of our data.</p>
 
                 <h3>2.2.3 Training a Neural Network</h3>
@@ -52,6 +54,7 @@ decision_boundary.plot_single(X, y, lambda x: clf.predict(x))</code></pre>
                 <a href="https://drive.google.com/file/d/1Gi7oQm3rIgRXjug5NRr298h4fZHV2Ct1/view?usp=sharing">
                     <img src="res/02/point_classify_arch.jpg" alt="Point Classification Architecture">
                 </a>
+                <img src="res/02/point_classify_arch.jpg" alt="Point Classification Architecture" width="600">
                 <p>We can choose the dimensionality (the number of nodes) of the hidden layer. The more nodes we put into the hidden layer the more complex functions we will be able fit. But higher dimensionality comes at a cost. First, more computation is required to make predictions and learn the network parameters. A bigger number of parameters also means we become more prone to overfitting our data.</p>
                 <p>How to choose the size of the hidden layer? While there are some general guidelines and recommendations, it always depends on your specific problem and is more of an art than a science. We will play with the number of nodes in the hidden later later on and see how it affects our output.</p>
                 <p>We also need to pick an activation function for our hidden layer. The activation function transforms the inputs of the layer into its outputs. A nonlinear activation function is what allows us to fit nonlinear hypotheses. Common chocies for <a href="activation_function.html">activation functions</a> are tanh, the sigmoid function, or ReLUs. We will use tanh, which performs quite well in many scenarios. A nice property of these functions is that their derivate can be computed using the original function value. For example, the derivative of \(tanh(x)\) is \(1 - {tanh}^2(x)\). This is useful because it allows us to compute \(tanh(x)\) once and re-use that same value later to get the derivative.</p>
@@ -199,16 +202,43 @@ model = build_model(3, print_loss=True)
 decision_boundary.plot_single(X, y, lambda x: predict(model, x))
 pyplot.show()</code></pre>
                 
+                <img src="res/02/model_size_3.png" alt="Decision Boundary With Hidden Layer Size 3" width="600">
+                <p style="text-align: center; color: #555555;">Figure 3 - Decision Boundary With Hidden Layer Size 3</p>
+
                 <p>Yay! This looks pretty good. Our neural networks was able to find a decision boundary that successfully separates the classes.</p>
 
                 <h3>2.2.5 Varying Hidden Size</h3>
 
                 <p>In the example above we picked a hidden layer size of 3. Let’s now get a sense of how varying the hidden layer size affects the result.</p>
+                <pre><code>figure = pyplot.figure()
+hidden_layer_dims = [1, 2, 4, 10, 50, 100]
+for i , nn_dim in enumerate(hidden_layer_dims):
+    figure.add_subplot(2, 3, i + 1)
+    pyplot.title('Hidden size ' + str(nn_dim))
+    model = build_model(nn_hdim=nn_dim)
+    decision_boundary.plot_multi(X, y, lambda x: predict(model, x))
+pyplot.show()</code></pre>
+
+                <img src="res/02/model_vary_size.png" alt="Decision Boundary With Varying Hidden Layer Sizes" width="600">
+                <p style="text-align: center; color: #555555;">Figure 4 - Decision Boundary With Varying Hidden Layer Sizes</p>
 
                 <p>We can see that a hidden layer of low dimensionality nicely captures the general trend of our data. Higher dimensionalities are prone to overfitting. They are “memorizing” the data as opposed to fitting the general shape. If we were to evaluate our model on a separate test set (and you should!) the model with a smaller hidden layer size would likely perform better due to better generalization. We could counteract overfitting with stronger regularization, but picking the a correct size for hidden layer is a much more economical solution.</p>
 
                 <h3>2.2.6 Torch Implement</h3>
-                <p>File <a href="">simple_dnn_torch.py</a></p>
+                <p>We can implement the same network using PyTorch, which is a popular deep learning framework. The code in file <a href="">simple_dnn_torch.py</a>much shorter and easier to read. It also automatically takes care of the backpropagation for us.</p>
+                
+                <h3>2.2.7 Exercises</h3>
+
+                <p>Here are some things you can try to become more familiar with the code:</p>
+                <ol>
+                    <li><p>Instead of batch gradient descent, use minibatch gradient descent to train the network. Minibatch gradient descent typically performs better in practice.</p></li>
+                    <li><p>We used a fixed learning rate \(epsilon\) for gradient descent. Implement an annealing schedule for the gradient descent learning rate.</p></li>
+                    <li><p>We used a tanh activation function for our hidden layer. Experiment with other activation functions (some are mentioned above). Note that changing the activation function also means changing the backpropagation derivative.</p></li>
+                    <li><p>Extend the network from two to three classes. You will need to generate an appropriate dataset for this.</p></li>
+                    <li><p>Extend the network to four layers. Experiment with the layer size. Adding another hidden layer means you will need to adjust both the forward propagation as well as the backpropagation code.</p></li>
+                </ol>
+                <p>Thank you for reading!</p>
+
                 <div class="navigation">
                     <a href="linear_algebra.html">Prev: 2.1 Points Classification</a>
                     <a href="pytorch_basics.html">Next: 2.3 PyTorch Basics</a>
