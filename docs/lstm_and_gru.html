@@ -31,6 +31,11 @@
                     \(P(w_1, ... , w_m) = \prod_{i=1}^mP(w_i|w_1, ..., w_{i-1})\)
                 </div>
                 <p>In words, the probability of a sentence is the product of probabilities of each word given the words that came before it. So, the probability of the sentence <em>"He went to buy some chocolate"</em> would be the probability of <em>"chocolate"</em> given <em>"He went to buy some"</em>, multiplied by the probability of <em>"some"</em> given <em>"He went to buy"</em>, and so on.</p>
+                <a href="https://drive.google.com/file/d/1Mi2s9fwEjXUV5w9QaI7bbcsw_TfLYZpc/view?usp=sharing">
+                    <img src="res/04/simple_lang_model.jpg" alt="Simple Language Model" width="600">
+                </a>
+                <p style="text-align: center; color: #555555;">Figure 1 - A Simple Language Model</p>
+                
                 <p>Why is that useful? Why would we want to assign a probability to observing a sentence?</p>
                 <p>First, such a model can be used as a scoring mechanism. For example, a Machine Translation system typically generates multiple candidates for an input sentence. You could use a language model to pick the most probable sentence. Intuitively, the most probable sentence is likely to be grammatically correct. Similar scoring happens in speech recognition systems.</p>
                 <p>But solving the Language Modeling problem also has a cool side effect. Because we can predict the probability of a word given the preceding words, we are able to generate new text. It’s a <em>generative model</em>. Given an existing sequence of words we sample a next word from the predicted probabilities, and repeat the process until we have a full sentence. Andrej Karparthy has a great <a href="https://karpathy.github.io/2015/05/21/rnn-effectiveness/">post</a> that demonstrates what language models are capable of. His models are trained on single characters as opposed to full words, and can generate anything from Shakespeare to Linux Code.</p>
