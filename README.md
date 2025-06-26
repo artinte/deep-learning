@@ -7,8 +7,8 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 - [x] 1.2 [Introduction to Tensors](https://artinte.github.io/deep-learning/tensor_intro.html)
 - [ ] 1.3 [Data Representation](https://artinte.github.io/deep-learning/data_represent.html)
 - [ ] 1.4 [Principles of Deep Learning](https://artinte.github.io/deep-learning/principle_learn.html)
-- [x] 1.5 [Calculus](https://artinte.github.io/deep-learning/calculus.html)
-- [ ] 1.6 [Gradient Descent](https://artinte.github.io/deep-learning/gradient_descent.html)
+- [ ] 1.5 [Calculus](https://artinte.github.io/deep-learning/calculus.html)
+- [x] 1.6 [Gradient Descent](https://artinte.github.io/deep-learning/gradient_descent.html)
 - [x] 1.7 [Neural Network from Scratch](https://artinte.github.io/deep-learning/network_scratch.html)
 
 ### 02 Fully Connected Network
@@ -30,7 +30,7 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 
 ### 04 Recurrent Network
 
-- [ ] 4.1 [RNN from Scratch](https://artinte.github.io/deep-learning/rnn_classify_scratch.html)
+- [x] 4.1 [RNN from Scratch](https://artinte.github.io/deep-learning/rnn_classify_scratch.html)
 - [ ] 4.2 [Word Embeddings](https://artinte.github.io/deep-learning/word_embed.html)
 - [ ] 4.3 [Word2Vec](https://artinte.github.io/deep-learning/word2vec.html)
 - [ ] 4.4 [LTSM and GRU](https://artinte.github.io/deep-learning/lstm_and_gru.html)

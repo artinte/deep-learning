@@ -450,7 +450,22 @@ Test: loss 0.006 | accuracy: 1.000</samp></pre>
                 <p>We can visualize the training process:</p>
                 <img src="res/04/simple_rnn_visual.png" alt="Simple RNN Visualize">
                 <h3>4.1.9 PyTorch Implement</h3>
-                <p><a href="https://github.com/artinte/deep-learning/blob/develop/04_rnn/1_scratch/rnn_classify_torch.py">rnn_classify_torch.py</a></p>
+                <p>While building an RNN from scratch is a great learning experience, it’s not very practical. In real-world applications, we’d use a proper ML library like PyTorch or TensorFlow to build our RNNs. File <a href="https://github.com/artinte/deep-learning/blob/develop/04_rnn/1_scratch/rnn_classify_torch.py">rnn_classify_torch.py</a> rewrite above process:</p>
+
+                <pre><samp>Epoch 1/100, loss: 0.6968
+Epoch 11/100, loss: 0.6665
+Epoch 21/100, loss: 0.4091
+Epoch 31/100, loss: 0.2538
+Epoch 41/100, loss: 0.1921
+Epoch 51/100, loss: 0.1132
+Epoch 61/100, loss: 0.0243
+Epoch 71/100, loss: 0.0126
+Epoch 81/100, loss: 0.0054
+Epoch 91/100, loss: 0.0034
+Test accuracy: 1.0000</samp></pre>
+
+                <img src="res/04/rnn_classify_torch.png" alt="RNN Classify">
+
                 <h3>4.1.10 The End</h3>
                 <p>That’s it! In this post, we completed a walkthrough of Recurrent Neural Networks, including what they are, how they work, why they’re useful, how to train them, and how to implement one. There’s still much more you can do, though:</p>
                 <ul class="with-bullets">
