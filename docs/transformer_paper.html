@@ -92,39 +92,52 @@
                 <p>Multi-head attention allows the model to jointly attend to information from different representation subspaces at different positions. With a single attention head, averaging inhibits this.</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \[
-                    Multihead(Q, K, V) = Concat({head}_1, \cdots, {head}_h)W^O \\
-                    \text{where } {head_i} = Attention(Q W_i^Q, K W_i^K, V W_i^V)
+                    \begin{flalign*}
+                    & Multihead(Q, K, V) = Concat({head}_1, \cdots, {head}_h)W^O \\
+                    & where \ {head_i} = Attention(Q W_i^Q, K W_i^K, V W_i^V)
+                    \end{flalign*}
                     \]
                 </div>
-                <p>Where the projections are parameter matrices \(W_i^Q \in \mathbb{R}^{d_{model} \times d_k}\), \(W_i^K \in \mathbb{R}^{d_{model} \times d_k}\), \(W_i^K \in \mathbb{R}^{d_{model} \times d_k}\), \(W_i^V \in \mathbb{R}^{d_{model} \times d_v}\) and \(W^O \in \mathbb{R}^{hd_v \times d_{model}}\).</p>
+                <p>Where the projections are parameter matrices \(W_i^Q \in \mathbb{R}^{d_{model} \times d_k}\), \(W_i^K \in \mathbb{R}^{d_{model} \times d_k}\), \(W_i^V \in \mathbb{R}^{d_{model} \times d_v}\) and \(W^O \in \mathbb{R}^{hd_v \times d_{model}}\).</p>
 
-                <p></p>
-
+                <p>In this work we employ \(h = 8\) parallel attention layers, or heads. For each of these we use \(d_k = d_v = d_{model}/h = 64\).  Due to the reduced dimension of each head, the total computational cost is similar to that of single-head attention with full dimensionality.</p>
 
                 <h5>Applications of Attention in our Model</h5>
                 <p>The Transformer uses multi-head attention in three different ways:</p>
                 <ul class="with-bullets">
-                    <li><p>In "encoder-decoder attention" layers, the queries come from the previous decoder layer, and the memory keys and values come from the output of the encoder. This allows every position in the decoder to attend over all positions in the input sequence. This mimics the typical encoder-decoder attention mechanisms in sequence-to-sequence models such as [38, 2, 9].</p></li>
+                    <li><p>In "encoder-decoder attention" layers, the queries come from the previous decoder layer, and the memory keys and values come from the output of the encoder. This allows every position in the decoder to attend over all positions in the input sequence. This mimics the typical encoder-decoder attention mechanisms in sequence-to-sequence models.</p></li>
                     <li><p>The encoder contains self-attention layers. In a self-attention layer all of the keys, values and queries come from the same place, in this case, the output of the previous layer in the encoder. Each position in the encoder can attend to all positions in the previous layer of the encoder.</p></li>
-                    <li><p>Similarly, self-attention layers in the decoder allow each position in the decoder to attend to all positions in the decoder up to and including that position. We need to prevent leftward information flow in the decoder to preserve the auto-regressive property. We implement this inside of scaled dot-product attention by masking out (setting to −∞) all values in the input of the softmax which correspond to illegal connections. See Figure 2.</p></li>
+                    <li><p>Similarly, self-attention layers in the decoder allow each position in the decoder to attend to all positions in the decoder up to and including that position. We need to prevent leftward information flow in the decoder to preserve the auto-regressive property. We implement this inside of scaled dot-product attention by masking out (setting to \(-\infty\)) all values in the input of the softmax which correspond to illegal connections. See Figure 2.</p></li>
                 </ul>
 
                 <h4>5.2.3.3 Position-wise Feed-Forward Networks</h4>
                 <p>In addition to attention sub-layers, each of the layers in our encoder and decoder contains a fully connected feed-forward network, which is applied to each position separately and identically. This consists of two linear transformations with a ReLU activation in between.</p>
-                
-                
+
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(FFN(x) = max(0, xW_1 + b_1)W_2 + b_2|)
+                </div>
+
                 <p>While the linear transformations are the same across different positions, they use different parameters from layer to layer. Another way of describing this is as two convolutions with kernel size 1. The dimensionality of input and output is \(d_{model} = 512\),  and the inner-layer has dimensionality \(d_{ff} = 2048\).</p>
 
                 <h4>5.2.3.4 Embeddings and Softmax</h4>
-                <p>Similarly to other sequence transduction models, we use learned embeddings to convert the input tokens and output tokens to vectors of dimension \(d_{model}\). We also use the usual learned linear transformation and softmax function to convert the decoder output to predicted next-token probabilities. In our model, we share the same weight matrix between the two embedding layers and the pre-softmax linear transformation, similar to [30]. In the embedding layers, we multiply those weights by \(\sqrt{d_{model}}\).</p>
+                <p>Similarly to other sequence transduction models, we use <a href="word_embed.html">learned embeddings</a> to convert the input tokens and output tokens to vectors of dimension \(d_{model}\). We also use the usual learned linear transformation and softmax function to convert the decoder output to predicted next-token probabilities. In our model, we share the same weight matrix between the two embedding layers and the pre-softmax linear transformation. In the embedding layers, we multiply those weights by \(\sqrt{d_{model}}\).</p>
 
                 <h4>5.2.3.5 Positional Encoding</h4>
-                <p>Since our model contains no recurrence and no convolution, in order for the model to make use of the order of the sequence, we must inject some information about the relative or absolute position of the tokens in the sequence. To this end, we add "positional encodings" to the input embeddings at the bottoms of the encoder and decoder stacks. The positional encodings have the same dimension \(d_{model}\) as the embeddings, so that the two can be summed. There are many choices of positional encodings, learned and fixed [9].</p>
+                <p>Since our model contains no recurrence and no convolution, in order for the model to make use of the order of the sequence, we must inject some information about the relative or absolute position of the tokens in the sequence. To this end, we add "positional encodings" to the input embeddings at the bottoms of the encoder and decoder stacks. The positional encodings have the same dimension \(d_{model}\) as the embeddings, so that the two can be summed. There are many choices of positional encodings, learned and fixed.</p>
 
                 <p>In this work, we use sine and cosine functions of different frequencies:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \[
+                    \begin{flalign*}
+                    & {PE}_{(pos, 2i)} = sin(pos/{10000}^{2i/d_{model}}) \\
+                    & {PE}_{(pos, 2i+1)} = cos(pos/{10000}^{2i/d_{model}})
+                    \end{flalign*}
+                    \]
+                </div>
+
                 <p>where \(pos\) is the position and \(i\) is the dimension. That is, each dimension of the positional encoding corresponds to a sinusoid. The wavelengths form a geometric progression from \(2\pi\) to \(10000 \cdot 2\pi\). We chose this function because we hypothesized it would allow the model to easily learn to attend by relative positions, since for any fixed offset \(k\), \({PE}_{pos+k}\) can be represented as a linear function of \({PE}_{pos}\).</p>
-                <p>We also experimented with using learned positional embeddings [9] instead, and found that the two versions produced nearly identical results (see Table 3 row (E)). We chose the sinusoidal version because it may allow the model to extrapolate to sequence lengths longer than the ones encountered during training.</p>
-        
+                <p>We also experimented with using learned positional embeddings instead, and found that the two versions produced nearly identical results (see Table 3 row (E)). We chose the sinusoidal version because it may allow the model to extrapolate to sequence lengths longer than the ones encountered during training.</p>
+
                 <h3>5.2.4 Why Self-Attention</h3>
                 <p>In this section we compare various aspects of self-attention layers to the recurrent and convolutional layers commonly used for mapping one variable-length sequence of symbol representations \((x_1, \cdots, x_n\) to another sequence of equal length \((z_1, \cdots, z_n)\), with \(x_i, z_i \in \mathbb{R}^d\), such as a hidden layer in a typical sequence transduction encoder or decoder. Motivating our use of self-attention we consider three desiderata.</p>
                 <p>One is the total computational complexity per layer. Another is the amount of computation that can be parallelized, as measured by the minimum number of sequential operations required.</p>
