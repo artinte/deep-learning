@@ -151,7 +151,7 @@ Hello world &lt;blank&gt; &lt;blank&gt;</samp></pre>
                 </div>
                 <p>Note that when applying this to a minibatch, we need the batch matrix multiplication. In the following implementation of the scaled dot product attention, we use dropout for model regularization.</p>
 
-                <h5>Additive Attention</h5>
+                <h5 id="additive">Additive Attention</h5>
                 <p>When queries \(\mathbf{q}\) and keys \(\mathbf{k}\) are vectors of different dimension, we can either use a matrix to address the mismatch via \(\mathbf{q}^\top \mathbf{M} \mathbf{k}\), or we can use additive attention as the scoring function. Another benefit is that, as its name indicates, the attention is additive. This can lead to some minor computational savings.</p>
                 <p> Given a query \(\mathbf{q} \in \mathbb{R}^q\) and a key \(\mathbf{k} \in \mathbb{R}^k\), the additive attention scoring function (Bahdanau et al., 2014) is given by:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
