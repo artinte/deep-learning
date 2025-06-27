@@ -120,8 +120,11 @@
                 <h3>4.4.4 Generating Text</h3>
                 
                 
-                <h3>4.4.5 Long Short-Term Memory Unit</h3>
+                <h3 id="lstm">4.4.5 Long Short-Term Memory Unit</h3>
                 <p>The Long Short-Term Memory (LSTM) unit was initially proposed by Hochreiter and Schmidhuber. Since then, a number of minor modifications to the original LSTM unit have been made. We follow the implementation of LSTM as used in Graves.</p>
+
+                <img src="res/04/lstm_arch.png" alt="LSTM Architecture" width="600">
+                
                 <p>Unlike to the recurrent unit which simply computes a weighted sum of the input signal and applies a nonlinear function, each \(j\)-th LSTM unit maintains a memory \(c_t^j\) at time \(t\). The output \(h_t^j\), or the activation, of the LSTM unit is then:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(h_t^j = o_t^j tanh(c_t^j)\)
@@ -150,7 +153,7 @@
 
                 <p>Unlike to the traditional recurrent unit which overwrites its content at each time-step, an LSTM unit is able to decide whether to keep the existing memory via the introduced gates. Intuitively, if the LSTM unit detects an important feature from an input sequence at early stage, it easily carries this information (the existence of the feature) over a long distance, hence, capturing potential long-distance dependencies.</p>
                 
-                <h3>4.4.6 Gated Recurrent Unit</h3>
+                <h3 id="gru">4.4.6 Gated Recurrent Unit</h3>
                 <p>A gated recurrent unit (GRU) was proposed by Cho et al. [2014] to make each recurrent unit to adaptively capture dependencies of different time scales. Similarly to the LSTM unit, the GRU has gating units that modulate the flow of information inside the unit, however, without having a separate memory cells.</p>
                 <p>The activation \(h_t^j\) of the GRU at time \(t\) is a linear interpolation between the previous activation \(h_{t-1}^j\) and the candidate activation \({\tilde {h}}_t^j\):</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">

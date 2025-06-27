@@ -42,20 +42,11 @@
                 <p>Recently, a number of papers have proposed the use of neural networks to directly learn this conditional distribution (see, e.g., Kalchbrenner and Blunsom, 2013; Cho et al., 2014a; Sutskever et al., 2014; Cho et al., 2014b; Forcada and Neco, 1997). This neural machine translation approach typically consists of two components, the first of which encodes a source sentence \(x\) and the second decodes to a target sentence \(y\).  For instance, two recurrent neural networks (RNN) were used by (Cho et al., 2014a) and (Sutskever et al., 2014) to encode a variable-length source sentence into a fixed-length vector and to decode the vector into a variable-length target sentence.</p>
                 <p>Despite being a quite new approach, neural machine translation has already shown promising results. Sutskever et al. (2014) reported that the neural machine translation based on RNNs with long short term memory (LSTM) units achieves close to the state-of-the-art performance of the conventional phrase-based machine translation system on an English-to-French translation task. Adding neural components to existing translation systems, for instance, to score the phrase pairs in the phrase table (Cho et al., 2014a) or to re-rank candidate translations (Sutskever et al., 2014), has allowed to surpass the previous state-of-the-art performance level.</p>
                 
-                <h5>RNN Encoder-Decoder</h5>
+                <h5 id="rnn-encoder-decoder">RNN Encoder-Decoder</h5>
                 <p>Here, we describe briefly the underlying framework, called <strong>RNN Encoder–Decoder</strong>, proposed by Cho et al. (2014a) and Sutskever et al. (2014) upon which we build a novel architecture that learns to align and translate simultaneously.</p>
                 <p>In the Encoder–Decoder framework, an encoder reads the input sentence, a sequence of vectors \(x = (x_1, \cdots, x_{T_x})\), into a vector \(c\). The most common approach is to use an RNN such that:</p>
 
-                <p>and</p>
-
                 <p>where \(h_t \in \mathbb{R}^n\) is a hidden state at time \(t\), and \(c\) is a vector generated from the sequence of the hidden states. \(f\) and \(q\) are some nonlinear functions. Sutskever et al. (2014) used an LSTM as \(f\) and</p>
-                
-
-                <h5>RNN Encoder-Decoder</h5>
-                <p>Here, we describe briefly the underlying framework, called RNN Encoder–Decoder, proposed by Cho et al. (2014a) and Sutskever et al. (2014) upon which we build a novel architecture that learns to align and translate simultaneously.</p>
-                <p>In the Encoder–Decoder framework, an encoder reads the input sentence, a sequence of vectors decoders (Sutskever et al., 2014; Cho et al., 2014a), with an encoder and a decoder for each language, or involve a language-specific encoder applied to each sentence whose outputs are then compared (Hermann and Blunsom, 2014).</p>
-                
-                
 
                 <h3>4.5.3 Learning to Align And Translate</h3>
 
