@@ -23,7 +23,7 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 ### 03 Convolutional Network
 
 - [x] 3.1 [CNN from Scratch](https://artinte.github.io/deep-learning/cnn_classify_stratch.html)
-- [ ] 3.2 [AlexNet](https://artinte.github.io/deep-learning/alex_net.html)
+- [x] 3.2 [AlexNet](https://artinte.github.io/deep-learning/alex_net.html)
 - [ ] 3.3 [ResNet](https://artinte.github.io/deep-learning/res_net.html)
 - [ ] 3.4 [U-Net](https://artinte.github.io/deep-learning/u_net.html)
 - [ ] 3.5 [DenseNet](https://artinte.github.io/deep-learning/dense_net.html)

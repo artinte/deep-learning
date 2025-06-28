@@ -72,7 +72,7 @@ optimizer.step()
 
 assert torch.isclose(w_torch, torch.tensor(w), atol=1e-6)</code></pre>
 
-                <h3>2.6.2 Adam</h3>
+                <h3 id="adam">2.6.2 Adam</h3>
                 <p>We propose Adam, a method for efficient stochastic optimization that only requires first-order gradients with little memory requirement. The method computes individual adaptive learning rates for different parameters from estimates of first and second moments of the gradients; the name Adam is derived from adaptive moment estimation.</p>
                 <p>Algorithm: Adam, our proposed algorithm for stochastic optimization, and for a slightly more efficient (but less clear) order of computation. \(g_t^2\) indicates the elementwise square \(g_t \odot g_t\). Good default settings for the tested machine learning problem are \(\alpha = 0.001\), \(\beta_1 = 0.9\), \(\beta_2 = 0.999\) and \(\epsilon = 10^{-8}\). All operations on vectors are element-wise. With \(\beta_1^t\) and \(\beta_2^t\) we denote \(\beta_1\) and \(\beta_2\) to the power \(t\).</p>
 
