@@ -79,7 +79,7 @@
                 <p>The two most commonly used attention functions are <a href="attention_mechanism.html#additive">additive attention</a>, and dot-product (multiplicative) attention. Dot-product attention is identical to our algorithm, except for the scaling factor \(\frac{1}{\sqrt{d_k}}\).  Additive attention computes the compatibility function using a feed-forward network with a single hidden layer. While the two are similar in theoretical complexity, dot-product attention is much faster and more space-efficient in practice, since it can be implemented using highly optimized matrix multiplication code.</p>
                 <p>While for small values of \(d_k\) the two mechanisms perform similarly, additive attention outperforms dot product attention without scaling for larger values of \(d_k\).  We suspect that for large values of \(d_k\), the dot products grow large in magnitude, pushing the softmax function into regions where it has extremely small gradients. To counteract this effect, we scale the dot products by \(\frac{1}{\sqrt{d_k}}\).</p>
 
-                <h5>Multi-Head Attention</h5>
+                <h5 id="multi-head-attention">Multi-Head Attention</h5>
                 <p>Instead of performing a single attention function with \(d_{model}\)-dimensional keys, values and queries, we found it beneficial to linearly project the queries, keys and values \(h\) times with different, learned linear projections to \(d_k\), \(d_k\) and \(d_v\) dimensions, respectively. On each of these projected versions of queries, keys and values we then perform the attention function in parallel, yielding \(d_v\)-dimensional output values. These are concatenated and once again projected, resulting in the final values, as depicted in Figure 3.</p>
 
                 <a href="https://drive.google.com/file/d/1EIRszxdwLHceGAtZhTltg62NMTwbZWdb/view?usp=sharing">
@@ -236,9 +236,9 @@
                                 <th>\(d_{model}\)</th>
                                 <th>\(d_{ff}\)</th>
                                 <th>\(h\)</th>
-                                <th>d_k</th>
-                                <th>d_v</th>
-                                <th>P_{drop}</th>
+                                <th>\(d_k\)</th>
+                                <th>\(d_v\)</th>
+                                <th>\(P_{drop}\)</th>
                                 <th>\(\epsilon_{ls}\)</th>
                                 <th>train steps</th>
                                 <th>PPL (dev)</th>
@@ -263,19 +263,141 @@
                                 <td>65</td>
                             </tr>
                             <tr>
-                                <td>(A)</td>
+                                <td rowspan="4" style="vertical-align: middle;">(A)</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>1</td>
+                                <td>512</td>
+                                <td>512</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>5.29</td>
+                                <td>24.9</td>
+                                <td></td>
                             </tr>
                             <tr>
-                                <td>(B)</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>4</td>
+                                <td>128</td>
+                                <td>128</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>5.00</td>
+                                <td>25.5</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>16</td>
+                                <td>32</td>
+                                <td>32</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>4.91</td>
+                                <td>25.8</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>32</td>
+                                <td>16</td>
+                                <td>16</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>5.01</td>
+                                <td>25.4</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td rowspan="2" style="vertical-align: middle;">(B)</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>16</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>5.16</td>
+                                <td>25.1</td>
+                                <td>58</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>32</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>5.01</td>
+                                <td>25.4</td>
+                                <td>60</td>
                             </tr>
                             <tr>
                                 <td>(C)</td>
+                                <td>2</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>6.11</td>
+                                <td>23.7</td>
+                                <td>36</td>
                             </tr>
                             <tr>
-                                <td>(D)</td>
+                                <td rowspan="2" style="vertical-align: middle;">(D)</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>0.0</td>
+                                <td></td>
+                                <td></td>
+                                <td>5.77</td>
+                                <td>24.6</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>0.2</td>
+                                <td></td>
+                                <td></td>
+                                <td>4.95</td>
+                                <td>25.5</td>
+                                <td></td>
                             </tr>
                             <tr>
                                 <td>(E)</td>
+                                <td colspan="9">positional embedding instead of sinusiods</td>
+                                <td>4.92</td>
+                                <td>25.7</td>
+                                <td></td>
                             </tr>
                             <tr>
                                 <td>big</td>
@@ -296,16 +418,16 @@
                 </div>
                 <p style="text-align: center; color: #555555;">Table 2 - Variations on the Transformer Architecture</p>
 
-                <p>In Table 2 rows (A), we vary the number of attention heads and the attention key and value dimensions, keeping the amount of computation constant, as described in Section 3.2.2. While single-head attention is 0.9 BLEU worse than the best setting, quality also drops off with too many heads.</p>
-                <p>In Table 2 rows (B), we observe that reducing the attention key size \(d_k\) hurts model quality. This suggests that determining compatibility is not easy and that a more sophisticated compatibility function than dot product may be beneficial. We further observe in rows (C) and (D) that, as expected, bigger models are better, and dropout is very helpful in avoiding over-fitting. In row (E) we replace our sinusoidal positional encoding with learned positional embeddings [9], and observe nearly identical results to the base model.</p>
+                <p>In Table 2 rows (A), we vary the number of attention heads and the attention key and value dimensions, keeping the amount of computation constant, as d.escribed in section <a href="multi-head-attention">Multi-Head Attention</a>. While single-head attention is 0.9 BLEU worse than the best setting, quality also drops off with too many heads.</p>
+                <p>In Table 2 rows (B), we observe that reducing the attention key size \(d_k\) hurts model quality. This suggests that determining compatibility is not easy and that a more sophisticated compatibility function than dot product may be beneficial. We further observe in rows (C) and (D) that, as expected, bigger models are better, and dropout is very helpful in avoiding over-fitting. In row (E) we replace our sinusoidal positional encoding with learned positional embeddings, and observe nearly identical results to the base model.</p>
                 
                 <h4>5.2.6.3 English Constituency Parsing</h4>
                 <p>To evaluate if the Transformer can generalize to other tasks we performed experiments on English constituency parsing. This task presents specific challenges: the output is subject to strong structural constraints and is significantly longer than the input. Furthermore, RNN sequence-to-sequence models have not been able to attain state-of-the-art results in small-data regimes.</p>
-                <p>We trained a 4-layer transformer with \(d_{model} 1024\) on the Wall Street Journal (WSJ) portion of the Penn Treebank [25], about 40K training sentences. We also trained it in a semi-supervised setting, using the larger high-confidence and BerkleyParser corpora from with approximately 17M sentences [37]. We used a vocabulary of 16K tokens for the WSJ only setting and a vocabulary of 32K tokens for the semi-supervised setting.</p>
+                <p>We trained a 4-layer transformer with \(d_{model} = 1024\) on the Wall Street Journal (WSJ) portion of the Penn Treebank, about 40K training sentences. We also trained it in a semi-supervised setting, using the larger high-confidence and BerkleyParser corpora from with approximately 17M sentences. We used a vocabulary of 16K tokens for the WSJ only setting and a vocabulary of 32K tokens for the semi-supervised setting.</p>
 
-                <p>We performed only a small number of experiments to select the dropout, both attention and residual (section 5.4), learning rates and beam size on the Section 22 development set, all other parameters remained unchanged from the English-to-German base translation model. During inference, we increased the maximum output length to input length + 300. We used a beam size of 21 and \(\alpha = 0.3\) for both WSJ only and the semi-supervised setting.</p>
-                <p>Our results in Table 4 show that despite the lack of task-specific tuning our model performs surprisingly well, yielding better results than all previously reported models with the exception of the Recurrent Neural Network Grammar [8].</p>
-                <p>In contrast to RNN sequence-to-sequence models [37], the Transformer outperforms the Berkeley-Parser [29] even when training only on the WSJ training set of 40K sentences.</p>
+                <p>We performed only a small number of experiments to select the dropout, both attention and residual, learning rates and beam size on the Section 22 development set, all other parameters remained unchanged from the English-to-German base translation model. During inference, we increased the maximum output length to input length + 300. We used a beam size of 21 and \(\alpha = 0.3\) for both WSJ only and the semi-supervised setting.</p>
+                <p>Our results show that despite the lack of task-specific tuning our model performs surprisingly well, yielding better results than all previously reported models with the exception of the Recurrent Neural Network Grammar [8].</p>
+                <p>In contrast to RNN sequence-to-sequence models, the Transformer outperforms the Berkeley-Parser even when training only on the WSJ training set of 40K sentences.</p>
                 
                 <h3>5.2.7 Conclusion</h3>
                 <p>In this work, we presented the Transformer, the first sequence transduction model based entirely on attention, replacing the recurrent layers most commonly used in encoder-decoder architectures with multi-headed self-attention.</p>
