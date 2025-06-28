@@ -131,6 +131,30 @@ Epoch [10/10], train loss: 0.0103
 Test reconstruction MSE: 0.0105</samp></pre>
 
                 <p>Now that the model is trained, let's test it by encoding and decoding images from the test set.</p>
+                <pre><code>encoded_imgs = autoencoder.encoder(sample_input.to(device))
+decoded_imgs = autoencoder.decoder(encoded_imgs).detach().cpu().numpy()
+
+n = 10
+pyplot.figure(figsize=(9, 2))
+for i in range(n):
+    # display original
+    ax = pyplot.subplot(2, n, i + 1)
+    pyplot.imshow(sample_input[i].squeeze(), cmap="gray")
+    pyplot.gray()
+    ax.get_xaxis().set_visible(False)
+    ax.get_yaxis().set_visible(False)
+
+    # display reconstruction
+    ax = pyplot.subplot(2, n, i + 1 + n)
+    pyplot.imshow(decoded_imgs[i].squeeze(), cmap="gray")
+    pyplot.gray()
+    ax.get_xaxis().set_visible(False)
+    ax.get_yaxis().set_visible(False)
+
+pyplot.show()</code></pre>
+
+                <img src="res/09/img_reconstruct.png" alt="Basic Autoencoder" width="600">
+                <p style="text-align: center; color: #555555;">Figure 1 - Basic Autoencoder</p>
                 
                 
                 <h3>9.8.2 Second example: Image denoising</h3>
