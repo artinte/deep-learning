@@ -22,7 +22,7 @@ print(labels.shape)
 
 class AutoEncoder(torch.nn.Module):
     def __init__(self, latent_dim, shape):
-        super(AutoEncoder, latent_dim, shape)
+        super().__init__()
         self.lantent_dim = latent_dim
         self.shape = shape
         self.input_dim = 1
@@ -46,21 +46,45 @@ class AutoEncoder(torch.nn.Module):
         decoded = self.decoder(encoded)
         return decoded
 
-latent_dim = 64
-autoencoder = AutoEncoder(latent_dim, train_set.data.shape[1:])
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-sample_input, _ = next(iter(test_loader))
-output = autoencoder(sample_input)
+latent_dim = 64
+autoencoder = AutoEncoder(latent_dim, train_set[0][0].shape).to(device)
+
+sample_input, _ = next(iter(test_loader)).to(device)
+output = autoencoder.forward(sample_input)
 print(output.shape)
+
 
 criterion = torch.nn.MSELoss()
 optimizer = torch.optim.Adam(autoencoder.parameters(), lr=1e-3)
 
-for images, _ in train_loader:
-    outputs = autoencoder(images)
-    loss = criterion(outputs, images)
-    loss.backward()
-    optimizer.step()
-    optimizer.zero_grad()
+for epoch in range(10):
+    autoencoder.train()
+    total_loss = 0
+    for images, _ in train_loader:
+        images = images.to(device)
+        outputs = autoencoder(images)
+        loss = criterion(outputs, images)
+        
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+        
+        total_loss += loss.item()
+    
+    print(f"Epoch [{epoch+1}/10], train Loss: {total_loss / len(train_loader):.4f}")
+
+
+autoencoder.eval()
+mse_total = 0
+with torch.no_grad():
+    for images, _ in test_loader:
+        images = images.to(device)
+        outputs = autoencoder(images)
+        loss = criterion(outputs, images)
+        mse_total += loss.item()
+
+print(f"Test reconstruction MSE: {mse_total / len(test_loader):.4f}")
 
     
