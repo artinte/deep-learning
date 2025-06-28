@@ -51,8 +51,8 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 latent_dim = 64
 autoencoder = AutoEncoder(latent_dim, train_set[0][0].shape).to(device)
 
-sample_input, _ = next(iter(test_loader)).to(device)
-output = autoencoder.forward(sample_input)
+sample_input, _ = next(iter(test_loader))
+output = autoencoder.forward(sample_input.to(device))
 print(output.shape)
 
 
@@ -73,7 +73,7 @@ for epoch in range(10):
         
         total_loss += loss.item()
     
-    print(f"Epoch [{epoch+1}/10], train Loss: {total_loss / len(train_loader):.4f}")
+    print(f"Epoch [{epoch+1}/10], train loss: {total_loss / len(train_loader):.4f}")
 
 
 autoencoder.eval()
