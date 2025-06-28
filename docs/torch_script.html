@@ -20,8 +20,14 @@
             <main class="col-md-8 content">
                 <h2 class="custom-title">12.2 TorchScript</h2>
                 <p class="title-subtext"></p>
-                <p style="color: #a0a0a0;">Created Date: 2025-06-07</p>
+                <p style="color: #a0a0a0;">Created Date: 2025-06-28</p>
 
+                <p>TorchScript is a way to create serializable and optimizable models from PyTorch code. Any TorchScript program can be saved from a Python process and loaded in a process where there is no Python dependency.</p>
+                <p>We provide tools to incrementally transition a model from a pure Python program to a TorchScript program that can be run independently from Python, such as in a standalone C++ program. This makes it possible to train models in PyTorch using familiar tools in Python and then export the model via TorchScript to a production environment where Python programs may be disadvantageous for performance and multi-threading reasons.</p>
+
+                
+                
+                
                 <div class="navigation">
                     <a href="onnx.html">Prev: 12.1 ONNX</a>
                     <a href="execu_torch.html">Next: 12.3 ExecuTorch</a>
