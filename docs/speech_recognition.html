@@ -28,10 +28,31 @@
                 <p>The Whisper architecture is a simple end-to-end approach, implemented as an encoder-decoder Transformer. Input audio is split into 30-second chunks, converted into a log-Mel spectrogram, and then passed into an encoder. A decoder is trained to predict the corresponding text caption, intermixed with special tokens that direct the single model to perform tasks such as language identification, phrase-level timestamps, multilingual speech transcription, and to-English speech translation.</p>
 
                 
+                <h3>8.2.1 Introduction</h3>
 
+                <h3>8.2.2 Approach</h3>
+
+                <h4>8.2.2.1 Data Processing</h4>
+                <p>Following the trend of recent work leveraging web-scale text from the internet for training machine learning systems, we take a minimalist approach to data pre-processing. In contrast to a lot of work on speech recognition, we train Whisper models to predict the raw text of transcripts without any significant standardization, relying on the expressiveness of sequence-to-sequence models to learn to map between utterances and their transcribed form. This simplifies the speech recognition pipeline since it removes the need for a separate inverse text normalization step in order to produce naturalistic transcriptions.</p>
+                <p>We construct the dataset from audio that is paired with transcripts on the Internet. This results in a very diverse dataset covering a broad distribution of audio from many different environments, recording setups, speakers, and languages.</p>
+                <p>While diversity in audio quality can help train a model to be robust, diversity in transcript quality is not similarly beneficial. Initial inspection showed a large amount of subpar transcripts in the raw dataset. To address this, we developed several automated filtering methods to improve transcript quality.</p>
+
+                <h4>8.2.2.2 Model</h4>
+                <p>Since the focus of our work is on studying the capabilities of large-scale supervised pre-training for speech recognition, we use an off-the-shelf architecture to avoid confounding our findings with model improvements. We chose an encoder-decoder Transformer (Vaswani et al., 2017) as this architecture has been well validated to scale reliably.</p>
+                <p>All audio is re-sampled to 16,000 Hz, and an 80-channel log-magnitude Mel spectrogram representation is computed on 25-millisecond windows with a stride of 10 milliseconds. For feature normalization, we globally scale the input to be between -1 and 1 with approximately zero mean across the pre-training dataset.</p>
+
+                <p>The encoder processes this input representation with a small stem consisting of two convolution layers with a filter width of 3 and the GELU activation function (Hendrycks & Gimpel, 2016) where the second convolution layer has a stride of two. Sinusoidal position embeddings are then added to the output of the stem after which the encoder Transformer blocks are applied.</p>
+                <p>The transformer uses pre-activation residual blocks (Child et al., 2019), and a final layer normalization is applied to the encoder output. The decoder uses learned position embeddings and tied input-output token representations (Press & Wolf, 2017). The encoder and decoder have the same width and number of transformer blocks. Figure 1 summarizes the model architecture.</p>
+                
                 <img src="res/08/whisper_arch.jpg" alt="Whisper Architecture" width="600">
                 <p style="text-align: center; color: #555555;">Figure 1 - Whisper Architecture</p>
 
+                <p>We use the same byte-level BPE text tokenizer used in GPT-2 (Sennrich et al., 2015; Radford et al., 2019) for the English-only models and refit the vocabulary (but keep the same size) for the multilingual models to avoid excessive fragmentation on other languages since the GPT-2 BPE vocabulary is English only.</p>
+
+                <h4>8.2.2.3 Multitask Format</h4>
+                <p>We train a suite of models of various sizes in order to study the scaling properties of Whisper. Please see Table 1 for an overview.</p>
+
+                <h4>8.2.2.4 Training Details</h4>
 
                 <div class="navigation">
                     <a href="speech_feature.html">Prev: 8.1 Speech Feature Extraction</a>
