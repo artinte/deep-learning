@@ -140,14 +140,12 @@ for i in range(n):
     # display original
     ax = pyplot.subplot(2, n, i + 1)
     pyplot.imshow(sample_input[i].squeeze(), cmap="gray")
-    pyplot.gray()
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
 
     # display reconstruction
     ax = pyplot.subplot(2, n, i + 1 + n)
     pyplot.imshow(decoded_imgs[i].squeeze(), cmap="gray")
-    pyplot.gray()
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
 
@@ -173,7 +171,7 @@ noisy_images = torch.clamp(noisy_images, 0.0, 1.0)
 n = 10
 pyplot.figure(figsize=(6, 2))
 for i in range(n):
-    ax = pyplot.subplot(2, n // 2, i + 1)
+    ax = pyplot.subplot(1, n, i + 1)
     pyplot.imshow(noisy_images[i].squeeze())
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
@@ -182,6 +180,8 @@ pyplot.show()</code></pre>
 
                 <img src="res/09/img_denoising.png" alt="Sample Image Denoising" width="600">
                 <p style="text-align: center; color: #555555;">Figure 2 - Sample Image Denoising</p>
+
+                <p>In this example, we will train a convolutional autoencoder using Conv2D layers in the encoder, and Conv2DTranspose layers in the decoder.</p>
 
                 <h3>9.8.3 Third example: Anomaly detection</h3>
                 <p>In this example, you will train an autoencoder to detect anomalies on the ECG5000 dataset. This dataset contains 5,000 Electrocardiograms, each with 140 data points. You will use a simplified version of the dataset, where each example has been labeled either 0 (corresponding to an abnormal rhythm), or 1 (corresponding to a normal rhythm). You are interested in identifying the abnormal rhythms.</p>

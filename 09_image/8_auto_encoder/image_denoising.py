@@ -32,3 +32,41 @@ for i in range(n):
     ax.get_yaxis().set_visible(False)
     pyplot.gray()
 pyplot.show()
+
+class Denoise(torch.nn.Module):
+    def __init__(self):
+        super(Denoise).__init__()
+
+        self.encoder = torch.nn.Sequential(
+            torch.nn.Conv2d(1, 16, kernel_size=3, stride=2, padding=1),
+            torch.nn.ReLU(),
+            torch.nn.Conv2d(16, 8, kernel_size=3, stride=2, padding=1))
+        
+        self.decoder = torch.nn.Sequential(
+            torch.nn.ConvTranspose2d(8, 16, kernel_size=3, stride=2, padding=1, output_padding=1),
+            torch.nn.ReLU(),
+            torch.nn.ConvTranspose2d(16, 1, kernel_size=3, stride=2, padding=1, output_padding=1),
+            torch.nn.Sigmoid())
+    
+    def forward(self, x):
+        encoded = self.encoder(x)
+        decoded = self.decoder(encoded)
+        return decoded
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model = Denoise().to(device)
+criterion = torch.nn.BCELoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+
+epochs = 10
+for epoch in range(epochs):
+    model.train()
+    total_loss = 0
+
+    for images, _ in train_loader:
+        noisy_images = images + noise_factor * torch.randn_like(images)
+        noisy_images = torch.clamp(noisy_images, 0.0, 1.0)
+
+        
+        
+    

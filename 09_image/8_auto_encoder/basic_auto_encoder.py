@@ -97,14 +97,12 @@ for i in range(n):
     # display original
     ax = pyplot.subplot(2, n, i + 1)
     pyplot.imshow(sample_input[i].squeeze(), cmap="gray")
-    pyplot.gray()
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
 
     # display reconstruction
     ax = pyplot.subplot(2, n, i + 1 + n)
     pyplot.imshow(decoded_imgs[i].squeeze(), cmap="gray")
-    pyplot.gray()
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
 
