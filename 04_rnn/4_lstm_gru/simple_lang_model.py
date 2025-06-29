@@ -214,6 +214,13 @@ if __name__ == '__main__':
 
 
     model = RNNNumpy(vocabulary_size)
+    print(x_train[10])
+    o, s = model.forward_propagation(x_train[10])
+    print(o.shape)
+    
+    predictions = model.predict(x_train[10])
+    print(predictions)
+
     start = time.time()
     model.sgd_step(x_train[10], y_train[10], 0.005)
     duration = time.time() - start

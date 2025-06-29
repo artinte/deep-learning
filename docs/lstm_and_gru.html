@@ -137,16 +137,65 @@ Origin output: what are n't you understanding about this? SENTENCE_END
                     \([-\frac{1}{\sqrt{n}}, \frac{1}{\sqrt{n}}]\)
                 </div>
                 <p>where \(n\) is the number of incoming connections from the previous layer. This may sound overly complicated, but don’t worry too much it. As long as you initialize your parameters to small random values it typically works out fine.</p>
+                <pre><code>class RNNNumpy:
+    def __init__(self, word_dim, hidden_dim=100, bptt_truncate=4):
+        # Assign instance variables.
+        self.word_dim = word_dim
+        self.hidden_dim = hidden_dim
+        self.bptt_truncate = bptt_truncate
+        # Randomly initialize the network parameters.
+        rng = numpy.random.default_rng(0)
+        self.U = rng.uniform(-numpy.sqrt(1./word_dim), numpy.sqrt(1./word_dim),
+                             (hidden_dim, word_dim))
+        self.V = rng.uniform(-numpy.sqrt(1./hidden_dim), numpy.sqrt(1./hidden_dim),
+                             (word_dim, hidden_dim))
+        self.W = rng.uniform(-numpy.sqrt(1./hidden_dim), numpy.sqrt(1./hidden_dim),
+                             (hidden_dim, hidden_dim))</code></pre>
+                
                 <p>Above, <code>word_dim</code> is the size of our vocabulary, and <code>hidden_dim</code> is the size of our hidden layer (we can pick it). Don’t worry about the <code>bptt_truncate</code> parameter for now, we’ll explain what that is later.</p>
 
                 <h4>4.4.3.2 Forward Propagation</h4>
                 <p>Next, let’s implement the forward propagation, predicting word probabilities, defined by our equations above:</p>
+                <pre><code>class RNNNumpy:
+    # ...
+    def forward_propagation(self, x):
+        # The total number of time steps.
+        T = len(x)
+        # During forward propagation we save all hidden states in s because need them later.
+        # We add one additional element for the initial hidden, which we set to 0.
+        s = numpy.zeros((T + 1, self.hidden_dim))
+        # The outputs at each time step. Again, we save them for later.
+        o = numpy.zeros((T, self.word_dim))
+
+        # For each time step...
+        for t in numpy.arange(T):
+            # Note that we are indexing U by x[t].
+            # This is the same as multiplying U with a one-hot vector.
+            s[t] = numpy.tanh(self.U[:, x[t]] + self.W.dot(s[t-1]))
+            o[t] = softmax(self.V.dot(s[t]))
+        return (o, s)</code></pre>
 
                 <p>We not only return the calculated outputs, but also the hidden states. We will use them later to calculate the gradients, and by returning them here we avoid duplicate computation. Each \(o_t\) is a vector of probabilities representing the words in our vocabulary, but sometimes, for example when evaluating our model, all we want is the next word with the highest probability. We call this function <code>predict</code>.</p>
+                <pre><code>class RNNNumpy:
+    # ...
+    def predict(self, x):
+        # Perform forward propagation and return index of the highest score.
+        o, s = self.forward_propagation(x)
+        return numpy.argmax(o, axis=1)</code></pre>
 
                 <p>Let’s try our newly implemented methods and see an example output:</p>
+                <pre><code>model = RNNNumpy(vocabulary_size)
+    print(x_train[10])
+    o, s = model.forward_propagation(x_train[10])
+    print(o.shape)</code></pre>
+                <pre><samp>[0, 7, 7510, 3415, 13, 17, 126, 5, 327, 3, 329, 14, 3, 132, 269, 2]
+(16, 8000)</samp></pre>
 
                 <p>For each word in the sentence (45 above), our model made 8000 predictions representing probabilities of the next word. Note that because we initialized \(U\), \(V\), \(W\) to random values these predictions are completely random right now. The following gives the indices of the highest probability predictions for each word:</p>
+                <pre><code>predictions = model.predict(x_train[10])
+print(predictions)</code></pre>
+                <pre><samp>[6703 1153 4245  857 3803 1813 6387 2065 7020 4074  140  877 4765 1913  1111  557]</samp></pre>
+
 
                 <h4>4.4.3.3 Calculating the Loss</h4>
                 <p>To train our network we need a way to measure the errors it makes. We call this the loss function \(L\), and our goal is find the parameters \(U\), \(V\) and \(W\) that minimize the loss function for our training data. A common choice for the loss function is the cross-entropy loss. If we have \(N\) training examples (words in our text) and \(C\) classes (the size of our vocabulary) then the loss with respect to our predictions \(o\) and the true labels \(y\) is given by:</p>
