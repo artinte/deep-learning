@@ -57,12 +57,63 @@
 
                 <h4>4.4.2.4 Build Training Data Matrices</h4>
                 <p>The input to our Recurrent Neural Networks are vectors, not strings. So we create a mapping between words and indices, <code>index_to_word</code> and <code>word_to_index</code>. For example, the word "friendly" may be at index 2001. A training example \(x\) may look like \([0, 179, 241, 416]\), where 0 corresponds to <code>SENTENCE_START</code>.  The corresponding label \(y\) would be \([179, 341, 416, 1]\). Remember that our goal is to predict the next word, so \(y\) is just the \(x\) vector shifted by one position with the last element being the <code>SENTENCE_END</code> token. In other wrods, the correct prediction for word 179 above would be 341, the actual next word.</p>
-                
+
+                <pre><code>vocabulary_size = 8000
+unknown_token = 'UNKNOWN_TOKEN'
+sentence_start_token = 'SENTENCE_START'
+sentence_end_token = 'SENTENCE_END'
+
+nltk.download('punkt_tab')
+# Read the data and append SENTENCE_START and SENTENCE_END tokens.
+with open('data/reddit-comments-2015-08.csv', 'r', encoding='utf-8') as f:
+    reader = csv.reader(f, skipinitialspace=True)
+    # Split full comments into sentences.
+    sentences = itertools.chain(*[nltk.sent_tokenize(x[0].lower()) for x in reader])
+    # Append SENTENCE_START and SENTENCE_END.
+    sentences = ['%s %s %s' % (sentence_start_token, x, sentence_end_token) for x in sentences]
+
+# Tokenize the sentences into words.
+tokenized_sentences = [nltk.word_tokenize(sent) for sent in sentences]
+# Count the word frequencies.
+word_freq = nltk.FreqDist(itertools.chain(*tokenized_sentences))
+
+# Get the most common words and build index_to_word and word_to_index vectors.
+vocab = word_freq.most_common(vocabulary_size - 1)
+index_to_word = [x[0] for x in vocab]
+index_to_word.append(unknown_token)
+word_to_index = dict([(w, i) for i, w in enumerate(index_to_word)])
+
+# Replace all words in our vocabulary with the unkown token.
+for i, sent in enumerate(tokenized_sentences):
+    tokenized_sentences[i] = [w if w in word_to_index else unknown_token for w in sent]
+
+# Create the training data.
+x_train = numpy.asarray([[word_to_index[w] for w in sent[:-1]] for sent in tokenized_sentences], dtype=object)
+y_train = numpy.asarray([[word_to_index[w] for w in sent[1:]] for sent in tokenized_sentences], dtype=object)
+
+sample_sentence_x = "SENTENCE_START what are n't you understanding about this?"
+print('Origin input:', sample_sentence_x)
+sample_sentence_x = nltk.word_tokenize(sample_sentence_x)
+sample_sentence_x = [w if w in word_to_index else unknown_token for w in sample_sentence_x]
+print(numpy.asarray([word_to_index[w] for w in sample_sentence_x]))
+sample_sentence_y = "what are n't you understanding about this? SENTENCE_END"
+print('Origin output:', sample_sentence_y)
+sample_sentence_y = nltk.word_tokenize(sample_sentence_y)
+sample_sentence_y = [w if w in word_to_index else unknown_token for w in sample_sentence_y]
+print(numpy.asarray([word_to_index[w] for w in sample_sentence_y]))</code></pre>
+
+                <pre><samp>Origin input: SENTENCE_START what are n't you understanding about this?
+[  0  52  28  17  10 858  55  26  35]
+Origin output: what are n't you understanding about this? SENTENCE_END
+[ 52  28  17  10 858  55  26  35   1]</samp></pre>
 
                 <h3>4.4.3 Building the RNN</h3>
-                <p>For a general overview of RNNs take a look at first part of the tutorial.</p>
                 <p>Let’s get concrete and see what the RNN for our language model looks like. The input \(x\) will be a sequence of words (just like the example printed above) and each \(x_t\) is a single word. But there’s one more thing: Because of how matrix multiplication works we can’t simply use a word index (like 36) as an input.</p>
-                <p>Instead, we represent each word as a <a href="#">one-hot</a> vector of size <code>vocabulary_size</code>. For example, the word with index 36 would be the vector of all 0’s and a 1 at position 36. So, each \(x_t\) will become a vector, and \(x\) will be a matrix, with each row representing a word. We’ll perform this transformation in our Neural Network code instead of doing it in the pre-processing.</p>
+                
+                <img src="res/04/simple_rnn_arch.jpg" alt="RNN Overview" width="600">
+                <p style="text-align: center; color: #555555;">Figure 2 - RNN Overview</p>
+
+                <p>Instead, we represent each word as a <a href="word_embed.html#one_hot">one-hot</a> vector of size <code>vocabulary_size</code>. For example, the word with index 36 would be the vector of all 0’s and a 1 at position 36. So, each \(x_t\) will become a vector, and \(x\) will be a matrix, with each row representing a word. We’ll perform this transformation in our Neural Network code instead of doing it in the pre-processing.</p>
                 <p>The output of our network \(o\) has a similar format. Each \(o_t\) is a vector of <code>vocabulary_size</code> elements, and each element represents the probability of that word being the next word in the sentence.</p>
                 <p>Let’s recap the equations for the RNN from the first part of the tutorial:</p>
                 <p class="highlight-math" style="text-align: center; overflow-x: auto;">\(s_t = tanh(U \cdot x_t + W \cdot s_{t-1})\)</p>
