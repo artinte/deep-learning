@@ -96,6 +96,7 @@ print('Origin input:', sample_sentence_x)
 sample_sentence_x = nltk.word_tokenize(sample_sentence_x)
 sample_sentence_x = [w if w in word_to_index else unknown_token for w in sample_sentence_x]
 print(numpy.asarray([word_to_index[w] for w in sample_sentence_x]))
+
 sample_sentence_y = "what are n't you understanding about this? SENTENCE_END"
 print('Origin output:', sample_sentence_y)
 sample_sentence_y = nltk.word_tokenize(sample_sentence_y)
@@ -132,12 +133,13 @@ Origin output: what are n't you understanding about this? SENTENCE_END
                 <p>Armed with this, it’s time to start our implementation.</p>
                 
                 <h4>4.4.3.1 Initialization</h4>
-                <p>We start by declaring a RNN class an initializing our parameters. I’m calling this class <code>RNNNumpy</code>. Initializing the parameters \(U\), \(V\) and \(W\) is a bit tricky. We can’t just initialize them to 0’s because that would result in symmetric calculations in all our layers. We must initialize them randomly. Because proper initialization seems to have an impact on training results there has been lot of research in this area. It turns out that the best initialization depends on the activation function (\(tanh\ in our case), and one recommended approach is to initialize the weights randomly in the interval from:</p>
+                <p>We start by declaring a RNN class an initializing our parameters. I’m calling this class <code>RNNNumpy</code>. Initializing the parameters \(U\), \(V\) and \(W\) is a bit tricky. We can’t just initialize them to 0’s because that would result in symmetric calculations in all our layers. We must initialize them randomly. Because proper initialization seems to have an impact on training results there has been lot of research in this area. It turns out that the best initialization depends on the activation function (\(tanh\) in our case), and one recommended approach is to initialize the weights randomly in the interval from:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \([-\frac{1}{\sqrt{n}}, \frac{1}{\sqrt{n}}]\)
                 </div>
                 <p>where \(n\) is the number of incoming connections from the previous layer. This may sound overly complicated, but don’t worry too much it. As long as you initialize your parameters to small random values it typically works out fine.</p>
                 <pre><code>class RNNNumpy:
+    # ...
     def __init__(self, word_dim, hidden_dim=100, bptt_truncate=4):
         # Assign instance variables.
         self.word_dim = word_dim
@@ -185,9 +187,9 @@ Origin output: what are n't you understanding about this? SENTENCE_END
 
                 <p>Let’s try our newly implemented methods and see an example output:</p>
                 <pre><code>model = RNNNumpy(vocabulary_size)
-    print(x_train[10])
-    o, s = model.forward_propagation(x_train[10])
-    print(o.shape)</code></pre>
+print(x_train[10])
+o, s = model.forward_propagation(x_train[10])
+print(o.shape)</code></pre>
                 <pre><samp>[0, 7, 7510, 3415, 13, 17, 126, 5, 327, 3, 329, 14, 3, 132, 269, 2]
 (16, 8000)</samp></pre>
 

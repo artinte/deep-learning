@@ -206,6 +206,7 @@ if __name__ == '__main__':
     sample_sentence_x = nltk.word_tokenize(sample_sentence_x)
     sample_sentence_x = [w if w in word_to_index else unknown_token for w in sample_sentence_x]
     print(numpy.asarray([word_to_index[w] for w in sample_sentence_x]))
+
     sample_sentence_y = "what are n't you understanding about this? SENTENCE_END"
     print('Origin output:', sample_sentence_y)
     sample_sentence_y = nltk.word_tokenize(sample_sentence_y)
