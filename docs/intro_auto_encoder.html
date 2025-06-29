@@ -182,6 +182,75 @@ pyplot.show()</code></pre>
                 <p style="text-align: center; color: #555555;">Figure 2 - Sample Image Denoising</p>
 
                 <p>In this example, we will train a convolutional autoencoder using Conv2D layers in the encoder, and Conv2DTranspose layers in the decoder.</p>
+                <pre><code>class Denoise(torch.nn.Module):
+    def __init__(self):
+        super().__init__()
+
+        self.encoder = torch.nn.Sequential(
+            torch.nn.Conv2d(1, 16, kernel_size=3, stride=2, padding=1),
+            torch.nn.ReLU(),
+            torch.nn.Conv2d(16, 8, kernel_size=3, stride=2, padding=1),
+        )
+
+        self.decoder = torch.nn.Sequential(
+            torch.nn.ConvTranspose2d(
+                8, 16, kernel_size=3, stride=2, padding=1, output_padding=1
+            ),
+            torch.nn.ReLU(),
+            torch.nn.ConvTranspose2d(
+                16, 1, kernel_size=3, stride=2, padding=1, output_padding=1
+            ),
+            torch.nn.Sigmoid(),
+        )
+
+    def forward(self, x):
+        encoded = self.encoder(x)
+        decoded = self.decoder(encoded)
+        return decoded</code></pre>
+
+                <p>Let's take a look at a summary of the encoder. Notice how the images are downsampled from \(28 \times 28\) to \(7 \times 7\).</p>
+                <pre><samp>----------------------------------------------------------------
+        Layer (type)               Output Shape         Param #
+================================================================
+            Conv2d-1           [-1, 16, 14, 14]             160
+              ReLU-2           [-1, 16, 14, 14]               0
+            Conv2d-3              [-1, 8, 7, 7]           1,160
+================================================================
+Total params: 1,320
+Trainable params: 1,320
+Non-trainable params: 0
+----------------------------------------------------------------
+Input size (MB): 0.00
+Forward/backward pass size (MB): 0.05
+Params size (MB): 0.01
+Estimated Total Size (MB): 0.06
+----------------------------------------------------------------</samp></pre>
+
+                <p>The decoder upsamples the images back from \(7 \times 7\) to \(28 \times 28\).</p>
+                <pre><samp>----------------------------------------------------------------
+        Layer (type)               Output Shape         Param #
+================================================================
+   ConvTranspose2d-1           [-1, 16, 14, 14]           1,168
+              ReLU-2           [-1, 16, 14, 14]               0
+   ConvTranspose2d-3            [-1, 1, 28, 28]             145
+           Sigmoid-4            [-1, 1, 28, 28]               0
+================================================================
+Total params: 1,313
+Trainable params: 1,313
+Non-trainable params: 0
+----------------------------------------------------------------
+Input size (MB): 0.00
+Forward/backward pass size (MB): 0.06
+Params size (MB): 0.01
+Estimated Total Size (MB): 0.07
+----------------------------------------------------------------
+Params size (MB): 0.01
+Estimated Total Size (MB): 0.07
+----------------------------------------------------------------</samp></pre>
+
+                <p>Plotting both the noisy images and the denoised images produced by the autoencoder.</p>
+                <img src="res/09/denoising_output.png" alt="Denoising Comparison" width="600">
+                <p style="text-align: center; color: #555555;">Figure 3 - Denosiing Comparison</p>
 
                 <h3>9.8.3 Third example: Anomaly detection</h3>
                 <p>In this example, you will train an autoencoder to detect anomalies on the ECG5000 dataset. This dataset contains 5,000 Electrocardiograms, each with 140 data points. You will use a simplified version of the dataset, where each example has been labeled either 0 (corresponding to an abnormal rhythm), or 1 (corresponding to a normal rhythm). You are interested in identifying the abnormal rhythms.</p>
