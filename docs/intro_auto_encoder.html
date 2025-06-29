@@ -253,9 +253,18 @@ Estimated Total Size (MB): 0.07
                 <p style="text-align: center; color: #555555;">Figure 3 - Denosiing Comparison</p>
 
                 <h3>9.8.3 Third example: Anomaly detection</h3>
-                <p>In this example, you will train an autoencoder to detect anomalies on the ECG5000 dataset. This dataset contains 5,000 Electrocardiograms, each with 140 data points. You will use a simplified version of the dataset, where each example has been labeled either 0 (corresponding to an abnormal rhythm), or 1 (corresponding to a normal rhythm). You are interested in identifying the abnormal rhythms.</p>
+                <p>In this example, you will train an autoencoder to detect anomalies on the <a href="https://www.timeseriesclassification.com/description.php?Dataset=ECG5000">ECG5000</a> dataset. This dataset contains 5,000 Electrocardiograms, each with 140 data points. You will use a simplified version of the dataset, where each example has been labeled either 0 (corresponding to an abnormal rhythm), or 1 (corresponding to a normal rhythm). You are interested in identifying the abnormal rhythms.</p>
+                
+                <p class="comment">Note: This is a labeled dataset, so you could phrase this as a supervised learning problem. The goal of this example is to illustrate anomaly detection concepts you can apply to larger datasets, where you do not have labels available (for example, if you had many thousands of normal rhythms, and only a small number of abnormal rhythms).</p>
+                
                 <p>How will you detect anomalies using an autoencoder? Recall that an autoencoder is trained to minimize reconstruction error. You will train an autoencoder on the normal rhythms only, then use it to reconstruct all the data. Our hypothesis is that the abnormal rhythms will have higher reconstruction error. You will then classify a rhythm as an anomaly if the reconstruction error surpasses a fixed threshold.</p>
                 
+                <img src="res/09/normal_ecg.png" alt="A Normal ECG" width="600">
+                <p style="text-align: center; color: #555555;">Figure 4 - A Normal ECG</p>
+
+                <img src="res/09/anomalous_ecg.png" alt="An Anomalous ECG" width="600">
+                <p style="text-align: center; color: #555555;">Figure 5 - An Anomalous ECG</p>
+
                 <div class="navigation">
                     <a href="segment_anything.html">9.7 Segment Anything</a>
                     <a href="rl_introduction.html">Next: 10.1 Introduction RL Problems</a>
