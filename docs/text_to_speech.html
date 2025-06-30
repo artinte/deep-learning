@@ -59,6 +59,11 @@
 
                 <p><strong>Mel-Spectrogram Loss</strong> In addition to the GAN objective, we add a mel-spectrogram loss to improve the training efficiency of the generator and the fidelity of the generated audio. Referring to previous work (Isola et al., 2017), applying a reconstruction loss to GAN model helps to generate realistic results, and in Yamamoto et al. (2020)’s work, time-frequency distribution is effectively captured by jointly optimizing multi-resolution spectrogram and adversarial loss functions.</p>
                 <p>We used mel-spectrogram loss according to the input conditions, which can also be expected to have the effect of focusing more on improving the perceptual quality due to the characteristics of the human auditory system. The mel-spectrogram loss is the L1 distance between the mel-spectrogram of a waveform synthesized by the generator and that of a ground truth waveform. It is defined as:</p>
+
+                <p><strong>Feature Matching Loss</strong> The feature matching loss is a learned similarity metric measured by the difference in features of the discriminator between a ground truth sample and a generated sample (Larsen et al., 2016, Kumar et al., 2019).</p>
+                <p>As it was successfully adopted to speech synthesis (Kumar et al., 2019), we use it as an additional loss to train the generator. Every intermediate feature of the discriminator is extracted, and the L1 distance between a ground truth sample and a conditionally generated sample in each feature space is calculated. The feature matching loss is defined as:</p>
+
+                <p><strong>Final Loss</strong> Our final objectives for the generator and discriminator are as:</p>
                 
                 <div class="navigation">
                     <a href="speech_recognition.html">Prev: 8.2 Automatic Speech Recognition</a>
