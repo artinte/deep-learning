@@ -38,8 +38,28 @@
 
                 <p>To this end, we propose the multi-period discriminator (MPD) consisting of several sub-discriminators each handling a portion of periodic signals of input audio. Additionally, to capture consecutive patterns and long-term dependencies, we use the multi-scale discriminator (MSD) proposed in MelGAN (Kumar et al., 2019), which consecutively evaluates audio samples at different levels. We conducted simple experiments to show the ability of MPD and MSD to capture periodic patterns, and the results can be found in Appendix B.</p>
 
-                <p></p>
+                <p><strong>Multi-Period Discriminator</strong> MPD is a mixture of sub-discriminators, each of which only accepts equally spaced samples of an input audio; the space is given as period \(p\). The sub-discriminators are designed to capture different implicit structures from each other by looking at different parts of an input audio. We set the periods to \([2, 3, 5, 7, 11]\) to avoid overlaps as much as possible. As shown in Figure 2b, we first reshape 1D raw audio of length \(T\) T into 2D data of height \(T/p\) and width \(p\) and then apply 2D convolutions to the reshaped data.</p>
+                <p>In every convolutional layer of MPD, we restrict the kernel size in the width axis to be 1 to process the periodic samples independently. Each sub-discriminator is a stack of strided convolutional layers with leaky rectified linear unit (ReLU) activation. Subsequently, weight normalization (Salimans and Kingma, 2016) is applied to MPD. By reshaping the input audio into 2D data instead of sampling periodic signals of audio, gradients from MPD can be delivered to all time steps of the input audio.</p>
 
+                <p><strong>Multi-Scale Discriminator</strong> Because each sub-discriminator in MPD only accepts disjoint samples, we add MSD to consecutively evaluate the audio sequence. The architecture of MSD is drawn from that of MelGAN (Kumar et al., 2019). MSD is a mixture of three sub-discriminators operating on different input scales: raw audio, \(\times 2\) average-pooled audio, and \(\times 4\) average-pooled audio, as shown in Figure 2a.</p>
+
+                <p>Each of the sub-discriminators in MSD is a stack of strided and grouped convolutional layers with leaky ReLU activation. The discriminator size is increased by reducing stride and adding more layers. Weight normalization is applied except for the first sub-discriminator, which operates on raw audio. Instead, spectral normalization (Miyato et al., 2018) is applied and stabilizes training as it reported.</p>
+
+                <p>Note that MPD operates on disjoint samples of raw waveforms, whereas MSD operates on smoothed waveforms.</p>
+
+                <p>For previous work using multi-discriminator architecture such as MPD and MSD, Binkowski et al. (2019)’s work can also be referred. The discriminator architecture proposed in the work has resemblance to MPD and MSD in that it is a mixture of discriminators, but MPD and MSD are Markovian window-based fully unconditional discriminator, whereas it averages the output and has conditional discriminators.</p>
+                <p>Also, the resemblance between MPD and RWD (Binkowski et al., 2019) can be considered in the part of reshaping input audio, but MPD uses periods set to prime numbers to discriminate data of as many periods as possible, whereas RWD uses reshape factors of overlapped periods and does not handle each channel of the reshaped data separately, which are different from what MPD is aimed for. A variation of RWD can perform a similar operation to MPD, but it is also not the same as MPD in terms of parameter sharing and strided convolution to adjacent signals. More details of the architectural difference can be found in Appendix C.</p>
+
+                <h4>8.3.3.3 Training Loss Terms</h4>
+                <p><strong>GAN Loss</strong> For brevity, we describe our discriminators, MSD and MPD, as one discriminator throughout Section 2.4. For the generator and discriminator, the training objectives follow LS-GAN (Mao et al., 2017), which replace the binary cross-entropy terms of the original GAN objectives (Goodfellow et al., 2014) with least squares loss functions for non-vanishing gradient flows.</p>
+                <p>The discriminator is trained to classify ground truth samples to 1, and the samples synthesized from the generator to 0. The generator is trained to fake the discriminator by updating the sample quality to be classified to a value almost equal to 1. GAN losses for the generator G and the discriminator D are defined as:</p>
+
+
+                <p>, where \(x\) denotes the ground truth audio and \(s\) denotes the input condition, the mel-spectrogram of the ground truth audio.</p>
+
+                <p><strong>Mel-Spectrogram Loss</strong> In addition to the GAN objective, we add a mel-spectrogram loss to improve the training efficiency of the generator and the fidelity of the generated audio. Referring to previous work (Isola et al., 2017), applying a reconstruction loss to GAN model helps to generate realistic results, and in Yamamoto et al. (2020)’s work, time-frequency distribution is effectively captured by jointly optimizing multi-resolution spectrogram and adversarial loss functions.</p>
+                <p>We used mel-spectrogram loss according to the input conditions, which can also be expected to have the effect of focusing more on improving the perceptual quality due to the characteristics of the human auditory system. The mel-spectrogram loss is the L1 distance between the mel-spectrogram of a waveform synthesized by the generator and that of a ground truth waveform. It is defined as:</p>
+                
                 <div class="navigation">
                     <a href="speech_recognition.html">Prev: 8.2 Automatic Speech Recognition</a>
                     <a href="speech_separation.html">Next: 8.4 Speech Separation</a>
