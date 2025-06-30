@@ -37,7 +37,21 @@
                 <h3>3.5.3 DenseNets</h3>
                 <p>Consider a single image \(x_0\) that is passed through a convolutional network. The network comprises \(L\) layers, each of which implements a non-linear transformation \(H_l(\cdot)\), where \(l\) indexes the layer. \(H_l(\cdot)\) can be a composite function of operations such as Batch Normalization (BN), rectified linear units (ReLU), Pooling, or or Convolution (Conv). We denote the output of the \(l^{th}\) layer as \(x_l\).</p>
                 <h5>ResNets</h5>
-                <p>Traditional convolutional feed-forward networks connect the output of the </p>
+                <p>Traditional convolutional feed-forward networks connect the output of the \(\mathcal{l}^{th}\) layer as input to the \({(\mathcal{l} + 1)}^{th}\) layer, which gives rise to the following layer transition: \(x_{\mathcal{l}} = H_{\mathcal{l}}(x_{\mathcal{l} - 1})\). ResNets add a skip-connection that bypasses the non-linear transformations with an identity function:</p>
+
+                <p>An advantage of ResNets is that the gradient can flow directly through the identity function from later layers to the earlier layers. However, the identity function and the output of \(H_{\mathcal{l}}\) are combined by summation, which may impede the information flow in the network.</p>
+
+                <h5>Dense connectivity</h5>
+
+                <h5>Composite function</h5>
+
+                <h5>Pooling layers</h5>
+
+                <h5>Growth rate</h5>
+
+                <h5>Bottleneck layers</h5>
+
+                <h5>Compression</h5>
 
                 <h3>3.5.4 Experiments</h3>
                 
