@@ -151,7 +151,6 @@ def subsequent_mask(size):
     subsequent_mask = torch.triu(torch.ones(attn_shape), diagonal=1).type(torch.uint8)
     return subsequent_mask == 0
 
-# 展示 subsequent_mask 作用
 print(subsequent_mask(6))
 
 def attention(query, key, value, mask=None, dropout=None):

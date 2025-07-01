@@ -260,7 +260,7 @@
                 <p>where \(p_i\) and \(\lambda_i\) are \(i\)th eigenvector and eigenvalue of the \(3 \times 3\) covariance matrix of RGB pixel values, respectively, and \(a_i\) is the aforementioned random variable. Each \(a_i\) is drawn only once for all the pixels of a particular training image until that image is used for training again, at which point it is re-drawn.</p>
                 <p>This scheme approximately captures an important property of natural images, namely, that object identity is invariant to changes in the intensity and color of the illumination. This scheme reduces the top-1 error rate by over 1%.</p>
 
-                <h4>3.2.4.2 Dropout</h4>
+                <h4 id="dropout">3.2.4.2 Dropout</h4>
                 <p>Combining the predictions of many different models is a very successful way to reduce test errors, but it appears to be too expensive for big neural networks that already take several days to train. There is, however, a very efficient version of model combination that only costs about a factor of two during training.</p>
                 <p>The recently-introduced technique, called <em>"dropout"</em>, consists of setting to zero the output of each hidden neuron with probability 0.5. The neurons which are "dropout out" in this way do not contribute to the forward pass and do not participate in backpropagation.</p>
                 <p>So every time an input is presented, the neural network samples a different architecture, but all these architectures share weights. This technique reduces complex co-adaptations of neurons, since a neuron cannot rely on the presence of particular other neurons.</p>

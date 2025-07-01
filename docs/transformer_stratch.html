@@ -21,27 +21,122 @@
                 <h2 class="custom-title">5.4 Transformer from Stratch</h2>
                 <p class="title-subtext"></p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-22</p>
-                <p>The Transformer has been on a lot of people’s minds over the last year five years. This post presents an annotated version of the paper in the form of a line-by-line implementation. It reorders and deletes some sections from the original paper and adds comments throughout. This document itself is a working notebook, and should be a completely usable implementation.</p>
+                <p>The <strong>Transformer</strong> has been on a lot of people’s minds over the past few years. This post presents an annotated version of the paper in the form of a line-by-line implementation. It reorders and deletes some sections from the original paper and adds comments throughout.</p>
+
                 <h3>5.4.1 Background</h3>
                 <p>The goal of reducing sequential computation also forms the foundation of the Extended Neural GPU, ByteNet and ConvS2S, all of which use convolutional neural networks as basic building block, computing hidden representations in parallel for all input and output positions. In these models, the number of operations required to relate signals from two arbitrary input or output positions grows in the distance between positions, linearly for ConvS2S and logarithmically for ByteNet. This makes it more difficult to learn dependencies between distant positions.</p>
-                <p>In the Transformer this is reduced to a constant number of operations, albeit at the cost of reduced effective resolution due to averaging attention-weighted positions, an effect we counteract with Multi-Head Attention.</p>
+                <p>In the Transformer this is reduced to a constant number of operations, albeit at the cost of reduced effective resolution due to averaging attention-weighted positions, an effect we counteract with <strong>Multi-Head Attention</strong>.</p>
+
                 <p>Self-attention, sometimes called intra-attention is an attention mechanism relating different positions of a single sequence in order to compute a representation of the sequence. Self-attention has been used successfully in a variety of tasks including reading comprehension, abstractive summarization, textual entailment and learning task-independent sentence representations.</p>
                 <p>End-to-end memory networks are based on a recurrent attention mechanism instead of sequencealigned recurrence and have been shown to perform well on simple-language question answering and language modeling tasks.</p>
                 <p>To the best of our knowledge, however, the Transformer is the first transduction model relying entirely on self-attention to compute representations of its input and output without using sequence aligned RNNs or convolution.</p>
 
                 <h3>5.4.2 Part 1: Model Architecture</h3>
-                <p>Most competitive neural sequence transduction models have an encoder-decoder structure. Here, the encoder maps an input sequence of symbol representations \(x_1, \cdots , x_n\) to a sequence of continuous representations \(z = (z_1, \cdots , z_n)\).</p>
-                <p>Given \(z\), the decoder then generates an output sequence \(y_1, \cdots , y_m\) of symbols one element at a time. At each step the model is auto-regressive, consuming the previously generated symbols as additional input when generating the next.</p>
-                <p>The Transformer follows this overall architecture using stacked self-attention and point-wise, fully connected layers for both the encoder and decoder, shown in the left and right halves of below figure, respectively.</p>
-               
+                <p>Most competitive neural sequence transduction models have an encoder-decoder structure. Here, the encoder maps an input sequence of symbol representations \((x_1, \cdots , x_n)\) to a sequence of continuous representations \(\mathbf{z} = (z_1, \cdots , z_n)\).</p>
+                <p>Given \(\mathbf{z}\), the decoder then generates an output sequence \((y_1, \cdots , y_m)\) of symbols one element at a time. At each step the model is auto-regressive, consuming the previously generated symbols as additional input when generating the next.</p>
+                <pre><code>class EncoderDecoder(nn.Module):
+    """
+    A standard Encoder-Decoder architecture. Base for this and many
+    other models.
+    """
+    def __init__(self, encoder, decoder, src_embed, tgt_embed, generator):
+        super(EncoderDecoder, self).__init__()
+        self.encoder = encoder
+        self.decoder = decoder
+        self.src_embed = src_embed
+        self.tgt_embed = tgt_embed
+        self.generator = generator
+    
+    def forward(self, src, tgt, src_mask, tgt_mask):
+        """
+        Take in and process masked src and target sequences.
+        """
+        return self.decode(self.encode(src, src_mask), src_mask, tgt, tgt_mask)
+
+    def encode(self, src, src_mask):
+        return self.encoder(self.src_embed(src), src_mask)
+    
+    def decode(self, memory, src_mask, tgt, tgt_mask):
+        return self.decoder(self.tgt_embed(tgt), memory, src_mask, tgt_mask)</code></pre>
+                
+                <p>The Transformer follows this overall architecture using stacked self-attention and point-wise, fully connected layers for both the encoder and decoder, shown in the left and right halves of Figure 1, respectively.</p>
+                <img src="res/00/transformer_arch.png">
+                <p style="text-align: center; color: #555555;">Figure 1 - The Transformer Architecture</p>
+
+                <p>The <code>Generator</code> takes the hidden states from the model, applies a linear layer to produce scores over the vocabulary, and uses <code>log_softmax</code> to get log-probabilities for word prediction or training.</p>
+                <pre><code>class Generator(nn.Module):
+    """
+    Define standard linear + softmax generation step.
+    """
+    def __init__(self, d_model, vocab):
+        super(Generator, self).__init__()
+        self.proj = nn.Linear(d_model, vocab)
+
+    def forward(self, x):
+        return nn.functional.log_softmax(self.proj(x), dim=-1)</code></pre>
+
                 <h4>5.4.2.1 Encoder and Decoder Stacks</h4>
-                <p>We employ a <a href="#">residual</a> connection around each of the two sub-layers, followed by layer normalization:</p>
-                <p>That is, the output of each sub-layer is <code>LayerNorm(x + SubLayer(x))</code>, where <code>SubLayer(x)</code> is the function implemented by the sub-layer itself. We apply <a href="#">dropout</a> to the output of each sub-layer, before it is added to the sub-layer input and normalized.</p>
+
+                <h5>Encoder</h5>
+
+                <p>The encoder is composed of a stack of \(N = 6\) identical layers.</p>
+                <pre><code>def clones(module, N):
+    """
+    Produce N identical layers.
+    """
+    return nn.ModuleList([copy.deepcopy(module) for _ in range(N)])
+
+class Encoder(nn.Module):
+    """
+    Core encoder is a stack of N layers
+    """
+    def __init__(self, layer, N):
+        super(Encoder, self).__init__()
+        self.layers = clones(layer, N)
+        self.norm = LayerNorm(layer.size)
+    
+    def forward(self, x, mask):
+        # Pass the input (and mask) through each layer in turn.
+        for layer in self.layers:
+            x = layer(x, mask)
+        return self.norm(x)</code></pre>
+
+                <p>We employ a <a href="res_net.html">residual</a> connection around each of the two sub-layers, followed by layer normalization:</p>
+                <pre><code>class LayerNorm(nn.Module):
+    """
+    Construct a layernorm module (See citation for details).
+    """
+    def __init__(self, features, eps=1e-6):
+        super(LayerNorm, self).__init__()
+        self.a_2 = nn.Parameter(torch.ones(features))
+        self.b_2 = nn.Parameter(torch.zeros(features))
+        self.eps = eps
+    
+    def forward(self, x):
+        mean = x.mean(-1, keepdim=True)
+        std = x.std(-1, keepdim=True)
+        return self.a_2 * (x - mean) / (std + self.eps) + self.b_2</code></pre>
+                
+                <p>That is, the output of each sub-layer is <code>LayerNorm(x + SubLayer(x))</code>, where <code>SubLayer(x)</code> is the function implemented by the sub-layer itself. We apply <a href="alex_net.html#dropout">dropout</a> to the output of each sub-layer, before it is added to the sub-layer input and normalized.</p>
                 <p>To facilitate these residual connections, all sub-layers in the model, as well as the embedding layers, produce outputs of dimension \(d_{model} = 512\).</p>
+
+                <pre><code>class SublayerConnection(nn.Module):
+    """
+    A residual connection followed by a layer norm.
+    Note for code simplicity the norm is first as opposed to last.
+    """
+    def __init__(self, size, dropout):
+        super(SublayerConnection, self).__init__()
+        self.norm = LayerNorm(size)
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, x, sublayer):
+        # Apply residual connection to any sublayer with the same size.
+        return x + self.dropout(sublayer(self.norm(x)))</code></pre>
 
                 <p>Each layer has two sub-layers. The first is a multi-head self-attention mechanism, and the second is a simple, position-wise fully connected feed-forward network.</p>
 
-                <h5>Decoder Stacks</h5>
+                <h5>Decoder</h5>
                 <p>In addition to the two sub-layers in each encoder layer, the decoder inserts a third sub-layer, which performs multi-head attention over the output of the encoder stack. Similar to the encoder, we employ residual connections around each of the sub-layers, followed by layer normalization.</p>
                 <p>We also modify the self-attention sub-layer in the decoder stack to prevent positions from attending to subsequent positions. This masking, combined with fact that the output embeddings are offset by one position, ensures that the predictions for position i can depend only on the known outputs at positions less than i.</p>
 
