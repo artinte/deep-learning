@@ -242,6 +242,15 @@ pyplot.show()</code></pre>
 
                 <p>Multi-head attention allows the model to jointly attend to information from different representation subspaces at different positions. With a single attention head, averaging inhibits this.</p>
 
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \[
+                    \begin{flalign*}
+                    & Multihead(Q, K, V) = Concat({head}_1, \cdots, {head}_h)W^O \\
+                    & where \ {head_i} = Attention(Q W_i^Q, K W_i^K, V W_i^V)
+                    \end{flalign*}
+                    \]
+                </div>
+
                 <p>Where the projections are parameter matrices \(W_i^Q \in \mathbb{R}^{d_{model} \times d_k}\), \(W_i^K \in \mathbb{R}^{d_{model} \times d_k}\), \(W_i^V \in \mathbb{R}^{d_{model} \times d_v}\) and \(W^O \in \mathbb{R}^{h d_v \times d_{model}}\).</p>
 
                 <p>In this work we employ \(h = 8\) parallel attention layers, or heads. For each of these we use \(d_k = d_v = d_{model}/h = 64\).  Due to the reduced dimension of each head, the total computational cost is similar to that of single-head attention with full dimensionality.</p>
@@ -286,8 +295,40 @@ pyplot.show()</code></pre>
         del key
         del value
         return self.linears[-1](x)</code></pre>
+
+                <h5>The Computation Process</h5>
+                <p>The multi-head attention mechanism is computed in a staged process, involving the weight matrices we discussed earlier. Let's break it down step by step:</p>
+                <p>1. Independently Compute Q, K, V for Each Attention Head</p>
+                <p>For each attention head \(i\) (from 1 to h\), we perform linear transformations on the input queries (\(Q_{input}\)), keys (\(K_{input}\)), and values (\(V_{inputs}\)). These inputs are typically representations from the previous layer (e.g., the encoder's output or a previous layer's output in the decoder).</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(Q_i = Q_{input} W_i^Q\)
+                </div>
+                <p>Here, \(Q_{input}\) is the input query matrix, typically with dimensions \(N \times d_{model}\) (\(N\) is the sequence length , \(d_{model}\) is the model's dimension).</p>
+                <p>\(W_i^Q\) is the query weight matrix for the i-th attention head, with dimensions \(d_{model} \times d_k\) , the resulting \(Q_i\) has dimensions \(N \times d_k\) .</p>
+
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(K_i = K_{input} W_i^K\)
+                </div>
+                <p>\(K_{input}\) is the input key matrix, typically with dimensions \(M \times d_{model}\) (\(M\) is another sequence length, or the same as \(N\)).</p>
+                <p>\(W_i^K\) is the key weight matrix for the i-th attention head, with dimensions \(d_{model} \times d_k\) , the resulting \(K_i\) has dimensions \(M \times d_k\) .</p>
                 
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(V_i = V_{input} W_i^V\)
+                </div>
+                <p>\(v_{input}\) is the input value matrix, typically with dimensions \(M \times d_{model}\) .</p>
+                <p>\(W_i^V\) is the value weight matrix for the i-th attention head, with dimensions \(d_{model} \times d_v\) , the resulting \(V_i\) has dimensions \(M \times d_v\)</p>
+
+                <p>2. Compute Scaled Dot-Product Attention</p>
+                <p>For each attention head \(i\), we use \(Q_i\) , \(K_i\) , and \(V_i\) to compute the attention output. This is the core of "attention" in the Transformer:</p>
+
                 <h5>Applications of Attention in our Model</h5>
+
+                <p>The Transformer uses multi-head attention in three different ways:</p>
+                <ul class="with-bullets">
+                    <li><p>In "encoder-decoder attention" layers, the queries come from the previous decoder layer, and the memory keys and values come from the output of the encoder. This allows every position in the decoder to attend over all positions in the input sequence. This mimics the typical encoder-decoder attention mechanisms in sequence-to-sequence models.</p></li>
+                    <li><p>The encoder contains self-attention layers. In a self-attention layer all of the keys, values and queries come from the same place, in this case, the output of the previous layer in the encoder. Each position in the encoder can attend to all positions in the previous layer of the encoder.</p></li>
+                    <li><p>Similarly, self-attention layers in the decoder allow each position in the decoder to attend to all positions in the decoder up to and including that position. We need to prevent leftward information flow in the decoder to preserve the auto-regressive property. We implement this inside of scaled dot-product attention by masking out (setting to \(-\infty\)) all values in the input of the softmax which correspond to illegal connections. See Figure 2.</p></li>
+                </ul>
 
                 <h4>5.4.2.2  Position-wise Feed-Forward Networks</h4>
                 <p>In addition to attention sub-layers, each of the layers in our encoder and decoder contains a fully connected feed-forward network, which is applied to each position separately and identically. This consists of two linear transformations with a ReLU activation in between.</p>
