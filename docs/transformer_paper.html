@@ -98,7 +98,7 @@
                     \end{flalign*}
                     \]
                 </div>
-                <p>Where the projections are parameter matrices \(W_i^Q \in \mathbb{R}^{d_{model} \times d_k}\), \(W_i^K \in \mathbb{R}^{d_{model} \times d_k}\), \(W_i^V \in \mathbb{R}^{d_{model} \times d_v}\) and \(W^O \in \mathbb{R}^{hd_v \times d_{model}}\).</p>
+                <p>Where the projections are parameter matrices \(W_i^Q \in \mathbb{R}^{d_{model} \times d_k}\), \(W_i^K \in \mathbb{R}^{d_{model} \times d_k}\), \(W_i^V \in \mathbb{R}^{d_{model} \times d_v}\) and \(W^O \in \mathbb{R}^{h d_v \times d_{model}}\).</p>
 
                 <p>In this work we employ \(h = 8\) parallel attention layers, or heads. For each of these we use \(d_k = d_v = d_{model}/h = 64\).  Due to the reduced dimension of each head, the total computational cost is similar to that of single-head attention with full dimensionality.</p>
 
