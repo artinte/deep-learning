@@ -3,11 +3,7 @@ from torch import nn
 import math
 import copy
 import time
-import pandas
-import os
-import spacy
-import warnings
-import pandas
+from matplotlib import pyplot
 
 class EncoderDecoder(nn.Module):
     """
@@ -151,7 +147,10 @@ def subsequent_mask(size):
     subsequent_mask = torch.triu(torch.ones(attn_shape), diagonal=1).type(torch.uint8)
     return subsequent_mask == 0
 
-print(subsequent_mask(6))
+mask_example = subsequent_mask(10)[0]
+pyplot.imshow(mask_example)
+pyplot.grid(True)
+pyplot.show()
 
 def attention(query, key, value, mask=None, dropout=None):
     '''
