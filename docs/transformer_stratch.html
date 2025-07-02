@@ -320,6 +320,18 @@ pyplot.show()</code></pre>
 
                 <p>2. Compute Scaled Dot-Product Attention</p>
                 <p>For each attention head \(i\), we use \(Q_i\) , \(K_i\) , and \(V_i\) to compute the attention output. This is the core of "attention" in the Transformer:</p>
+                <ul class="with-bullets">
+                    <li><p>Calculate Attention Scores: First, compute the dot product between the queries and keys to measure their similarity, \(Score_i = Q_i K_i^T, Score_i \in \mathbb{R}^{N \times M}\).</p></li>
+                    <li><p>Scale: To prevent the dot product results from becoming too large, which can cause the Softmax function to fall into saturation regions (very small gradients) during gradient descent, we scale the scores, \(ScaledScore_i = \frac{Score_i}{\sqrt{d_k}}\).</p></li>
+                    <li><p>Apply Softmax: Convert the scaled scores into a probability distribution using the Softmax function, ensuring all weights sum to 1, \(AttentionWeight_i = Softmax(ScaledScore_i)\).</p></li>
+                    <li><p>Weighted Sum of Values: Perform a weighted sum of the values \(V_i\) using the attention weights to get the output of the current attention head, \({Head}_i = AttentionWeight_i  V_i, Head_i \in \mathbb{R}^{N \times d_v}\).</p></li>
+                </ul>
+
+                <p>3. Concatenate Outputs from All Attention Heads</p>
+                <p>Once all \(h\) attention heads have computed their respective outputs \((Head_1, Head_2, ..., Head_h)\), we concatenate them along the feature dimension, \(ConcatHeads = Concat(Head_1, Head_2, ..., Head_h), ConcatHeads in \mathbb{R}^{N \times (h \cdot d_v)}\).</p>
+
+                <p>4. Final Linear Transformation</p>
+                <p>Finally, the concatenated result is passed through a final linear transformation (performed by the \(W^o\) matrix), which projects the dimension from \(h \cdot d_v\) back to the model's original dimension \(d_{model}\) , \(Output = ConcatHeads W^O\), \(W^O\) has dimensions \((h \cdot d_v) \times d_{model}\), the final \(Output\) has dimensions \(N \times d_{model}\) .</p>
 
                 <h5>Applications of Attention in our Model</h5>
 
