@@ -18,12 +18,12 @@
             </nav>
 
             <main class="col-md-8 content">
-                <h2 class="custom-title">5.4 Transformer from Stratch</h2>
+                <h2 class="custom-title">5.3 Transformer from Stratch</h2>
                 <p class="title-subtext"></p>
-                <p style="color: #a0a0a0;">Created Date: 2025-05-22</p>
+                <p style="color: #a0a0a0;">Created Date: 2025-06-29</p>
                 <p>The <strong>Transformer</strong> has been on a lot of people’s minds over the past few years. This post presents an annotated version of the paper in the form of a line-by-line implementation. It reorders and deletes some sections from the original paper and adds comments throughout.</p>
 
-                <h3>5.4.1 Background</h3>
+                <h3>5.3.1 Background</h3>
                 <p>The goal of reducing sequential computation also forms the foundation of the Extended Neural GPU, ByteNet and ConvS2S, all of which use convolutional neural networks as basic building block, computing hidden representations in parallel for all input and output positions. In these models, the number of operations required to relate signals from two arbitrary input or output positions grows in the distance between positions, linearly for ConvS2S and logarithmically for ByteNet. This makes it more difficult to learn dependencies between distant positions.</p>
                 <p>In the Transformer this is reduced to a constant number of operations, albeit at the cost of reduced effective resolution due to averaging attention-weighted positions, an effect we counteract with <strong>Multi-Head Attention</strong>.</p>
 
@@ -31,7 +31,7 @@
                 <p>End-to-end memory networks are based on a recurrent attention mechanism instead of sequencealigned recurrence and have been shown to perform well on simple-language question answering and language modeling tasks.</p>
                 <p>To the best of our knowledge, however, the Transformer is the first transduction model relying entirely on self-attention to compute representations of its input and output without using sequence aligned RNNs or convolution.</p>
 
-                <h3>5.4.2 Part 1: Model Architecture</h3>
+                <h3>5.3.2 Part 1: Model Architecture</h3>
                 <p>Most competitive neural sequence transduction models have an encoder-decoder structure. Here, the encoder maps an input sequence of symbol representations \((x_1, \cdots , x_n)\) to a sequence of continuous representations \(\mathbf{z} = (z_1, \cdots , z_n)\).</p>
                 <p>Given \(\mathbf{z}\), the decoder then generates an output sequence \((y_1, \cdots , y_m)\) of symbols one element at a time. At each step the model is auto-regressive, consuming the previously generated symbols as additional input when generating the next.</p>
                 <pre><code>class EncoderDecoder(nn.Module):
@@ -75,7 +75,7 @@
     def forward(self, x):
         return nn.functional.log_softmax(self.proj(x), dim=-1)</code></pre>
 
-                <h4>5.4.2.1 Encoder and Decoder Stacks</h4>
+                <h4>5.3.2.1 Encoder and Decoder Stacks</h4>
 
                 <p>Encoder and decoder stacks are composed of many identical layers stacked together.</p>
 
@@ -349,7 +349,7 @@ pyplot.show()</code></pre>
                     <li><p>Similarly, self-attention layers in the decoder allow each position in the decoder to attend to all positions in the decoder up to and including that position. We need to prevent leftward information flow in the decoder to preserve the auto-regressive property. We implement this inside of scaled dot-product attention by masking out (setting to \(-\infty\)) all values in the input of the softmax which correspond to illegal connections. See Figure 2.</p></li>
                 </ul>
 
-                <h4>5.4.2.2  Position-wise Feed-Forward Networks</h4>
+                <h4>5.3.2.2  Position-wise Feed-Forward Networks</h4>
                 <p>In addition to attention sub-layers, each of the layers in our encoder and decoder contains a fully connected feed-forward network, which is applied to each position separately and identically. This consists of two linear transformations with a ReLU activation in between.</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(FFN(x) = max(0, x W_1 + b_1) W_2 + b2\)
@@ -369,7 +369,7 @@ pyplot.show()</code></pre>
     def forward(self, x):
         return self.w_2(self.dropout(self.w_1(x).relu()))</code></pre>
 
-                <h4>5.4.2.3 Embeddings and Softmax</h4>
+                <h4>5.3.2.3 Embeddings and Softmax</h4>
                 <p>Similarly to other sequence transduction models, we use learned embeddings to convert the input tokens and output tokens to vectors of dimension \(d_{model}\). We also use the usual learned linear transformation and softmax function to convert the decoder output to predicted next-token probabilities. In our model, we share the same weight matrix between the two embedding layers and the pre-softmax linear transformation, similar to (cite). In the embedding layers, we multiply those weights by \(\sqrt{d_{model}}\).</p>
                 <pre><code>class Embeddings(nn.Module):
     def __init__(self, d_model, vocab):
@@ -380,7 +380,7 @@ pyplot.show()</code></pre>
     def forward(self, x):
         return self.lut(x) * math.sqrt(self.d_model)</code></pre>
 
-                <h4>5.4.2.4 Positional Encoding</h4>
+                <h4>5.3.2.4 Positional Encoding</h4>
 
                 <p>Since our model contains no recurrence and no convolution, in order for the model to make use of the order of the sequence, we must inject some information about the relative or absolute position of the tokens in the sequence. To this end, we add “positional encodings” to the input embeddings at the bottoms of the encoder and decoder stacks. The positional encodings have the same dimension \(d_{model}\) as the embeddings, so that the two can be summed. There are many choices of positional encodings, learned and fixed.</p>
                 <p>In this work, we use sine and cosine functions of different frequencies:</p>
@@ -421,7 +421,7 @@ pyplot.show()</code></pre>
 
                 <p>We also experimented with using learned positional embeddings instead, and found that the two versions produced nearly identical results. We chose the sinusoidal version because it may allow the model to extrapolate to sequence lengths longer than the ones encountered during training.</p>
 
-                <h4>5.4.2.5 Full Model</h4>
+                <h4>5.3.2.5 Full Model</h4>
                 <p>Here we define a function from hyperparameters to a full model.</p>
                 <pre><code>def make_model(src_vocab, tgt_vocab, N=6, d_model=512, d_ff=2048, h=8, dropout=0.1):
     # Helper: Construct a model from hyperparameters.
@@ -477,9 +477,9 @@ Untrained Prediction: tensor([[0, 4, 5, 5, 5, 5, 5, 5, 5, 5]])
 Untrained Prediction: tensor([[0, 7, 4, 7, 2, 2, 2, 2, 2, 2]])</samp></pre>
 
 
-                <h3>5.4.3 Part 2: Model Training</h3>
+                <h3>5.3.3 Part 2: Model Training</h3>
 
-                <h4>5.4.3.1 Training</h4>
+                <h4>5.3.3.1 Training</h4>
                 <p>This section describes the training regime for our models.</p>
 
                 <h5>Batches and Masking</h5>
@@ -624,7 +624,7 @@ def run_epoch(data_iter, model, loss_compute,
         self.true_dist = true_dist
         return self.criterion(x, true_dist.clone().detach())</code></pre>
 
-                <h4>5.4.3.2 A First Example</h4>
+                <h4>5.3.3.2 A First Example</h4>
                 <p>We can begin by trying out a simple copy-task. Given a random set of input symbols from a small vocabulary, the goal is to generate back those same symbols.</p>
                 <pre><code># The data_gen function generates an input and target that are identical.
 def data_gen(V, batch_size, nbatches):
@@ -749,24 +749,10 @@ Epoch Step:      1 | Accumulation Step:   2 | Loss:   0.16 | Tokens / Sec:  1581
 Epoch Step:      1 | Accumulation Step:   2 | Loss:   0.08 | Tokens / Sec:  1497.5 | Learning Rate: 1.1e-03
 tensor([[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]])</samp></pre>
                 
-                <h3>5.4.4 Part 3: A Real World Example</h3>
-                <p>Now we consider a real-world example using the Multi30k German-English Translation task. This task is much smaller than the WMT task considered in the paper, but it illustrates the whole system. We also show how to use multi-gpu processing to make it really fast.</p>
-                
-                <h4>5.4.4.1 Data Loading</h4>
-                <p>We will load the dataset using torchtext and spacy for tokenization.</p>
-                <p>Batching matters a ton for speed. We want to have very evenly divided batches, with absolutely minimal padding. To do this we have to hack a bit around the default torchtext batching. This code patches their default batching to make sure we search over enough sentences to find tight batches.</p>
-                <h4>5.4.4.2 Iterators</h4>
-                <h4>5.4.4.3 Training the System</h4>
-                <p>Once trained we can decode the model to produce a set of translations. Here we simply translate the first sentence in the validation set. This dataset is pretty small so the translations with greedy search are reasonably accurate.</p>
 
-                <h3>5.4.5 Additional Components: BPE, Search, Averaging</h3>
-                
-
-                <h3>5.4.6 Conclusion</h3>
-                
                 <div class="navigation">
-                    <a href="nn_transformer.html">Prev: 5.3 nn.Transformer</a>
-                    <a href="nano_gpt.html">Next: 5.5 nanoGPT</a>
+                    <a href="transformer_paper.html">Prev: 5.2 Attention Is All You Need</a>
+                    <a href="nn_transformer.html">Next: 5.4 nn.Transformer</a>
                 </div>
             </main>
 

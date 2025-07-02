@@ -18,13 +18,28 @@
             </nav>
 
             <main class="col-md-8 content">
-                <h2 class="custom-title">5.3 nn.Transformer</h2>
+                <h2 class="custom-title">5.4 nn.Transformer</h2>
                 <p class="title-subtext"></p>
-                <p style="color: #a0a0a0;">Created Date: 2025-05-22</p>
+                <p style="color: #a0a0a0;">Created Date: 2025-07-02</p>
+
+                <h3>5.4.4 Part 3: A Real World Example</h3>
+                <p>Now we consider a real-world example using the Multi30k German-English Translation task. This task is much smaller than the WMT task considered in the paper, but it illustrates the whole system. We also show how to use multi-gpu processing to make it really fast.</p>
+                
+                <h4>5.4.4.1 Data Loading</h4>
+                <p>We will load the dataset using torchtext and spacy for tokenization.</p>
+                <p>Batching matters a ton for speed. We want to have very evenly divided batches, with absolutely minimal padding. To do this we have to hack a bit around the default torchtext batching. This code patches their default batching to make sure we search over enough sentences to find tight batches.</p>
+                <h4>5.4.4.2 Iterators</h4>
+                <h4>5.4.4.3 Training the System</h4>
+                <p>Once trained we can decode the model to produce a set of translations. Here we simply translate the first sentence in the validation set. This dataset is pretty small so the translations with greedy search are reasonably accurate.</p>
+
+                <h3>5.4.5 Additional Components: BPE, Search, Averaging</h3>
+                
+
+                <h3>5.4.6 Conclusion</h3>
 
                 <div class="navigation">
-                    <a href="transformer_paper.html">Prev: 5.2 Attention Is All You Need</a>
-                    <a href="transformer_stratch.html">Next: 5.4 Transformer from Stratch</a>
+                    <a href="transformer_stratch.html">Prev: 5.3 Transformer from Stratch</a>
+                    <a href="nano_gpt.html">Next: 5.5 nanoGPT</a>
                 </div>
             </main>
 
