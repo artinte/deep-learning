@@ -252,10 +252,6 @@ class PositionalEncoding(nn.Module):
         x = x + self.pe[:, : x.size(1)].requires_grad_(False)
         return self.dropout(x)
 
-pe = PositionalEncoding(10, 0)
-y = pe.forward(torch.zeros(1, 2, 10))
-print(y)
-
 def make_model(src_vocab, tgt_vocab, N=6, d_model=512, d_ff=2048, h=8, dropout=0.1):
     # Helper: Construct a model from hyperparameters.
     c = copy.deepcopy
@@ -286,7 +282,7 @@ def inference_test():
     memory = test_model.encode(src, src_mask)
     ys = torch.zeros(1, 1).type_as(src)
     
-    for i in range(9):
+    for _ in range(9):
         out = test_model.decode(
             memory, src_mask, ys, subsequent_mask(ys.size(1)).type_as(src.data))
         prob = test_model.generator(out[:, -1])
@@ -296,11 +292,12 @@ def inference_test():
             [ys, torch.empty(1, 1).type_as(src.data).fill_(next_word)], dim=1
         )
     
-    print("Example Untrained Model Prediction:", ys)
+    print("Untrained Prediction:", ys)
 
-for _ in range(10):
+for _ in range(5):
     inference_test()  
-        
+
+
 class Batch:
     """
     Object for holding a batch of data with mask during training.
@@ -325,7 +322,6 @@ class Batch:
 
 
 # Training loop
-
 class TrainState:
     """
     Track number of steps, examples, and tokens processed

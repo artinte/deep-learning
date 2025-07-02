@@ -324,14 +324,21 @@ pyplot.show()</code></pre>
                     <li><p>Calculate Attention Scores: First, compute the dot product between the queries and keys to measure their similarity, \(Score_i = Q_i K_i^T, Score_i \in \mathbb{R}^{N \times M}\).</p></li>
                     <li><p>Scale: To prevent the dot product results from becoming too large, which can cause the Softmax function to fall into saturation regions (very small gradients) during gradient descent, we scale the scores, \(ScaledScore_i = \frac{Score_i}{\sqrt{d_k}}\).</p></li>
                     <li><p>Apply Softmax: Convert the scaled scores into a probability distribution using the Softmax function, ensuring all weights sum to 1, \(AttentionWeight_i = Softmax(ScaledScore_i)\).</p></li>
-                    <li><p>Weighted Sum of Values: Perform a weighted sum of the values \(V_i\) using the attention weights to get the output of the current attention head, \({Head}_i = AttentionWeight_i  V_i, Head_i \in \mathbb{R}^{N \times d_v}\).</p></li>
+                    <li><p>Weighted Sum of Values: Perform a weighted sum of the values \(V_i\) using the attention weights to get the output of the current attention head, \({Head}_i = AttentionWeight_i \cdot V_i, Head_i \in \mathbb{R}^{N \times d_v}\).</p></li>
                 </ul>
 
                 <p>3. Concatenate Outputs from All Attention Heads</p>
-                <p>Once all \(h\) attention heads have computed their respective outputs \((Head_1, Head_2, ..., Head_h)\), we concatenate them along the feature dimension, \(ConcatHeads = Concat(Head_1, Head_2, ..., Head_h), ConcatHeads in \mathbb{R}^{N \times (h \cdot d_v)}\).</p>
+                <p>Once all \(h\) attention heads have computed their respective outputs \((Head_1, Head_2, ..., Head_h)\), we concatenate them along the feature dimension:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(ConcatHeads = Concat(Head_1, Head_2, ..., Head_h), ConcatHeads \in \mathbb{R}^{N \times (h \cdot d_v)}\)
+                </div>
 
                 <p>4. Final Linear Transformation</p>
-                <p>Finally, the concatenated result is passed through a final linear transformation (performed by the \(W^o\) matrix), which projects the dimension from \(h \cdot d_v\) back to the model's original dimension \(d_{model}\) , \(Output = ConcatHeads W^O\), \(W^O\) has dimensions \((h \cdot d_v) \times d_{model}\), the final \(Output\) has dimensions \(N \times d_{model}\) .</p>
+                <p>Finally, the concatenated result is passed through a final linear transformation (performed by the \(W^o\) matrix), which projects the dimension from \(h \cdot d_v\) back to the model's original dimension \(d_{model}\) :</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(Output = ConcatHeads \cdot W^O\)
+                </div>
+                <p>\(W^O\) has dimensions \((h \cdot d_v) \times d_{model}\), the final \(Output\) has dimensions \(N \times d_{model}\) .</p>
 
                 <h5>Applications of Attention in our Model</h5>
 
@@ -349,25 +356,399 @@ pyplot.show()</code></pre>
                 </div>
                 <p>While the linear transformations are the same across different positions, they use different parameters from layer to layer. Another way of describing this is as two convolutions with kernel size 1. The dimensionality of input and output is \(d_{model} = 512\), and the inner-layer has dimensionality \(d_{ff} = 2048\).</p>
 
+                <pre><code>class PositionwiseFeedForward(nn.Module):
+    """
+    Implements FFN equation.
+    """
+    def __init__(self, d_model, d_ff, dropout=0.1):
+        super(PositionwiseFeedForward, self).__init__()
+        self.w_1 = nn.Linear(d_model, d_ff)
+        self.w_2 = nn.Linear(d_ff, d_model)
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, x):
+        return self.w_2(self.dropout(self.w_1(x).relu()))</code></pre>
+
                 <h4>5.4.2.3 Embeddings and Softmax</h4>
                 <p>Similarly to other sequence transduction models, we use learned embeddings to convert the input tokens and output tokens to vectors of dimension \(d_{model}\). We also use the usual learned linear transformation and softmax function to convert the decoder output to predicted next-token probabilities. In our model, we share the same weight matrix between the two embedding layers and the pre-softmax linear transformation, similar to (cite). In the embedding layers, we multiply those weights by \(\sqrt{d_{model}}\).</p>
+                <pre><code>class Embeddings(nn.Module):
+    def __init__(self, d_model, vocab):
+        super(Embeddings, self).__init__()
+        self.lut = nn.Embedding(vocab, d_model)
+        self.d_model = d_model
+    
+    def forward(self, x):
+        return self.lut(x) * math.sqrt(self.d_model)</code></pre>
 
                 <h4>5.4.2.4 Positional Encoding</h4>
 
+                <p>Since our model contains no recurrence and no convolution, in order for the model to make use of the order of the sequence, we must inject some information about the relative or absolute position of the tokens in the sequence. To this end, we add “positional encodings” to the input embeddings at the bottoms of the encoder and decoder stacks. The positional encodings have the same dimension \(d_{model}\) as the embeddings, so that the two can be summed. There are many choices of positional encodings, learned and fixed.</p>
+                <p>In this work, we use sine and cosine functions of different frequencies:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \[
+                    \begin{flalign*}
+                    & {PE}_{(pos, 2i)} = sin(pos/{10000}^{2i/d_{model}}) \\
+                    & {PE}_{(pos, 2i+1)} = cos(pos/{10000}^{2i/d_{model}})
+                    \end{flalign*}
+                    \]
+                </div>
+
+                <p>where \(pos\) is the position and \(i\) is the dimension. That is, each dimension of the positional encoding corresponds to a sinusoid. The wavelengths form a geometric progression from \(2\pi\) to \(10000 \cdot 2\pi\). We chose this function because we hypothesized it would allow the model to easily learn to attend by relative positions, since for any fixed offset \(k\), \({PE}_{pos+k}\) can be represented as a linear function of \({PE}_{pos}\).</p>
+                <p>In addition, we apply dropout to the sums of the embeddings and the positional encodings in both the encoder and decoder stacks. For the base model, we use a rate of \(P_{drop} = 0.1\) .</p>
+
+                <pre><code>class PositionalEncoding(nn.Module):
+    """
+    Implement the PE function.
+    """
+    def __init__(self, d_model, dropout, max_len=5000):
+        super(PositionalEncoding, self).__init__()
+        self.dropout = nn.Dropout(p=dropout)
+        
+        # Compute the positional encodings once in log space.
+        pe = torch.zeros(max_len, d_model)
+        position = torch.arange(0, max_len).unsqueeze(1)
+        div_term = torch.exp(
+            torch.arange(0, d_model, 2) * -(math.log(10000.0) / d_model)
+        )
+        pe[:, 0::2] = torch.sin(position * div_term)
+        pe[:, 1::2] = torch.cos(position * div_term)
+        pe = pe.unsqueeze(0)
+        self.register_buffer('pe', pe)
+    
+    def forward(self, x):
+        x = x + self.pe[:, : x.size(1)].requires_grad_(False)
+        return self.dropout(x)</code></pre>
+
+                <p>We also experimented with using learned positional embeddings instead, and found that the two versions produced nearly identical results. We chose the sinusoidal version because it may allow the model to extrapolate to sequence lengths longer than the ones encountered during training.</p>
+
                 <h4>5.4.2.5 Full Model</h4>
+                <p>Here we define a function from hyperparameters to a full model.</p>
+                <pre><code>def make_model(src_vocab, tgt_vocab, N=6, d_model=512, d_ff=2048, h=8, dropout=0.1):
+    # Helper: Construct a model from hyperparameters.
+    c = copy.deepcopy
+    attn = MultiHeadedAttention(h, d_model)
+    ff = PositionwiseFeedForward(d_model, d_ff, dropout)
+    position = PositionalEncoding(d_model, dropout)
+    model = EncoderDecoder(
+        Encoder(EncoderLayer(d_model, c(attn), c(ff), dropout), N),
+        Decoder(DecoderLayer(d_model, c(attn), c(attn), c(ff), dropout), N),
+        nn.Sequential(Embeddings(d_model, src_vocab), c(position)),
+        nn.Sequential(Embeddings(d_model, tgt_vocab), c(position)),
+        Generator(d_model, tgt_vocab),
+    )
+    
+    # This was important from their code.
+    # Initialize parameters with Glorot / fan_avg.
+    for p in model.parameters():
+        if p.dim() > 1:
+            nn.init.xavier_uniform_(p)
+    return model</code></pre>
+
+                <h4>Inference</h4>
+                <p>Here we make a forward step to generate a prediction of the model. We try to use our transformer to memorize the input. As you will see the output is randomly generated due to the fact that the model is not trained yet. In the next tutorial we will build the training function and try to train our model to memorize the numbers from 1 to 10.</p>
+                <pre><code>def inference_test():
+    test_model = make_model(11, 11, 2)
+    test_model.eval()
+    src = torch.LongTensor([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]])
+    src_mask = torch.ones(1, 1, 10)
+    
+    memory = test_model.encode(src, src_mask)
+    ys = torch.zeros(1, 1).type_as(src)
+    
+    for _ in range(9):
+        out = test_model.decode(
+            memory, src_mask, ys, subsequent_mask(ys.size(1)).type_as(src.data))
+        prob = test_model.generator(out[:, -1])
+        _, next_word = torch.max(prob, dim=1)
+        next_word = next_word.data[0]
+        ys = torch.cat(
+            [ys, torch.empty(1, 1).type_as(src.data).fill_(next_word)], dim=1
+        )
+    
+    print("Untrained Prediction:", ys)
+
+for _ in range(5):
+    inference_test()</code></pre>
+
+                <pre><samp>Untrained Prediction: tensor([[0, 6, 4, 4, 4, 4, 4, 4, 4, 4]])
+Untrained Prediction: tensor([[0, 4, 4, 4, 4, 4, 4, 4, 4, 4]])
+Untrained Prediction: tensor([[0, 8, 0, 8, 0, 8, 0, 8, 0, 8]])
+Untrained Prediction: tensor([[0, 4, 5, 5, 5, 5, 5, 5, 5, 5]])
+Untrained Prediction: tensor([[0, 7, 4, 7, 2, 2, 2, 2, 2, 2]])</samp></pre>
+
 
                 <h3>5.4.3 Part 2: Model Training</h3>
 
                 <h4>5.4.3.1 Training</h4>
+                <p>This section describes the training regime for our models.</p>
+
                 <h5>Batches and Masking</h5>
+                <p>We stop for a quick interlude to introduce some of the tools needed to train a standard encoder decoder model. First we define a batch object that holds the src and target sentences for training, as well as constructing the masks.</p>
+                <pre><code>class Batch:
+    """
+    Object for holding a batch of data with mask during training.
+    """
+    def __init__(self, src, tgt=None, pad=2):  # 2 = <blank>
+        self.src = src
+        self.src_mask = (src != pad).unsqueeze(-2)
+        if tgt is not None:
+            self.tgt = tgt[:, :-1]
+            self.tgt_y = tgt[:, 1:]
+            self.tgt_mask = self.make_std_mask(self.tgt, pad)
+            self.ntokens = (self.tgt_y != pad).data.sum()
+    
+    @staticmethod
+    def make_std_mask(tgt, pad):
+        # Create a mask to hide padding and future words.
+        tgt_mask = (tgt != pad).unsqueeze(-2)
+        tgt_mask = tgt_mask & subsequent_mask(tgt.size(-1)).type_as(
+            tgt_mask.data
+        )
+        return tgt_mask</code></pre>
+
                 <h5>Training Loop</h5>
+
+                <p>Next we create a generic training and scoring function to keep track of loss. We pass in a generic loss compute function that also handles parameter updates.</p>
+                <pre><code># Training loop
+class TrainState:
+    """
+    Track number of steps, examples, and tokens processed
+    """
+    step: int = 0  # Steps in the current epoch
+    accum_step: int = 0  # Number of gradient accumulation steps
+    samples: int = 0  # total # of examples used
+    tokens: int = 0  # total # of tokens processed
+
+def run_epoch(data_iter, model, loss_compute,
+              optimizer,
+              scheduler,
+              mode='train',
+              accum_iter=1,
+              train_state=TrainState):
+    """
+    Train a single epoch.
+    """
+    start = time.time()
+    total_tokens = 0
+    total_loss = 0
+    tokens = 0
+    n_accum = 0
+    for i, batch in enumerate(data_iter):
+        out = model.forward(
+            batch.src, batch.tgt, batch.src_mask, batch.tgt_mask
+        )
+        loss, loss_node = loss_compute(out, batch.tgt_y, batch.ntokens)
+        # loss_node = loss_node / accum_iter
+        if mode == "train" or mode == "train+log":
+            loss_node.backward()
+            train_state.step += 1
+            train_state.samples += batch.src.shape[0]
+            train_state.tokens += batch.ntokens
+            if i % accum_iter == 0:
+                optimizer.step()
+                optimizer.zero_grad(set_to_none=True)
+                n_accum += 1
+                train_state.accum_step += 1
+            scheduler.step()
+        
+        total_loss += loss
+        total_tokens += batch.ntokens
+        tokens += batch.ntokens
+        if i % 40 == 1 and (mode == "train" or mode == "train+log"):
+            lr = optimizer.param_groups[0]["lr"]
+            elapsed = time.time() - start
+            print(
+                (
+                    "Epoch Step: %6d | Accumulation Step: %3d | Loss: %6.2f "
+                    + "| Tokens / Sec: %7.1f | Learning Rate: %6.1e"
+                )
+                % (i, n_accum, loss / batch.ntokens, tokens / elapsed, lr)
+            )
+            start = time.time()
+            tokens = 0
+        del loss
+        del loss_node
+    return total_loss / total_tokens, train_state</code></pre>
+
                 <h5>Training Data and Batching</h5>
+                <p>We trained on the standard WMT 2014 English-German dataset consisting of about 4.5 million sentence pairs. Sentences were encoded using byte-pair encoding, which has a shared source-target vocabulary of about 37000 tokens. For English-French, we used the significantly larger WMT 2014 English-French dataset consisting of 36M sentences and split tokens into a 32000 word-piece vocabulary.</p>
+                <p>Sentence pairs were batched together by approximate sequence length. Each training batch contained a set of sentence pairs containing approximately 25000 source tokens and 25000 target tokens.</p>
+
                 <h5>Hardware and Schedule</h5>
+                <p>We trained our models on one machine with 8 NVIDIA P100 GPUs. For our base models using the hyperparameters described throughout the paper, each training step took about 0.4 seconds. We trained the base models for a total of 100,000 steps or 12 hours. For our big models, step time was 1.0 seconds. The big models were trained for 300,000 steps (3.5 days).</p>
+
                 <h5>Optimizer</h5>
+                <p>We used the <a href="optimizer.html#adam">Adam optimizer</a> with \(\beta_1 = 0.9\), \(\beta_2 = 0.98\), and \(\epsilon = 10^{-9}\). We varied the learning rate over the course of training, according to the formula:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(lrate = d_{model}^{-0.5} \cdot min({step\_num}^{-0.5}, step\_num \cdot {warmup\_steps}^{-1.5})\)
+                </div>
+                <p>This corresponds to increasing the learning rate linearly for the first \(warmup\_steps\) training steps, and decreasing it thereafter proportionally to the inverse square root of the step number. We used \(warmup\_steps = 4000\).</p>
+
+                <pre><code>def rate(step, model_size, factor, warmup):
+    """
+    we have to default the step to 1 for LambdaLR function
+    to avoid zero raising to negative power.
+    """
+    if step == 0:
+        step = 1
+    return factor * (
+        model_size ** (-0.5) * min(step ** (-0.5), step * warmup ** (-1.5))
+    )</code></pre>
+
                 <h5>Regularization</h5>
 
-                <h4>5.4.3.2 A First Example</h4>
+                <p>During training, we employed label smoothing of value \(\epsilon_{ls} = 0.1\). This hurts perplexity, as the model learns to be more unsure, but improves accuracy and BLEU score.</p>
+                <p class="comment">We implement label smoothing using the KL div loss. Instead of using a one-hot target distribution, we create a distribution that has confidence of the correct word and the rest of the smoothing mass distributed throughout the vocabulary.</p>
+                <pre><code>class LabelSmoothing(nn.Module):
+    """
+    Implement label smoothing.
+    """
+    def __init__(self, size, padding_idx, smoothing=0.0):
+        super(LabelSmoothing, self).__init__()
+        self.criterion = nn.KLDivLoss(reduction="sum")
+        self.padding_idx = padding_idx
+        self.confidence = 1.0 - smoothing
+        self.smoothing = smoothing
+        self.size = size
+        self.true_dist = None
 
+    def forward(self, x, target):
+        assert x.size(1) == self.size
+        true_dist = x.data.clone()
+        true_dist.fill_(self.smoothing / (self.size - 2))
+        true_dist.scatter_(1, target.data.unsqueeze(1), self.confidence)
+        true_dist[:, self.padding_idx] = 0
+        mask = torch.nonzero(target.data == self.padding_idx)
+        if mask.dim() > 0:
+            true_dist.index_fill_(0, mask.squeeze(), 0.0)
+        self.true_dist = true_dist
+        return self.criterion(x, true_dist.clone().detach())</code></pre>
+
+                <h4>5.4.3.2 A First Example</h4>
+                <p>We can begin by trying out a simple copy-task. Given a random set of input symbols from a small vocabulary, the goal is to generate back those same symbols.</p>
+                <pre><code># The data_gen function generates an input and target that are identical.
+def data_gen(V, batch_size, nbatches):
+    """
+    Generate random data for a src-tgt copy task.
+    """
+    for i in range(nbatches):
+        data = torch.randint(1, V, size=(batch_size, 10))
+        data[:, 0] = 1
+        src = data.requires_grad_(False).clone().detach()
+        tgt = data.requires_grad_(False).clone().detach()
+        yield Batch(src, tgt, 0)
+        
+class SimpleLossCompute:
+    """
+    A simple loss compute and train function.
+    """
+    def __init__(self, generator, criterion):
+        self.generator = generator
+        self.criterion = criterion
+
+    def __call__(self, x, y, norm):
+        x = self.generator(x)
+        sloss = (
+            self.criterion(
+                x.contiguous().view(-1, x.size(-1)), y.contiguous().view(-1)
+            )
+            / norm
+        )
+        return sloss.data * norm, sloss
+
+class DummyOptimizer(torch.optim.Optimizer):
+    def __init__(self):
+        self.param_groups = [{"lr": 0}]
+        None
+
+    def step(self):
+        None
+
+    def zero_grad(self, set_to_none=False):
+        None
+
+class DummyScheduler:
+    def step(self):
+        None
+
+def greedy_decode(model, src, src_mask, max_len, start_symbol):
+    memory = model.encode(src, src_mask)
+    ys = torch.zeros(1, 1).fill_(start_symbol).type_as(src.data)
+    for i in range(max_len - 1):
+        out = model.decode(
+            memory, src_mask, ys, subsequent_mask(ys.size(1)).type_as(src.data)
+        )
+        prob = model.generator(out[:, -1])
+        _, next_word = torch.max(prob, dim=1)
+        next_word = next_word.data[0]
+        ys = torch.cat(
+            [ys, torch.zeros(1, 1).type_as(src.data).fill_(next_word)], dim=1
+        )
+    return ys
+
+def example_simple_model():
+    V = 11
+    criterion = LabelSmoothing(size=V, padding_idx=0, smoothing=0.0)
+    model = make_model(V, V, N=2)
+    optimizer = torch.optim.Adam(
+        model.parameters(), lr=0.5, betas=(0.9, 0.98), eps=1e-9
+    )
+    lr_scheduler = torch.optim.lr_scheduler.LambdaLR(
+        optimizer=optimizer,
+        lr_lambda=lambda step: rate(
+            step, model_size=model.src_embed[0].d_model, factor=1.0, warmup=400
+        ),
+    )
+    
+    batch_size = 80
+    for epoch in range(20):
+        model.train()
+        run_epoch(data_gen(V, batch_size, 20),
+                  model,
+                  SimpleLossCompute(model.generator, criterion),
+                  optimizer,
+                  lr_scheduler,
+                  mode='train')
+        model.eval()
+        run_epoch(
+            data_gen(V, batch_size, 5),
+            model,
+            SimpleLossCompute(model.generator, criterion),
+            DummyOptimizer(),
+            DummyScheduler(),
+            mode="eval",
+        )
+    
+    model.eval()
+    src = torch.LongTensor([[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]])
+    max_len = src.shape[1]
+    src_mask = torch.ones(1, 1, max_len)
+    print(greedy_decode(model, src, src_mask, max_len=max_len, start_symbol=0))
+
+example_simple_model()</code></pre>
+
+                <pre><samp>Epoch Step:      1 | Accumulation Step:   2 | Loss:   3.03 | Tokens / Sec:   541.6 | Learning Rate: 5.5e-06
+Epoch Step:      1 | Accumulation Step:   2 | Loss:   2.03 | Tokens / Sec:  1550.9 | Learning Rate: 6.1e-05
+Epoch Step:      1 | Accumulation Step:   2 | Loss:   1.73 | Tokens / Sec:  1639.5 | Learning Rate: 1.2e-04
+Epoch Step:      1 | Accumulation Step:   2 | Loss:   1.45 | Tokens / Sec:  1836.4 | Learning Rate: 1.7e-04
+Epoch Step:      1 | Accumulation Step:   2 | Loss:   1.07 | Tokens / Sec:  1804.4 | Learning Rate: 2.3e-04
+Epoch Step:      1 | Accumulation Step:   2 | Loss:   0.63 | Tokens / Sec:  1590.8 | Learning Rate: 2.8e-04
+Epoch Step:      1 | Accumulation Step:   2 | Loss:   0.38 | Tokens / Sec:  1608.8 | Learning Rate: 3.4e-04
+Epoch Step:      1 | Accumulation Step:   2 | Loss:   0.18 | Tokens / Sec:  1416.6 | Learning Rate: 3.9e-04
+Epoch Step:      1 | Accumulation Step:   2 | Loss:   0.19 | Tokens / Sec:  1487.9 | Learning Rate: 4.5e-04
+Epoch Step:      1 | Accumulation Step:   2 | Loss:   0.15 | Tokens / Sec:  1547.1 | Learning Rate: 5.0e-04
+Epoch Step:      1 | Accumulation Step:   2 | Loss:   0.12 | Tokens / Sec:  1725.5 | Learning Rate: 5.6e-04
+Epoch Step:      1 | Accumulation Step:   2 | Loss:   0.11 | Tokens / Sec:  1381.7 | Learning Rate: 6.1e-04
+Epoch Step:      1 | Accumulation Step:   2 | Loss:   0.12 | Tokens / Sec:  2106.1 | Learning Rate: 6.7e-04
+Epoch Step:      1 | Accumulation Step:   2 | Loss:   0.14 | Tokens / Sec:  2284.4 | Learning Rate: 7.2e-04
+Epoch Step:      1 | Accumulation Step:   2 | Loss:   0.08 | Tokens / Sec:  2015.4 | Learning Rate: 7.8e-04
+Epoch Step:      1 | Accumulation Step:   2 | Loss:   0.13 | Tokens / Sec:  2388.6 | Learning Rate: 8.3e-04
+Epoch Step:      1 | Accumulation Step:   2 | Loss:   0.12 | Tokens / Sec:  2272.0 | Learning Rate: 8.9e-04
+Epoch Step:      1 | Accumulation Step:   2 | Loss:   0.08 | Tokens / Sec:  1886.4 | Learning Rate: 9.4e-04
+Epoch Step:      1 | Accumulation Step:   2 | Loss:   0.16 | Tokens / Sec:  1581.0 | Learning Rate: 1.0e-03
+Epoch Step:      1 | Accumulation Step:   2 | Loss:   0.08 | Tokens / Sec:  1497.5 | Learning Rate: 1.1e-03
+tensor([[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]])</samp></pre>
+                
                 <h3>5.4.4 Part 3: A Real World Example</h3>
                 <p>Now we consider a real-world example using the Multi30k German-English Translation task. This task is much smaller than the WMT task considered in the paper, but it illustrates the whole system. We also show how to use multi-gpu processing to make it really fast.</p>
                 
