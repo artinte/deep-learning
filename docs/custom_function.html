@@ -20,8 +20,35 @@
             <main class="col-md-8 content">
                 <h2 class="custom-title">11.2 Custom Functions</h2>
                 <p class="title-subtext"></p>
-                <p style="color: #a0a0a0;">Created Date: 2025-06-05</p>
+                <p style="color: #a0a0a0;">Created Date: 2025-07-03</p>
 
+                <p>It is sometimes useful to run backwards twice through backward graph, for example to compute higher-order gradients. It takes an understanding of autograd and some care to support double backwards, however. Functions that support performing backward a single time are not necessarily equipped to support double backward. In this tutorial we show how to write a custom autograd function that supports double backward, and point out some things to look out for.</p>
+
+                <p>When writing a custom autograd function to backward through twice, it is important to know when operations performed in a custom function are recorded by autograd, when they aren’t, and most importantly, how save_for_backward works with all of this.</p>
+
+                <p>Custom functions implicitly affects grad mode in two ways:</p>
+                <ul class="with-bullets">
+                    <li><p>During forward, autograd does not record any the graph for any operations performed within the forward function. When forward completes, the backward function of the custom function becomes the grad_fn of each of the forward’s outputs.</p></li>
+                    <li><p>During backward, autograd records the computation graph used to compute the backward pass if create_graph is specified.</p></li>
+                </ul>
+
+                <p>Next, to understand how save_for_backward interacts with the above, we can explore a couple examples.</p>
+
+                <h3>11.2.1 Saving the Inputs</h3>
+                <p>Consider this simple squaring function. It saves an input tensor for backward. Double backward works automatically when autograd is able to record operations in the backward pass, so there is usually nothing to worry about when we save an input for backward as the input should have grad_fn if it is a function of any tensor that requires grad. This allows the gradients to be properly propagated.</p>
+
+                <p>We can use torchviz to visualize the graph to see why this works</p>
+
+                <p>We can see that the gradient wrt to x, is itself a function of x (dout/dx = 2x) And the graph of this function has been properly constructed</p>
+
+                <h3>11.2.2 Saving the Outputs</h3>
+                <p>A slight variation on the previous example is to save an output instead of input. The mechanics are similar because outputs are also associated with a grad_fn.</p>
+
+                <h3>11.2.3 Saving Intermediate Results</h3>
+                <p>A more tricky case is when we need to save an intermediate result. We demonstrate this case by implementing:</p>
+
+                
+                
                 <div class="navigation">
                     <a href="custom_operator.html">Prev: 11.1 Custom Operators</a>
                     <a href="cpp_extension.html">Next: 11.3 C++ and CUDA Extensions</a>
