@@ -20,8 +20,34 @@
             <main class="col-md-8 content">
                 <h2 class="custom-title">11.1 Custom Operators</h2>
                 <p class="title-subtext"></p>
-                <p style="color: #a0a0a0;">Created Date: 2025-06-05</p>
+                <p style="color: #a0a0a0;">Created Date: 2025-07-03</p>
 
+                <p>PyTorch offers a large library of operators that work on Tensors (e.g. <code>torch.add</code>, <code>torch.sum</code>, etc). However, you might wish to use a new customized operator with PyTorch, perhaps written by a third-party library. This tutorial shows how to wrap Python functions so that they behave like PyTorch native operators. Reasons why you may wish to create a custom operator in PyTorch include:</p>
+                <ul class="with-bullets">
+                    <li><p>Treating an arbitrary Python function as an opaque callable with respect to <code>torch.compile</code> (that is, prevent <code>torch.compile</code> from tracing into the function).</p></li>
+                    <li><p>Adding training support to an arbitrary Python function.</p></li>
+                </ul>
+
+                <p>Use <code>torch.library.custom_op()</code> to create Python custom operators. Use the C++ TORCH_LIBRARY APIs to create C++ custom operators (these work in Python-less environments). See the Custom Operators Landing Page for more details.</p>
+                <p>Please note that if your operation can be expressed as a composition of existing PyTorch operators, then there is usually no need to use the custom operator API – everything (for example torch.compile, training support) should just work.</p>
+
+                <h3>11.1.1 Example: Wrapping PIL's crop into a custom operator</h3>
+
+                <h3>11.1.2 Adding training support for crop</h3>
+
+                <h3>11.1.3 Testing Python Custom operators</h3>
+
+                <h3>11.1.4 Mutable Python Custom operators</h3>
+
+                <h3>11.1.5 Conclusion</h3>
+                <p>In this tutorial, we learned how to use torch.library.custom_op to create a custom operator in Python that works with PyTorch subsystems such as torch.compile and autograd.</p>
+
+                <p>This tutorial provides a basic introduction to custom operators. For more detailed information, see:</p>
+                <ul class="with-bullets">
+                    <li><p>the torch.library documentation</p></li>
+                    <li><p>the Custom Operators Manual</p></li>
+                </ul>
+                
                 <div class="navigation">
                     <a href="function_appro.html">Prev: 10.5 Function Approximation</a>
                     <a href="custom_function.html">Next: 11.2 Custom Functions</a>
