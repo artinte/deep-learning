@@ -31,13 +31,40 @@
                 <p>Use <code>torch.library.custom_op()</code> to create Python custom operators. Use the C++ TORCH_LIBRARY APIs to create C++ custom operators (these work in Python-less environments). See the Custom Operators Landing Page for more details.</p>
                 <p>Please note that if your operation can be expressed as a composition of existing PyTorch operators, then there is usually no need to use the custom operator API – everything (for example torch.compile, training support) should just work.</p>
 
-                <h3>11.1.1 Example: Wrapping PIL's crop into a custom operator</h3>
+                <h3>11.1.1 Example: Wrapping PIL's <code>crop</code> Into a Custom Operator</h3>
+                <p>Let’s say that we are using PIL’s <code>crop</code> operation</p>
+
+                <p><code>crop</code> is not handled effectively out-of-the-box by <code>torch.compile</code>: <code>torch.compile</code> induces a "graph break" on functions it is unable to handle and graph breaks are bad for performance. The following code demonstrates this by raising an error (torch.compile with fullgraph=True raises an error if a graph break occurs).</p>
+
+                <p>In order to black-box <code>crop</code> for use with <code>torch.compile</code>, we need to do two things:</p>
+                <ol>
+                    <li><p>wrap the function into a PyTorch custom operator.</p></li>
+                    <li><p>add a "FakeTensor kernel" (aka "meta kernel") to the operator. Given some FakeTensors inputs (dummy Tensors that don’t have storage), this function should return dummy Tensors of your choice with the correct Tensor metadata (shape/strides/dtype/device).</p></li>
+                </ol>
+
+                <p>After this, <code>crop</code> now works without graph breaks:</p>
+
+               
 
                 <h3>11.1.2 Adding training support for crop</h3>
 
+                <p>Use <code>torch.library.register_autograd</code> to add training support for an operator. Prefer this over directly using <code>torch.autograd.Function</code>; some compositions of <code>autograd.Function</code> with PyTorch operator registration APIs can lead to (and has led to) silent incorrectness when composed with <code>torch.compile</code>.</p>
+
+                <p>If you don't need training support, there is no need to use torch.library.register_autograd. If you end up training with a custom_op that doesn’t have an autograd registration, we’ll raise an error message.</p>
+
+                <p>The gradient formula for crop is essentially PIL.paste (we’ll leave the derivation as an exercise to the reader). Let’s first wrap paste into a custom operator:</p>
+                
+                
+
                 <h3>11.1.3 Testing Python Custom operators</h3>
 
+                <p>Use <code>torch.library.opcheck</code> to test that the custom operator was registered correctly. This does not test that the gradients are mathematically correct; please write separate tests for that (either manual ones or torch.autograd.gradcheck).</p>
+
+                <p>To use <code>opcheck</code>, pass it a set of example inputs to test against. If your operator supports training, then the examples should include Tensors that require grad. If your operator supports multiple devices, then the examples should include Tensors from each device.</p>
+
                 <h3>11.1.4 Mutable Python Custom operators</h3>
+
+                <p>You can also wrap a Python function that mutates its inputs into a custom operator. Functions that mutate inputs are common because that is how many low-level kernels are written; for example, a kernel that computes sin may take in the input and an output tensor and write input.sin() to the output tensor.</p>
 
                 <h3>11.1.5 Conclusion</h3>
                 <p>In this tutorial, we learned how to use torch.library.custom_op to create a custom operator in Python that works with PyTorch subsystems such as torch.compile and autograd.</p>
