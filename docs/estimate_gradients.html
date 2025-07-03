@@ -32,6 +32,18 @@
                 </ol>
                 <p>Likelihood-based models and implicit generative models, however, both have significant limitations. Likelihood-based models either require strong restrictions on the model architecture to ensure a tractable normalizing constant for likelihood computation, or must rely on surrogate objectives to approximate maximum likelihood training. Implicit generative models, on the other hand, often require adversarial training, which is notoriously unstable and can lead to mode collapse.</p>
                 <p>In this blog post, I will introduce another way to represent probability distributions that may circumvent several of these limitations. The key idea is to model the gradient of the log probability density function, a quantity often known as the (Stein) score function. Such score-based models are not required to have a tractable normalizing constant, and can be directly learned by score matching.</p>
+
+
+                <h3>6.5.2 Score-based Generative Modeling</h3>
+                <p>Suppose our dataset consists of i.i.d. samples \({\{x_i \in \mathbb{R}^D\}}_{i=1}^N\) from an unknown data distribution \(p_{data}(x)\). We define the score of a probability density \(p(x)\) to be \({\Delta}_x {log}_p(x)\). The <em>score network</em> \(s_{\theta} : \mathbb{R}^D \rightarrow \mathbb{R}^D\) is a neural network parameterized by \(\theta\), which will be trained to approximate the score of \(p_{data}(x)\).</p>
+                <p>The goal of generative modeling is to use the dataset to learn a model for generating new samples from \(p_{data}(x)\). The framework of score-based generative modeling has two ingredients: score matching and Langevin dynamics.</p>
+
+                <h3>6.5.2.1 Score Matching for Score Estimation</h3>
+                <p>Score matching [24] is originally designed for learning non-normalized statistical models based on i.i.d. samples from an unknown data distribution. Following [53], we repurpose it for score estimation. </p>
+
+                <h3>6.5.2.2 Sampling with Langevin Dynamics</h3>
+                <p>Langevin dynamics can produce samples from a probability density \(p(x)\) using only the score function \(\Delta_x logp(x)\).</p>
+                
                 
                 <div class="navigation">
                     <a href="gaussian_process.html">Prev: 6.4 Diffusion from Scratch</a>
