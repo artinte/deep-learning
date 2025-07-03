@@ -80,7 +80,7 @@ print(result)</code></pre>
                 <pre><samp>tensor([[ 0.7725, -1.1844, -2.5558, -0.5727,  0.3379],
         [-0.1080, -0.9385,  0.0624,  0.5128,  0.8134],
         [-0.7676,  0.4160,  0.9115,  0.1926,  0.0960]],
-       grad_fn=<EmbeddingBackward0>)</samp></pre>
+       grad_fn=&lt;EmbeddingBackward0&gt;)</samp></pre>
 
                 <p>The \([1000, 5]\) shape refers to the internal embedding matrix of the layer — you can think of it like a dictionary, where each row represents the embedding vector of a word.</p>
                 <p>The input \([1, 2, 3]\) is a list of token IDs. PyTorch's Embedding layer simply looks up rows 1, 2, and 3 from that matrix.</p>
@@ -88,7 +88,7 @@ print(result)</code></pre>
 result = embedding_matrix[[1, 2, 3]]
 assert result.shape == (3, 5)</code></pre>
 
-                <p>For text or sequence problems, the Embedding layer takes a 2D tensor of integers, of shape \((samples, sequence_length)\), where each entry is a sequence of integers. It can embed sequences of variable lengths. You could feed into the embedding layer above batches with shapes \((32, 10)\) (batch of 32 sequences of length 10) or \((64, 15)\) (batch of 64 sequences of length 15).</p>
+                <p>For text or sequence problems, the Embedding layer takes a 2D tensor of integers, of shape <code>(samples, sequence_length)</code>, where each entry is a sequence of integers. It can embed sequences of variable lengths. You could feed into the embedding layer above batches with shapes \((32, 10)\) (batch of 32 sequences of length 10) or \((64, 15)\) (batch of 64 sequences of length 15).</p>
                 <p>The returned tensor has one more axis than the input, the embedding vectors are aligned along the new last axis. Pass it a \((2, 3)\) input batch and the output is \((2, 3, N)\).</p>
                 <pre><code>result = simple_embedding_layer(torch.tensor([[0, 1, 2], [3, 4, 5]]))
 assert result.shape == (2, 3, 5)</code></pre>
