@@ -67,7 +67,33 @@ print(os.listdir(train_dir))</code></pre>
 shutil.rmtree(remove_dir)</code></pre>
 
                 <h3>4.2.3 Embedding Layer</h3>
-                <p>The Embedding layer can be understood as a lookup table that maps from integer indices (which stand for specific words) to dense vectors (their embeddings). The dimensionality (or width) of the embedding is a parameter you can experiment with to see what works well for your problem, much in the same way you would experiment with the number of neurons in a Dense layer.</p>
+                <p>The <strong>Embedding layer</strong> can be understood as a lookup table that maps from integer indices (which stand for specific words) to dense vectors (their embeddings). The dimensionality (or width) of the embedding is a parameter you can experiment with to see what works well for your problem, much in the same way you would experiment with the number of neurons in a Dense layer.</p>
+
+                <pre><code># Embed a 1000 word vocabulary into 5 dimensions.
+simple_embedding_layer = torch.nn.Embedding(num_embeddings=1000,
+                                            embedding_dim=5)</code></pre>
+                
+                <p>When you create an Embedding layer, the weights for the embedding are randomly initialized (just like any other layer). During training, they are gradually adjusted via backpropagation. Once trained, the learned word embeddings will roughly encode similarities between words (as they were learned for the specific problem your model is trained on).</p>
+                <p>If you pass an integer to an embedding layer, the result replaces each integer with the vector from the embedding table:</p>
+                <pre><code>result = simple_embedding_layer(torch.tensor([1, 2, 3]))
+print(result)</code></pre>
+                <pre><samp>tensor([[ 0.7725, -1.1844, -2.5558, -0.5727,  0.3379],
+        [-0.1080, -0.9385,  0.0624,  0.5128,  0.8134],
+        [-0.7676,  0.4160,  0.9115,  0.1926,  0.0960]],
+       grad_fn=<EmbeddingBackward0>)</samp></pre>
+
+                <p>The \([1000, 5]\) shape refers to the internal embedding matrix of the layer — you can think of it like a dictionary, where each row represents the embedding vector of a word.</p>
+                <p>The input \([1, 2, 3]\) is a list of token IDs. PyTorch's Embedding layer simply looks up rows 1, 2, and 3 from that matrix.</p>
+                <pre><code>embedding_matrix = torch.randn(1000, 5)
+result = embedding_matrix[[1, 2, 3]]
+assert result.shape == (3, 5)</code></pre>
+
+                <p>For text or sequence problems, the Embedding layer takes a 2D tensor of integers, of shape \((samples, sequence_length)\), where each entry is a sequence of integers. It can embed sequences of variable lengths. You could feed into the embedding layer above batches with shapes \((32, 10)\) (batch of 32 sequences of length 10) or \((64, 15)\) (batch of 64 sequences of length 15).</p>
+                <p>The returned tensor has one more axis than the input, the embedding vectors are aligned along the new last axis. Pass it a \((2, 3)\) input batch and the output is \((2, 3, N)\).</p>
+                <pre><code>result = simple_embedding_layer(torch.tensor([[0, 1, 2], [3, 4, 5]]))
+assert result.shape == (2, 3, 5)</code></pre>
+
+                <p>When given a batch of sequences as input, an embedding layer returns a 3D floating point tensor, of shape <code>(samples, sequence_length, embedding_dimensionality)</code>. To convert from this sequence of variable length to a fixed representation there are a variety of standard approaches. You could use an RNN, Attention, or pooling layer before passing it to a Dense layer. This tutorial uses pooling because it's the simplest.</p>
 
                 <h3>4.2.4 Preprocessing</h3>
 
