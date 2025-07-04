@@ -1,4 +1,5 @@
 import collections
+import numpy
 import os
 import pathlib
 import re
@@ -68,11 +69,124 @@ def tokenize(text):
     return custom_standardization(text).split()
 
 
+assert tokenize("Hello, world!") == ["hello", "world"]
+
+
 def yield_tokens(data_iter):
     for text, _ in data_iter:
         yield tokenize(text)
 
 
-# In newer torchtext version, we can use maxtokens to limit token's number.
-vocab = torchtext.vocab.build_vocab_from_iterator(yield_tokens(train_data))
-print(list(vocab.stoi.keys())[:10])
+counter = collections.Counter()
+
+for tokens in yield_tokens(train_data):
+    counter.update(tokens)
+
+vocab = counter.most_common(1000)
+print(vocab[:5])
+
+word_to_index = {word: idx + 2 for idx, (word, _) in enumerate(vocab)}
+word_to_index["<PAD>"] = 0
+word_to_index["<UNK>"] = 1
+
+
+class IMDBDataset(torch.utils.data.Dataset):
+    def __init__(self, data, word_to_index):
+        self.data = data
+        self.word_to_index = word_to_index
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        text, label = self.data[idx]
+        text_idx = [
+            self.word_to_index.get(word, self.word_to_index["<UNK>"])
+            for word in tokenize(text)
+        ]
+        return torch.tensor(text_idx), torch.tensor(label)
+
+
+train_dataset = IMDBDataset(train_data, word_to_index)
+print(train_dataset[0])
+
+
+def collate_fn(batch):
+    texts, labels = zip(*batch)
+
+    max_len = max(len(text) for text in texts)
+
+    padded_texts = [
+        torch.cat(
+            [text, torch.tensor([word_to_index["<PAD>"]] * (max_len - len(text)))]
+        )
+        for text in texts
+    ]
+
+    padded_texts_tensor = torch.stack(padded_texts).long()
+
+    labels_tensor = torch.tensor(labels).long()
+
+    return padded_texts_tensor, labels_tensor
+
+
+train_loader = torch.utils.data.DataLoader(
+    train_dataset, batch_size=32, shuffle=True, collate_fn=collate_fn
+)
+
+
+class TextClassificationModel(torch.nn.Module):
+    def __init__(self, vocab_size, embedding_dim):
+        super(TextClassificationModel, self).__init__()
+        self.embedding = torch.nn.Embedding(vocab_size, embedding_dim)
+        self.pool = torch.nn.AdaptiveAvgPool1d(1)
+        self.fc1 = torch.nn.Linear(embedding_dim, 16)
+        self.fc2 = torch.nn.Linear(16, 1)
+
+    def forward(self, x):
+        x = self.embedding(x)
+        # [batch_size, embedding_dim, seq_len]
+        x = x.permute(0, 2, 1)
+        x = self.pool(x)
+        # [batch_size, embedding_dim]
+        x = x.squeeze(-1)
+        x = torch.relu(self.fc1(x))
+        x = self.fc2(x)
+        return x
+
+
+embedding_dim = 16
+vocab_size = len(word_to_index)
+model = TextClassificationModel(vocab_size, embedding_dim)
+
+criterion = torch.nn.BCEWithLogitsLoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+
+num_epochs = 10
+for epoch in range(num_epochs):
+    model.train()
+    total_loss = 0
+    for texts, labels in train_loader:
+        outputs = model(texts)
+        loss = criterion(outputs.squeeze(), labels.float())
+
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        total_loss += loss.item()
+
+    print(f"Epoch {epoch+1}/{num_epochs}, Loss: {total_loss/len(train_loader):.4f}")
+
+
+if not os.path.exists("temp"):
+    os.makedirs("temp")
+
+embedding_weights = model.embedding.weight.data.cpu().numpy()
+numpy.savetxt("temp/embedding_vectors.tsv", embedding_weights, delimiter="\t")
+
+with open("temp/embedding_labels.tsv", "w") as f:
+    for word in word_to_index:
+        f.write(f"{word}\n")
+
+print('You can open the two TSV files at: https://projector.tensorflow.org/')
