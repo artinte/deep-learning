@@ -43,9 +43,18 @@
 
                 <h5>Dense connectivity</h5>
 
+                <p>To further improve the information flow between layers we propose a different connectivity pattern: we introduce direct connections from any layer to all subsequent layers. Figure 1 illustrates the layout of the resulting DenseNet schematically. Consequently, the \(\mathcal{l}^{th}\)  layer receives the feature-maps of all preceding layers, \(x_0, \cdot , x_{\mathcal{l} - 1}, as input:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(x_{\mathcal{l}} = H_{\mathcal{l}}([x_0, x_1, \cdots , x_{\mathcal{l} - 1}])\)
+                </div>
+                <p>where \([x_0, x_1, \cdots , x_{\mathcal{l} - 1}]\) refers to the concatenation of the feature-maps produced in layers \(0, \cdots , \mathcal{l} - 1\). Because of its dense connectivity we refer to this network architecture as <em>Dense Convolutional Network (DenseNet)</em>. For ease of implementation, we concatenate the multiple inputs of \(H_{\mathcal{l}}(\cdot)\) in eq. (2) into a single tensor.</p>
+
                 <h5>Composite function</h5>
+                <p>Motivated by [12], we define \(H_{\mathcal{l}}(\cdot)\) as a composite function of three consecutive operations: batch normalization (BN) [14], followed by a rectified linear unit (ReLU) [6] and a 3 × 3 convolution (Conv).</p>
 
                 <h5>Pooling layers</h5>
+                <p>The concatenation operation used in Eq. (2) is not viable when the size of feature-maps changes. However, an essential part of convolutional networks is down-sampling layers that change the size of feature-maps. To facilitate down-sampling in our architecture we divide the network into multiple densely connected dense blocks; see Figure 2. We refer to layers between blocks as transition layers, which do convolution and pooling. The transition layers used in our experiments consist of a batch normalization layer and an \(1 \times 1\) convolutional layer followed by a \(2 \times 2\) average pooling layer.</p>
+                
 
                 <h5>Growth rate</h5>
 
