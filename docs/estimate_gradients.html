@@ -42,7 +42,10 @@
                 <p>Score matching [24] is originally designed for learning non-normalized statistical models based on i.i.d. samples from an unknown data distribution. Following [53], we repurpose it for score estimation. </p>
 
                 <h3>6.5.2.2 Sampling with Langevin Dynamics</h3>
-                <p>Langevin dynamics can produce samples from a probability density \(p(x)\) using only the score function \(\Delta_x logp(x)\).</p>
+                <p>Langevin dynamics can produce samples from a probability density \(p(x)\) using only the score function \(\Delta_x logp(x)\). Given a fixed step size \(\epsilon \gt 0\), and an initial value \(\hat{x}_0 ~ \pi(x)\) with \(pi\) being a prior distribution, the Langevin method recursively computes the following:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\hat{x}_t = \hat{x}_{t-1} + \frac{\epsilon}{2} \Delta_x log p(\hat{x}_{t-1}) + \sqrt{\epsilon} z_t\)
+                </div>
                 
                 
                 <div class="navigation">
