@@ -116,7 +116,7 @@ train_data = load_imdb_data(train_dir)
 
 def custom_standardization(text):
     text = text.lower()
-    text = re.sub(r"<br\s*/?>", " ", text)  # replace <br /> or <br> with space
+    text = re.sub(r"&lt;br\s*/?&gt;", " ", text)  # replace &lt;br /&gt; or &lt;br&gt; with space
     text = re.sub(r"[%s]" % re.escape(string.punctuation), "", text)
     return text
 

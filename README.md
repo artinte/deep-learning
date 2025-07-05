@@ -31,7 +31,7 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 ### 04 Recurrent Network
 
 - [x] 4.1 [RNN from Scratch](https://artinte.github.io/deep-learning/rnn_classify_scratch.html)
-- [ ] 4.2 [Word Embeddings](https://artinte.github.io/deep-learning/word_embed.html)
+- [x] 4.2 [Word Embeddings](https://artinte.github.io/deep-learning/word_embed.html)
 - [ ] 4.3 [Word2Vec](https://artinte.github.io/deep-learning/word2vec.html)
 - [ ] 4.4 [LTSM and GRU](https://artinte.github.io/deep-learning/lstm_and_gru.html)
 - [ ] 4.5 [Neural Machine Translation](https://artinte.github.io/deep-learning/nmt_align.html)
@@ -95,9 +95,8 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 
 - [ ] 11.1 [Custom Operators](https://artinte.github.io/deep-learning/custom_operator.html)
 - [ ] 11.2 [Custom Functions](https://artinte.github.io/deep-learning/custom_function.html)
-- [ ] 11.3 [C++ and CUDA Extensions](https://artinte.github.io/deep-learning/cpp_extension.html)
-- [ ] 11.4 [Extending TorchScript](https://artinte.github.io/deep-learning/extend_script.html)
-- [ ] 11.5 [Dispatcher](https://artinte.github.io/deep-learning/dispatcher.html)
+- [ ] 11.3 [Extending TorchScript](https://artinte.github.io/deep-learning/extend_script.html)
+- [ ] 11.4 [Dispatcher](https://artinte.github.io/deep-learning/dispatcher.html)
 
 ### 12 Deploying Models
 
