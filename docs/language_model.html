@@ -57,7 +57,7 @@ model-00001-of-00002.safetensors: 100%|█████████████�
                 <h4>7.3.1.5 Generate Text</h4>
 
                 <h3 id="deepseek">7.3.2 DeepSeek-V3</h3>
-                <p>We present DeepSeek-V3, a strong Mixture-of-Experts (MoE) language model with 671B total parameters with 37B activated for each token. To achieve efficient inference and cost-effective training, DeepSeek-V3 adopts Multi-head Latent Attention (MLA) and DeepSeekMoE architectures, which were thoroughly validated in DeepSeek-V2. Furthermore, DeepSeek-V3 pioneers an auxiliary-loss-free strategy for load balancing and sets a multi-token prediction training objective for stronger performance.</p>
+                <p>We present <a href="https://arxiv.org/abs/2412.19437">DeepSeek-V3</a>, a strong Mixture-of-Experts (MoE) language model with 671B total parameters with 37B activated for each token. To achieve efficient inference and cost-effective training, DeepSeek-V3 adopts <strong>Multi-head Latent Attention (MLA)</strong> and DeepSeekMoE architectures, which were thoroughly validated in DeepSeek-V2. Furthermore, DeepSeek-V3 pioneers an auxiliary-loss-free strategy for load balancing and sets a multi-token prediction training objective for stronger performance.</p>
                 <p>We pre-train DeepSeek-V3 on 14.8 trillion diverse and high-quality tokens, followed by Supervised Fine-Tuning and Reinforcement Learning stages to fully harness its capabilities. Comprehensive evaluations reveal that DeepSeek-V3 outperforms other open-source models and achieves performance comparable to leading closed-source models.</p>
                 <p>Despite its excellent performance, DeepSeek-V3 requires only 2.788M H800 GPU hours for its full training. In addition, its training process is remarkably stable. Throughout the entire training process, we did not experience any irrecoverable loss spikes or perform any rollbacks.</p>
 
@@ -66,8 +66,24 @@ model-00001-of-00002.safetensors: 100%|█████████████�
                 
 
                 <h5>Basic Architecture</h5>
-                <p>The basic architecture of DeepSeek-V3 is still within the Transformer (Vaswani et al., 2017) framework. For efficient inference and economical training, DeepSeek-V3 also adopts MLA and DeepSeekMoE, which have been thoroughly validated by DeepSeek-V2.</p>
+                <p>The basic architecture of DeepSeek-V3 is still within the <a href="transformer_paper.html">Transformer (Vaswani et al., 2017)</a> framework. For efficient inference and economical training, DeepSeek-V3 also adopts MLA and DeepSeekMoE, which have been thoroughly validated by DeepSeek-V2.</p>
+                <p>Compared with DeepSeek-V2, an exception is that we additionally introduce an auxiliary-loss-free load balancing strategy (Wang et al., 2024a) for DeepSeekMoE to mitigate the performance degradation induced by the effort to ensure load balance. Figure 2 illustrates the basic architecture of DeepSeek-V3, and we will briefly review the details of MLA and DeepSeekMoE in this section.</p>
+                <img src="res/07/deepseek_v3_arch.png" alt="DeepSeek-V3 Architecture" width="600">
+                <p style="text-align: center; color: #555555;">Figure 2 - Basic Architecture of DeepSeek-V3</p>
 
+                <h5>Multi-Head Latent Attention</h5>
+                <p>For attention, DeepSeek-V3 adopts the MLA architecture. Let \(d\) denote the embedding dimension, \(n_h\) denote the number of attention heads, \(d_h\) denote the dimension per head, and \(h_t \in \mathbb{R}^d\) denote the attention input for the 𝑡-th token at a given attention layer. The core of MLA is the low-rank joint compression for attention keys and values to reduce Key-Value (KV) cache during inference:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \[
+                    \begin{flalign*}
+                    & c_t^{KV} = W^{DKV} h_t \\
+                    & [k_{t,1}^C , k_{t,2}^C , \cdots , k_{t, n_h}^C] = k_t^C = W^{UK} c_t^{KV} \\
+                    & k_t^R = R_O PE(W^{KR} h_t) \\
+                    & k_{t, i} = [k_{t,i}^C , k_{t}^R] \\
+                    & [v_{t,1}^C , v_{t,2}^C , \cdots , v_{t, n_h}^C] = v_t^C = W^{UV} c_t^{KV}
+                    \end{flalign*}
+                    \]
+                </div>
 
                 <div class="navigation">
                     <a href="easy_ocr.html">Prev: 7.2 Easy OCR</a>
