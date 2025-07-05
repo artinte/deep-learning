@@ -53,3 +53,14 @@ def plot(x_train, y_train, x_val, y_val, kernels, names, attention=False):
     pyplot.show()
 
 plot(x_train, y_train, x_val, y_val, kernels, names)
+
+
+# adapting attention pooling
+sigmas = (0.1, 0.2, 0.5, 1)
+names = ['Sigma ' + str(sigma) for sigma in sigmas]
+
+def gaussian_with_width(sigma):
+    return (lambda x: torch.exp(-x**2 / (2*sigma**2)))
+
+kernels = [gaussian_with_width(sigma) for sigma in sigmas]
+plot(x_train, y_train, x_val, y_val, kernels, names)
