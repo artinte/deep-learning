@@ -194,8 +194,87 @@ train_loader = torch.utils.data.DataLoader(
 )</code></pre>
 
                 <h3>4.2.5 Classification model</h3>
+                <p>Use the PyTorch Sequential API to define the sentiment classification model. In this case it is a "Continuous bag of words" style model:</p>
+                <pre><code>class TextClassificationModel(torch.nn.Module):
+    def __init__(self, vocab_size, embedding_dim):
+        super(TextClassificationModel, self).__init__()
+        self.embedding = torch.nn.Embedding(vocab_size, embedding_dim)
+        self.pool = torch.nn.AdaptiveAvgPool1d(1)
+        self.fc1 = torch.nn.Linear(embedding_dim, 16)
+        self.fc2 = torch.nn.Linear(16, 1)
 
-                
+    def forward(self, x):
+        x = self.embedding(x)
+        # [batch_size, embedding_dim, seq_len]
+        x = x.permute(0, 2, 1)
+        x = self.pool(x)
+        # [batch_size, embedding_dim]
+        x = x.squeeze(-1)
+        x = torch.relu(self.fc1(x))
+        x = self.fc2(x)
+        return x</code></pre>
+
+                <ul class="with-bullets">
+                    <li><p>The <code>Embedding</code> layer takes the integer-encoded vocabulary and looks up the embedding vector for each word-index. These vectors are learned as the model trains. The vectors add a dimension to the output array. The resulting dimensions are: <code>(batch, sequence, embedding)</code>.</p></li>
+                    <li><p>The <code>AdaptiveAvgPool1d</code> layer returns a fixed-length output vector for each example by averaging over the sequence dimension. This allows the model to handle input of variable length, in the simplest way possible.</p></li>
+                    <li><p>The fixed-length output vector is piped through a fully-connected (Dense) layer with 16 hidden units.</p></li>
+                    <li><p>The last layer is densely connected with a single output node.</p></li>
+                </ul>
+
+                <p>Compile and train the model using the <a href="optimizer.html#adam">Adam</a> optimizer and BinaryCrossentropy loss.</p>
+                <pre><code>embedding_dim = 16
+vocab_size = len(word_to_index)
+model = TextClassificationModel(vocab_size, embedding_dim)
+
+criterion = torch.nn.BCEWithLogitsLoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+
+num_epochs = 10
+for epoch in range(num_epochs):
+    model.train()
+    total_loss = 0
+    for texts, labels in train_loader:
+        outputs = model(texts)
+        loss = criterion(outputs.squeeze(), labels.float())
+
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        total_loss += loss.item()
+
+    print(f"Epoch {epoch+1}/{num_epochs}, Loss: {total_loss/len(train_loader):.4f}")</code></pre>
+
+                <pre><samp>Epoch 1/10, Loss: 0.6873
+Epoch 2/10, Loss: 0.6001
+Epoch 3/10, Loss: 0.4751
+Epoch 4/10, Loss: 0.4149
+Epoch 5/10, Loss: 0.3862
+Epoch 6/10, Loss: 0.3670
+Epoch 7/10, Loss: 0.3523
+Epoch 8/10, Loss: 0.3420
+Epoch 9/10, Loss: 0.3325
+Epoch 10/10, Loss: 0.3269</samp></pre>
+
+                <p>Retrieve the word embeddings learned during training. The embeddings are weights of the Embedding layer in the model. The weights matrix is of shape <code>(vocab_size, embedding_dimension)</code>.</p>
+                <p>Obtain the weights from the model:</p>
+                <pre><code>embedding_weights = model.embedding.weight.data.cpu().numpy()</code></pre>
+
+                <p>Write the weights to disk. To use the Embedding Projector, you will upload two files in tab separated format: a file of vectors (containing the embedding), and a file of meta data (containing the words).</p>
+                <pre><code>numpy.savetxt("temp/embedding_vectors.tsv", embedding_weights, delimiter="\t")
+
+with open("temp/embedding_labels.tsv", "w") as f:
+    for word in word_to_index:
+        f.write(f"{word}\n")</code></pre>
+
+                <p>To visualize the embeddings, upload them to the embedding projector. Open the Embedding Projector:</p>
+                <ul class="with-bullets">
+                    <li><p>Click on "Load data".</p></li>
+                    <li><p>Upload the two files you created above: <span class="highlight">embedding_vectors.tsv</span> and <span class="highlight">embedding_labels.tsv</span> .</p></li>
+                </ul>
+
+                <p>The embeddings you have trained will now be displayed. You can search for words to find their closest neighbors. For example, try searching for "beautiful". You may see neighbors like "wonderful".</p>
+
                 <div class="navigation">
                     <a href="rnn_classify_scratch.html">Prev: 4.1 RNN from Stratch</a>
                     <a href="word2vec.html">Next: 4.3 Word2Vec</a>
