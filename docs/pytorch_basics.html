@@ -270,6 +270,30 @@ Zeros Tensor:
 
                 <h4>2.3.2.2 Attributes of a Tensor</h4>
                 <p>Tensor attributes describe their shape, datatype, and the device on which they are stored.</p>
+                <pre><code>tensor = torch.rand(3,4)
+
+print(f"Shape of tensor: {tensor.shape}")
+print(f"Datatype of tensor: {tensor.dtype}")
+print(f"Device tensor is stored on: {tensor.device}")</code></pre>
+
+                <pre><samp>Shape of tensor: torch.Size([3, 4])
+Datatype of tensor: torch.float32
+Device tensor is stored on: cpu</samp></pre>
+
+                <h4>2.3.2.3 Operations on Tensors</h4>
+                <p>Over 1200 tensor operations, including arithmetic, linear algebra, matrix manipulation (transposing, indexing, slicing), sampling and more are comprehensively described <a href="https://docs.pytorch.org/docs/stable/torch.html">here</a> .</p>
+                
+                <h5>Accelerator</h5>
+                <p>Each of these operations can be run on the CPU and Accelerator such as CUDA, MPS, MTIA, or XPU.</p>
+                <p>By default, tensors are created on the CPU. We need to explicitly move tensors to the accelerator using <code>.to</code> method (after checking for accelerator availability). Keep in mind that copying large tensors across devices can be expensive in terms of time and memory!</p>
+
+                <pre><code># We move our tensor to the current accelerator if available
+if torch.accelerator.is_available():
+    tensor = tensor.to(torch.accelerator.current_accelerator())
+print(f"Device tensor is stored on: {tensor.device}")</code></pre>
+                <pre><samp>Device tensor is stored on: cuda:0</samp></pre>
+                
+                <h5>Standard MumPy-like Indexing and Slicing</h5>
 
                 <h3>2.3.3 Datasets and DataLoaders</h3>
                 <h3>2.3.4 Transforms</h3>
