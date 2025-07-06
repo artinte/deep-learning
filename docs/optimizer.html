@@ -76,6 +76,32 @@ assert torch.isclose(w_torch, torch.tensor(w), atol=1e-6)</code></pre>
                 <p>We propose Adam, a method for efficient stochastic optimization that only requires first-order gradients with little memory requirement. The method computes individual adaptive learning rates for different parameters from estimates of first and second moments of the gradients; the name Adam is derived from adaptive moment estimation.</p>
                 <p>Algorithm: Adam, our proposed algorithm for stochastic optimization, and for a slightly more efficient (but less clear) order of computation. \(g_t^2\) indicates the elementwise square \(g_t \odot g_t\). Good default settings for the tested machine learning problem are \(\alpha = 0.001\), \(\beta_1 = 0.9\), \(\beta_2 = 0.999\) and \(\epsilon = 10^{-8}\). All operations on vectors are element-wise. With \(\beta_1^t\) and \(\beta_2^t\) we denote \(\beta_1\) and \(\beta_2\) to the power \(t\).</p>
 
+                <ul class="with-bullets">
+                    <li><p>\(\alpha\): StepSize;</p></li>
+                    <li><p>\(\beta_1, \beta_2 \in [0, 1)\): Exponential decay rates for the moment estimates;</p></li>
+                    <li><p>\(f(\theta)\): Stochastic objective function with parameters \(\theta\);</p></li>
+                    <li><p>\(\theta_0\): Initial parameter vector</p></li>
+                    <li><p>\(m_0 \leftarrow 0\): (Initialize \(1^{st}\) moment vector);</p></li>
+                    <li><p>\(v_0 \leftarrow 0\): (Initialize \(2^{nd}\) moment vector);</p></li>
+                    <li><p>\(t \leftarrow 0\): (Initialize timestep).</p></li>
+                </ul>
+                <p>while \(\theta_t\) not converged do</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \[
+                    \begin{flalign*}
+                    & t \leftarrow t + 1 \\
+                    & g_t \leftarrow \Delta_{\theta} f_t(\theta_{t-1}) \\
+                    & m_t \leftarrow \beta_1 \cdot m_{t-1} + (1 - \beta_1) \cdot g_t \\
+                    & v_t \leftarrow \beat_2 \cdot v_{t-1} + (1 - \beat_2) \codt g_t^2 \\
+                    & \hat{m}_t \leftarrow m_t / (1 - \beta_2^t) \\
+                    & \hat{v}_t \leftarrow v_t / (1 - \beta_2^t) \\
+                    & \theta_t \leftarrow \theta_{t-1} - \alpha \cdot \hat{m}_t / (\sqrt{\hat{v}_t} + \epsilon) \\
+                    \end{flalign*}
+                    \]
+                </div>
+                <p>end while</p>
+                <p>return \(\theta_t\) (Resulting parameters)</p>
+
                 <img src="res/02/simple_adam.png" alt="Simple Adam" width="600">
                 <p style="text-align: center; color: #555555;">Figure 2 - Simple Adam</p>
 
