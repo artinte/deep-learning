@@ -1,67 +1,57 @@
-import math
 import torch
-from typing import Dict, Tuple, Any
+from matplotlib import pyplot
 
 
-class GenericAdaptiveOptimizer(torch.optim.optimizer.Optimizer):
-    def __init__(
-        self,
-        params,
-        defaults: Dict[str, Any],
-        lr: float,
-        betas: Tuple[float, float],
-        eps: float,
-    ):
-        if not 0.0 <= lr:
-            raise ValueError(f"Invalid learning rate: {lr}")
-        if not 0.0 <= eps:
-            raise ValueError(f"Invalid epsilon value: {eps}")
-        if not 0.0 <= betas[0] < 1.0:
-            raise ValueError(f"Invalid beta parameter at index 0: {betas[0]}")
-        if not 0.0 <= betas[1] < 1.0:
-            raise ValueError(f"Invalid beta parameter at index 1: {betas[1]}")
+class SimpleAdam:
+    def __init__(self, params, lr=0.1, betas=(0.9, 0.999), eps=1e-8):
+        self.params = list(params)
+        self.lr = lr
+        self.beta1, self.beta2 = betas
+        self.eps = eps
 
-        defaults.update(dict(lr=lr, betas=betas, eps=eps))
-        super().__init__(params, defaults)
+        self.m = [torch.zeros_like(p) for p in self.params]
+        self.v = [torch.zeros_like(p) for p in self.params]
+        self.t = 0
 
-    def init_state(
-        self, state: Dict[str, any], group: Dict[str, any], param: torch.nn.Parameter
-    ):
-        pass
+    def step(self):
+        self.t += 1
+        for i, p in enumerate(self.params):
+            if p.grad is None:
+                continue
 
-    def step_param(
-        self,
-        state: Dict[str, any],
-        group: Dict[str, any],
-        grad: torch.Tensor,
-        param: torch.Tensor,
-    ):
-        pass
+            g = p.grad.data
+            self.m[i] = self.beta1 * self.m[i] + (1 - self.beta1) * g
+            self.v[i] = self.beta2 * self.v[i] + (1 - self.beta2) * (g**2)
 
-    @torch.no_grad()
-    def step(self, closure=None):
-        loss = None
-        if closure is not None:
-            with torch.enable_grad():
-                loss = closure()
+            m_hat = self.m[i] / (1 - self.beta1**self.t)
+            v_hat = self.v[i] / (1 - self.beta2**self.t)
 
-        for group in self.param_groups:
-            for param in group["params"]:
-                if param.grad is None:
-                    continue
+            p.data -= self.lr * m_hat / (v_hat.sqrt() + self.eps)
 
-                grad = param.grad.data
-                if grad.is_sparse:
-                    raise RuntimeError(
-                        "GenericAdaptiveOptimizer does not support sparse gradients,"
-                        " please consider SparseAdam instead"
-                    )
+    def zero_grad(self):
+        for p in self.params:
+            if p.grad is not None:
+                p.grad.zero_()
 
-                state = self.state[param]
 
-                if len(state) == 0:
-                    self.init_state(state, group, param)
+# Test function: f(x) = (x - 3)^2
+x = torch.tensor([10.0], requires_grad=True)
 
-                self.step_param(state, group, grad, param)
+optimizer = SimpleAdam([x], lr=0.1)
+losses = []
+xs = []
+for step in range(150):
+    optimizer.zero_grad()
+    loss = (x - 3) ** 2
+    loss.backward()
+    optimizer.step()
 
-        return loss
+    losses.append(loss.item())
+    xs.append(x.item())
+    print(f"Step {step:03d} | x = {x.item():.5f} | loss = {loss.item():.5f}")
+
+pyplot.plot(losses, label="loss")
+pyplot.plot(xs, label="x")
+pyplot.legend()
+pyplot.grid(True)
+pyplot.show()
