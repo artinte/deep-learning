@@ -80,8 +80,13 @@ magnitude = numpy.abs(fft_result)[:sample_rate // 2]</code></pre>
                     \(X_k = \sum_{n=0}^{N-1} x_n e^{- \frac{2 \pi i}{N} nk}\)
                 </div>
 
+                <p>The value of <code>n_fft</code> determines the resolution of frequency axis. However, with the higher <code>n_fft</code> value, the energy will be distributed among more bins, so when you visualize it, it might look more blurry, even thought they are higher resolution.</p>
 
                 <h4>8.1.4.2 GriffinLim</h4>
+                <p>To recover a waveform from a spectrogram, you can use <a href="https://docs.pytorch.org/audio/stable/generated/torchaudio.transforms.GriffinLim.html#torchaudio.transforms.GriffinLim">torchaudio.transforms.GriffinLim</a> .</p>
+                <p>The same set of parameters used for spectrogram must be used.</p>
+
+                
 
                 <h4>8.1.4.3 Mel Filter Bank</h4>
 
