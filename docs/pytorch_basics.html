@@ -29,7 +29,7 @@
                 <p>If you’re new to deep learning frameworks, head right into the section <a href="#tensor">Tensors</a> of our step-by-step guide.</p>
                 
                 <h3 id="quick-start">2.3.1 Quickstart</h3>
-                <p>This section runs through the API for common tasks in machine learning. File <p><a href="https://github.com/artinte/deep-learning/blob/develop/02_dnn/3_torch_basic/quick_start.py">quick_start.py</a></p> records the full process, refer to the links in each section to dive deeper.</p>
+                <p>This section runs through the API for common tasks in machine learning. File <a href="https://github.com/artinte/deep-learning/blob/develop/02_dnn/3_torch_basic/quick_start.py">quick_start.py</a> records the full process, refer to the links in each section to dive deeper.</p>
 
                 <h4>2.3.1.1 Working With Data</h4>
                 <p>PyTorch has two primitives to work with data: <a href="https://docs.pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader">torch.utils.data.DataLoader</a> and <a href="https://docs.pytorch.org/docs/stable/data.html#torch.utils.data.Dataset">torch.utils.data.Dataset</a> . <code>Dataset</code> stores the samples and their corresponding labels, and <code>DataLoader</code> wraps an iterable around the <code>Dataset</code> .</p>
@@ -208,6 +208,68 @@ Done!</samp></pre>
 
 
                 <h3 id="tensor">2.3.2 Tensors</h3>
+                <p>Tensors are a specialized data structure that are very similar to arrays and matrices. In PyTorch, we use tensors to encode the inputs and outputs of a model, as well as the model’s parameters.</p>
+                <p>Tensors are similar to NumPy’s ndarrays, except that tensors can run on GPUs or other hardware accelerators. In fact, tensors and NumPy arrays can often share the same underlying memory, eliminating the need to copy data (see Bridge with NumPy). Tensors are also optimized for automatic differentiation (we’ll see more about that later in the Autograd section). If you’re familiar with ndarrays, you’ll be right at home with the Tensor API. If not, follow along!</p>
+
+                <h4>2.3.2.1 Initializing a Tensor</h4>
+                <p>Tensors can be initialized in various ways. Take a look at the following examples in file <a href="">tensor_demo.py</a> .</p>
+
+                <h5>Directly from Data</h5>
+                <p>Tensors can be created directly from data. The data type is automatically inferred.</p>
+                <pre><code># directly from data
+data = [[1, 2], [3, 4]]
+x_data = torch.tensor(data)
+assert x_data.shape == (2, 2)</code></pre>
+
+                <h5>From a NumPy array</h5>
+                <p>Tensors can be created from NumPy arrays (and vice versa - see Bridge with NumPy).</p>
+                <pre><code># from a numpy array
+np_array = numpy.array(data)
+x_np = torch.from_numpy(np_array)
+assert x_np.shape == (2, 2)</code></pre>
+
+                <h5>From Another Tensor</h5>
+                <p>The new tensor retains the properties (shape, datatype) of the argument tensor, unless explicitly overridden.</p>
+                <pre><code>x_ones = torch.ones_like(x_data)
+print(f"Ones Tensor: \n {x_ones} \n")
+
+x_rand = torch.rand_like(x_data, dtype=torch.float)
+print(f"Random Tensor: \n {x_rand} \n")</code></pre>
+
+                <pre><samp>Ones Tensor: 
+ tensor([[1, 1],
+        [1, 1]])
+
+Random Tensor:
+ tensor([[0.2572, 0.9217],
+        [0.7783, 0.2022]])</samp></pre>
+
+                <h5>With Random or Constant Values</h5>
+                <p><code>shape</code> is a tuple of tensor dimensions. In the functions below, it determines the dimensionality of the output tensor.</p>
+
+                <pre><code>shape = (2,3,)
+rand_tensor = torch.rand(shape)
+ones_tensor = torch.ones(shape)
+zeros_tensor = torch.zeros(shape)
+
+print(f"Random Tensor: \n {rand_tensor} \n")
+print(f"Ones Tensor: \n {ones_tensor} \n")
+print(f"Zeros Tensor: \n {zeros_tensor}")</code></pre>
+
+                <pre><samp>Random Tensor:
+ tensor([[0.9961, 0.3413, 0.4354],
+        [0.4710, 0.9064, 0.8762]])
+
+Ones Tensor:
+ tensor([[1., 1., 1.],
+        [1., 1., 1.]])
+
+Zeros Tensor:
+ tensor([[0., 0., 0.],
+        [0., 0., 0.]])</samp></pre>
+
+                <h4>2.3.2.2 Attributes of a Tensor</h4>
+                <p>Tensor attributes describe their shape, datatype, and the device on which they are stored.</p>
 
                 <h3>2.3.3 Datasets and DataLoaders</h3>
                 <h3>2.3.4 Transforms</h3>
