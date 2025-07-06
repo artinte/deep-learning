@@ -36,6 +36,40 @@
                 <h3>8.1.3 FFmpeg Tools</h3>
                 <p>FFmpeg is the leading multimedia framework, able to decode, encode, transcode, mux, demux, stream, filter and play pretty much anything that humans and machines have created. It supports the most obscure ancient formats up to the cutting edge.</p>
                 
+                <h3>8.1.4 Feature Extractions</h3>
+                <p><code>torchaudio</code> implements feature extractions commonly used in the audio domain. They are available in <code>torchaudio.functional</code> and <code>torchaudio.transforms</code> .</p>
+
+                <p><code>functional</code> implements features as standalone functions. They are stateless.</p>
+                <p><code>transforms</code> implements features as objects, using implementations from <code>functional</code> and <code>torch.nn.Module</code> . They can be serialized using TorchScript.</p>
+
+                <p>The following diagram shows the relationship between common audio features and torchaudio APIs to generate them.</p>
+                <img src="res/08/audio_extractions.png" alt="Audio Feature Extractions" width="600">
+                <p style="text-align: center; color: #555555;">Figure 1 - Audio Feature Extractions</p>
+
+                <p>For the complete list of available features, please refer to the documentation.</p>
+
+                <h4>8.1.4.1 Spectrogram</h4>
+
+                <p>To get the frequency make-up of an audio signal as it varies with time, you can use <a href="https://docs.pytorch.org/audio/stable/generated/torchaudio.transforms.Spectrogram.html#torchaudio.transforms.Spectrogram">torchaudio.transforms.Spectrogram()</a> .</p>
+
+
+                <p>The core of spectrogram computation is <strong>(short-term) Fourier transform</strong>, and the <code>n_fft</code> parameter corresponds to the \(N\) in the following definition of descrete Fourier transform:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(X_k = \sum_{n=0}^{N-1} x_n e^{- \frac{2 \pi i}{N} nk}\)
+                </div>
+                
+
+                <h4>8.1.4.2 GriffinLim</h4>
+
+                <h4>8.1.4.3 Mel Filter Bank</h4>
+
+                <h4>8.1.4.4 MelSpectrogram</h4>
+
+                <h4>8.1.4.5 MFCC</h4>
+
+                <h4>8.1.4.6 LFCC</h4>
+
+
 
                 <div class="navigation">
                     <a href="chatbots.html">Prev: 7.4 Chatbots</a>
