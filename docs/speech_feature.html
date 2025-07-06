@@ -48,6 +48,28 @@
 
                 <p>For the complete list of available features, please refer to the documentation.</p>
 
+                <h4>8.1.4.1 FFT</h4>
+                <p>FFT helps us find out which frequencies are present in a signal, and how strong they are. You feed it a time-domain signal (e.g., a waveform), and it returns a frequency-domain representation (a spectrum).</p>
+                <p>File <a>simple_fft.py</a> show a example, create a signal with two frequencies: 50Hz and 120Hz, FFT is used to extract the hidden frequency components from the time domain.</p>
+
+                <pre><code>sample_rate = 1024
+duration = 1
+t = numpy.linspace(0, duration, sample_rate, endpoint=False)
+
+freq1 = 50
+freq2 = 200
+signal = numpy.sin(2 * numpy.pi * freq1 * t) + 0.5 * numpy.sin(2 * numpy.pi * freq2 * t)
+
+fft_result = numpy.fft.fft(signal)
+freqs = numpy.fft.fftfreq(len(t), 1 / sample_rate)
+
+positive_freqs = freqs[:sample_rate // 2]
+magnitude = numpy.abs(fft_result)[:sample_rate // 2]</code></pre>
+
+                <img src="res/08/simple_fft.png" alt="Simple FFT" width="600">
+                <p style="text-align: center; color: #555555;">Figure 2 - Simple FFT</p>
+
+
                 <h4>8.1.4.1 Spectrogram</h4>
 
                 <p>To get the frequency make-up of an audio signal as it varies with time, you can use <a href="https://docs.pytorch.org/audio/stable/generated/torchaudio.transforms.Spectrogram.html#torchaudio.transforms.Spectrogram">torchaudio.transforms.Spectrogram()</a> .</p>
@@ -57,7 +79,7 @@
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(X_k = \sum_{n=0}^{N-1} x_n e^{- \frac{2 \pi i}{N} nk}\)
                 </div>
-                
+
 
                 <h4>8.1.4.2 GriffinLim</h4>
 
