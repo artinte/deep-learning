@@ -25,14 +25,190 @@
                 <p>We’ll use the <a href="data_represent.html#mnist">MNIST</a> dataset to train a neural network that predicts if an input image belongs to one of the ten digit classes (0 through 9).</p>
                 <p>This tutorial assumes a basic familiarity with Python and <a href="principle_learn.html">Deep Learning concepts</a>.</p>
 
-                <h3>2.3.1 Quickstart</h3>
-                <p>This section runs through the API for common tasks in machine learning. Refer to the links in each section to dive deeper.</p>
+                <p>If you’re familiar with other deep learning frameworks, check out the section <a href="#quick-start">Quickstart</a> first to quickly familiarize yourself with PyTorch’s API.</p>
+                <p>If you’re new to deep learning frameworks, head right into the section <a href="#tensor">Tensors</a> of our step-by-step guide.</p>
+                
+                <h3 id="quick-start">2.3.1 Quickstart</h3>
+                <p>This section runs through the API for common tasks in machine learning. File <p><a href="https://github.com/artinte/deep-learning/blob/develop/02_dnn/3_torch_basic/quick_start.py">quick_start.py</a></p> records the full process, refer to the links in each section to dive deeper.</p>
 
-                <p><a href="">quick_start.py</a></p>
+                <h4>2.3.1.1 Working With Data</h4>
+                <p>PyTorch has two primitives to work with data: <a href="https://docs.pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader">torch.utils.data.DataLoader</a> and <a href="https://docs.pytorch.org/docs/stable/data.html#torch.utils.data.Dataset">torch.utils.data.Dataset</a> . <code>Dataset</code> stores the samples and their corresponding labels, and <code>DataLoader</code> wraps an iterable around the <code>Dataset</code> .</p>
+
+                <p>PyTorch offers domain-specific libraries such as TorchText, TorchVision, and TorchAudio, all of which include datasets. For this tutorial, we will be using a TorchVision dataset.</p>
+                <p>Every TorchVision Dataset includes two arguments: transform and target_transform to modify the samples and labels respectively.</p>
+                <pre><code>from torchvision import datasets
+
+training_data = datasets.MNIST(
+    root='data',
+    train=True,
+    download=True,
+    transform=torchvision.transforms.ToTensor(),
+)
+
+test_data = datasets.MNIST(
+    root='data',
+    train=False,
+    download=True,
+    transform=torchvision.transforms.ToTensor(),
+)</code></pre>
+
+                <p>We pass the Dataset as an argument to DataLoader. This wraps an iterable over our dataset, and supports automatic batching, sampling, shuffling and multiprocess data loading. Here we define a batch size of 64, i.e. each element in the dataloader iterable will return a batch of 64 features and labels.</p>
+                <pre><code>batch_size = 64
+train_dataloader = DataLoader(training_data, batch_size=batch_size)
+test_dataloader = DataLoader(test_data, batch_size=batch_size)
+
+for X, y in test_dataloader:
+    print(f"Shape of X [N, C, H, W]: {X.shape}")
+    print(f"Shape of y: {y.shape} {y.dtype}")
+    break</code></pre>
+
                 <pre><samp>Shape of X [N, C, H, W]: torch.Size([64, 1, 28, 28])
 Shape of y: torch.Size([64]) torch.int64</samp></pre>
 
-                <h3>2.3.2 Tensors</h3>
+                <h4>2.3.1.2 Creating Models</h4>
+
+                <p>To define a neural network in PyTorch, we create a class that inherits from nn.Module. We define the layers of the network in the __init__ function and specify how data will pass through the network in the forward function. To accelerate operations in the neural network, we move it to the accelerator such as CUDA, MPS, MTIA, or XPU. If the current accelerator is available, we will use it. Otherwise, we use the CPU.</p>
+                <pre><code>device = torch.accelerator.current_accelerator().type \
+    if torch.accelerator.is_available() else 'cpu'
+
+print(f'Using {device} device')
+
+class NeuralNetwork(torch.nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.flatten = torch.nn.Flatten()
+        self.linear_relu_stack = torch.nn.Sequential(
+            torch.nn.Linear(28 * 28, 512),
+            torch.nn.ReLU(),
+            torch.nn.Linear(512, 512),
+            torch.nn.ReLU(),
+            torch.nn.Linear(512, 10)
+        )
+        
+    def forward(self, x):
+        x = self.flatten(x)
+        logits = self.linear_relu_stack(x)
+        return logits
+
+model = NeuralNetwork().to(device)
+print(model)</code></pre>
+
+                <pre><samp>Using mps device
+NeuralNetwork(
+    (flatten): Flatten(start_dim=1, end_dim=-1)
+    (linear_relu_stack): Sequential(
+    (0): Linear(in_features=784, out_features=512, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=512, out_features=512, bias=True)
+    (3): ReLU()
+    (4): Linear(in_features=512, out_features=10, bias=True)
+    )
+)</samp></pre>
+
+                <h4>2.3.1.3 Optimizing the Model Parameters</h4>
+
+                <p>To train a model, we need a loss function and an optimizer.</p>
+                <pre><code>loss_fn = torch.nn.CrossEntropyLoss()
+optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)</code></pre>
+
+                <p>In a single training loop, the model makes predictions on the training dataset (fed to it in batches), and backpropagates the prediction error to adjust the model’s parameters.</p>
+
+                <pre><code>def train(dataloader, model, loss_fn, optimizer):
+    size = len(dataloader.dataset)
+    model.train()
+    for batch, (X, y) in enumerate(dataloader):
+        X, y= X.to(device), y.to(device)
+        
+        # Compute prediction error.
+        pred = model(X)
+        loss = loss_fn(pred, y)
+        
+        # backpropagation
+        loss.backward()
+        optimizer.step()
+        optimizer.zero_grad()
+        
+        if batch % 100 == 0:
+            loss, current = loss.item(), (batch + 1) * len(X)
+            print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")</code></pre>
+
+                <p>We also check the model’s performance against the test dataset to ensure it is learning.</p>
+                <pre><code>def test(dataloader, model, loss_fn):
+    size = len(dataloader.dataset)
+    num_batches = len(dataloader)
+    model.eval()
+    test_loss, correct = 0, 0
+    with torch.no_grad():
+        for X, y in dataloader:
+            X, y = X.to(device), y.to(device)
+            pred = model(X)
+            test_loss += loss_fn(pred, y).item()
+            correct += (pred.argmax(1) == y).type(torch.float).sum().item()
+    test_loss /= num_batches
+    correct /= size
+    print(f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")</code></pre>
+
+                <p>The training process is conducted over several iterations (epochs). During each epoch, the model learns parameters to make better predictions. We print the model’s accuracy and loss at each epoch; we’d like to see the accuracy increase and the loss decrease with every epoch.</p>
+                <pre><code>epochs = 20
+for t in range(epochs):
+    print(f"Epoch {t+1}\n-------------------------------")
+    train(train_dataloader, model, loss_fn, optimizer)
+    test(test_dataloader, model, loss_fn)
+print("Done!")</code></pre>
+
+                <pre><samp>Epoch 1
+-------------------------------
+loss: 2.304244  [   64/60000]
+loss: 2.297499  [ 6464/60000]
+loss: 2.292170  [12864/60000]
+loss: 2.286326  [19264/60000]
+loss: 2.280987  [25664/60000]
+loss: 2.273621  [32064/60000]
+loss: 2.264372  [38464/60000]
+loss: 2.281450  [44864/60000]
+loss: 2.262312  [51264/60000]
+loss: 2.248378  [57664/60000]
+Test Error: 
+    Accuracy: 44.1%, Avg loss: 2.254247
+
+...
+
+Epoch 19
+-------------------------------
+loss: 0.454976  [   64/60000]
+loss: 0.356519  [ 6464/60000]
+loss: 0.364573  [12864/60000]
+loss: 0.436727  [19264/60000]
+loss: 0.348171  [25664/60000]
+loss: 0.429552  [32064/60000]
+loss: 0.311450  [38464/60000]
+loss: 0.496438  [44864/60000]
+loss: 0.452633  [51264/60000]
+loss: 0.487647  [57664/60000]
+Test Error: 
+    Accuracy: 89.2%, Avg loss: 0.392691 
+
+Epoch 20
+-------------------------------
+loss: 0.439239  [   64/60000]
+loss: 0.345591  [ 6464/60000]
+loss: 0.349240  [12864/60000]
+loss: 0.428157  [19264/60000]
+loss: 0.335903  [25664/60000]
+loss: 0.421431  [32064/60000]
+loss: 0.300410  [38464/60000]
+loss: 0.485814  [44864/60000]
+loss: 0.441437  [51264/60000]
+loss: 0.481266  [57664/60000]
+Test Error: 
+    Accuracy: 89.4%, Avg loss: 0.382875 
+
+Done!</samp></pre>
+                
+
+
+                <h3 id="tensor">2.3.2 Tensors</h3>
+
                 <h3>2.3.3 Datasets and DataLoaders</h3>
                 <h3>2.3.4 Transforms</h3>
                 <h3 id="build_model">2.3.5 Build Model</h3>
