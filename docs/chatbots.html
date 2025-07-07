@@ -19,8 +19,30 @@
 
             <main class="col-md-8 content">
                 <h2 class="custom-title">7.4 Chatbots</h2>
-                <p class="title-subtext"></p>
-                <p style="color: #a0a0a0;">Created Date: 2025-05-28</p>
+                <p class="title-subtext">Chatbot Tutorial</p>
+                <p style="color: #a0a0a0;">Created Date: 2025-07-07</p>
+
+                <p>In this tutorial, we explore a fun and interesting use-case of recurrent sequence-to-sequence models. We will train a simple chatbot using movie scripts from the Cornell Movie-Dialogs Corpus.</p>
+
+                <p>Conversational models are a hot topic in artificial intelligence research. Chatbots can be found in a variety of settings, including customer service applications and online helpdesks. These bots are often powered by retrieval-based models, which output predefined responses to questions of certain forms.</p>
+                <p>In a highly restricted domain like a company’s IT helpdesk, these models may be sufficient, however, they are not robust enough for more general use-cases. Teaching a machine to carry out a meaningful conversation with a human in multiple domains is a research question that is far from solved. Recently, the deep learning boom has allowed for powerful generative models like Google’s Neural Conversational Model, which marks a large step towards multi-domain generative conversational models. In this tutorial, we will implement this kind of model in PyTorch.</p>
+
+                <h3>7.4.1 Preparations</h3>
+
+                <h3>7.4.2 Define Models</h3>
+                <p>The brains of our chatbot is a sequence-to-sequence (seq2seq) model. The goal of a seq2seq model is to take a variable-length sequence as an input, and return a variable-length sequence as an output using a fixed-sized model.</p>
+
+                <p>Sutskever et al. discovered that by using two separate recurrent neural nets together, we can accomplish this task. One RNN acts as an encoder, which encodes a variable length input sequence to a fixed-length context vector. In theory, this context vector (the final hidden layer of the RNN) will contain semantic information about the query sentence that is input to the bot. The second RNN is a decoder, which takes an input word and the context vector, and returns a guess for the next word in the sequence and a hidden state to use in the next iteration.</p>
+
+                <h3>7.4.3 Define Training Procedure</h3>
+
+                <h3>7.4.4 Define Evaluation</h3>
+
+                <h3>7.4.5 Run Model</h3>
+
+                <h3>7.4.6 Conclusion</h3>
+                <p>That’s all for this one, folks. Congratulations, you now know the fundamentals to building a generative chatbot model! If you’re interested, you can try tailoring the chatbot’s behavior by tweaking the model and training parameters and customizing the data that you train the model on.</p>
+
 
                 <div class="navigation">
                     <a href="language_model.html">Prev: 7.3 Language Modeling</a>
