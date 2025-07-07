@@ -19,9 +19,38 @@
 
             <main class="col-md-8 content">
                 <h2 class="custom-title">14.3 Fully Sharded Data Parallel</h2>
-                <p class="title-subtext"></p>
-                <p style="color: #a0a0a0;">Created Date: 2025-06-11</p>
+                <p class="title-subtext">Large Scale Transformer model training with Tensor Parallel (TP)</p>
+                <p style="color: #a0a0a0;">Created Date: 2025-07-07</p>
 
+                <p>PyTorch FSDP2 provides a fully sharded data parallelism (FSDP) implementation targeting performant eager-mode while using per-parameter sharding for improved usability.</p>
+
+                <h3>14.3.1 How FSDP2 works</h3>
+                <p>In DistributedDataParallel (DDP) training, each rank owns a model replica and processes a batch of data, finally it uses all-reduce to sync gradients across ranks.</p>
+
+                <p>Comparing with DDP, FSDP reduces GPU memory footprint by sharding model parameters, gradients, and optimizer states. It makes it feasible to train models that cannot fit on a single GPU. As shown below in the picture:</p>
+                <ul class="with-bullets">
+                    <li><p>Outside of forward and backward computation, parameters are fully sharded;</p></li>
+                    <li><p>Before forward and backward, sharded parameters are all-gathered into unsharded parameters;</p></li>
+                    <li><p>Inside backward, local unsharded gradients are reduce-scatterred into sharded gradients;</p></li>
+                    <li><p>Optimizer updates sharded parameters with sharded gradients, resulting in sharded optimizer states.</p></li>
+                </ul>
+
+                <p>FSDP can be considered a decomposition of DDP’s all-reduce into reduce-scatter and all-gather operations.</p>
+
+                <h3>14.3.2 How to use FSDP2</h3>
+
+                <h4>14.3.2.1 Model Initialization</h4>
+
+                <h4>14.3.2.2 Forward/Backward with Prefetching</h4>
+
+                <h4>14.3.2.3 Enabling Mixed Precision</h4>
+
+                <h4>14.3.2.4 Gradient Clipping and Optimizer with DTensor</h4>
+
+                <h4>14.3.2.5 State Dicts with DTensor APIs</h4>
+
+                <h4>14.3.2.6 State Dict with DCP APIs</h4>
+                
                 <div class="navigation">
                     <a href="distrib_parallel.html">Prev: 14.2 Distributed Data Parallel</a>
                     <a href="tensor_parallel.html">Next: 14.4 Tensor Parallel</a>
