@@ -47,9 +47,29 @@
                 </div>
                 <p>The difference between the two sides of the equality is known as the temporal difference error,:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
-                    
+                    \(\sigma = Q(s, a) - (r + \gamma \mathop{\max}\limits_{a}^{\prime} Q(s', a))\)
                 </div>
                 <p>To minimize this error, we will use the Huber loss. The Huber loss acts like the mean squared error when the error is small, but like the mean absolute error when the error is large - this makes it more robust to outliers when the estimates of \(Q\) are very noisy. We calculate this over a batch of transitions, \(B\), sampled from the replay memory:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(\mathcal{L} = \frac{1}{|B|} \sum_{(s, a, s', r) \in B} \mathcal{L}(\gamma)\)
+                </div>
+
+                <p>Our model will be a feed forward neural network that takes in the difference between the current and previous screen patches. It has two outputs, representing \(Q(s, left)\) and \(Q(s, right)\) (where \(s\) is the input to the network). In effect, the network is trying to predict the expected return of taking each action given the current input.</p>
+
+                <h3>10.3.4 Training</h3>
+                <p>This cell instantiates our model and its optimizer, and defines some utilities:</p>
+                <p><code>select_action</code> - will select an action according to an epsilon greedy policy. Simply put, we’ll sometimes use our model for choosing the action, and sometimes we’ll just sample one uniformly. The probability of choosing a random action will start at EPS_START and will decay exponentially towards EPS_END. EPS_DECAY controls the rate of the decay.</p>
+                <p><code>plot_durations</code> - a helper for plotting the duration of episodes, along with an average over the last 100 episodes (the measure used in the official evaluations). The plot will be underneath the cell containing the main training loop, and will update after every episode.</p>
+
+                <p>Finally, the code for training our model.</p>
+
+                <p>Here, you can find an optimize_model function that performs a single step of the optimization. It first samples a batch, concatenates all the tensors into a single one, computes \(Q(s_t, a_t)\) and \(V(s_{t+1}) = {max}_a Q(s_{t+1}, a), and combines them into our loss. By definition we set \(V(s) = 0\) if \(s\) is a terminal state.</p>
+
+                <p>We also use a target network to compute \(V(s_{t+1})\)  for added stability. The target network is updated at every step with a soft update controlled by the hyperparameter TAU, which was previously defined.</p>
+
+                <p>Below, you can find the main training loop. At the beginning we reset the environment and obtain the initial state Tensor. Then, we sample an action, execute it, observe the next state and the reward (always 1), and optimize our model once. When the episode ends (our model fails), we restart the loop.</p>
+
+                <p>Below, num_episodes is set to 600 if a GPU is available, otherwise 50 episodes are scheduled so training does not take too long. However, 50 episodes is insufficient for to observe good performance on CartPole. You should see the model constantly achieve 500 steps within 600 training episodes. Training RL agents can be a noisy process, so restarting training can produce better results if convergence is not observed.</p>
                 
                 <div class="navigation">
                     <a href="dynamic_program.html">Prev: 10.2 Dynamic Programming</a>
