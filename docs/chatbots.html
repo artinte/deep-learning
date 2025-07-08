@@ -28,6 +28,44 @@
                 <p>In a highly restricted domain like a company’s IT helpdesk, these models may be sufficient, however, they are not robust enough for more general use-cases. Teaching a machine to carry out a meaningful conversation with a human in multiple domains is a research question that is far from solved. Recently, the deep learning boom has allowed for powerful generative models like Google’s Neural Conversational Model, which marks a large step towards multi-domain generative conversational models. In this tutorial, we will implement this kind of model in PyTorch.</p>
 
                 <h3>7.4.1 Preparations</h3>
+                <p>To get started, download the Movie-Dialogs Corpus zip file.</p>
+
+                <p>The next step is to reformat our data file and load the data into structures that we can work with.</p>
+
+                <p>The Cornell Movie-Dialogs Corpus is a rich dataset of movie character dialog:</p>
+                <ul class="with-bullets">
+                    <li><p>220,579 conversational exchanges between 10,292 pairs of movie characters;</p></li>
+                    <li><p>9,035 characters from 617 movies;</p></li>
+                    <li><p>304,713 total utterances.</p></li>
+                </ul>
+
+                <p>This dataset is large and diverse, and there is a great variation of language formality, time periods, sentiment, etc. Our hope is that this diversity makes our model robust to many forms of inputs and queries.</p>
+
+                <p>First, we’ll take a look at some lines of our datafile to see the original format.</p>
+
+                <h4>7.4.1.1 Create Formatted Data File</h4>
+                <p>For convenience, we’ll create a nicely formatted data file in which each line contains a tab-separated query sentence and a response sentence pair.</p>
+                <p>The following functions facilitate the parsing of the raw utterances.jsonl data file.</p>
+
+
+                <h4>7.4.1.2 Load and Trim Data</h4>
+                <p>Our next order of business is to create a vocabulary and load query/response sentence pairs into memory.</p>
+                <p>Note that we are dealing with sequences of words, which do not have an implicit mapping to a discrete numerical space. Thus, we must create one by mapping each unique word that we encounter in our dataset to an index value.</p>
+
+                <p>For this we define a Voc class, which keeps a mapping from words to indexes, a reverse mapping of indexes to words, a count of each word and a total word count. The class provides methods for adding a word to the vocabulary (addWord), adding all words in a sentence (addSentence) and trimming infrequently seen words (trim). More on trimming later.</p>
+
+                <p>Now we can assemble our vocabulary and query/response sentence pairs. Before we are ready to use this data, we must perform some preprocessing.</p>
+
+                <p>First, we must convert the Unicode strings to ASCII using unicodeToAscii. Next, we should convert all letters to lowercase and trim all non-letter characters except for basic punctuation (normalizeString). Finally, to aid in training convergence, we will filter out sentences with length greater than the MAX_LENGTH threshold (filterPairs).</p>
+
+                <p>Another tactic that is beneficial to achieving faster convergence during training is trimming rarely used words out of our vocabulary. Decreasing the feature space will also soften the difficulty of the function that the model must learn to approximate. We will do this as a two-step process:</p>
+                <ol>
+                    <li><p>Trim words used under MIN_COUNT threshold using the voc.trim function.</p></li>
+                    <li><p>Filter out pairs with trimmed words.</p></li>
+                </ol>
+
+                <h4>7.4.1.3 Prepare Data for Models</h4>
+                
 
                 <h3>7.4.2 Define Models</h3>
                 <p>The brains of our chatbot is a sequence-to-sequence (seq2seq) model. The goal of a seq2seq model is to take a variable-length sequence as an input, and return a variable-length sequence as an output using a fixed-sized model.</p>
