@@ -82,12 +82,45 @@
                 </div>
                 <p>how can we learn a function \(f\) to predict the output \(\hat{y} = f(x)\) for any new input \(x\).</p>
                 <p>Generate a synthetic dataset based on the following nonlinear function:</p>
-                <p class="highlight-math" style="text-align: center;  overflow-x: auto;">
+                <div class="highlight-math" style="text-align: center;  overflow-x: auto;">
                     \(y_i = 2sin(x_i) + x_i^{0.8} + \xi\)
-                </p>
-                <p>Here, \(\xi\) is the added noise term, which follows a normal distribution with mean 0 and standard deviation 0.5 .In this example, 50 training samples are generated. For better visualization, the training samples are sorted. The code is in the file <a href="#">random_point_dataset.py</a> .</p>
-                
+                </div>
+                <p>Here, \(\xi\) is the added noise term, which follows a normal distribution with mean 0 and standard deviation 0.5 .In this example, 50 training samples are generated. For better visualization, the training samples are sorted. The code is in the file <a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/1_attention/simple_attention.py">random_point_dataset.py</a> .</p>
+                <pre><code>def func(x):
+    return 2 * numpy.sin(x) + x**0.8
 
+rng = numpy.random.default_rng(0)
+n_train = 50
+keys = numpy.sort(rng.random(n_train) * 5)
+values = func(keys) + rng.normal(0.0, 0.5, (n_train,))</code></pre>
+                <p>The <code>compute_attention_weights</code> function calculates how much attention a query should pay to each key based on how close they are. Instead of using the standard dot-product method like in Transformers, it uses a distance-based approach. It measures the squared distance between the query and each key, then applies a Gaussian function to turn these distances into similarity scores. Finally, it normalizes the scores so they add up to one. This method gives higher attention to keys that are closer to the query, making it useful for tasks where local similarity matters.</p>
+                <pre><code>def compute_attention_weights(query, keys, sigma):
+    # Compute distance-based weights
+    dist = (query - keys) ** 2
+    weights = numpy.exp(-dist / (2 * sigma**2))
+    return weights / weights.sum()</code></pre>
+
+                <p>The <p>simple_attention</p> function computes attention-based outputs for a sequence of queries. For each query, it calculates attention weights over fixed keys using a Gaussian function, giving more weight to nearby keys. It then uses these weights to compute a weighted sum of values. The function returns both the result and the attention weights for all queries.</p>
+                <pre><code>def simple_attention(x, sigma=1.0):
+    n = len(x)
+    result = numpy.zeros(n)
+    attention_history = []
+    for i in range(n):
+        attention_weights = compute_attention_weights(x[i], keys, sigma)
+        result[i] = numpy.sum(attention_weights * values)
+        attention_history.append(attention_weights)
+    return result, attention_history
+
+
+queries = numpy.arange(0, 5, 0.05)
+result, attn_matrix = simple_attention(queries, sigma=0.5)</code></pre>
+                <p>We can draw the result in Figure 4:</p>
+                <img src="res/05/distance_attn_result.png" alt="Distance-Based Attention Output" width="600">
+                <p style="text-align: center; color: #555555;">Figure 4 - Distance-Based Attention Output</p>                
+
+                <p>Figure 5 shows the attention weights assigned to each key for different query positions. The brighter areas indicate higher weights, meaning the query pays more attention to keys nearby. This highlights how the Gaussian kernel focuses attention locally, with weights decreasing smoothly as the distance between query and key increases.</p>
+                <img src="res/05/distance_weights.png" alt="Attention Weights Over Distance" width="600">
+                <p style="text-align: center; color: #555555;">Figure 5 - Attention Weights Over Distance</p>
 
                 <h3>5.1.2 Attention Pooling</h3>
                 <p>Now that we have introduced the primary components of the attention mechanism, let’s use them in a rather classical setting, namely regression and classification via kernel density estimation.</p>

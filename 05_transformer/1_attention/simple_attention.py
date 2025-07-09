@@ -5,7 +5,6 @@ from matplotlib import pyplot
 def func(x):
     return 2 * numpy.sin(x) + x**0.8
 
-
 rng = numpy.random.default_rng(0)
 n_train = 50
 keys = numpy.sort(rng.random(n_train) * 5)
