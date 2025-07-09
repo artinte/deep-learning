@@ -144,6 +144,31 @@ result, attn_matrix = simple_attention(queries, sigma=0.5)</code></pre>
                 
                 <p>All the kernels \(\alpha (k, q)\) defined in this section are translation and rotation invariant; that is, if we shift and rotate \(k\) and \(q\) in the same manner, the value of \(\alpha\) remains unchanged. For simplicity we thus pick scalar arguments \(k, q \in \mathbb{R}\) and pick the key \(k = 0\) as the origin. File <a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/1_attention/kernel_func.py">kernel_func.py</a> yields:</p>
 
+                <pre><code>def gaussian(x):
+    return torch.exp(-x**2 / 2)
+
+def boxcar(x):
+    return torch.abs(x) < 1.0
+
+def constant(x):
+    return 1.0 + 0 * x
+
+def epanechikov(x):
+    return torch.max(1 - torch.abs(x), torch.zeros_like(x))
+
+fig, axes = pyplot.subplots(1, 4, sharey=True, figsize=(9, 5))
+
+kernels = (gaussian, boxcar, constant, epanechikov)
+names = ('Gaussian', 'Boxcar', 'Constant', 'Epanechikov')
+x = torch.arange(-2.5, 2.5, 0.1)
+
+for kernel, name, ax in zip(kernels, names, axes):
+    ax.plot(x.numpy(), kernel(x).numpy())
+    ax.set_xlabel(name)
+
+pyplot.subplots_adjust(left=0.06, right=0.96, top=0.95, bottom=0.12)
+pyplot.show()</code></pre>
+
                 <img src="res/05/kernel_functions.png" alt="Kernel Functions" width="600">
                 <p style="text-align: center; color: #555555;">Figure 6 - Kernel Functions</p>
 
@@ -152,9 +177,11 @@ result, attn_matrix = simple_attention(queries, sigma=0.5)</code></pre>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(y_i = 2 sin(x_i) + x_i + \epsilon\)
                 </div>
-                <p>where \(\epsilon\) is drawn from a <a href="normal_distrib">normal distribution</a> with zero mean and unit variance. We draw 40 training examples.</p>
+                <p>where \(\epsilon\) is drawn from a <a href="prob_theory.html#normal_distrib">normal distribution</a> with zero mean and unit variance. We draw 40 training examples.</p>
 
-                <h5>Attention Pooling via Nadaraya–Watson Regression</h5>
+                <pre><code></code></pre>
+
+                <h5>5.1.2.2 Attention Pooling via Nadaraya–Watson Regression</h5>
                 <p>Now that we have data and kernels, all we need is a function that computes the kernel regression estimates. Note that we also want to obtain the relative kernel weights in order to perform some minor diagnostics.</p>
                 <p>Hence we first compute the kernel between all training features (covariates) <code>x_train</code> and all validation features <code>x_val</code>. This yields a matrix, which we subsequently normalize. When multiplied with the training labels <code>y_train</code> we obtain the estimates.</p>
                 <p>Recall attention pooling formula, Let each validation feature be a query, and each training feature–label pair be a key–value pair. As a result, the normalized relative kernel weights (<code>attention_w</code> below) are the attention weights.</p>
