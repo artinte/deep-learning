@@ -51,7 +51,7 @@
                 <p>Clearly we would not have introduced a simple database here if it wasn't for the purpose of explaining deep learning. Indeed, this leads to one of the most exciting concepts introduced in deep learning in the past decade: the <strong>attention mechanism</strong>.</p>
                 <p>We will cover the specifics of its application to machine translation later. For now, simply consider the following: denote by \(\mathcal{D} = {(k_1, v_1), \cdots, (k_m, v_m)}\) a database of \(m\) tuples of keys and values. Moreover, denote by \(q\) a query. Then we can define the attention over \(\mathcal{D}\) as:</p>
 
-                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;" id="attention-pooling">
                     \(Attention(q, D) = \sum_{i=1}^{m} \alpha(q, k_i) v_i\)
                 </div>
 
@@ -148,7 +148,7 @@ result, attn_matrix = simple_attention(queries, sigma=0.5)</code></pre>
     return torch.exp(-x**2 / 2)
 
 def boxcar(x):
-    return torch.abs(x) < 1.0
+    return torch.abs(x) &lt; 1.0
 
 def constant(x):
     return 1.0 + 0 * x
@@ -177,14 +177,54 @@ pyplot.show()</code></pre>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(y_i = 2 sin(x_i) + x_i + \epsilon\)
                 </div>
-                <p>where \(\epsilon\) is drawn from a <a href="prob_theory.html#normal_distrib">normal distribution</a> with zero mean and unit variance. We draw 40 training examples.</p>
+                <p>where \(\epsilon\) is drawn from a <a href="prob_theory.html#normal_distrib">normal distribution</a> with zero mean and unit variance. File <a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/1_attention/nadaraya_regression.py"></a> draw 40 training examples:</p>
 
-                <pre><code></code></pre>
+                <pre><code>def f(x):
+    return 2 * torch.sin(x) + x
+
+n = 40
+x_train, _ = torch.sort(torch.rand(n) * 5)
+y_train = f(x_train) + torch.randn(n)
+x_val = torch.arange(0, 5, 0.1)
+y_val = f(x_val)</code></pre>
 
                 <h5>5.1.2.2 Attention Pooling via Nadaraya–Watson Regression</h5>
                 <p>Now that we have data and kernels, all we need is a function that computes the kernel regression estimates. Note that we also want to obtain the relative kernel weights in order to perform some minor diagnostics.</p>
                 <p>Hence we first compute the kernel between all training features (covariates) <code>x_train</code> and all validation features <code>x_val</code>. This yields a matrix, which we subsequently normalize. When multiplied with the training labels <code>y_train</code> we obtain the estimates.</p>
-                <p>Recall attention pooling formula, Let each validation feature be a query, and each training feature–label pair be a key–value pair. As a result, the normalized relative kernel weights (<code>attention_w</code> below) are the attention weights.</p>
+
+                <p>Recall <a href="#attention-pooling">attention pooling formula</a> , Let each validation feature be a query, and each training feature–label pair be a key–value pair. As a result, the normalized relative kernel weights (<code>attention_w</code> below) are the attention weights.</p>
+                <pre><code>def nadaraya_watson(x_train, y_train, x_val, kernel):
+    dists = x_train.reshape((-1, 1)) - x_val.reshape((1, -1))
+    # Each column/row corresponds to each query/key
+    k = kernel(dists).type(torch.float32)
+    # Normalization over keys for each query
+    attention_w = k / k.sum(0)
+    y_hat = y_train@attention_w
+    return y_hat, attention_w</code></pre>
+
+                <p>Let’s have a look at the kind of estimates that the different kernels produce:</p>
+                <pre><code>def plot(x_train, y_train, x_val, y_val, kernels, names, attention=False):
+    fig, axes = pyplot.subplots(1, 4, sharey=True, figsize=(10, 5))
+    for kernel, name, ax in zip(kernels, names, axes):
+        y_hat, attention_w = nadaraya_watson(x_train, y_train, x_val, kernel)
+        if attention:
+            pcm = ax.imshow(attention_w.detach().numpy(), cmap='Reds')
+        else:
+            ax.plot(x_val, y_hat)
+            ax.plot(x_val, y_val, 'm--')
+            ax.plot(x_train, y_train, 'o', alpha=0.5)
+        ax.set_xlabel(name)
+        if not attention:
+            ax.legend(['y_hat', 'y'])
+    if attention:
+        fig.colorbar(pcm, ax=axes, shrink=0.7)
+    pyplot.show()
+
+plot(x_train, y_train, x_val, y_val, kernels, names)</code></pre>
+
+                <img src="res/05/attn_diff_kernels.png" alt="Attention with Different Kernels">
+                <p style="text-align: center; color: #555555;">Figure 7 - Attention with Different Kernels</p>
+                
                 <p>The first thing that stands out is that all three nontrivial kernels (Gaussian, Boxcar, and Epanechikov) produce fairly workable estimates that are not too far from the true function.</p>
                 <p>Only the constant kernel that leads to the trivial estimate \(f(x) = \frac{1}{n} \sum_i y_i\) produces a rather unrealistic result. Let’s inspect the attention weighting a bit more closely:</p>
 
@@ -193,6 +233,7 @@ pyplot.show()</code></pre>
                 <p>Clearly, the narrower the kernel, the less smooth the estimate. At the same time, it adapts better to the local variations. Let’s look at the corresponding attention weights.</p>
                 <p>As we would expect, the narrower the kernel, the narrower the range of large attention weights. It is also clear that picking the same width might not be ideal.</p>
                 <p>Nadaraya–Watson kernel regression is an early precursor of the current attention mechanisms. It can be used directly with little to no training or tuning, either for classification or regression. The attention weight is assigned according to the similarity (or distance) between query and key, and according to how many similar observations are available.</p>
+
                 <h3>5.1.3 Scoring Functions</h3>
                 <p>we used a number of different distance-based kernels, including a Gaussian kernel to model interactions between queries and keys. As it turns out, distance functions are slightly more expensive to compute than dot products.</p>
                 <img src="res/05/attention_output.png" alt="Attention Output" width="600">
