@@ -39,8 +39,8 @@
                 <h3>5.1.1 Queries, Keys, and Values</h3>
                 <p>So far all the networks we have reviewed crucially relied on the input being of a well-defined size. For instance, the images in ImageNet are of size \(224 \times 224\) pixels and CNNs are specifically tuned to this size. Even in natural language processing the input size for RNNs is well defined and fixed.</p>
                 <p>Variable size is addressed by sequentially processing one token at a time, or by specially designed convolution kernels. This approach can lead to significant problems when the input is truly of varying size with varying information content. In particular, for long sequences it becomes quite difficult to keep track of everything that has already been generated or even viewed by the network.</p>
-                <p>Compare this to databases. In their simplest form they are collections of keys (\(k\)) and value (\(v\)). For instance, our database \(D\) might consist of tuples <code>{("Zhang", "Aston"), ("Lipton", "Zachary"), ("Li", "Mu"), ("Smola", "Alex"), ("Hu", "Rachel"), ("Werness", "Brent")}</code> with the last name being the key and the first name being the value.</p>
-                <p>We can operate on \(D\), for instance with the exact query for "Li" which would return the value "Mu". If <code>("Li", "Mu")</code> was not a record in \(D\), there would be no valid answer. If we also allowed for approximate matches, we would retrieve <code>("Lipton", "Zachary")</code> instead.</p>
+                <p>Compare this to databases. In their simplest form they are collections of keys (\(k\)) and value (\(v\)). For instance, our database \(\mathcal{D}\) might consist of tuples <code>{("Zhang", "Aston"), ("Lipton", "Zachary"), ("Li", "Mu"), ("Smola", "Alex"), ("Hu", "Rachel"), ("Werness", "Brent")}</code> with the last name being the key and the first name being the value.</p>
+                <p>We can operate on \(\mathcal{D}\), for instance with the exact query for <code>"Li"</code> which would return the value <code>"Mu"</code>. If <code>("Li", "Mu")</code> was not a record in \(\mathcal{D}\), there would be no valid answer. If we also allowed for approximate matches, we would retrieve <code>("Lipton", "Zachary")</code> instead.</p>
                 <p>This quite simple and trivial example nonetheless teaches us a number of useful things:</p>
                 <ul class="with-bullets">
                     <li><p>We can design queries \(q\) that operate on \((k, v)\) pairs in such a manner as to be valid regardless of the database size.</p></li>
@@ -49,16 +49,16 @@
                     <li><p>There is no need to compress or simplify the database to make the operations effective.</p></li>
                 </ul>
                 <p>Clearly we would not have introduced a simple database here if it wasn't for the purpose of explaining deep learning. Indeed, this leads to one of the most exciting concepts introduced in deep learning in the past decade: the <strong>attention mechanism</strong>.</p>
-                <p>We will cover the specifics of its application to machine translation later. For now, simply consider the following: denote by \(D = {(k_1, v_1), \cdots, (k_m, v_m)}\) a database of \(m\) tuples of keys and values. Moreover, denote by \(q\) a query. Then we can define the attention over \(D\) as:</p>
+                <p>We will cover the specifics of its application to machine translation later. For now, simply consider the following: denote by \(\mathcal{D} = {(k_1, v_1), \cdots, (k_m, v_m)}\) a database of \(m\) tuples of keys and values. Moreover, denote by \(q\) a query. Then we can define the attention over \(\mathcal{D}\) as:</p>
 
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(Attention(q, D) = \sum_{i=1}^{m} \alpha(q, k_i) v_i\)
                 </div>
 
                 <p>where \(\alpha(q, k_i) \in \mathbb{R} (i = 1, \cdots , m)\) are scalar attention weights. The operation itself is typically referred to as <strong>attention pooling</strong>. The name attention derives from the fact that the operation pays particular attention to the terms for which the weight \(\alpha\) is significant (i.e., large).</p>
-                <p>As such, the attention over \(D\) generates a linear combination of values contained in the database. In fact, this contains the above example as a special case where all but one weight is zero. We have a number of special cases:</p>
-                <ul class="comment">
-                    <li><p>The weights \(\alpha(q, k_i)\) are nonnegative. In this case the output of the attention mechanism is contained in the convex cone spanned by the values \(v_i\).</p></li>
+                <p>As such, the attention over \(\mathcal{D}\) generates a linear combination of values contained in the database. In fact, this contains the above example as a special case where all but one weight is zero. We have a number of special cases:</p>
+                <ul class="with-bullets">
+                    <li><p>The weights \(\alpha(q, k_i)\) are nonnegative. In this case the output of the attention mechanism is contained in the convex cone spanned by the values \(v_i\) .</p></li>
                     <li><p>The weights \(\alpha(q, k_i)\) form a convex combination, i.e. \(\sum_i \alpha(q, k_i) = 1\) and \(\alpha(q, k_i) \ge 0\) for all \(i\). This is the most common setting in deep learning.</p></li>
                     <li><p>Exactly one of the weights \(\alpha(q, k_i)\) is 1, while all others are 0. This is akin to a traditional database query.</p></li>
                     <li><p>All weights are equal, i.e. \(\alpha(q, k_i) = \frac{1}{m}\) for all \(i\). This amounts to averaging across the entire database, also called average pooling in deep learning.</p></li>
@@ -72,8 +72,22 @@
                     \(\alpha(q, k_i) = \frac{exp(\alpha(q, k_i))}{\sum_j exp(\alpha(q, k_j))}\)
                 </div>
                 <p>This operation is readily available in all deep learning frameworks. It is differentiable and its gradient never vanishes, all of which are desirable properties in a model. Note though, the attention mechanism introduced above is not the only option.</p>
-                <p>For instance, we can design a non-differentiable attention model that can be trained using reinforcement learning methods. As one would expect, training such a model is quite complex. Consequently the bulk of modern attention research follows the framework outlined in below figure. We thus focus our exposition on this family of differentiable mechanisms.</p>
+                <p>For instance, we can design a non-differentiable attention model that can be trained using reinforcement learning methods. As one would expect, training such a model is quite complex. Consequently the bulk of modern attention research follows the framework outlined in Figure 3. We thus focus our exposition on this family of differentiable mechanisms.</p>
                 <img src="res/05/query_kv.png" alt="Query - (Keys, Values)" width="600">
+                <p style="text-align: center; color: #555555;">Figure 3 - Query - (Keys, Values)</p>
+
+                <p>For simplicity, consider the following regression problem, given a dataset of input-output pairs:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \({(x_1, y_1), \cdots , (x_n, y_n)}\)
+                </div>
+                <p>how can we learn a function \(f\) to predict the output \(\hat{y} = f(x)\) for any new input \(x\).</p>
+                <p>Generate a synthetic dataset based on the following nonlinear function:</p>
+                <p class="highlight-math" style="text-align: center;  overflow-x: auto;">
+                    \(y_i = 2sin(x_i) + x_i^{0.8} + \xi\)
+                </p>
+                <p>Here, \(\xi\) is the added noise term, which follows a normal distribution with mean 0 and standard deviation 0.5 .In this example, 50 training samples are generated. For better visualization, the training samples are sorted. The code is in the file <a href="#">random_point_dataset.py</a> .</p>
+                
+
 
                 <h3>5.1.2 Attention Pooling</h3>
                 <p>Now that we have introduced the primary components of the attention mechanism, let’s use them in a rather classical setting, namely regression and classification via kernel density estimation.</p>
