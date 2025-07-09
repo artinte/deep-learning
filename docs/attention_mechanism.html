@@ -93,14 +93,14 @@ rng = numpy.random.default_rng(0)
 n_train = 50
 keys = numpy.sort(rng.random(n_train) * 5)
 values = func(keys) + rng.normal(0.0, 0.5, (n_train,))</code></pre>
-                <p>The <code>compute_attention_weights</code> function calculates how much attention a query should pay to each key based on how close they are. Instead of using the standard dot-product method like in Transformers, it uses a distance-based approach. It measures the squared distance between the query and each key, then applies a Gaussian function to turn these distances into similarity scores. Finally, it normalizes the scores so they add up to one. This method gives higher attention to keys that are closer to the query, making it useful for tasks where local similarity matters.</p>
+                <p>The \(\alpha(q, k)\) function calculates how much attention a query should pay to each key based on how close they are. Instead of using the standard dot-product method like in Transformers, it uses a distance-based approach. It measures the squared distance between the query and each key, then applies a Gaussian function to turn these distances into similarity scores. Finally, it normalizes the scores so they add up to one. This method gives higher attention to keys that are closer to the query, making it useful for tasks where local similarity matters.</p>
                 <pre><code>def compute_attention_weights(query, keys, sigma):
     # Compute distance-based weights
     dist = (query - keys) ** 2
     weights = numpy.exp(-dist / (2 * sigma**2))
     return weights / weights.sum()</code></pre>
 
-                <p>The <p>simple_attention</p> function computes attention-based outputs for a sequence of queries. For each query, it calculates attention weights over fixed keys using a Gaussian function, giving more weight to nearby keys. It then uses these weights to compute a weighted sum of values. The function returns both the result and the attention weights for all queries.</p>
+                <p>The <code>simple_attention</code> function computes attention-based outputs for a sequence of queries. For each query, it calculates attention weights over fixed keys using a Gaussian function, giving more weight to nearby keys. It then uses these weights to compute a weighted sum of values. The function returns both the result and the attention weights for all queries.</p>
                 <pre><code>def simple_attention(x, sigma=1.0):
     n = len(x)
     result = numpy.zeros(n)
@@ -114,7 +114,7 @@ values = func(keys) + rng.normal(0.0, 0.5, (n_train,))</code></pre>
 
 queries = numpy.arange(0, 5, 0.05)
 result, attn_matrix = simple_attention(queries, sigma=0.5)</code></pre>
-                <p>We can draw the result in Figure 4:</p>
+                <p>We can draw the result in Figure 4, it shows how the weighted sum of values changes smoothly as the query moves along the input range:</p>
                 <img src="res/05/distance_attn_result.png" alt="Distance-Based Attention Output" width="600">
                 <p style="text-align: center; color: #555555;">Figure 4 - Distance-Based Attention Output</p>                
 
@@ -138,10 +138,15 @@ result, attn_matrix = simple_attention(queries, sigma=0.5)</code></pre>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(f(q) = \sum_i v_i \frac{\alpha(q, k_i)}{\sum_j \alpha(q, k_j)}\)
                 </div>
-                <p>In the case of a (scalar) regression with observations \(x_i, y_i\) for features and labels respectively, \(v_i = y_i\) are scalars, \(k_i = x_i\) are vectors, and the query \(q\) denotes the new location where \(f\) should be evaluated. In the case of (multiclass) classification, we use one-hot-encoding of \(y_i\) to obtain \(v_i\). One of the convenient properties of this estimator is that it requires no training.</p>
-                <p>All the kernels \(\alpha (k, q)\) defined in this section are translation and rotation invariant; that is, if we shift and rotate \(k\) and \(q\) in the same manner, the value of \(\alpha\) remains unchanged. For simplicity we thus pick scalar arguments \(k, q \in \mathbb{R}\) and pick the key \(k = 0\) as the origin. This yields:</p>
+                <p>In the case of a (scalar) regression with observations \((x_i, y_i)\) for features and labels respectively, \(v_i = y_i\) are scalars, \(k_i = x_i\) are vectors, and the query \(q\) denotes the new location where \(f\) should be evaluated. In the case of (multiclass) classification, we use one-hot-encoding of \(y_i\) to obtain \(v_i\). One of the convenient properties of this estimator is that it requires no training.</p>
+                
+                <h4>5.1.2.1 Kernels and Data</h4>
+                
+                <p>All the kernels \(\alpha (k, q)\) defined in this section are translation and rotation invariant; that is, if we shift and rotate \(k\) and \(q\) in the same manner, the value of \(\alpha\) remains unchanged. For simplicity we thus pick scalar arguments \(k, q \in \mathbb{R}\) and pick the key \(k = 0\) as the origin. File <a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/1_attention/kernel_func.py">kernel_func.py</a> yields:</p>
 
                 <img src="res/05/kernel_functions.png" alt="Kernel Functions" width="600">
+                <p style="text-align: center; color: #555555;">Figure 6 - Kernel Functions</p>
+
                 <p>Different kernels correspond to different notions of range and smoothness. For instance, the boxcar kernel only attends to observations within a distance of 1 (or some otherwise defined hyperparameter) and does so indiscriminately.</p>
                 <p>To see Nadaraya–Watson estimation in action, let's define some training data. In the following we use the dependency:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
