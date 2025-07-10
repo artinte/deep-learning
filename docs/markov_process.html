@@ -26,8 +26,17 @@
 
                 <p>Thus MDPs involve delayed reward and the need to tradeoff immediate and delayed reward. Whereas in bandit problems we estimated the value \(q_*(a)\) of each action \(a\), in MDPs we estimate the value \(q_*(s, a)\) of each action \(a\) in each state \(s\), or we estimate the value \(v_*(s)\) of each state given optimal action selections. These state-dependent quantities are essential to accurately assigning credit for long-term consequences to individual action selections.</p>
                 
-                
+                <p>MDPs are a mathematically idealized form of the reinforcement learning problem for which precise theoretical statements can be made. We introduce key elements of the problem’s mathematical structure, such as returns, value functions, and Bellman equations.</p>
+                <p>We try to convey the wide range of applications that can be formulated as finite MDPs. As in all of artificial intelligence, there is a tension between breadth of applicability and mathematical tractability.</p>
 
+                <h3>10.2.1 The Agent–Environment Interface</h3>
+                <p>MDPs are meant to be a straightforward framing of the problem of learning from interaction to achieve a goal. The learner and decision maker is called the agent. The thing it interacts with, comprising everything outside the agent, is called the environment. These interact continually, the agent selecting actions and the environment responding to these actions and presenting new situations to the agent.</p>
+                <p> The environment also gives rise to rewards, special numerical values that the agent seeks to maximize over time through its choice of actions.</p>
+
+
+                <p>More specifically, the agent and environment interact at each of a sequence of discrete time steps, \(t = 1, 2, 3, \cdots\) . At each time step \(t\) the agent receives some representation of the environment’s state, \(S_t \in S\), and on that basis selects an action, \(A_t \in \mathcal{A}(s)\) . One </p>
+                
+                
                 <div class="navigation">
                     <a href="rl_introduction.html">Prev: 10.1 Introduction RL Problems</a>
                     <a href="dqn.html">Next: 10.3 DQN</a>
