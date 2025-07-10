@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="laptop_coding_48.png" type="image/png">
+    <title>Markov Decision Processes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="article_style.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="col-md-2 left-sidebar">
+
+            </nav>
+
+            <main class="col-md-8 content">
+                <h2 class="custom-title">10.2 Markov Decision Processes</h2>
+                <p class="title-subtext">Finite Markov Decision Processe</p>
+                <p style="color: #a0a0a0;">Created Date: 2025-07-10</p>
+
+                <p>In this section we introduce the formal problem of finite Markov decision processes, or finite MDPs. This problem involves evaluative feedback, as in bandits, but also an associative aspect—choosing different actions in di↵erent situations. MDPs are a classical formalization of sequential decision making, where actions influence not just immediate rewards, but also subsequent situations, or states, and through those future rewards.</p>
+
+                <p>Thus MDPs involve delayed reward and the need to tradeoff immediate and delayed reward. Whereas in bandit problems we estimated the value \(q_*(a)\) of each action \(a\), in MDPs we estimate the value \(q_*(s, a)\) of each action \(a\) in each state \(s\), or we estimate the value \(v_*(s)\) of each state given optimal action selections. These state-dependent quantities are essential to accurately assigning credit for long-term consequences to individual action selections.</p>
+                
+                
+
+                <div class="navigation">
+                    <a href="rl_introduction.html">Prev: 10.1 Introduction RL Problems</a>
+                    <a href="dqn.html">Next: 10.3 DQN</a>
+                </div>
+            </main>
+
+            <aside class="col-md-2 right-sidebar">
+                <h5><a href="index.html#section10">Reinforcement Learning</a></h5>
+                <ul id="dynamic-sidebar" class="nav flex-column">
+                </ul>
+            </aside>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="article_script.js"></script>
+</body>
+
+</html>
