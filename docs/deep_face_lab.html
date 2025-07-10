@@ -20,8 +20,38 @@
             <main class="col-md-8 content">
                 <h2 class="custom-title">9.5 DeepFaceLab</h2>
                 <p class="title-subtext"></p>
-                <p style="color: #a0a0a0;">Created Date: 2025-06-03</p>
+                <p style="color: #a0a0a0;">Created Date: 2025-07-10</p>
 
+                <p>Deepfake defense not only requires the research of detection but also requires the efforts of generation methods. However, current deepfake methods suffer the effects of obscure workflow and poor performance.</p>
+                <p>To solve this problem, we present DeepFaceLab, the current dominant deepfake framework for face-swapping. It provides the necessary tools as well as an easy-to-use way to conduct high-quality face-swapping. It also offers a flexible and loose coupling structure for people who need to strengthen their pipeline with other features without writing complicated boilerplate code.</p>
+                <p>We detail the principles that drive the implementation of DeepFaceLab and introduce its pipeline, through which every aspect of the pipeline can be modified painlessly by users to achieve their customization purpose.</p>
+                <p>It is noteworthy that DeepFaceLab could achieve cinema-quality results with high fidelity. We demonstrate the advantage of our system by comparing our approach with other face-swapping methods.</p>
+
+                <h3>9.5.1 Introduction</h3>
+
+                <p>Since deep learning has empowered the realm of computer vision in recent years, manipulating digital images, especially the manipulation of human portrait images, has improved rapidly and achieved photorealistic results in most cases. Face swapping is an eye-catching task in generating fake content by transferring a source face to the destination while maintaining the destination’s facial movements and expression deformations.</p>
+
+                <p>The fundamental motivation behind face manipulation techniques is Generative Adversarial Networks (GANs). More and more faces synthesized by StyleGAN, Style-GAN2 are becoming more and more realistic and entirely indistinguishable for the human vision system.</p>
+
+                <p>This paper introduces DeepFaceLab, an integrated open-source system with a clean-state design of the pipeline, achieving photorealistic face-swapping results without painful tuning. DFL has turned out to be very popular with the public. For instance, many artists create DFL-based videos and publish them on their YouTube channels. These videos made by DFL have more than 100 million hits.</p>
+                <p>The contributions of DeepFaceLab can be summarized as three-folds:</p>
+                <ul>
+                    <li><p>A state-of-the-art framework consists of a maturity pipeline is proposed, aiming to achieve photorealistic face-swapping results.</p></li>
+                    <li><p>DeepFaceLab open-sourced the code in 2018 and always kept up to the progress in the computer vision area, making a positive contribution for defending deepfake, which has drawn broad attention in the open-source community and VFX areas.</p></li>
+                    <li><p>A series of high-efficiency components and tools are introduced in DeepFaceLab to build better face-swapping videos.</p></li>
+                </ul>
+
+                <h3>9.5.2 Characteristics of DeepFaceLab</h3>
+
+                <h3>9.5.3 Pipeline</h3>
+                <p>DeepFaceLab provides a set of workflow which form the flexible pipeline. In DeepFaceLab (DFL for short), we can abstract the pipeline into three phases: extraction, training, and conversion. These three parts are presented sequentially. Besides, it is noteworthy that DFL falls in a typical one-to-one face-swapping paradigm, which means thereare only two kinds of data: src and dst, the abbreviation for source and destination, are used in the following narrative.</p>
+
+                <h4>9.5.3.1 Extraction</h4>
+                <p>The extraction phase is the first phase in DFL, aiming to extract a face from src and dst data. This phase consists of many algorithms and processing parts, i.e., face detection, face alignment, and face segmentation. DFL provides many extraction modes (i.e, half-face, full-face, whole face), which represents the face coverage area of the extraction phase. Generally, we take full-face mode by default.</p>
+
+                <h5>Face Detection</h5>
+                <p>The first step in extraction phase is to find the target face in the given data: src and dst. DFL regards S3FD as its default face detector. S3FD can be replaced with other face detection algorithms painlessly, i.e RetinaFace.</p>
+                
                 <div class="navigation">
                     <a href="fgsm_attack.html">Prev: 9.4 Spatial Transformer</a>
                     <a href="deep_face_live.html">Next: 9.6 DeepFaceLive</a>
