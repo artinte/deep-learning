@@ -29,6 +29,12 @@
 
                 
                 <h3>8.2.1 Introduction</h3>
+                <p>Progress in speech recognition has been energized by the development of unsupervised pre-training techniques exemplified by Wav2Vec 2.0 (Baevski et al., 2020). Since these methods learn directly from raw audio without the need for human labels, they can productively use large datasets of unlabeled speech and have been quickly scaled up to 1,000,000 hours of training data (Zhang et al., 2021), far more than the 1,000 or so hours typical of an academic supervised dataset. When fine-tuned on standard benchmarks, this approach has improved the state of the art, especially in a low-data setting.</p>
+
+                <p>These pre-trained audio encoders learn high-quality representations of speech, but because they are purely unsupervised they lack an equivalently performant decoder mapping those representations to usable outputs, necessitating a finetuning stage in order to actually perform a task such as speech recognition.</p>
+                <p>This unfortunately limits their usefulness and impact as fine-tuning can still be a complex process requiring a skilled practitioner. There is an additional risk with requiring fine-tuning.</p>
+
+                <p>Machine learning methods are exceedingly adept at finding patterns within a training dataset which boost performance on held-out data from the same dataset.</p>
 
                 <h3>8.2.2 Approach</h3>
 
@@ -53,6 +59,17 @@
                 <p>We train a suite of models of various sizes in order to study the scaling properties of Whisper. Please see Table 1 for an overview.</p>
 
                 <h4>8.2.2.4 Training Details</h4>
+
+                <h3>8.2.3 Experiments</h3>
+
+                <h3>8.2.4 Analysis and Ablations</h3>
+
+                <h3>8.2.5 Related Work</h3>
+
+                <h3>8.2.6 Limitations and Future Work</h3>
+
+                <h3>8.2.7 Conclusion</h3>
+                <p>Whisper suggests that scaling weakly supervised pretraining has been underappreciated so far in speech recognition research. We achieve our results without the need for the self-supervision and self-training techniques that have been a mainstay of recent large-scale speech recognition work and demonstrate how simply training on a large and diverse supervised dataset and focusing on zero-shot transfer can significantly improve the robustness of a speech recognition system.</p>
 
                 <div class="navigation">
                     <a href="speech_feature.html">Prev: 8.1 Speech Feature Extraction</a>
