@@ -222,13 +222,14 @@ y_val = f(x_val)</code></pre>
 
 plot(x_train, y_train, x_val, y_val, kernels, names)</code></pre>
 
-                <img src="res/05/attn_diff_kernels.png" alt="Attention with Different Kernels">
+                <img src="res/05/attn_diff_kernels.png" alt="Attention with Different Kernels" width="600">
                 <p style="text-align: center; color: #555555;">Figure 7 - Attention with Different Kernels</p>
                 
-                <p>The first thing that stands out is that all three nontrivial kernels (Gaussian, Boxcar, and Epanechikov) produce fairly workable estimates that are not too far from the true function.</p>
-                <p>Only the constant kernel that leads to the trivial estimate \(f(x) = \frac{1}{n} \sum_i y_i\) produces a rather unrealistic result. Let’s inspect the attention weighting a bit more closely:</p>
+                <p>The first thing that stands out is that all three nontrivial kernels (Gaussian, Boxcar, and Epanechikov) produce fairly workable estimates that are not too far from the true function. Only the constant kernel that leads to the trivial estimate \(f(x) = \frac{1}{n} \sum_i y_i\) produces a rather unrealistic result. Let’s inspect the attention weighting a bit more closely:</p>
+                <img src="res/05/attn_diff_weights.png" alt="Attention Heatmaps of Different Kernels" width="600">
+                <p style="text-align: center; color: #555555;">Figure 7 - Attention Heatmaps of Different Kernels</p>
 
-                <h5>Adapting Attention Pooling</h5>
+                <h5>5.1.2.3 Adapting Attention Pooling</h5>
                 <p>We could replace the Gaussian kernel with one of a different width. That is, we could use \(\alpha(\mathbf{q}, \mathbf{k}) = \exp\left(-\frac{1}{2 \sigma^2} \|\mathbf{q} - \mathbf{k}\|^2 \right)\) where \(\sigma^2\) determines the width of the kernel. Let’s see whether this affects the outcomes.</p>
                 <p>Clearly, the narrower the kernel, the less smooth the estimate. At the same time, it adapts better to the local variations. Let’s look at the corresponding attention weights.</p>
                 <p>As we would expect, the narrower the kernel, the narrower the range of large attention weights. It is also clear that picking the same width might not be ideal.</p>

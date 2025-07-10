@@ -48,11 +48,13 @@ def plot(x_train, y_train, x_val, y_val, kernels, names, attention=False):
         ax.set_xlabel(name)
         if not attention:
             ax.legend(['y_hat', 'y'])
-    if attention:
-        fig.colorbar(pcm, ax=axes, shrink=0.7)
+    # if attention:
+    #     fig.colorbar(pcm, ax=axes, shrink=0.7)
     pyplot.show()
 
 plot(x_train, y_train, x_val, y_val, kernels, names)
+
+plot(x_train, y_train, x_val, y_val, kernels, names, attention=True)
 
 
 # adapting attention pooling
