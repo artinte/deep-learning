@@ -51,6 +51,17 @@
 
                 <h5>Face Detection</h5>
                 <p>The first step in extraction phase is to find the target face in the given data: src and dst. DFL regards S3FD as its default face detector. S3FD can be replaced with other face detection algorithms painlessly, i.e RetinaFace.</p>
+
+                <h5>Face Alignment</h5>
+                <p>The second step is face alignment. After numerous experiments and failures, we realized that facial landmarks are the key to maintaining stability over time. We need to find an effective facial landmarks algorithm essential in producing an excellent successive footage shot and film.</p>
+                <p>DFL provides two canonical types of facial landmark extraction algorithms to solve this: (a) heatmap-based facial landmark algorithm 2DFAN (for faces with standard pose) and (b) PRNet with 3D face prior information (for faces with large Euler angle (yaw, pitch, roll), e.g., A face with a large yaw angle, means one side of the face is out of sight).</p>
+                <p>After facial landmarks are retrieved, we also provide an optional function with a configurable time step to smooth facial landmarks of consecutive frames in a single shot to ensure stability further.</p>
+
+                <p>Then we adopt a classical point pattern mapping and transformation method proposed by Umeyama to calculate a similarity transformation matrix used for face alignment.</p>
+                <p>As the method proposed by Umeyama et al. needs standard facial landmark templates in calculating similarity transformation matrix, DFL provides a canonical aligned facial landmark template. It is noteworthy that DFL could automatically predict the Euler angle by using the obtained facial landmarks.</p>
+
+                <h5>Face Segmentation</h5>
+                <p>After face alignment, a data folder with face of standard front/side-view (aligned src or aligned dst) is obtained. </p>
                 
                 <div class="navigation">
                     <a href="fgsm_attack.html">Prev: 9.4 Spatial Transformer</a>
