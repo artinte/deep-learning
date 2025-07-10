@@ -18,13 +18,22 @@
             </nav>
 
             <main class="col-md-8 content">
-                <h2 class="custom-title">10.2 Dynamic Programming</h2>
+                <h2 class="custom-title">10.3 Dynamic Programming</h2>
                 <p class="title-subtext"></p>
-                <p style="color: #a0a0a0;">Created Date: 2025-06-05</p>
+                <p style="color: #a0a0a0;">Created Date: 2025-07-10</p>
 
+                <p>The term dynamic programming (DP) refers to a collection of algorithms that can be used to compute optimal policies given a perfect model of the environment as a Markov decision process (MDP). Classical DP algorithms are of limited utility in reinforcement learning both because of their assumption of a perfect model and because of their great computational expense, but they are still important theoretically.</p>
+                <p>We usually assume that the environment is a finite MDP. That is, we assume that its state, action, and reward sets, \(\mathcal{S}\), \(\mathcal{A}\), and \(\mathcal{R}\), are finite, and that its dynamics are given by a set of probabilities \(p(s', r|s, a), for all \(s \in \mathcal{s}\) , \(a \in \mathcal{A}\)\) , \(r \in \mathcal{R}\) and \(s' \in \mathcal{S}^+\) (\(\mathcal{S}^+\) is \(\mathcal{S}\) plus a terminal state if the problem is episodic).</p>
+                <p>Although DP ideas can be applied to problems with continuous state and action spaces, exact solutions are possible only in special cases. A common way of obtaining approximate solutions for tasks with continuous states and actions is to quantize the state and action spaces and then apply finite-state DP methods.</p>
+
+                <p>The key idea of DP, and of reinforcement learning generally, is the use of value functions to organize and structure the search for good policies. In this chapter we show how DP can be used to compute the value functions defined in Chapter 3. As discussed there, we can easily obtain optimal policies once we have found the optimal value functions, \(v_*\) or \(q_*\),which satisfy the Bellman optimality equations:</p>
+
+                <h3>10.3.1 Policy Evaluation (Prediction)</h3>
+                <p>First we consider how to compute the state-value function \(v_{\pi}\) for an arbitrary policy \(\pi\). This is called policy evaluation in the DP literature. We also refer to it as the prediction </p>
+                
                 <div class="navigation">
-                    <a href="rl_introduction.html">Prev: 10.1 Introduction RL Problems</a>
-                    <a href="dqn.html">Next: 10.3 DQN</a>
+                    <a href="markov_process.html">Prev: 10.2 Markov Decision Processes</a>
+                    <a href="dqn.html">Next: 10.4 DQN</a>
                 </div>
             </main>
 
