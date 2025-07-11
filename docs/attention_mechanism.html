@@ -188,7 +188,7 @@ y_train = f(x_train) + torch.randn(n)
 x_val = torch.arange(0, 5, 0.1)
 y_val = f(x_val)</code></pre>
 
-                <h5>5.1.2.2 Attention Pooling via Nadaraya–Watson Regression</h5>
+                <h4>5.1.2.2 Attention Pooling via Nadaraya–Watson Regression</h4>
                 <p>Now that we have data and kernels, all we need is a function that computes the kernel regression estimates. Note that we also want to obtain the relative kernel weights in order to perform some minor diagnostics.</p>
                 <p>Hence we first compute the kernel between all training features (covariates) <code>x_train</code> and all validation features <code>x_val</code>. This yields a matrix, which we subsequently normalize. When multiplied with the training labels <code>y_train</code> we obtain the estimates.</p>
 
@@ -229,7 +229,7 @@ plot(x_train, y_train, x_val, y_val, kernels, names)</code></pre>
                 <img src="res/05/attn_diff_weights.png" alt="Attention Heatmaps of Different Kernels" width="600">
                 <p style="text-align: center; color: #555555;">Figure 8 - Attention Heatmaps of Different Kernels</p>
 
-                <h5>5.1.2.3 Adapting Attention Pooling</h5>
+                <h4>5.1.2.3 Adapting Attention Pooling</h4>
                 <p>We could replace the Gaussian kernel with one of a different width. That is, we could use \(\alpha(\mathbf{q}, \mathbf{k}) = \exp\left(-\frac{1}{2 \sigma^2} \|\mathbf{q} - \mathbf{k}\|^2 \right)\) where \(\sigma^2\) determines the width of the kernel. Let’s see whether this affects the outcomes.</p>
 
                 <pre><code># adapting attention pooling
@@ -248,16 +248,18 @@ plot(x_train, y_train, x_val, y_val, kernels, names)</code></pre>
                 <p>Clearly, the narrower the kernel, the less smooth the estimate. At the same time, it adapts better to the local variations. Let’s look at the corresponding attention weights.</p>
                 
                 <img src="res/05/attention_adapt_weights.png" alt="Attention Adapting Weigths" width="600">
-                <p style="text-align: center; color: #555555;">Figure 9 - Attention Weights with Different Parameters</p>
+                <p style="text-align: center; color: #555555;">Figure 10 - Attention Weights with Different Parameters</p>
 
                 <p>As we would expect, the narrower the kernel, the narrower the range of large attention weights. It is also clear that picking the same width might not be ideal.</p>
                 <p>Nadaraya–Watson kernel regression is an early precursor of the current attention mechanisms. It can be used directly with little to no training or tuning, either for classification or regression. The attention weight is assigned according to the similarity (or distance) between query and key, and according to how many similar observations are available.</p>
 
                 <h3>5.1.3 Scoring Functions</h3>
-                <p>we used a number of different distance-based kernels, including a Gaussian kernel to model interactions between queries and keys. As it turns out, distance functions are slightly more expensive to compute than dot products.</p>
+                <p>We used a number of different distance-based kernels, including a Gaussian kernel to model interactions between queries and keys. As it turns out, distance functions are slightly more expensive to compute than dot products. As such, with the softmax operation to ensure nonnegative attention weights, much of the work has gone into attention scoring functions \(a\) in Figure 11 .</p>
+
                 <img src="res/05/attention_output.png" alt="Attention Output" width="600">
-                <p style="text-align: center; color: #555555;">Weights are computed with \(\alpha\) and the softmax function</p>
-                <h5>Dot Product Attention</h5>
+                <p style="text-align: center; color: #555555;">Figure 11 - Weights are computed with \(\alpha\) and the softmax function</p>
+
+                <h5>5.1.3.1 Dot Product Attention</h5>
                 <p>Let’s review the attention function (without exponentiation) from the Gaussian kernel for a moment:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(a(\mathbf{q}, \mathbf{k}_i) = -\frac{1}{2} \|\mathbf{q} - \mathbf{k}_i\|^2 = \mathbf{q}^\top \mathbf{k}_i -\frac{1}{2} \|\mathbf{k}_i\|^2 -\frac{1}{2} \|\mathbf{q}\|^2\)
@@ -265,7 +267,7 @@ plot(x_train, y_train, x_val, y_val, kernels, names)</code></pre>
                 <p>First, note that the final term depends on \(\mathbf{q}\) only. As such it is identical for all \((\mathbf{q}, \mathbf{k}_i)\) pairs. Normalizing the attention weights to 1, ensures that this term disappears entirely.</p>
                 <p>Second, note that both batch and layer normalization (to be discussed later) lead to activations that have well-bounded, and often constant, norms \(\|\mathbf{k}_i\|\). This is the case, for instance, whenever the keys \(\mathbf{k}_i\) were generated by a layer norm. As such, we can drop it from the definition of \(a\) without any major change in the outcome.</p>
                 <p>Last, we need to keep the order of magnitude of the arguments in the exponential function under control. Assume that all the elements of the query \(\mathbf{q} \in \mathbb{R}^d\) and the key \(\mathbf{k}_i \in \mathbb{R}^d\) are independent and identically drawn random variables with zero mean and unit variance.</p>
-                <p>The dot product between both vectors has zero mean and a variance of \(d\). To ensure that the variance of the dot product still remains \(1\) regardless of vector length, we use the scaled dot product attention scoring function. That is, we rescale the dot product by \(1/\sqrt{d}\). We thus arrive at the first commonly used attention function that is used, e.g., in Transformers:</p>
+                <p>The dot product between both vectors has zero mean and a variance of \(d\). To ensure that the variance of the dot product still remains \(1\) regardless of vector length, we use the scaled dot product attention scoring function. That is, we rescale the dot product by \(1/\sqrt{d}\). We thus arrive at the first commonly used attention function that is used, e.g., in <a href="transformer_paper.html">Transformers</a> :</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(a(\mathbf{q}, \mathbf{k}_i) = \mathbf{q}^\top \mathbf{k}_i / \sqrt{d}\)
                 </div>
@@ -276,17 +278,62 @@ plot(x_train, y_train, x_val, y_val, kernels, names)</code></pre>
                 </div>
                 <p>As it turns out, all popular attention mechanisms use the softmax, hence we will limit ourselves to that in the remainder of this chapter.</p>
 
-                <h5>Convenience Functions</h5>
+                <h4>5.1.3.2 Convenience Functions</h4>
                 <p>We need a few functions to make the attention mechanism efficient to deploy. This includes tools for dealing with strings of variable lengths (common for natural language processing) and tools for efficient evaluation on minibatches (batch matrix multiplication).</p>
+                
+                <h5>Masked Softmax Operation</h5>
                 <p>One of the most popular applications of the attention mechanism is to sequence models. Hence we need to be able to deal with sequences of different lengths. In some cases, such sequences may end up in the same minibatch, necessitating padding with dummy tokens for shorter sequences. These special tokens do not carry meaning. For instance, assume that we have the following three sentences:</p>
                 <pre><samp>Dive  into  Deep    Learning
 Learn to    code    &lt;blank&gt;
 Hello world &lt;blank&gt; &lt;blank&gt;</samp></pre>
                 <p>Since we do not want blanks in our attention model we simply need to limit \(\sum_{i=1}^n \alpha(\mathbf{q}, \mathbf{k}_i) \mathbf{v}_i\) to \(\sum_{i=1}^l \alpha(\mathbf{q}, \mathbf{k}_i) \mathbf{v}_i\) for however long, \(l \leq n\), the actual sentence is. Since it is such a common problem, it has a name: the masked softmax operation.</p>
-                <p>Let’s implement it. Actually, the implementation cheats ever so slightly by setting the values of \(\mathbf{v}_i\), for \(i > l\), to zero. Moreover, it sets the attention weights to a large negative number, such as \(-10^{6}\), in order to make their contribution to gradients and values vanish in practice.</p>
+                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/1_attention/util.py">util.py</a> implement it. Actually, the implementation cheats ever so slightly by setting the values of \(\mathbf{v}_i\), for \(i > l\), to zero. Moreover, it sets the attention weights to a large negative number, such as \(-10^{6}\), in order to make their contribution to gradients and values vanish in practice.</p>
+                
                 <p>This is done since linear algebra kernels and operators are heavily optimized for GPUs and it is faster to be slightly wasteful in computation rather than to have code with conditional (if then else) statements.</p>
 
+                <pre><code>def masked_softmax(X, valid_lens):
+    """Perform softmax operation by masking elements on the last axis."""
+    # X: 3D tensor, valid_lens: 1D or 2D tensor
+    def _sequence_mask(X, valid_len, value=0):
+        maxlen = X.size(1)
+        mask = torch.arange((maxlen), dtype=torch.float32,
+                            device=X.device)[None, :] &lt; valid_len[:, None]
+        X[~mask] = value
+        return X
+
+    if valid_lens is None:
+        return torch.nn.functional.softmax(X, dim=-1)
+    else:
+        shape = X.shape
+        if valid_lens.dim() == 1:
+            valid_lens = torch.repeat_interleave(valid_lens, shape[1])
+        else:
+            valid_lens = valid_lens.reshape(-1)
+        # On the last axis, replace masked elements with a very large negative
+        # value, whose exponentiation outputs 0
+        X = _sequence_mask(X.reshape(-1, shape[-1]), valid_lens, value=-1e6)
+        return torch.nn.functional.softmax(X.reshape(shape), dim=-1)</code></pre>
+
                 <p>To illustrate how this function works, consider a minibatch of two examples of size \(2 \times 4\), where their valid lengths are \(2\) and \(3\), respectively. As a result of the masked softmax operation, values beyond the valid lengths for each pair of vectors are all masked as zero.</p>
+                <pre><code>print(masked_softmax(torch.rand(2, 2, 4), torch.tensor([2, 3])))</code></pre>
+                <pre><samp>tensor([[[0.3020, 0.6980, 0.0000, 0.0000],
+         [0.4403, 0.5597, 0.0000, 0.0000]],
+
+        [[0.3926, 0.3939, 0.2135, 0.0000],
+         [0.3525, 0.3829, 0.2646, 0.0000]]])</samp></pre>
+
+                <p>If we need more fine-grained control to specify the valid length for each of the two vectors of every example, we simply use a two-dimensional tensor of valid lengths. This yields:</p>
+                <pre><code>print(masked_softmax(torch.rand(2, 2, 4), torch.tensor([[1, 3], [2, 4]])))</code></pre>
+                <pre><samp>tensor([[[1.0000, 0.0000, 0.0000, 0.0000],
+         [0.4713, 0.2427, 0.2860, 0.0000]],
+
+        [[0.5315, 0.4685, 0.0000, 0.0000],
+         [0.2483, 0.2313, 0.2106, 0.3097]]])</samp></pre>
+
+                <h5>Batch Matrix Multiplication</h5>
+
+                
+                
                 <h5>Scaled Dot Product Attention</h5>
                 <p>Let’s return to the dot product attention. In general, it requires that both the query and the key have the same vector length, say \(d\), even though this can be addressed easily by replacing \(\mathbf{q}^\top \mathbf{k}\) with \(\mathbf{q}^\top \mathbf{M} \mathbf{k}\) where \(\mathbf{M}\) is a matrix suitably chosen for translating between both spaces. For now assume that the dimensions match.</p>
                 <p>In practice, we often think of minibatches for efficiency, such as computing attention for \(n\) queries and \(m\) key-value pairs, where queries and keys are of length \(d\) and values are of length \(v\). The scaled dot product attention of queries \(\mathbf Q\in\mathbb R^{n\times d}\), keys \(\mathbf K\in\mathbb R^{m\times d}\), and values \(\mathbf V\in\mathbb R^{m\times v}\) thus can be written as:</p>

@@ -3,13 +3,6 @@ import torch
 from util import masked_softmax, show_heatmaps
 
 
-print(masked_softmax(torch.rand(2, 2, 4), torch.tensor([2, 3])))
-
-Q = torch.ones((2, 3, 4))
-K = torch.ones((2, 4, 6))
-assert torch.bmm(Q, K).shape == (2, 3, 6)
-
-
 class DotProductAttention(torch.nn.Module):
     """Scaled dot product attention."""
 
