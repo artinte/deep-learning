@@ -247,7 +247,7 @@ plot(x_train, y_train, x_val, y_val, kernels, names)</code></pre>
 
                 <p>Clearly, the narrower the kernel, the less smooth the estimate. At the same time, it adapts better to the local variations. Let’s look at the corresponding attention weights.</p>
                 
-                <img src="res/05/attention_adapt_weights.png" alt="Attention Adapting Weigths" width="600">
+                <img src="res/05/attention_adapt_w.png" alt="Attention Adapting Weigths" width="600">
                 <p style="text-align: center; color: #555555;">Figure 10 - Attention Weights with Different Parameters</p>
 
                 <p>As we would expect, the narrower the kernel, the narrower the range of large attention weights. It is also clear that picking the same width might not be ideal.</p>
@@ -330,7 +330,7 @@ Hello world &lt;blank&gt; &lt;blank&gt;</samp></pre>
         [[0.5315, 0.4685, 0.0000, 0.0000],
          [0.2483, 0.2313, 0.2106, 0.3097]]])</samp></pre>
 
-                <h5>Batch Matrix Multiplication</h5>
+                <h5 id="batch-matrix-multiplication">Batch Matrix Multiplication</h5>
 
                 <p>Another commonly used operation is to multiply batches of matrices by one another. This comes in handy when we have minibatches of queries, keys, and values. More specifically, assume that</p>
                 <p class="highlight-math" style="text-align: center; overflow-x: auto;">
@@ -356,6 +356,39 @@ assert torch.bmm(Q, K).shape == (2, 3, 6)</code></pre>
                     \(\mathrm{softmax}\left(\frac{\mathbf Q \mathbf K^\top }{\sqrt{d}}\right) \mathbf V \in \mathbb{R}^{n\times v}\)
                 </div>
                 <p>Note that when applying this to a minibatch, we need the batch matrix multiplication. In the following implementation of the scaled dot product attention, we use dropout for model regularization.</p>
+
+                <pre><code>class DotProductAttention(torch.nn.Module):
+    """Scaled dot product attention."""
+
+    def __init__(self, dropout):
+        super().__init__()
+        self.dropout = torch.nn.Dropout(dropout)
+
+    # Shape of queries: (batch_size, no. of queries, d)
+    # Shape of keys: (batch_size, no. of key-value pairs, d)
+    # Shape of values: (batch_size, no. of key-value pairs, value dimension)
+    # Shape of valid_lens: (batch_size,) or (batch_size, no. of queries)
+    def forward(self, queries, keys, values, valid_lens=None):
+        d = queries.shape[-1]
+        # Swap the last two dimensions of keys with keys.transpose(1, 2)
+        scores = torch.bmm(queries, keys.transpose(1, 2)) / math.sqrt(d)
+        self.attention_weights = masked_softmax(scores, valid_lens)
+        return torch.bmm(self.dropout(self.attention_weights), values)</code></pre>
+
+                <p>To illustrate how the DotProductAttention class works, File <a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/1_attention/dot_prod_attention.py">dot_prod_attention.py</a> use the same keys, values, and valid lengths from the earlier toy example for additive attention. For the purpose of our example we assume that we have a minibatch size of 2, a total of 10 keys and values, and that the dimensionality of the values is 4. Lastly, we assume that the valid length per observation is 2 and 6 respectively. Given that, we expect the output to be a \(2 \times 1 \times 4\) tensor, i.e., one row per example of the minibatch.</p>
+
+                <pre><code>queries = torch.normal(0, 1, (2, 1, 2))
+keys = torch.normal(0, 1, (2, 10, 2))
+values = torch.normal(0, 1, (2, 10, 4))
+valid_lens = torch.tensor([2, 6])
+
+attention = DotProductAttention(dropout=0.5)
+attention.eval()
+assert attention(queries, keys, values, valid_lens).shape == (2, 1, 4)</code></pre>
+
+                <p>Let’s check whether the attention weights actually vanish for anything beyond the second and sixth column respectively (because of setting the valid length to 2 and 6).</p>
+                <img src="res/05/dot_prod_heatmap.png" alt="Heatmap of Dot Production Attention">
+                <p style="text-align: center; color: #555555;">Figure 12 - Heatmap of Dot Production Attention</p>
 
                 <h5 id="additive">Additive Attention</h5>
                 <p>When queries \(\mathbf{q}\) and keys \(\mathbf{k}\) are vectors of different dimension, we can either use a matrix to address the mismatch via \(\mathbf{q}^\top \mathbf{M} \mathbf{k}\), or we can use additive attention as the scoring function. Another benefit is that, as its name indicates, the attention is additive. This can lead to some minor computational savings.</p>
