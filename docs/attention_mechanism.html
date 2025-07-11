@@ -332,7 +332,22 @@ Hello world &lt;blank&gt; &lt;blank&gt;</samp></pre>
 
                 <h5>Batch Matrix Multiplication</h5>
 
-                
+                <p>Another commonly used operation is to multiply batches of matrices by one another. This comes in handy when we have minibatches of queries, keys, and values. More specifically, assume that</p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(Q = [Q_1, Q_2, \cdots , Q_n] \in \mathbb{R}^{n \times a \times b}\)
+                </p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(K = [K_1, K_2, \cdots , K_n] \in \mathbb{R}^{n \times b \times c}\)
+                </p>
+                <p>Then the batch matrix multiplication (BMM) computes the elementwise product:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(BMM(Q, K) = [Q_1 K_1, Q_2 K_2 , \cdots , Q_n K_n] \in \mathbb{R}^{n \times a \times c}\)
+                </div>
+                <p>Let’s see this in action in a deep learning framework.</p>
+                <pre><code>Q = torch.ones((2, 3, 4))
+K = torch.ones((2, 4, 6))
+assert torch.bmm(Q, K).shape == (2, 3, 6)</code></pre>
+
                 
                 <h5>Scaled Dot Product Attention</h5>
                 <p>Let’s return to the dot product attention. In general, it requires that both the query and the key have the same vector length, say \(d\), even though this can be addressed easily by replacing \(\mathbf{q}^\top \mathbf{k}\) with \(\mathbf{q}^\top \mathbf{M} \mathbf{k}\) where \(\mathbf{M}\) is a matrix suitably chosen for translating between both spaces. For now assume that the dimensions match.</p>
