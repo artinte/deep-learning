@@ -53,7 +53,6 @@ def plot(x_train, y_train, x_val, y_val, kernels, names, attention=False):
     pyplot.show()
 
 plot(x_train, y_train, x_val, y_val, kernels, names)
-
 plot(x_train, y_train, x_val, y_val, kernels, names, attention=True)
 
 
@@ -66,3 +65,4 @@ def gaussian_with_width(sigma):
 
 kernels = [gaussian_with_width(sigma) for sigma in sigmas]
 plot(x_train, y_train, x_val, y_val, kernels, names)
+plot(x_train, y_train, x_val, y_val, kernels, names, attention=True)

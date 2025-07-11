@@ -177,7 +177,7 @@ pyplot.show()</code></pre>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(y_i = 2 sin(x_i) + x_i + \epsilon\)
                 </div>
-                <p>where \(\epsilon\) is drawn from a <a href="prob_theory.html#normal_distrib">normal distribution</a> with zero mean and unit variance. File <a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/1_attention/nadaraya_regression.py"></a> draw 40 training examples:</p>
+                <p>where \(\epsilon\) is drawn from a <a href="prob_theory.html#normal_distrib">normal distribution</a> with zero mean and unit variance. File <a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/1_attention/nadaraya_regression.py">nadaraya_regression.py</a> draw 40 training examples:</p>
 
                 <pre><code>def f(x):
     return 2 * torch.sin(x) + x
@@ -227,11 +227,29 @@ plot(x_train, y_train, x_val, y_val, kernels, names)</code></pre>
                 
                 <p>The first thing that stands out is that all three nontrivial kernels (Gaussian, Boxcar, and Epanechikov) produce fairly workable estimates that are not too far from the true function. Only the constant kernel that leads to the trivial estimate \(f(x) = \frac{1}{n} \sum_i y_i\) produces a rather unrealistic result. Let’s inspect the attention weighting a bit more closely:</p>
                 <img src="res/05/attn_diff_weights.png" alt="Attention Heatmaps of Different Kernels" width="600">
-                <p style="text-align: center; color: #555555;">Figure 7 - Attention Heatmaps of Different Kernels</p>
+                <p style="text-align: center; color: #555555;">Figure 8 - Attention Heatmaps of Different Kernels</p>
 
                 <h5>5.1.2.3 Adapting Attention Pooling</h5>
                 <p>We could replace the Gaussian kernel with one of a different width. That is, we could use \(\alpha(\mathbf{q}, \mathbf{k}) = \exp\left(-\frac{1}{2 \sigma^2} \|\mathbf{q} - \mathbf{k}\|^2 \right)\) where \(\sigma^2\) determines the width of the kernel. Let’s see whether this affects the outcomes.</p>
+
+                <pre><code># adapting attention pooling
+sigmas = (0.1, 0.2, 0.5, 1)
+names = ['Sigma ' + str(sigma) for sigma in sigmas]
+
+def gaussian_with_width(sigma):
+    return (lambda x: torch.exp(-x**2 / (2*sigma**2)))
+
+kernels = [gaussian_with_width(sigma) for sigma in sigmas]
+plot(x_train, y_train, x_val, y_val, kernels, names)</code></pre>
+
+                <img src="res/05/attention_adapting.png" alt="Attention Adapting" width="600">
+                <p style="text-align: center; color: #555555;">Figure 9 - Attention Pooling with Different Parameters</p>
+
                 <p>Clearly, the narrower the kernel, the less smooth the estimate. At the same time, it adapts better to the local variations. Let’s look at the corresponding attention weights.</p>
+                
+                <img src="res/05/attention_adapt_weights.png" alt="Attention Adapting Weigths" width="600">
+                <p style="text-align: center; color: #555555;">Figure 9 - Attention Weights with Different Parameters</p>
+
                 <p>As we would expect, the narrower the kernel, the narrower the range of large attention weights. It is also clear that picking the same width might not be ideal.</p>
                 <p>Nadaraya–Watson kernel regression is an early precursor of the current attention mechanisms. It can be used directly with little to no training or tuning, either for classification or regression. The attention weight is assigned according to the similarity (or distance) between query and key, and according to how many similar observations are available.</p>
 
