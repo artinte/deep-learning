@@ -47,10 +47,26 @@
                 <h3>13.2.6 Remove Pruning Re-parametrization</h3>
 
                 <h3>13.2.7 Pruning Multiple Parameters in a Model</h3>
+                <p>By specifying the desired pruning technique and parameters, we can easily prune multiple tensors in a network, perhaps according to their type, as we will see in this example.</p>
 
                 <h3>13.2.8 Global pruning</h3>
+                <p>So far, we only looked at what is usually referred to as “local” pruning, i.e. the practice of pruning tensors in a model one by one, by comparing the statistics (weight magnitude, activation, gradient, etc.) of each entry exclusively to the other entries in that tensor. However, a common and perhaps more powerful technique is to prune the model all at once, by removing (for example) the lowest 20% of connections across the whole model, instead of removing the lowest 20% of connections in each layer. This is likely to result in different pruning percentages per layer. Let’s see how to do that using global_unstructured from <code>torch.nn.utils.prune</code> .</p>
 
+                <p>Now we can check the sparsity induced in every pruned parameter, which will not be equal to 20% in each layer. However, the global sparsity will be (approximately) 20% .</p>
+
+                
                 <h3>13.2.9 Extending <code>torch.nn.utils.prune</code></h3>
+
+                <p>To implement your own pruning function, you can extend the nn.utils.prune module by subclassing the BasePruningMethod base class, the same way all other pruning methods do. The base class implements the following methods for you: __call__, apply_mask, apply, prune, and remove.</p>
+
+                <p>Beyond some special cases, you shouldn’t have to reimplement these methods for your new pruning technique. You will, however, have to implement __init__ (the constructor), and compute_mask (the instructions on how to compute the mask for the given tensor according to the logic of your pruning technique). </p>
+
+                <p>In addition, you will have to specify which type of pruning this technique implements (supported options are global, structured, and unstructured). This is needed to determine how to combine masks in the case in which pruning is applied iteratively. In other words, when pruning a prepruned parameter, the current pruning technique is expected to act on the unpruned portion of the parameter. Specifying the PRUNING_TYPE will enable the PruningContainer (which handles the iterative application of pruning masks) to correctly identify the slice of the parameter to prune.</p>
+
+                <p>Let’s assume, for example, that you want to implement a pruning technique that prunes every other entry in a tensor (or – if the tensor has previously been pruned – in the remaining unpruned portion of the tensor). This will be of PRUNING_TYPE='unstructured' because it acts on individual connections in a layer and not on entire units/channels ('structured'), or across different parameters ('global').</p>
+
+                
+                
                 
                 <div class="navigation">
                     <a href="lora.html">Prev: 13.1 LoRA</a>
