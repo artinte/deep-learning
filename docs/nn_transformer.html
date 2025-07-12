@@ -67,7 +67,7 @@ print(dataset['train'][0])</code></pre>
                     <li><p><code>eos_token='&lt;eos&gt;'</code> adds a special "end of sequence" token at the end of each sentence.</p></li>
                     <li><p><code>pad_token='&lt;pad&gt;'</code> specifies a token to use for padding. When batching sentences, they often have different lengths. Padding ensures all sentences in a batch have the same length by adding <code>&lt;pad&gt;</code> tokens to shorter ones.</p></li>
                     <li><p><code>lower=True</code> converts all text to lowercase. This helps reduce vocabulary size and makes the model less sensitive to case variations.</p></li>
-                    <li><p><code>batch_first=True</code> when data is batched, this determines the dimension order. If True, the batch dimension comes first (e.g., \([batch_size, sequence_length]\)). </p></li>
+                    <li><p><code>batch_first=True</code> when data is batched, this determines the dimension order. If True, the batch dimension comes first (e.g., <code>[batch_size, sequence_length]</code>). </p></li>
                 </ul>
 
                 <p style="margin-left: 2em;">3. Creating <code>Example</code> Objects</p>
@@ -245,6 +245,46 @@ CLIP = 1.0  # Gradient clipping</code></pre>
     valid_loss = evaluate(model, valid_iterator, criterion)
     print(f"Epoch {epoch+1} | Train Loss: {train_loss:.3f} | Validation Loss: {valid_loss:.3f}")</code></pre>
 
+                <pre><samp>Epoch 1 | Train Loss: 4.128 | Validation Loss: 3.180
+Epoch 2 | Train Loss: 3.065 | Validation Loss: 2.667
+Epoch 3 | Train Loss: 2.637 | Validation Loss: 2.352
+Epoch 4 | Train Loss: 2.333 | Validation Loss: 2.126
+Epoch 5 | Train Loss: 2.097 | Validation Loss: 1.961
+Epoch 6 | Train Loss: 1.902 | Validation Loss: 1.835
+Epoch 7 | Train Loss: 1.739 | Validation Loss: 1.736
+Epoch 8 | Train Loss: 1.597 | Validation Loss: 1.651
+Epoch 9 | Train Loss: 1.473 | Validation Loss: 1.584
+Epoch 10 | Train Loss: 1.362 | Validation Loss: 1.525
+Epoch 11 | Train Loss: 1.263 | Validation Loss: 1.481
+Epoch 12 | Train Loss: 1.173 | Validation Loss: 1.445
+Epoch 13 | Train Loss: 1.090 | Validation Loss: 1.425
+Epoch 14 | Train Loss: 1.017 | Validation Loss: 1.392
+Epoch 15 | Train Loss: 0.950 | Validation Loss: 1.388
+Epoch 16 | Train Loss: 0.889 | Validation Loss: 1.376
+Epoch 17 | Train Loss: 0.833 | Validation Loss: 1.358
+Epoch 18 | Train Loss: 0.782 | Validation Loss: 1.363
+Epoch 19 | Train Loss: 0.737 | Validation Loss: 1.359
+Epoch 20 | Train Loss: 0.694 | Validation Loss: 1.360
+Epoch 21 | Train Loss: 0.657 | Validation Loss: 1.369
+Epoch 22 | Train Loss: 0.625 | Validation Loss: 1.371
+Epoch 23 | Train Loss: 0.593 | Validation Loss: 1.393
+Epoch 24 | Train Loss: 0.568 | Validation Loss: 1.411
+Epoch 25 | Train Loss: 0.542 | Validation Loss: 1.398
+Epoch 26 | Train Loss: 0.520 | Validation Loss: 1.406
+Epoch 27 | Train Loss: 0.498 | Validation Loss: 1.405
+Epoch 28 | Train Loss: 0.481 | Validation Loss: 1.429
+Epoch 29 | Train Loss: 0.463 | Validation Loss: 1.439
+Epoch 30 | Train Loss: 0.449 | Validation Loss: 1.447
+Epoch 31 | Train Loss: 0.431 | Validation Loss: 1.455
+Epoch 32 | Train Loss: 0.420 | Validation Loss: 1.474
+Epoch 33 | Train Loss: 0.406 | Validation Loss: 1.484
+Epoch 34 | Train Loss: 0.396 | Validation Loss: 1.499
+Epoch 35 | Train Loss: 0.385 | Validation Loss: 1.508
+Epoch 36 | Train Loss: 0.374 | Validation Loss: 1.524
+Epoch 37 | Train Loss: 0.366 | Validation Loss: 1.540
+Epoch 38 | Train Loss: 0.356 | Validation Loss: 1.560
+Epoch 39 | Train Loss: 0.350 | Validation Loss: 1.573
+Epoch 40 | Train Loss: 0.343 | Validation Loss: 1.563</samp></pre>
 
                 <pre><code>def translate_one_batch(model, iterator, SRC, TRG):
     model.eval()
@@ -284,6 +324,135 @@ def print_translations(translations):
 
 translations = translate_one_batch(model, test_iterator, SRC, TRG)
 print_translations(translations)</code></pre>
+
+                <pre><samp>Source: &lt;sos&gt; ein mann arbeitet an einem &lt;unk&gt; . &lt;eos&gt;
+Prediction: a man is working a man stand .
+Reference: a man is working a hotdog stand . &lt;eos&gt;
+--------------------------------------------------
+Source: &lt;sos&gt; ein junges mädchen schwimmt in einem pool &lt;eos&gt;
+Prediction: a young girl swimming in a young
+Reference: a young girl swimming in a pool &lt;eos&gt;
+--------------------------------------------------
+Source: &lt;sos&gt; zwei männer in schwarz in einer stadt &lt;eos&gt;
+Prediction: two men wearing black in a city
+Reference: two men wearing black in a city &lt;eos&gt;
+--------------------------------------------------
+Source: &lt;sos&gt; eine große menschenmenge füllt eine straße . &lt;eos&gt;
+Prediction: a large group of people fill a large .
+Reference: a large group of people fill a street . &lt;eos&gt;
+--------------------------------------------------
+Source: &lt;sos&gt; ein mann schneidet äste von bäumen . &lt;eos&gt;
+Prediction: a man cutting of . trees .
+Reference: a man cutting branches of trees . &lt;eos&gt;
+--------------------------------------------------
+Source: &lt;sos&gt; drei leute sitzen in einer höhle . &lt;eos&gt;
+Prediction: three people sit in a cave .
+Reference: three people sit in a cave . &lt;eos&gt;
+--------------------------------------------------
+Source: &lt;sos&gt; ein typ arbeitet an einem gebäude . &lt;eos&gt;
+Prediction: a building works on a building .
+Reference: a guy works on a building . &lt;eos&gt;
+--------------------------------------------------
+Source: &lt;sos&gt; leute reparieren das dach eines hauses . &lt;eos&gt;
+Prediction: people are fixing the roof of a house .
+Reference: people are fixing the roof of a house . &lt;eos&gt;
+--------------------------------------------------
+Source: &lt;sos&gt; zwei jungen vor einem &lt;unk&gt; . &lt;eos&gt; &lt;pad&gt;
+Prediction: two boys in front of a machine machine .
+Reference: two boys in front of a soda machine . &lt;eos&gt;
+--------------------------------------------------
+Source: &lt;sos&gt; ein typ küsst einen anderen typ &lt;eos&gt; &lt;pad&gt;
+Prediction: a guy also a guy
+Reference: a guy give a kiss to a guy also &lt;eos&gt;
+--------------------------------------------------
+Source: &lt;sos&gt; zwei jungen spielen gegeneinander fußball . &lt;eos&gt; &lt;pad&gt;
+Prediction: two boys play soccer against each other .
+Reference: two boys play soccer against each other . &lt;eos&gt;
+--------------------------------------------------
+Source: &lt;sos&gt; kinder kämpfen um den ballbesitz . &lt;eos&gt; &lt;pad&gt;
+Prediction: kids compete to the of of the soccer ball .
+Reference: kids compete to &lt;unk&gt; possession of the soccer ball . &lt;eos&gt;
+--------------------------------------------------
+Source: &lt;sos&gt; ein wandgemälde auf einem gebäude . &lt;eos&gt; &lt;pad&gt;
+Prediction: a mural on the side of a mural .
+Reference: a mural on the side of a building . &lt;eos&gt;
+--------------------------------------------------
+Source: &lt;sos&gt; ärzte bei einer art operation . &lt;eos&gt; &lt;pad&gt;
+Prediction: doctors performing some type of surgery .
+Reference: doctors performing some type of surgery . &lt;eos&gt;
+--------------------------------------------------
+Source: &lt;sos&gt; feuerwehrmänner kommen aus einer u-bahnstation . &lt;eos&lt; &lt;pad&gt;
+Prediction: firemen &lt;unk&gt; station a subway station .
+Reference: firemen &lt;unk&gt; from a subway station . &lt;eos&gt;
+--------------------------------------------------
+Source: &lt;sos&gt; arbeiter diskutieren neben den schienen . &lt;eos&gt; &lt;pad&gt;
+Prediction: construction workers having a construction by the tracks .
+Reference: construction workers having a discussion by the tracks . &lt;eos&gt;
+--------------------------------------------------
+Source: &lt;sos&gt; ein cowboy &lt;unk&gt; seinen arm . &lt;eos&gt; &lt;pad&gt;
+Prediction: a cowboy with his . arm up his cowboy .
+Reference: a cowboy wrapping up his arm with a bandage . &lt;eos&gt;
+--------------------------------------------------
+Source: &lt;sos&gt; ein mann verwendet &lt;unk&gt; geräte . &lt;eos&gt; &lt;pad&gt;
+Prediction: a man is using electronic equipment .
+Reference: a man is using electronic equipment . &lt;eos&gt;
+--------------------------------------------------
+Source: &lt;sos&gt; zwei fußballmannschaften auf dem feld . &lt;eos&lt; &lt;pad&gt;
+Prediction: two soccer teams are on the soccer .
+Reference: two soccer teams are on the field . &lt;eos&gt;
+--------------------------------------------------
+Source: &lt;sos&gt; ein mann an seinem hochzeitstag . &lt;eos&gt; &lt;pad&gt;
+Prediction: a man on his wedding day .
+Reference: a man on his wedding day . &lt;eos&gt;
+--------------------------------------------------
+Source: &lt;sos&gt; ein hellbrauner hund läuft bergauf . &lt;eos&gt; &lt;pad&gt;
+Prediction: a light brown dog is running up .
+Reference: a light brown dog is running up . &lt;eos&gt;
+--------------------------------------------------
+Source: &lt;sos&gt; hunde laufen auf einer hunderennbahn . &lt;eos&gt; &lt;pad&gt;
+Prediction: dogs run at a racetrack run .
+Reference: dogs run at a dog racetrack . &lt;eos&gt;
+--------------------------------------------------
+Source: &lt;sos&gt; ein am strand &lt;unk&gt; auto . &lt;eos&gt; &lt;pad&gt;
+Prediction: a car parked at the beach .
+Reference: a car parked at the beach . &lt;eos&gt;
+--------------------------------------------------
+Source: &lt;sos&gt; leute sitzen in einem zug . &lt;eos&gt; &lt;pad&gt;
+Prediction: people sit inside a train .
+Reference: people sit inside a train . &lt;eos&gt;
+--------------------------------------------------
+Source: &lt;sos&gt; ein kind planscht im wasser . &lt;eos&gt; &lt;pad&gt;
+Prediction: a child is splashing in the water
+Reference: a child is splashing in the water &lt;eos&gt;
+--------------------------------------------------
+Source: &lt;sos&gt; leute bewundern ein kunstwerk . &lt;eos&gt; &lt;pad&gt; &lt;pad&gt;
+Prediction: a are admiring a row . people of
+Reference: people are admiring a work of art . &lt;eos&gt;
+--------------------------------------------------
+Source: &lt;sos&gt; junge frau klettert auf felswand &lt;eos&gt; &lt;pad&gt; &lt;pad&gt;
+Prediction: young woman rock face face
+Reference: young woman climbing rock face &lt;eos&gt;
+--------------------------------------------------
+Source: &lt;sos&gt; ein rockkonzert findet statt . &lt;eos&gt; &lt;pad&gt; &lt;pad&gt;
+Prediction: a concert concert is taking place .
+Reference: a rock concert is taking place . &lt;eos&gt;
+--------------------------------------------------
+Source: &lt;sos&gt; eine frau spielt volleyball . &lt;eos&gt; &lt;pad&gt; &lt;pad&gt;
+Prediction: a woman is playing volleyball .
+Reference: a woman is playing volleyball . &lt;eos&gt;
+--------------------------------------------------
+Source: &lt;sos&gt; ein &lt;unk&gt; inspiziert etwas . &lt;eos&gt; &lt;pad&gt; &lt;pad&gt;
+Prediction: an army officer is inspecting something .
+Reference: an army officer is inspecting something . &lt;eos&gt;
+--------------------------------------------------
+Source: &lt;sos&gt; zwei männer mit mützen . &lt;eos&gt; &lt;pad&gt; &lt;pad&gt;
+Prediction: two men wearing hats .
+Reference: two men wearing hats . &lt;eos&gt;
+--------------------------------------------------
+Source: &lt;sos&gt; drei männer gehen bergauf . &lt;eos&gt; &lt;pad&gt; &lt;pad&gt;
+Prediction: three men are walking up walking .
+Reference: three men are walking up hill . &lt;eos&gt;
+--------------------------------------------------</samp></pre>
 
                 <h3>5.4.4 Part 3: A Real World Example</h3>
                 <p>Now we consider a real-world example using the Multi30k German-English Translation task. This task is much smaller than the WMT task considered in the paper, but it illustrates the whole system. We also show how to use multi-gpu processing to make it really fast.</p>
