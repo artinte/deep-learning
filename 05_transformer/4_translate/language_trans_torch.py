@@ -181,7 +181,7 @@ if __name__ == '__main__':
                 translations.append({
                     'src': ' '.join(src_tokens),
                     'hyp': ' '.join(hyp_tokens),
-                    'trg': ' '.join([TRG.vocab.itos[idx] for idx in trg[i][1:].cpu().numpy() if idx != TRG.vocab.stoi[TRG.pad_token]])  # 目标句子
+                    'trg': ' '.join([TRG.vocab.itos[idx] for idx in trg[i][1:].cpu().numpy() if idx != TRG.vocab.stoi[TRG.pad_token]])
                 })
         
         return translations
