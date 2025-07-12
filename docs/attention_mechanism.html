@@ -259,7 +259,7 @@ plot(x_train, y_train, x_val, y_val, kernels, names)</code></pre>
                 <img src="res/05/attention_output.png" alt="Attention Output" width="600">
                 <p style="text-align: center; color: #555555;">Figure 11 - Weights are computed with \(\alpha\) and the softmax function</p>
 
-                <h5>5.1.3.1 Dot Product Attention</h5>
+                <h4>5.1.3.1 Dot Product Attention</h4>
                 <p>Let’s review the attention function (without exponentiation) from the Gaussian kernel for a moment:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(a(\mathbf{q}, \mathbf{k}_i) = -\frac{1}{2} \|\mathbf{q} - \mathbf{k}_i\|^2 = \mathbf{q}^\top \mathbf{k}_i -\frac{1}{2} \|\mathbf{k}_i\|^2 -\frac{1}{2} \|\mathbf{q}\|^2\)
@@ -349,7 +349,7 @@ K = torch.ones((2, 4, 6))
 assert torch.bmm(Q, K).shape == (2, 3, 6)</code></pre>
 
                 
-                <h5>Scaled Dot Product Attention</h5>
+                <h4>5.1.3.3 Scaled Dot Product Attention</h4>
                 <p>Let’s return to the dot product attention. In general, it requires that both the query and the key have the same vector length, say \(d\), even though this can be addressed easily by replacing \(\mathbf{q}^\top \mathbf{k}\) with \(\mathbf{q}^\top \mathbf{M} \mathbf{k}\) where \(\mathbf{M}\) is a matrix suitably chosen for translating between both spaces. For now assume that the dimensions match.</p>
                 <p>In practice, we often think of minibatches for efficiency, such as computing attention for \(n\) queries and \(m\) key-value pairs, where queries and keys are of length \(d\) and values are of length \(v\). The scaled dot product attention of queries \(\mathbf Q\in\mathbb R^{n\times d}\), keys \(\mathbf K\in\mathbb R^{m\times d}\), and values \(\mathbf V\in\mathbb R^{m\times v}\) thus can be written as:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
@@ -390,15 +390,57 @@ assert attention(queries, keys, values, valid_lens).shape == (2, 1, 4)</code></p
                 <img src="res/05/dot_prod_heatmap.png" alt="Heatmap of Dot Production Attention">
                 <p style="text-align: center; color: #555555;">Figure 12 - Heatmap of Dot Production Attention</p>
 
-                <h5 id="additive">Additive Attention</h5>
+                <h4 id="additive-attention">5.1.3.4 Additive Attention</h4>
                 <p>When queries \(\mathbf{q}\) and keys \(\mathbf{k}\) are vectors of different dimension, we can either use a matrix to address the mismatch via \(\mathbf{q}^\top \mathbf{M} \mathbf{k}\), or we can use additive attention as the scoring function. Another benefit is that, as its name indicates, the attention is additive. This can lead to some minor computational savings.</p>
                 <p> Given a query \(\mathbf{q} \in \mathbb{R}^q\) and a key \(\mathbf{k} \in \mathbb{R}^k\), the additive attention scoring function (Bahdanau et al., 2014) is given by:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(a(\mathbf q, \mathbf k) = \mathbf w_v^\top \textrm{tanh}(\mathbf W_q\mathbf q + \mathbf W_k \mathbf k) \in \mathbb{R}\)
                 </div>
                 <p>where \(\mathbf W_q\in\mathbb R^{h\times q}\), \(\mathbf W_k\in\mathbb R^{h\times k}\), and \(\mathbf w_v\in\mathbb R^{h}\) are the learnable parameters. </p>
-                <p>This term is then fed into a softmax to ensure both nonnegativity and normalization. An equivalent interpretation of (11.3.7) is that the query and key are concatenated and fed into an MLP with a single hidden layer. Using \(\tanh\) as the activation function and disabling bias terms, we implement additive attention as follows:</p>
-                
+                <p>This term is then fed into a softmax to ensure both nonnegativity and normalization. An equivalent interpretation of above formula is that the query and key are concatenated and fed into an MLP with a single hidden layer. Using \(\tanh\) as the activation function and disabling bias terms, File <a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/1_attention/additive_attention.py">additive_attention.py</a> implement additive attention as follows:</p>
+                <pre><code>class AdditiveAttention(torch.nn.Module):
+    """Additive attention."""
+
+    def __init__(self, num_hiddens, dropout, **kwargs):
+        super(AdditiveAttention, self).__init__(**kwargs)
+        self.W_k = torch.nn.LazyLinear(num_hiddens, bias=False)
+        self.W_q = torch.nn.LazyLinear(num_hiddens, bias=False)
+        self.w_v = torch.nn.LazyLinear(1, bias=False)
+        self.dropout = torch.nn.Dropout(dropout)
+
+    def forward(self, queries, keys, values, valid_lens):
+        queries, keys = self.W_q(queries), self.W_k(keys)
+        # After dimension expansion, shape of queries: (batch_size, no. of
+        # queries, 1, num_hiddens) and shape of keys: (batch_size, 1, no. of
+        # key-value pairs, num_hiddens). Sum them up with broadcasting
+        features = queries.unsqueeze(2) + keys.unsqueeze(1)
+        features = torch.tanh(features)
+        # There is only one output of self.w_v, so we remove the last
+        # one-dimensional entry from the shape. Shape of scores: (batch_size,
+        # no. of queries, no. of key-value pairs)
+        scores = self.w_v(features).squeeze(-1)
+        self.attention_weights = masked_softmax(scores, valid_lens)
+        # Shape of values: (batch_size, no. of key-value pairs, value
+        # dimension)
+        return torch.bmm(self.dropout(self.attention_weights), values)</code></pre>
+
+                <p>Let’s see how AdditiveAttention works. In our toy example we pick queries, keys and values of size \((2, 1, 20)\), \((2, 10, 2)\) and \((2, 10, 40)\), respectively. This is identical to our choice for DotProductAttention, except that now the queries are 20-dimensional. Likewise, we pick \((2, 6)\) as the valid lengths for the sequences in the minibatch.</p>
+                <pre><code>queries = torch.normal(0, 1, (2, 1, 20))
+keys = torch.normal(0, 1, (2, 10, 2))
+values = torch.normal(0, 1, (2, 10, 4))
+valid_lens = torch.tensor([2, 6])
+
+attention = AdditiveAttention(num_hiddens=8, dropout=0.1)
+attention.eval()
+assert attention(queries, keys, values, valid_lens).shape == (2, 1, 4)
+
+show_heatmaps(attention.attention_weights.reshape((1, 1, 2, 10)),
+              xlabel='Keys', ylabel='Queries')</code></pre>
+
+                <p>When reviewing the attention function we see a behavior that is qualitatively quite similar to that of DotProductAttention. That is, only terms within the chosen valid length \((2, 6)\) are nonzero.</p>
+                <img src="res/05/heatmap_add_attn.png" alt="Heatmap of Additive Attention Weights">
+                <p style="text-align: center; color: #555555;">Figure 13 - Heatmap of Additive Attention Weights</p>
+
                 <div class="navigation">
                     <a href="attention_nmt.html">Prev: 4.6 Attention-based NMT</a>
                     <a href="transformer_paper.html">Next: 5.2 Attention Is All You Need</a>

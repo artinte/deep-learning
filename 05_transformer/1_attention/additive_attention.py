@@ -3,7 +3,7 @@ import torch
 from util import masked_softmax, show_heatmaps
 
 
-class AdditiveAttention(torch.nn.Module):  # @save
+class AdditiveAttention(torch.nn.Module):
     """Additive attention."""
 
     def __init__(self, num_hiddens, dropout, **kwargs):
@@ -40,4 +40,4 @@ attention.eval()
 assert attention(queries, keys, values, valid_lens).shape == (2, 1, 4)
 
 show_heatmaps(attention.attention_weights.reshape((1, 1, 2, 10)),
-              xlabel='Keys', ylabel='Queries')
+              xlabel='Keys', ylabel='Queries', cmap='YlGnBu')
