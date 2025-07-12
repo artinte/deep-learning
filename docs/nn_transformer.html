@@ -54,6 +54,89 @@ print(dataset['train'][0])</code></pre>
 })
 {'en': 'Two young, White males are outside near many bushes.', 'de': 'Zwei junge weiße Männer sind im Freien in der Nähe vieler Büsche.'}</samp></pre>
 
+                <p>We uses the <em>TorchText</em> library to handle the complexities of text processing, such as tokenization, vocabulary building, and batching. Let's break down the code step-by-step:</p>
+                <p>1. Data Loading and Initial Preparation</p>
+                <p>After we get <code>dataset</code> object from Hugging Face's datasets, extracts parallel sentences (German to English in this case) from the 'train', 'validation', and 'test' splits of the dataset.</p>
+
+                <p>2. Defining <code>Field</code> Objects</p>
+
+                <p><code>Field</code> objects in TorchText define how raw text data should be processed. Let's look at the arguments:</p>
+                <ul class="with-bullets">
+                    <li><p><code>tokenize=word_tokenize</code> specifies the tokenization function, it from NLTK , split a sentence into individual words or subword units. Tokenization is the process of breaking down a sequence of characters into pieces, called tokens.</p></li>
+                    <li><p><code>init_token='&lt;sos&gt;'</code> adds a special "start of sequence" token at the beginning of each sentence.</p></li>
+                    <li><p><code>eos_token='&lt;eos&gt;'</code> adds a special "end of sequence" token at the end of each sentence.</p></li>
+                    <li><p><code>pad_token='&lt;pad&gt;'</code> specifies a token to use for padding. When batching sentences, they often have different lengths. Padding ensures all sentences in a batch have the same length by adding <code>&lt;pad&gt;</code> tokens to shorter ones.</p></li>
+                    <li><p><code>lower=True</code> converts all text to lowercase. This helps reduce vocabulary size and makes the model less sensitive to case variations.</p></li>
+                    <li><p><code>batch_first=True</code> when data is batched, this determines the dimension order. If True, the batch dimension comes first (e.g., \([batch_size, sequence_length]\)). </p></li>
+                </ul>
+
+                <p>3. Creating <code>Example</code> Objects</p>
+                <p>Example objects represent a single instance of data, associating raw text with their respective Field definitions. Here, each German-English sentence pair is converted into an Example.</p>
+
+                <p>4. Building <code>Dataset</code> Objects</p>
+                <p><code>Dataset</code> objects in TorchText are containers for Example objects. They organize the data into a format suitable for use with DataLoader (which would be the next step for iterating through batches).</p>
+
+                <p>5. Building Vocabularies</p>
+                <p>This is a crucial step. <code>build_vocab</code> creates a vocabulary for each Field. A vocabulary is a mapping from unique words (tokens) to numerical indices.</p>
+
+                <pre><code>train_data = [(example['de'], example['en']) for example in dataset['train']]
+valid_data = [(example['de'], example['en']) for example in dataset['validation']]
+test_data = [(example['de'], example['en']) for example in dataset['test']]
+
+SRC = Field(tokenize=word_tokenize, init_token='<sos>', eos_token='<eos>', pad_token='<pad>', lower=True, batch_first=True)
+TRG = Field(tokenize=word_tokenize, init_token='<sos>', eos_token='<eos>', pad_token='<pad>', lower=True, batch_first=True)
+
+train_examples = [Example.fromlist([src, trg], fields=[('src', SRC), ('trg', TRG)]) for src, trg in train_data]
+valid_examples = [Example.fromlist([src, trg], fields=[('src', SRC), ('trg', TRG)]) for src, trg in valid_data]
+test_examples = [Example.fromlist([src, trg], fields=[('src', SRC), ('trg', TRG)]) for src, trg in test_data]
+
+train_dataset = Dataset(examples=train_examples, fields=[('src', SRC), ('trg', TRG)])
+valid_dataset = Dataset(examples=valid_examples, fields=[('src', SRC), ('trg', TRG)])
+test_dataset = Dataset(examples=test_examples, fields=[('src', SRC), ('trg', TRG)])
+
+SRC.build_vocab(train_dataset, min_freq=2)
+TRG.build_vocab(train_dataset, min_freq=2)
+
+print('Source vocabulary size: ' + str(len(SRC.vocab)))
+print('Target vocabulary size: ' + str(len(TRG.vocab)))
+
+print([word for word, _ in list(SRC.vocab.stoi.items())[:10]])
+print([word for word, _ in list(TRG.vocab.stoi.items())[:10]])</code></pre>
+
+                <p>We print useful information about the created vocabularies, prints the first 10 word-to-index mappings from the vocabulary. stoi stands for "string to index." This gives a peek into what words are included in the vocabulary and their assigned numerical IDs.</p>
+                <pre><samp>{'en': 'Two young, White males are outside near many bushes.', 'de': 'Zwei junge weiße Männer sind im Freien in der Nähe vieler Büsche.'}    
+Source vocabulary size: 7861
+Target vocabulary size: 5920
+['<unk>', '<pad>', '<sos>', '<eos>', '.', 'ein', 'einem', 'in', 'eine', ',']
+['<unk>', '<pad>', '<sos>', '<eos>', 'a', '.', 'in', 'the', 'on', 'man']</samp></pre>
+
+                <p>BucketIterator efficiently groups similar-length sentences into batches for training, validation, and testing. The loop demonstrates accessing these batched source (src) and target (trg) tensors and printing their shapes.</p>
+
+                <pre><code>BATCH_SIZE = 32
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+train_iterator, valid_iterator, test_iterator = BucketIterator.splits(
+    (train_dataset, valid_dataset, test_dataset),
+    batch_size=BATCH_SIZE,
+    device=device,
+    sort_within_batch=True,
+    sort_key=lambda x: len(x.src),
+)
+
+for batch in train_iterator:
+    src = batch.src
+    trg = batch.trg
+    
+    print(src.shape)
+    print(trg.shape)
+    break</code></pre>
+
+                <pre><samp>torch.Size([32, 19])
+torch.Size([32, 26])</samp></pre>
+
+                <h3>5.4.2 nn.Transformer API</h3>
+
+
                 <h3>5.4.4 Part 3: A Real World Example</h3>
                 <p>Now we consider a real-world example using the Multi30k German-English Translation task. This task is much smaller than the WMT task considered in the paper, but it illustrates the whole system. We also show how to use multi-gpu processing to make it really fast.</p>
                 
