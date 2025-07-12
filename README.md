@@ -39,7 +39,7 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 
 ### 05 Transformer
 
-- [ ] 5.1 [Attention Mechanism](https://artinte.github.io/deep-learning/attention_mechanism.html)
+- [x] 5.1 [Attention Mechanism](https://artinte.github.io/deep-learning/attention_mechanism.html)
 - [x] 5.2 [Attention Is All You Need](https://artinte.github.io/deep-learning/transformer_paper.html)
 - [x] 5.3 [Transformer from Stratch](https://artinte.github.io/deep-learning/transformer_stratch.html)
 - [ ] 5.4 [nn.Transformer](https://artinte.github.io/deep-learning/nn_transformer.html)
@@ -86,10 +86,11 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 ### 10 Reinforcement Learning
 
 - [ ] 10.1 [Introduction RL Problems](https://artinte.github.io/deep-learning/rl_introduction.html)
-- [ ] 10.2 [Dynamic Programming](https://artinte.github.io/deep-learning/dynamic_program.html)
-- [ ] 10.3 [DQN](https://artinte.github.io/deep-learning/dqn.html)
-- [ ] 10.4 [PPO](https://artinte.github.io/deep-learning/ppo.html)
-- [ ] 10.5 [Function Approximation](https://artinte.github.io/deep-learning/function_appro.html)
+- [ ] 10.2 [Markov Decision Processes](https://artinte.github.io/deep-learning/markov_process.html)
+- [ ] 10.3 [Dynamic Programming](https://artinte.github.io/deep-learning/dynamic_program.html)
+- [ ] 10.4 [DQN](https://artinte.github.io/deep-learning/dqn.html)
+- [ ] 10.5 [PPO](https://artinte.github.io/deep-learning/ppo.html)
+- [ ] 10.6 [Function Approximation](https://artinte.github.io/deep-learning/function_appro.html)
 
 ### 11 Extending PyTorch
 

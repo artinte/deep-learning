@@ -101,6 +101,7 @@
                                 <li><a class="nav-link" href="voice_synthesis.html">8.5 Voice Synthesis</a></li>
                             </ul>
                         </li>
+
                         <li class="nav-item">
                             <a class="nav-link" href="#section9" onclick="toggleChildChapters(event, 'chapter9')">09 Image and Video</a>
                             <ul id="chapter9" class="child-chapters" style="display: none;">
@@ -114,16 +115,19 @@
                                 <li><a class="nav-link" href="intro_auto_encoder.html">9.8 Intro to Autoencoders</a></li>
                             </ul>
                         </li>
+
                         <li class="nav-item">
                             <a class="nav-link" href="#section10" onclick="toggleChildChapters(event, 'chapter10')">10 Reinforcement Learning</a>
                             <ul id="chapter10" class="child-chapters" style="display: none;">
                                 <li><a class="nav-link" href="rl_introduction.html">10.1 Introduction RL Problems</a></li>
-                                <li><a class="nav-link" href="dynamic_program.html">10.2 Dynamic Programming</a></li>
-                                <li><a class="nav-link" href="dqn.html">10.3 DQN</a></li>
-                                <li><a class="nav-link" href="ppo.htlm">10.4 PPO</a></li>
-                                <li><a class="nav-link" href="function_appro.html">10.5 Function Approximation</a></li>
+                                <li><a class="nav-link" href="markov_process.html">10.2 Markov Decision Processes</a></li>
+                                <li><a class="nav-link" href="dynamic_program.html">10.3 Dynamic Programming</a></li>
+                                <li><a class="nav-link" href="dqn.html">10.4 DQN</a></li>
+                                <li><a class="nav-link" href="ppo.htlm">10.5 PPO</a></li>
+                                <li><a class="nav-link" href="function_appro.html">10.6 Function Approximation</a></li>
                             </ul>
                         </li>
+
                         <li class="nav-item">
                             <a class="nav-link" href="#section11" onclick="toggleChildChapters(event, 'chapter11')">11 Extending PyTorch</a>
                             <ul id="chapter11" class="child-chapters" style="display: none;">
@@ -133,6 +137,7 @@
                                 <li><a class="nav-link" href="dispatcher.html">11.4 Dispatcher</a></li>
                             </ul>
                         </li>
+
                         <li class="nav-item">
                             <a class="nav-link" href="#section12" onclick="toggleChildChapters(event, 'chapter12')">12 Deploying Models</a>
                             <ul id="chapter12" class="child-chapters" style="display: none;">
@@ -143,6 +148,7 @@
                                 <li><a class="nav-link" href="tensorflow_js.html">12.5 TensorFlow.js</a></li>
                             </ul>
                         </li>
+
                         <li class="nav-item">
                             <a class="nav-link" href="#section13" onclick="toggleChildChapters(event, 'chapter13')">13 Model Optimization</a>
                             <ul id="chapter13" class="child-chapters" style="display: none;">
@@ -152,6 +158,7 @@
                                 <li><a class="nav-link" href="distillation.html">13.4 Distillation</a></li>
                             </ul>
                         </li>
+
                         <li class="nav-item">
                             <a class="nav-link" href="#section14" onclick="toggleChildChapters(event, 'chapter14')">14 Distributed Training</a>
                             <ul id="chapter14" class="child-chapters" style="display: none;">
@@ -163,16 +170,18 @@
                                 <li><a class="nav-link" href="remote_call.html">14.6 Remote Procedure Call</a></li>
                             </ul>
                         </li>
+
                         <li class="nav-item">
                             <a class="nav-link" href="#section15" onclick="toggleChildChapters(event, 'chapter15')">15 Graph Netural Network</a>
+                            <ul id="chapter15" class="child-chapters" style="display: none;">
+                                <li><a class="nav-link" href="graph_foundation.html">15.1 Graph Foundation</a></li>
+                                <li><a class="nav-link" href="core_idea.html">15.2 Core Ideas</a></li>
+                                <li><a class="nav-link" href="mainstream_model.html">15.3 Mainstream Models</a></li>
+                                <li><a class="nav-link" href="common_task.html">15.4 Common Tasks</a></li>
+                                <li><a class="nav-link" href="advanced_topic.html">15.5 Advanced Topics</a></li>
+                            </ul>
                         </li>
-                        <ul id="chapter15" class="child-chapters" style="display: none;">
-                            <li><a class="nav-link" href="graph_foundation.html">15.1 Graph Foundation</a></li>
-                            <li><a class="nav-link" href="core_idea.html">15.2 Core Ideas</a></li>
-                            <li><a class="nav-link" href="mainstream_model.html">15.3 Mainstream Models</a></li>
-                            <li><a class="nav-link" href="common_task.html">15.4 Common Tasks</a></li>
-                            <li><a class="nav-link" href="advanced_topic.html">15.5 Advanced Topics</a></li>
-                        </ul>
+
                     </ul>
                 </nav>
 
@@ -353,9 +362,11 @@
                         <h2>05 Transformer</h2>
                         <p>The transformer is a deep learning architecture that was developed by researchers at Google and is based on the multi-head attention mechanism, which was proposed in the 2017 paper <a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a>.</p>
                         <img src="res/00/transformer_arch.png" alt="Transformer Architecture" width="400">
+
                         <h3 id="section5-sub1">
                             <a href="attention_mechanism.html" style="color: inherit;">5.1 Attention Mechanism</a>
                         </h3>
+                        <p>Mathematically speaking, an attention mechanism computes attention weights that reflect the relative importance of each part of an input sequence to the task at hand.</p>
                         <p><a href="https://www.ibm.com/think/topics/attention-mechanism">What is an attention mechanism?</a></p>
                         <p><a href="https://d2l.ai/chapter_attention-mechanisms-and-transformers/index.html">Attention Mechanisms and Transformers</a></p>
 
@@ -533,28 +544,37 @@
                         <h2>10 Reinforcement Learning</h2>
                         <p><a href="https://github.com/dennybritz/reinforcement-learning">Implementation of Reinforcement Learning Algorithms</a></p>
 
-                        <p><a href="https://www.andrew.cmu.edu/course/10-703/textbook/BartoSutton.pdf">Reinforcement Learnin: An Introductiong</a></p>
+                        <p><a href="https://www.andrew.cmu.edu/course/10-703/textbook/BartoSutton.pdf">Reinforcement Learning: An Introductiong</a></p>
                         <p><a href="https://davidstarsilver.wordpress.com/teaching/">David Silver's Reinforcement Learning</a></p>
                         
                         <h3 id="section10-sub1">
-                            <a href="rl_introduction.html" style="color: inherit;">10.1 Introduction RL Problems</a>
+                            <a href="rl_introduction.html" style="color: inherit;">10.1 Introduction of RL</a>
                         </h3>
                         <p><a href="http://incompleteideas.net/book/RLbook2018.pdf">Reinforcement Learning: An Introduction (2nd Edition)</a></p>
-                        <h3 id="section10-sub2">
-                            <a href="dynamic_program.html" style="color: inherit;">10.2 Dynamic Programming</a>
+                        
+                        <h3 id="section10-sub1=2">
+                            <a href="markov_process.html" style="color: inherit;">10.2 Markov Decision Processes</a>
                         </h3>
+                        
+                        
                         <h3 id="section10-sub3">
-                            <a href="dqn.html" style="color: inherit;">10.3 DQN</a>
+                            <a href="dynamic_program.html" style="color: inherit;">10.3 Dynamic Programming</a>
+                        </h3>
+
+                        <h3 id="section10-sub4">
+                            <a href="dqn.html" style="color: inherit;">10.4 DQN</a>
                         </h3>
                         <p>This tutorial shows how to use PyTorch to train a Deep Q Learning (DQN) agent on the CartPole-v1 task from Gymnasium.</p>
                         <p><a href="https://docs.pytorch.org/tutorials/intermediate/reinforcement_q_learning.html">Reinforcement Learning (DQN) Tutorial</a></p>
-                        <h3 id="section10-sub4">
-                            <a href="ppo.html" style="color: inherit;">10.4 PPO</a>
+
+                        <h3 id="section10-sub5">
+                            <a href="ppo.html" style="color: inherit;">10.5 PPO</a>
                         </h3>
                         <p>This tutorial demonstrates how to use PyTorch and torchrl to train a parametric policy network to solve the Inverted Pendulum task from the OpenAI-Gym/Farama-Gymnasium control library.</p>
                         <p><a href="https://docs.pytorch.org/tutorials/intermediate/reinforcement_ppo.html">Reinforcement Learning (PPO) with TorchRL Tutorial</a></p>
-                        <h3 id="section10-sub5">
-                            <a href="function_appro.html" style="color: inherit;">10.5 Function Approximation</a>
+
+                        <h3 id="section10-sub6">
+                            <a href="function_appro.html" style="color: inherit;">10.6 Function Approximation</a>
                         </h3>
                     </section>
 

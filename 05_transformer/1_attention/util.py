@@ -44,10 +44,11 @@ def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(5, 5), cmap='v
             fig.colorbar(im, ax=ax)
     pyplot.tight_layout()
     pyplot.show()
-    
-print(masked_softmax(torch.rand(2, 2, 4), torch.tensor([2, 3])))
-print(masked_softmax(torch.rand(2, 2, 4), torch.tensor([[1, 3], [2, 4]])))
 
-Q = torch.ones((2, 3, 4))
-K = torch.ones((2, 4, 6))
-assert torch.bmm(Q, K).shape == (2, 3, 6)
+if __name__ == '__main__':
+    print(masked_softmax(torch.rand(2, 2, 4), torch.tensor([2, 3])))
+    print(masked_softmax(torch.rand(2, 2, 4), torch.tensor([[1, 3], [2, 4]])))
+
+    Q = torch.ones((2, 3, 4))
+    K = torch.ones((2, 4, 6))
+    assert torch.bmm(Q, K).shape == (2, 3, 6)
