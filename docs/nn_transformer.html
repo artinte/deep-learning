@@ -136,6 +136,9 @@ torch.Size([32, 26])</samp></pre>
 
                 <h3>5.4.2 nn.Transformer API</h3>
 
+                <p>This section builds a Transformer model using PyTorch's nn.Transformer for sequence-to-sequence tasks. It defines embeddings, encoder-decoder layers, and output projection. Training employs teacher forcing, loss masking, and gradient clipping. Finally, inference generates translations by feeding target sequences and decoding predictions from model outputs.</p>
+
+                <h4>5.4.2.1 Make Transformer Model</h4>
                 <p>This TransformerModel class defines a standard sequence-to-sequence Transformer architecture using PyTorch's nn.Transformer module. It initializes with:</p>
                 <ul>
                     <li><p>src_emb and trg_emb: Embedding layers to convert input source and target token IDs into dense vector representations (emb_size).</p></li>
@@ -185,6 +188,8 @@ criterion.to(device)
 
 EPOCHS = 40
 CLIP = 1.0  # Gradient clipping</code></pre>
+
+                <h4>5.4.2.2 Training nn.Transformer</h4>
                 
                 <pre><code>def train(model, iterator, optimizer, criterion, clip):
     model.train()
@@ -285,6 +290,8 @@ Epoch 37 | Train Loss: 0.366 | Validation Loss: 1.540
 Epoch 38 | Train Loss: 0.356 | Validation Loss: 1.560
 Epoch 39 | Train Loss: 0.350 | Validation Loss: 1.573
 Epoch 40 | Train Loss: 0.343 | Validation Loss: 1.563</samp></pre>
+
+                <h4>5.4.2.3 Translation Inference</h4>
 
                 <pre><code>def translate_one_batch(model, iterator, SRC, TRG):
     model.eval()

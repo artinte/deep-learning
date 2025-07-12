@@ -1,4 +1,12 @@
+import torch
+import pathlib
+import sys
+import time
 
+project_root = pathlib.Path(__file__).resolve().parents[1]
+sys.path.append(str(project_root))
+
+from common import make_model, subsequent_mask
 
 def inference_test():
     test_model = make_model(11, 11, 2)
@@ -120,13 +128,13 @@ def rate(step, model_size, factor, warmup):
         model_size ** (-0.5) * min(step ** (-0.5), step * warmup ** (-1.5))
     )
 
-class LabelSmoothing(nn.Module):
+class LabelSmoothing(torch.nn.Module):
     """
     Implement label smoothing.
     """
     def __init__(self, size, padding_idx, smoothing=0.0):
         super(LabelSmoothing, self).__init__()
-        self.criterion = nn.KLDivLoss(reduction="sum")
+        self.criterion = torch.nn.KLDivLoss(reduction="sum")
         self.padding_idx = padding_idx
         self.confidence = 1.0 - smoothing
         self.smoothing = smoothing
@@ -220,7 +228,7 @@ def example_simple_model():
     )
     
     batch_size = 80
-    for epoch in range(20):
+    for _ in range(20):
         model.train()
         run_epoch(data_gen(V, batch_size, 20),
                   model,
