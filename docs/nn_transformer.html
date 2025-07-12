@@ -140,7 +140,7 @@ torch.Size([32, 26])</samp></pre>
 
                 <h4>5.4.2.1 Make Transformer Model</h4>
                 <p>This TransformerModel class defines a standard sequence-to-sequence Transformer architecture using PyTorch's nn.Transformer module. It initializes with:</p>
-                <ul>
+                <ul class="with-bullets">
                     <li><p>src_emb and trg_emb: Embedding layers to convert input source and target token IDs into dense vector representations (emb_size).</p></li>
                     <li><p>transformer: The core nn.Transformer module, consisting of stacked encoder and decoder layers. Key parameters like d_model (embedding dimension), nhead (attention heads), nlayers (number of layers), dim_feedforward (hidden dimension of feedforward networks), and dropout are configurable.</p></li>
                     <li><p>fc_out: A final linear layer to project the Transformer's output back to the size of the target vocabulary (trg_vocab_size), producing logits for word prediction.</p></li>

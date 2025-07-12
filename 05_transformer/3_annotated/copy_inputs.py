@@ -7,6 +7,7 @@ project_root = pathlib.Path(__file__).resolve().parents[1]
 sys.path.append(str(project_root))
 
 from common import make_model, subsequent_mask
+from common import LabelSmoothing
 
 def inference_test():
     test_model = make_model(11, 11, 2)
@@ -128,30 +129,6 @@ def rate(step, model_size, factor, warmup):
         model_size ** (-0.5) * min(step ** (-0.5), step * warmup ** (-1.5))
     )
 
-class LabelSmoothing(torch.nn.Module):
-    """
-    Implement label smoothing.
-    """
-    def __init__(self, size, padding_idx, smoothing=0.0):
-        super(LabelSmoothing, self).__init__()
-        self.criterion = torch.nn.KLDivLoss(reduction="sum")
-        self.padding_idx = padding_idx
-        self.confidence = 1.0 - smoothing
-        self.smoothing = smoothing
-        self.size = size
-        self.true_dist = None
-
-    def forward(self, x, target):
-        assert x.size(1) == self.size
-        true_dist = x.data.clone()
-        true_dist.fill_(self.smoothing / (self.size - 2))
-        true_dist.scatter_(1, target.data.unsqueeze(1), self.confidence)
-        true_dist[:, self.padding_idx] = 0
-        mask = torch.nonzero(target.data == self.padding_idx)
-        if mask.dim() > 0:
-            true_dist.index_fill_(0, mask.squeeze(), 0.0)
-        self.true_dist = true_dist
-        return self.criterion(x, true_dist.clone().detach())
     
 # The data_gen function generates an input and target that are identical.
 def data_gen(V, batch_size, nbatches):
