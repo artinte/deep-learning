@@ -461,20 +461,53 @@ Prediction: three men are walking up walking .
 Reference: three men are walking up hill . &lt;eos&gt;
 --------------------------------------------------</samp></pre>
 
-                <h3>5.4.4 Part 3: A Real World Example</h3>
-                <p>Now we consider a real-world example using the Multi30k German-English Translation task. This task is much smaller than the WMT task considered in the paper, but it illustrates the whole system. We also show how to use multi-gpu processing to make it really fast.</p>
-                
-                <h4>5.4.4.1 Data Loading</h4>
-                <p>We will load the dataset using torchtext and spacy for tokenization.</p>
-                <p>Batching matters a ton for speed. We want to have very evenly divided batches, with absolutely minimal padding. To do this we have to hack a bit around the default torchtext batching. This code patches their default batching to make sure we search over enough sentences to find tight batches.</p>
-                <h4>5.4.4.2 Iterators</h4>
-                <h4>5.4.4.3 Training the System</h4>
-                <p>Once trained we can decode the model to produce a set of translations. Here we simply translate the first sentence in the validation set. This dataset is pretty small so the translations with greedy search are reasonably accurate.</p>
+                <h3>5.4.3 Transformer from Scratch</h3>
 
-                <h3>5.4.5 Additional Components: BPE, Search, Averaging</h3>
-                
+                <pre><samp>Epoch 1 | Train Loss: 4.187 | Validation Loss: 3.352
+Epoch 2 | Train Loss: 3.199 | Validation Loss: 2.923
+Epoch 3 | Train Loss: 2.832 | Validation Loss: 2.656
+Epoch 4 | Train Loss: 2.580 | Validation Loss: 2.496
+Epoch 5 | Train Loss: 2.384 | Validation Loss: 2.370
+Epoch 6 | Train Loss: 2.220 | Validation Loss: 2.275
+Epoch 7 | Train Loss: 2.078 | Validation Loss: 2.198
+Epoch 8 | Train Loss: 1.950 | Validation Loss: 2.127
+Epoch 9 | Train Loss: 1.837 | Validation Loss: 2.084
+Epoch 10 | Train Loss: 1.733 | Validation Loss: 2.058
+Epoch 11 | Train Loss: 1.636 | Validation Loss: 2.031
+Epoch 12 | Train Loss: 1.548 | Validation Loss: 2.011
+Epoch 13 | Train Loss: 1.461 | Validation Loss: 2.007
+Epoch 14 | Train Loss: 1.382 | Validation Loss: 2.000
+Epoch 15 | Train Loss: 1.307 | Validation Loss: 1.990
+Epoch 16 | Train Loss: 1.234 | Validation Loss: 2.007
+Epoch 17 | Train Loss: 1.163 | Validation Loss: 2.011
+Epoch 18 | Train Loss: 1.099 | Validation Loss: 2.031
+Epoch 19 | Train Loss: 1.037 | Validation Loss: 2.054
+Epoch 20 | Train Loss: 0.978 | Validation Loss: 2.060
+Epoch 21 | Train Loss: 0.922 | Validation Loss: 2.080
+Epoch 22 | Train Loss: 0.869 | Validation Loss: 2.095
+Epoch 23 | Train Loss: 0.822 | Validation Loss: 2.120
+Epoch 24 | Train Loss: 0.775 | Validation Loss: 2.149
+Epoch 25 | Train Loss: 0.733 | Validation Loss: 2.182
+Epoch 26 | Train Loss: 0.691 | Validation Loss: 2.199
+Epoch 27 | Train Loss: 0.654 | Validation Loss: 2.236
+Epoch 28 | Train Loss: 0.617 | Validation Loss: 2.272
+Epoch 29 | Train Loss: 0.584 | Validation Loss: 2.298
+Epoch 30 | Train Loss: 0.553 | Validation Loss: 2.339
+Epoch 31 | Train Loss: 0.524 | Validation Loss: 2.372
+Epoch 32 | Train Loss: 0.497 | Validation Loss: 2.410
+Epoch 33 | Train Loss: 0.472 | Validation Loss: 2.444
+Epoch 34 | Train Loss: 0.450 | Validation Loss: 2.478
+Epoch 35 | Train Loss: 0.428 | Validation Loss: 2.494
+Epoch 36 | Train Loss: 0.407 | Validation Loss: 2.545
+Epoch 37 | Train Loss: 0.387 | Validation Loss: 2.569
+Epoch 38 | Train Loss: 0.370 | Validation Loss: 2.603
+Epoch 39 | Train Loss: 0.353 | Validation Loss: 2.652
+Epoch 40 | Train Loss: 0.338 | Validation Loss: 2.678</samp></pre>
 
-                <h3>5.4.6 Conclusion</h3>
+                <h3>5.4.4 Optimization</h3>
+
+
+                <h3>5.4.5 Conclusion</h3>
 
                 <div class="navigation">
                     <a href="transformer_stratch.html">Prev: 5.3 Transformer from Stratch</a>
