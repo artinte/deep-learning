@@ -136,6 +136,46 @@ torch.Size([32, 26])</samp></pre>
 
                 <h3>5.4.2 nn.Transformer API</h3>
 
+                <p>This TransformerModel class defines a standard sequence-to-sequence Transformer architecture using PyTorch's nn.Transformer module. It initializes with:</p>
+                <ul>
+                    <li><p>src_emb and trg_emb: Embedding layers to convert input source and target token IDs into dense vector representations (emb_size).</p></li>
+                    <li><p>transformer: The core nn.Transformer module, consisting of stacked encoder and decoder layers. Key parameters like d_model (embedding dimension), nhead (attention heads), nlayers (number of layers), dim_feedforward (hidden dimension of feedforward networks), and dropout are configurable.</p></li>
+                    <li><p>fc_out: A final linear layer to project the Transformer's output back to the size of the target vocabulary (trg_vocab_size), producing logits for word prediction.</p></li>
+                </ul>
+
+                <p>The forward method takes embedded source and target sequences, passes them through the transformer, and then applies the final linear layer to get the output logits. This model is commonly used for tasks like neural machine translation.</p>
+
+                <pre><code>class TransformerModel(nn.Module):
+    def __init__(self, src_vocab_size, trg_vocab_size,
+                 emb_size=256, nhead=8, nhid=1024, nlayers=6, dropout=0.1):
+        super(TransformerModel, self).__init__()
+
+        self.src_emb = nn.Embedding(src_vocab_size, emb_size)
+        self.trg_emb = nn.Embedding(trg_vocab_size, emb_size)
+        
+        self.transformer = nn.Transformer(
+            d_model=emb_size,
+            nhead=nhead,
+            num_encoder_layers=nlayers,
+            num_decoder_layers=nlayers,
+            dim_feedforward=nhid,
+            batch_first=True,
+            dropout=dropout,
+        )
+
+        self.fc_out = nn.Linear(emb_size, trg_vocab_size)
+    
+    def forward(self, src, trg):
+        src_emb = self.src_emb(src)
+        trg_emb = self.trg_emb(trg)
+        
+        output = self.transformer(src_emb, trg_emb)
+        
+        return self.fc_out(output)</code></pre>
+
+                <p>The <code>self.fc_out = nn.Linear(emb_size, trg_vocab_size)</code> layer in a Transformer's decoder is the final output layer.</p>
+                <p>It convert the internal representation (of emb_size dimensions) of the generated token from the Transformer decoder into a vector whose size matches the total number of unique words/tokens in the target language's vocabulary (trg_vocab_size).</p>
+                <p>Essentially, it's the layer that translates the model's learned representation of "what word comes next" into concrete predictions over all possible words.</p>
 
                 <h3>5.4.4 Part 3: A Real World Example</h3>
                 <p>Now we consider a real-world example using the Multi30k German-English Translation task. This task is much smaller than the WMT task considered in the paper, but it illustrates the whole system. We also show how to use multi-gpu processing to make it really fast.</p>
