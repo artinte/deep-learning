@@ -22,6 +22,38 @@
                 <p class="title-subtext"></p>
                 <p style="color: #a0a0a0;">Created Date: 2025-07-02</p>
 
+                <p>In section 5.2 we write a simple transformer demo, copy input to output.</p>
+
+                <h3 id="multi30k">5.4.1 Dataset of Multi30k</h3>
+
+                <p>This dataset contains the "multi30k" dataset, which is the "task 1" dataset from <a href="https://www.statmt.org/wmt16/multimodal-task.html">here</a> .</p>
+                <p>Each example consists of an "en" and a "de" feature. "en" is an English sentence, and "de" is the German translation of the English sentence. The Multi30k dataset has 3 splits: train, validation, and test.</p>
+
+                <pre><code>nltk.download('punkt')
+nltk.download('punkt_tab')
+
+dataset = datasets.load_dataset('bentrevett/multi30k')
+print(dataset)
+# {'en': 'Two young, White males are outside near many bushes.',
+# 'de': 'Zwei junge weiße Männer sind im Freien in der Nähe vieler Büsche.'}
+print(dataset['train'][0])</code></pre>
+
+                <pre><samp>DatasetDict({
+    train: Dataset({
+        features: ['en', 'de'],
+        num_rows: 29000
+    })
+    validation: Dataset({
+        features: ['en', 'de'],
+        num_rows: 1014
+    })
+    test: Dataset({
+        features: ['en', 'de'],
+        num_rows: 1000
+    })
+})
+{'en': 'Two young, White males are outside near many bushes.', 'de': 'Zwei junge weiße Männer sind im Freien in der Nähe vieler Büsche.'}</samp></pre>
+
                 <h3>5.4.4 Part 3: A Real World Example</h3>
                 <p>Now we consider a real-world example using the Multi30k German-English Translation task. This task is much smaller than the WMT task considered in the paper, but it illustrates the whole system. We also show how to use multi-gpu processing to make it really fast.</p>
                 

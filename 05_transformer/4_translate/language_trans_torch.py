@@ -1,7 +1,7 @@
 import nltk
 import torch
 from torch import nn, optim
-from datasets import load_dataset
+import datasets
 from torchtext.data import Field, Example, Dataset, BucketIterator
 from nltk.tokenize import word_tokenize
 
@@ -37,7 +37,7 @@ if __name__ == '__main__':
     nltk.download('punkt')
     nltk.download('punkt_tab')
 
-    dataset = load_dataset('bentrevett/multi30k')
+    dataset = datasets.load_dataset('bentrevett/multi30k')
     print(dataset)
     # {'en': 'Two young, White males are outside near many bushes.',
     # 'de': 'Zwei junge weiße Männer sind im Freien in der Nähe vieler Büsche.'}
@@ -195,3 +195,4 @@ if __name__ == '__main__':
     
     translations = translate_one_batch(model, test_iterator, SRC, TRG)
     print_translations(translations)
+ 
