@@ -220,30 +220,6 @@ class Decoder(torch.nn.Module):
         return self.norm(x)
 
 
-class Encoder(torch.nn.Module):
-    def __init__(self, layer, N):
-        super().__init__()
-        self.layers = torch.nn.ModuleList([layer for _ in range(N)])
-        self.norm = torch.nn.LayerNorm(layer.norm1.normalized_shape)
-
-    def forward(self, x, src_mask=None):
-        for layer in self.layers:
-            x = layer(x, src_mask)
-        return self.norm(x)
-
-
-class Decoder(torch.nn.Module):
-    def __init__(self, layer, N):
-        super().__init__()
-        self.layers = torch.nn.ModuleList([layer for _ in range(N)])
-        self.norm = torch.nn.LayerNorm(layer.norm1.normalized_shape)
-
-    def forward(self, x, memory, tgt_mask=None, src_mask=None):
-        for layer in self.layers:
-            x = layer(x, memory, tgt_mask, src_mask)
-        return self.norm(x)
-
-
 class TransformerModel(torch.nn.Module):
     def __init__(
         self,

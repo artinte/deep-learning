@@ -22,7 +22,7 @@
                 <p class="title-subtext"></p>
                 <p style="color: #a0a0a0;">Created Date: 2025-07-02</p>
 
-                <p>In section 5.2 we write a simple transformer demo, copy input to output.</p>
+                <p>In <a href="transformer_stratch.html">section 5.3</a> we write a simple transformer demo, copy input to output. In this tutorial, we will use the <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Transformer.html">torch.nn.Transformer</a> interface to quickly translate German to English and complete the framework of the translation project. Then we will use the handwritten multi-head attention, encoder, decoder, and forward propagation layers to replace the <code>torch.nn.Transformer</code> interface.</p>
 
                 <h3 id="multi30k">5.4.1 Dataset of Multi30k</h3>
 
@@ -54,7 +54,8 @@ print(dataset['train'][0])</code></pre>
 })
 {'en': 'Two young, White males are outside near many bushes.', 'de': 'Zwei junge weiße Männer sind im Freien in der Nähe vieler Büsche.'}</samp></pre>
 
-                <p>We uses the <em>TorchText</em> library to handle the complexities of text processing, such as tokenization, vocabulary building, and batching. Let's break down the code step-by-step:</p>
+                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/4_translate/language_trans_torch.py">language_trans_torch.py</a> uses the <em>TorchText</em> library to handle the complexities of text processing, such as tokenization, vocabulary building, and batching. Let's break down the code step-by-step:</p>
+
                 <p style="margin-left: 2em;">1. Data Loading and Initial Preparation</p>
                 <p>After we get <code>dataset</code> object from Hugging Face's datasets, extracts parallel sentences (German to English in this case) from the 'train', 'validation', and 'test' splits of the dataset.</p>
 
@@ -462,6 +463,8 @@ Reference: three men are walking up hill . &lt;eos&gt;
 --------------------------------------------------</samp></pre>
 
                 <h3>5.4.3 Transformer from Scratch</h3>
+
+                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/4_translate/translate_scratch.py">translate_scratch.py</a></p>
 
                 <pre><samp>Epoch 1 | Train Loss: 4.187 | Validation Loss: 3.352
 Epoch 2 | Train Loss: 3.199 | Validation Loss: 2.923
