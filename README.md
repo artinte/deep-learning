@@ -81,7 +81,7 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 - [ ] 9.5 [DeepFaceLab](https://artinte.github.io/deep-learning/deep_face_lab.html)
 - [ ] 9.6 [DeepFaceLive](https://artinte.github.io/deep-learning/deep_face_live.html)
 - [ ] 9.7 [Segment Anything](https://artinte.github.io/deep-learning/segment_anything.html)
-- [ ] 9.8 [Intro to Autoencoders](https://artinte.github.io/deep-learning/intro_auto_encoder.html)
+- [x] 9.8 [Intro to Autoencoders](https://artinte.github.io/deep-learning/intro_auto_encoder.html)
 
 ### 10 Reinforcement Learning
 
@@ -116,12 +116,11 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 
 ### 14 Distributed Training
 
-- [ ] 14.1 [Distributed Overview](https://artinte.github.io/deep-learning/distrib_overview.html)
-- [ ] 14.2 [Distributed Data Parallel](https://artinte.github.io/deep-learning/distrib_parallel.html)
-- [ ] 14.3 [Fully Sharded Data Parallel](https://artinte.github.io/deep-learning/fully_parallel.html)
-- [ ] 14.4 [Tensor Parallel](https://artinte.github.io/deep-learning/tensor_parallel.html)
-- [ ] 14.5 [Device Mesh](https://artinte.github.io/deep-learning/device_mesh.html)
-- [ ] 14.6 [Remote Procedure Call](https://artinte.github.io/deep-learning/remote_call.html)
+- [ ] 14.1 [Distributed Data Parallel](https://artinte.github.io/deep-learning/distrib_parallel.html)
+- [ ] 14.2 [Fully Sharded Data Parallel](https://artinte.github.io/deep-learning/fully_parallel.html)
+- [ ] 14.3 [Tensor Parallel](https://artinte.github.io/deep-learning/tensor_parallel.html)
+- [ ] 14.4 [Device Mesh](https://artinte.github.io/deep-learning/device_mesh.html)
+- [ ] 14.5 [Remote Procedure Call](https://artinte.github.io/deep-learning/remote_call.html)
 
 ### 15 Graph Netural Network
 

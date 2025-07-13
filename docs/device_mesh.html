@@ -18,35 +18,35 @@
             </nav>
 
             <main class="col-md-8 content">
-                <h2 class="custom-title">14.5 Device Mesh</h2>
+                <h2 class="custom-title">14.4 Device Mesh</h2>
                 <p class="title-subtext">Getting Started with DeviceMesh</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-07-07</p>
 
                 <p>Setting up distributed communicators, i.e. NVIDIA Collective Communication Library (NCCL) communicators, for distributed training can pose a significant challenge. For workloads where users need to compose different parallelisms, users would need to manually set up and manage NCCL communicators (for example, ProcessGroup) for each parallelism solution. This process could be complicated and susceptible to errors. DeviceMesh can simplify this process, making it more manageable and less prone to errors.</p>
 
-                <h3>14.5.1 What is DeviceMesh</h3>
+                <h3>14.4.1 What is DeviceMesh</h3>
                 <p>DeviceMesh is a higher level abstraction that manages ProcessGroup. It allows users to effortlessly create inter-node and intra-node process groups without worrying about how to set up ranks correctly for different sub process groups. Users can also easily manage the underlying process_groups/devices for multi-dimensional parallelism via DeviceMesh.</p>
 
-                <h3>14.5.2 Why DeviceMesh is Useful</h3>
+                <h3>14.4.2 Why DeviceMesh is Useful</h3>
                 <p>DeviceMesh is useful when working with multi-dimensional parallelism (i.e. 3-D parallel) where parallelism composability is required. For example, when your parallelism solutions require both communication across hosts and within each host. The image above shows that we can create a 2D mesh that connects the devices within each host, and connects each device with its counterpart on the other hosts in a homogeneous setup.</p>
 
                 <p>Without DeviceMesh, users would need to manually set up NCCL communicators, cuda devices on each process before applying any parallelism, which could be quite complicated. The following code snippet illustrates a hybrid sharding 2-D Parallel pattern setup without DeviceMesh. First, we need to manually calculate the shard group and replicate group. Then, we need to assign the correct shard and replicate group to each rank.</p>
 
                 
-                <h3>14.5.3 How to use DeviceMesh with HSDP</h3>
+                <h3>14.4.3 How to use DeviceMesh with HSDP</h3>
 
                 <p>Hybrid Sharding Data Parallel(HSDP) is 2D strategy to perform FSDP within a host and DDP across hosts.</p>
 
-                <h3>14.5.4 How to Use DeviceMesh for Your Custom Parallel Solutions</h3>
+                <h3>14.4.4 How to Use DeviceMesh for Your Custom Parallel Solutions</h3>
 
                 <p>When working with large scale training, you might have more complex custom parallel training composition. For example, you may need to slice out sub-meshes for different parallelism solutions. DeviceMesh allows users to slice child mesh from the parent mesh and re-use the NCCL communicators already created when the parent mesh is initialized.</p>
 
-                <h3>14.5.5 Conclusion</h3>
+                <h3>14.4.5 Conclusion</h3>
                 <p>In conclusion, we have learned about DeviceMesh and init_device_mesh(), as well as how they can be used to describe the layout of devices across the cluster.</p>
                 
                 <div class="navigation">
-                    <a href="tensor_parallel.html">Prev: 14.4 Tensor Parallel</a>
-                    <a href="remote_call.html">Next: 14.6 Remote Procedure Call</a>
+                    <a href="tensor_parallel.html">Prev: 14.3 Tensor Parallel</a>
+                    <a href="remote_call.html">Next: 14.5 Remote Procedure Call</a>
                 </div>
             </main>
 
