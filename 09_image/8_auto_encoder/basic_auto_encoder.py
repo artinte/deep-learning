@@ -15,7 +15,7 @@ test_set = torchvision.datasets.FashionMNIST(
 test_loader = torch.utils.data.DataLoader(test_set, batch_size=64, shuffle=False)
 
 images, labels = next(iter(train_loader))
-print(images.shape)
+print('Input', images.shape)
 print(labels.shape)
 
 
@@ -53,7 +53,7 @@ autoencoder = AutoEncoder(latent_dim, train_set[0][0].shape).to(device)
 
 sample_input, _ = next(iter(test_loader))
 output = autoencoder.forward(sample_input.to(device))
-print(output.shape)
+print('Output', output.shape)
 
 
 criterion = torch.nn.MSELoss()

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Web Profile</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      scroll-behavior: smooth;
+      background: #f5f7fa;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      background-color: #333;
+      padding: 10px 20px;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    header nav a {
+      color: #fff;
+      text-decoration: none;
+      margin: 0 10px;
+      font-weight: bold;
+    }
+
+    header nav a:hover {
+      text-decoration: underline;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 60px 20px;
+      background: linear-gradient(135deg, #4caf50, #2e7d32);
+      color: white;
+    }
+
+    .hero img {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        object-fit: cover;
+        object-position: center;
+        display: block;
+        margin: 0 auto;
+        border: 4px solid white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .hero h1 {
+      margin-top: 15px;
+      font-size: 32px;
+    }
+
+    .section {
+      padding: 40px 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .section h2 {
+      color: #333;
+      border-bottom: 2px solid #4caf50;
+      padding-bottom: 6px;
+      margin-bottom: 20px;
+    }
+
+    .about p {
+      line-height: 1.6;
+      color: #444;
+    }
+
+    .skills .skill {
+      margin-bottom: 15px;
+    }
+
+    .skills .label {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .skills .bar {
+      background-color: #e0e0e0;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .skills .bar-fill {
+      height: 12px;
+      background-color: #4caf50;
+      width: 0;
+      transition: width 1s ease-out;
+    }
+
+    .contact p, .contact a {
+      color: #333;
+      font-size: 16px;
+    }
+
+    .social-icons {
+      margin-top: 10px;
+    }
+
+    .social-icons a {
+      text-decoration: none;
+      margin-right: 10px;
+      font-size: 20px;
+      color: #4caf50;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #eee;
+      color: #666;
+      margin-top: 40px;
+    }
+
+    @media (max-width: 600px) {
+      .hero h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div><strong>Luke Bell</strong></div>
+  <nav>
+    <a href="#about">About</a>
+    <a href="#skills">Skills</a>
+    <a href="#contact">Contact</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <img src="profile.jpg" alt="Profile Picture" />
+  <h1>Luke Bell</h1>
+  <p>Full-Stack Developer | AI Researcher | Creator</p>
+</section>
+
+<section class="section about" id="about">
+  <h2>About Me</h2>
+  <p>
+    I am a software developer with a focus on building scalable full-stack applications and AI-powered tools.
+    I enjoy designing clean UI/UX and optimizing backend performance. In my spare time, I contribute to open-source
+    and mentor junior developers.
+  </p>
+</section>
+
+<section class="section skills" id="skills">
+  <h2>Skills</h2>
+
+  <div class="skill">
+    <div class="label">Python</div>
+    <div class="bar"><div class="bar-fill" style="width: 90%;"></div></div>
+  </div>
+
+  <div class="skill">
+    <div class="label">JavaScript / React</div>
+    <div class="bar"><div class="bar-fill" style="width: 85%;"></div></div>
+  </div>
+
+  <div class="skill">
+    <div class="label">Node.js</div>
+    <div class="bar"><div class="bar-fill" style="width: 80%;"></div></div>
+  </div>
+
+  <div class="skill">
+    <div class="label">Docker / Kubernetes</div>
+    <div class="bar"><div class="bar-fill" style="width: 75%;"></div></div>
+  </div>
+
+  <div class="skill">
+    <div class="label">Machine Learning</div>
+    <div class="bar"><div class="bar-fill" style="width: 70%;"></div></div>
+  </div>
+</section>
+
+<section class="section contact" id="contact">
+  <h2>Contact</h2>
+  <p>Email: <a href="wangrl2016@gmail.com">wangrl2016@gmail.com</a></p>
+  <p>YouTube: <a href="https://www.youtube.com/@lukebellell" target="_blank">Luke Bell</a></p>
+  <p>GitHub: <a href="https://github.com/artinte" target="_blank">github.com/artinte</a></p>
+
+  <div class="social-icons">
+    <a href="https://github.com/artinte" target="_blank">💻</a>
+  </div>
+</section>
+
+<footer>
+  &copy; 2025 Luke Bell. All rights reserved.
+</footer>
+
+</body>
+</html>

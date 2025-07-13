@@ -137,3 +137,12 @@ pyplot.plot(decoded_data[0], 'r')
 pyplot.fill_between(numpy.arange(140), decoded_data[0], normal_test_data[0], color='lightcoral')
 pyplot.legend(labels=['Input', 'Reconstruction', 'Error'])
 pyplot.show()
+
+encoded_data = autoencoder.encoder(anomalous_test_data.to(device))
+decoded_data = autoencoder.decoder(encoded_data).detach().cpu().numpy()
+
+pyplot.plot(anomalous_test_data[0], 'b')
+pyplot.plot(decoded_data[0], 'r')
+pyplot.fill_between(numpy.arange(140), decoded_data[0], anomalous_test_data[0], color='lightcoral')
+pyplot.legend(labels=["Input", "Reconstruction", "Error"])
+pyplot.show()

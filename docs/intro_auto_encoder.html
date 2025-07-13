@@ -21,8 +21,8 @@
                 <h2 class="custom-title">9.8 Intro to Autoencoders</h2>
                 <p class="title-subtext"></p>
                 <p style="color: #a0a0a0;">Created Date: 2025-06-16</p>
-                <p>This tutorial introduces autoencoders with three examples: the basics, image denoising, and anomaly detection.</p>
-                <p>An <strong>autoencoder</strong> is a special type of neural network that is trained to copy its input to its output. For example, given an image of a handwritten digit, an autoencoder first encodes the image into a lower dimensional latent representation, then decodes the latent representation back to an image. An autoencoder learns to compress the data while minimizing the reconstruction error.</p>
+                <p>This tutorial introduces autoencoders with three examples: the basics, image denoising, and anomaly detection, and demonstrates how to train a <strong>Variational Autoencoder (VAE)</strong> on the MNIST dataset. </p>
+                <p>An <strong>autoencoder</strong> is a special type of neural network that is trained to copy its input to its output. For example, given an image of a handwritten digit, an autoencoder first encodes the image into a lower dimensional <em>latent representation</em>, then decodes the latent representation back to an image. An autoencoder learns to compress the data while minimizing the reconstruction error.</p>
 
                 <p>To start, you will train the basic autoencoder using the Fashion MNIST dataset. Each image in this dataset is \(28 \times 28\) pixels:</p>
                 <pre><code>transform = torchvision.transforms.Compose([torchvision.transforms.ToTensor()])
@@ -158,7 +158,7 @@ pyplot.show()</code></pre>
                 <h3>9.8.2 Second example: Image denoising</h3>
                 <p>An autoencoder can also be trained to remove noise from images. In the following section, you will create a noisy version of the Fashion MNIST dataset by applying random noise to each image. You will then train an autoencoder using the noisy image as input, and the original image as the target.</p>
 
-                <p>Let's reimport the dataset to omit the modifications made earlier. Adding random noise to the images:</p>
+                <p><a href="https://github.com/artinte/deep-learning/blob/develop/09_image/8_auto_encoder/image_denoising.py">image_denoising.py</a> reimport the dataset to omit the modifications made earlier. Adding random noise to the images:</p>
                 
                 <pre><code>sample_images, sample_labels = next(iter(train_loader))
 print(sample_images.shape)
@@ -250,20 +250,180 @@ Estimated Total Size (MB): 0.07
 
                 <p>Plotting both the noisy images and the denoised images produced by the autoencoder.</p>
                 <img src="res/09/denoising_output.png" alt="Denoising Comparison" width="600">
-                <p style="text-align: center; color: #555555;">Figure 3 - Denosiing Comparison</p>
+                <p style="text-align: center; color: #555555;">Figure 3 - Denosing Comparison</p>
 
                 <h3>9.8.3 Third example: Anomaly detection</h3>
-                <p>In this example, you will train an autoencoder to detect anomalies on the <a href="https://www.timeseriesclassification.com/description.php?Dataset=ECG5000">ECG5000</a> dataset. This dataset contains 5,000 Electrocardiograms, each with 140 data points. You will use a simplified version of the dataset, where each example has been labeled either 0 (corresponding to an abnormal rhythm), or 1 (corresponding to a normal rhythm). You are interested in identifying the abnormal rhythms.</p>
+                <p>In this example, you will train an autoencoder to detect anomalies on the <a href="https://www.timeseriesclassification.com/description.php?Dataset=ECG5000">ECG5000</a> dataset. This dataset contains 5,000 Electrocardiograms, each with 140 data points. We will use a simplified version of the dataset, where each example has been labeled either 0 (corresponding to an abnormal rhythm), or 1 (corresponding to a normal rhythm). You are interested in identifying the abnormal rhythms.</p>
                 
                 <p class="comment">Note: This is a labeled dataset, so you could phrase this as a supervised learning problem. The goal of this example is to illustrate anomaly detection concepts you can apply to larger datasets, where you do not have labels available (for example, if you had many thousands of normal rhythms, and only a small number of abnormal rhythms).</p>
                 
-                <p>How will you detect anomalies using an autoencoder? Recall that an autoencoder is trained to minimize reconstruction error. You will train an autoencoder on the normal rhythms only, then use it to reconstruct all the data. Our hypothesis is that the abnormal rhythms will have higher reconstruction error. You will then classify a rhythm as an anomaly if the reconstruction error surpasses a fixed threshold.</p>
+                <p>How will we detect anomalies using an autoencoder? Recall that an autoencoder is trained to minimize reconstruction error. You will train an autoencoder on the normal rhythms only, then use it to reconstruct all the data. Our hypothesis is that the abnormal rhythms will have higher reconstruction error. You will then classify a rhythm as an anomaly if the reconstruction error surpasses a fixed threshold.</p>
+
+                <p>The dataset we will use is based on one from <a href="https://www.timeseriesclassification.com/description.php?Dataset=ECG5000">timeseriesclassification.com</a> .</p>
+                <pre><code>url = r"https://github.com/artinte/tiny-datasets/raw/refs/heads/develop/ecg.csv"
+
+# Download the dataset
+dataframe = pandas.read_csv(url)
+raw_data = dataframe.values
+dataframe.head()
+
+print(raw_data.shape)</code></pre>
+
+                <pre><samp>(4997, 141)</samp></pre>
+
+                <p>We need preprocess the data, normalize the data to \([0,1]\) , will train the autoencoder using only the normal rhythms, which are labeled in this dataset as 1. Separate the normal rhythms from the abnormal rhythms.</p>
+                <pre><code># The last element contains the labels
+labels = raw_data[:, -1]
+# The other data points are the electrocadriogram data
+data = raw_data[:, 0:-1]
+
+train_data, test_data, train_labels, test_labels = (
+    sklearn.model_selection.train_test_split(
+        data, labels, test_size=0.2, random_state=21
+    )
+)
+
+train_data = torch.from_numpy(train_data)
+test_data = torch.from_numpy(test_data)
+
+# normalize the data to [0, 1]
+min_val = torch.min(train_data)
+max_val = torch.max(train_data)
+
+train_data = (train_data - min_val) / (max_val - min_val)
+test_data = (test_data - min_val) / (max_val - min_val)
+
+train_data = train_data.to(torch.float32)
+test_data = test_data.to(torch.float32)
+
+train_labels = train_labels.astype(bool)
+test_labels = test_labels.astype(bool)
+
+normal_train_data = train_data[train_labels]
+normal_test_data = test_data[test_labels]
+
+anomalous_train_data = train_data[~train_labels]
+anomalous_test_data = test_data[~test_labels]
+
+train_labels = torch.tensor(train_labels)
+test_labels = torch.tensor(test_labels)
+
+train_dataset = torch.utils.data.TensorDataset(train_data, train_labels)
+test_dataset = torch.utils.data.TensorDataset(test_data, test_labels)
+
+train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=64, shuffle=True)
+test_loader = torch.utils.data.DataLoader(train_dataset, batch_size=64, shuffle=False)</code></pre>
+
+                <p>Plot a normal ECG:</p>
+                <pre><code>input_dims = 140
+
+pyplot.grid()
+pyplot.plot(numpy.arange(input_dims), normal_train_data[0])
+pyplot.title("A Normal ECG")
+pyplot.show()</code></pre>
                 
                 <img src="res/09/normal_ecg.png" alt="A Normal ECG" width="600">
                 <p style="text-align: center; color: #555555;">Figure 4 - A Normal ECG</p>
 
+                <p>Plot an anomalous ECG:</p>
+                <pre><code>pyplot.grid()
+pyplot.plot(numpy.arange(input_dims), anomalous_train_data[0])
+pyplot.title("An Anomalous ECG")
+pyplot.show()</code></pre>
+
                 <img src="res/09/anomalous_ecg.png" alt="An Anomalous ECG" width="600">
                 <p style="text-align: center; color: #555555;">Figure 5 - An Anomalous ECG</p>
+
+                <p>Build the model:</p>
+                <pre><code>class AnomalyDetector(torch.nn.Module):
+    def __init__(self, input_dim):
+        super().__init__()
+        self.encoder = torch.nn.Sequential(
+            torch.nn.Linear(input_dim, 32),
+            torch.nn.ReLU(),
+            torch.nn.Linear(32, 16),
+            torch.nn.ReLU(),
+            torch.nn.Linear(16, 8),
+            torch.nn.ReLU(),
+        )
+        self.decoder = torch.nn.Sequential(
+            torch.nn.Linear(8, 16),
+            torch.nn.ReLU(),
+            torch.nn.Linear(16, 32),
+            torch.nn.ReLU(),
+            torch.nn.Linear(32, 140),
+            torch.nn.Sigmoid(),
+        )
+
+    def forward(self, x):
+        encoded = self.encoder(x)
+        decoded = self.decoder(encoded)
+        return decoded
+
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+autoencoder = AnomalyDetector(input_dims).to(device)
+optimizer = torch.optim.Adam(autoencoder.parameters(), lr=1e-3)
+criterion = torch.nn.L1Loss()
+
+train_history = []
+val_history = []
+for epoch in range(10):
+    autoencoder.train()
+    total_loss = 0
+    for data, labels in train_loader:
+        data = data.to(device)
+        outputs = autoencoder.forward(data)
+        loss = criterion(outputs, data)
+
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+        total_loss += loss.item()
+        
+    autoencoder.eval()
+    val_loss = 0
+    with torch.no_grad():
+        for data, labels in test_loader:
+            data = data.to(device)
+            outputs = autoencoder.forward(data)
+            loss = criterion(outputs, data)
+            val_loss += loss.item()
+
+    print(f"Epoch [{epoch+1}/10], train loss: {total_loss / len(train_loader):.4f}, val loss: {val_loss / len(test_loader):.4f}")</code></pre>
+
+                <p>Notice that the autoencoder is trained using only the normal ECGs, but is evaluated using the full test set.</p>
+
+                <p>We will soon classify an ECG as anomalous if the reconstruction error is greater than one standard deviation from the normal training examples. First, let's plot a normal ECG from the training set, the reconstruction after it's encoded and decoded by the autoencoder, and the reconstruction error.</p>
+                <pre><code>encoded_data = autoencoder.encoder(normal_test_data.to(device))
+decoded_data = autoencoder.decoder(encoded_data).detach().cpu().numpy()
+
+pyplot.plot(normal_test_data[0], 'b')
+pyplot.plot(decoded_data[0], 'r')
+pyplot.fill_between(numpy.arange(140), decoded_data[0], normal_test_data[0], color='lightcoral')
+pyplot.legend(labels=['Input', 'Reconstruction', 'Error'])
+pyplot.show()</code></pre>
+                
+                <p>Create a similar plot, this time for an anomalous test example:</p>
+                <pre><code>encoded_data = autoencoder.encoder(anomalous_test_data.to(device))
+decoded_data = autoencoder.decoder(encoded_data).detach().cpu().numpy()
+
+pyplot.plot(anomalous_test_data[0], 'b')
+pyplot.plot(decoded_data[0], 'r')
+pyplot.fill_between(numpy.arange(140), decoded_data[0], anomalous_test_data[0], color='lightcoral')
+pyplot.legend(labels=["Input", "Reconstruction", "Error"])
+pyplot.show()</code></pre>
+
+                <p>Detect anomalies by calculating whether the reconstruction loss is greater than a fixed threshold. In this tutorial, you will calculate the mean average error for normal examples from the training set, then classify future examples as anomalous if the reconstruction error is higher than one standard deviation from the training set.</p>
+                <p>Plot the reconstruction error on normal ECGs from the training set:</p>
+
+                <p>Choose a threshold value that is one standard deviations above the mean.</p>
+
+                <p>If you examine the reconstruction error for the anomalous examples in the test set, you'll notice most have greater reconstruction error than the threshold. By varing the threshold, you can adjust the precision and recall of your classifier.</p>
+
+                <p>Classify an ECG as an anomaly if the reconstruction error is greater than the threshold.</p>
 
                 <div class="navigation">
                     <a href="segment_anything.html">9.7 Segment Anything</a>
