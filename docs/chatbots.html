@@ -72,6 +72,33 @@
 
                 <p>Sutskever et al. discovered that by using two separate recurrent neural nets together, we can accomplish this task. One RNN acts as an encoder, which encodes a variable length input sequence to a fixed-length context vector. In theory, this context vector (the final hidden layer of the RNN) will contain semantic information about the query sentence that is input to the bot. The second RNN is a decoder, which takes an input word and the context vector, and returns a guess for the next word in the sequence and a hidden state to use in the next iteration.</p>
 
+                <h4>7.4.2.1 Encoder</h4>
+                <p>The encoder RNN iterates through the input sentence one token (e.g. word) at a time, at each time step outputting an “output” vector and a “hidden state” vector. The hidden state vector is then passed to the next time step, while the output vector is recorded. The encoder transforms the context it saw at each point in the sequence into a set of points in a high-dimensional space, which the decoder will use to generate a meaningful output for the given task.</p>
+                <p>At the heart of our encoder is a multi-layered Gated Recurrent Unit, invented by Cho et al. in 2014. We will use a bidirectional variant of the GRU, meaning that there are essentially two independent RNNs: one that is fed the input sequence in normal sequential order, and one that is fed the input sequence in reverse order. The outputs of each network are summed at each time step. Using a bidirectional GRU will give us the advantage of encoding both past and future contexts.</p>
+
+                <p>Bidirectional RNN:</p>
+
+                <p>Note that an embedding layer is used to encode our word indices in an arbitrarily sized feature space. For our models, this layer will map each word to a feature space of size hidden_size. When trained, these values should encode semantic similarity between similar meaning words.</p>
+                <p>Finally, if passing a padded batch of sequences to an RNN module, we must pack and unpack padding around the RNN pass using nn.utils.rnn.pack_padded_sequence and nn.utils.rnn.pad_packed_sequence respectively.</p>
+
+                <p>Computation Graph:</p>
+                <ol>
+                    <li><p>Convert word indexes to embeddings.</p></li>
+                    <li><p>Pack padded batch of sequences for RNN module.</p></li>
+                    <li><p>Forward pass through GRU.</p></li>
+                    <li><p>Unpack padding.</p></li>
+                    <li><p>Sum bidirectional GRU outputs.</p></li>
+                    <li><p>Return output and final hidden state.</p></li>
+                </ol>
+
+                <h4>7.4.2.2 Decoder</h4>
+                <p>The decoder RNN generates the response sentence in a token-by-token fashion. It uses the encoder’s context vectors, and internal hidden states to generate the next word in the sequence. It continues generating words until it outputs an EOS_token, representing the end of the sentence. A common problem with a vanilla seq2seq decoder is that if we rely solely on the context vector to encode the entire input sequence’s meaning, it is likely that we will have information loss. This is especially the case when dealing with long input sequences, greatly limiting the capability of our decoder.</p>
+                <p>To combat this, Bahdanau et al. created an “attention mechanism” that allows the decoder to pay attention to certain parts of the input sequence, rather than using the entire fixed context at every step.</p>
+
+                <p>At a high level, attention is calculated using the decoder’s current hidden state and the encoder’s outputs. The output attention weights have the same shape as the input sequence, allowing us to multiply them by the encoder outputs, giving us a weighted sum which indicates the parts of encoder output to pay attention to. Sean Robertson’s figure describes this very well:</p>
+
+                
+                
                 <h3>7.4.3 Define Training Procedure</h3>
 
                 <h3>7.4.4 Define Evaluation</h3>
