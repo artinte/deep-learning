@@ -97,11 +97,34 @@
 
                 <p>At a high level, attention is calculated using the decoder’s current hidden state and the encoder’s outputs. The output attention weights have the same shape as the input sequence, allowing us to multiply them by the encoder outputs, giving us a weighted sum which indicates the parts of encoder output to pay attention to. Sean Robertson’s figure describes this very well:</p>
 
-                
+                <p>Luong et al. improved upon Bahdanau et al.’s groundwork by creating “Global attention”. The key difference is that with “Global attention”, we consider all of the encoder’s hidden states, as opposed to Bahdanau et al.’s “Local attention”, which only considers the encoder’s hidden state from the current time step. Another difference is that with “Global attention”, we calculate attention weights, or energies, using the hidden state of the decoder from the current time step only. Bahdanau et al.’s attention calculation requires knowledge of the decoder’s state from the previous time step. Also, Luong et al. provides various methods to calculate the attention energies between the encoder output and decoder output which are called “score functions”:</p>
+
+                <p>Overall, the Global attention mechanism can be summarized by the following figure. Note that we will implement the “Attention Layer” as a separate nn.Module called Attn. The output of this module is a softmax normalized weights tensor of shape (batch_size, 1, max_length).</p>
                 
                 <h3>7.4.3 Define Training Procedure</h3>
 
+                <h4>7.4.3.1 Masked loss</h4>
+
+                <h4>7.4.3.2 Single Training Iteration</h4>
+
+                <h4>7.4.3.3 Training iterations</h4>
+                <p>It is finally time to tie the full training procedure together with the data. The trainIters function is responsible for running n_iterations of training given the passed models, optimizers, data, etc. This function is quite self explanatory, as we have done the heavy lifting with the train function.</p>
+
+                <p>One thing to note is that when we save our model, we save a tarball containing the encoder and decoder state_dicts (parameters), the optimizers’ state_dicts, the loss, the iteration, etc. Saving the model in this way will give us the ultimate flexibility with the checkpoint. After loading a checkpoint, we will be able to use the model parameters to run inference, or we can continue training right where we left off.</p>
+
                 <h3>7.4.4 Define Evaluation</h3>
+
+                <p>After training a model, we want to be able to talk to the bot ourselves. First, we must define how we want the model to decode the encoded input.</p>
+
+                <p>Greedy decoding is the decoding method that we use during training when we are NOT using teacher forcing. In other words, for each time step, we simply choose the word from decoder_output with the highest softmax value. This decoding method is optimal on a single time-step level.</p>
+
+                <p>To facilitate the greedy decoding operation, we define a GreedySearchDecoder class. When run, an object of this class takes an input sequence (input_seq) of shape (input_seq length, 1), a scalar input length (input_length) tensor, and a max_length to bound the response sentence length. The input sentence is evaluated using the following computational graph:</p>
+
+                <p>Now that we have our decoding method defined, we can write functions for evaluating a string input sentence. The evaluate function manages the low-level process of handling the input sentence. We first format the sentence as an input batch of word indexes with batch_size==1. We do this by converting the words of the sentence to their corresponding indexes, and transposing the dimensions to prepare the tensor for our models. </p>
+
+                <p>We also create a lengths tensor which contains the length of our input sentence. In this case, lengths is scalar because we are only evaluating one sentence at a time (batch_size==1). Next, we obtain the decoded response sentence tensor using our GreedySearchDecoder object (searcher). Finally, we convert the response’s indexes to words and return the list of decoded words.</p>
+
+                
 
                 <h3>7.4.5 Run Model</h3>
 
