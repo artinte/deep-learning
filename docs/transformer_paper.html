@@ -138,7 +138,7 @@
                 <p>where \(pos\) is the position and \(i\) is the dimension. That is, each dimension of the positional encoding corresponds to a sinusoid. The wavelengths form a geometric progression from \(2\pi\) to \(10000 \cdot 2\pi\). We chose this function because we hypothesized it would allow the model to easily learn to attend by relative positions, since for any fixed offset \(k\), \({PE}_{pos+k}\) can be represented as a linear function of \({PE}_{pos}\).</p>
                 <p>We also experimented with using learned positional embeddings instead, and found that the two versions produced nearly identical results (see Table 3 row (E)). We chose the sinusoidal version because it may allow the model to extrapolate to sequence lengths longer than the ones encountered during training.</p>
 
-                <h3>5.2.4 Why Self-Attention</h3>
+                <h3 id="self-attention">5.2.4 Why Self-Attention</h3>
                 <p>In this section we compare various aspects of self-attention layers to the recurrent and convolutional layers commonly used for mapping one variable-length sequence of symbol representations \((x_1, \cdots, x_n)\) to another sequence of equal length \((z_1, \cdots, z_n)\), with \(x_i, z_i \in \mathbb{R}^d\), such as a hidden layer in a typical sequence transduction encoder or decoder. Motivating our use of self-attention we consider three desiderata.</p>
                 <p>One is the total computational complexity per layer. Another is the amount of computation that can be parallelized, as measured by the minimum number of sequential operations required.</p>
 
