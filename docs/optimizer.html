@@ -22,6 +22,31 @@
                 <p class="title-subtext"></p>
                 <p style="color: #a0a0a0;">Created Date: 2025-06-23</p>
 
+                <p>There are many optimizers available for machine learning and deep learning, with the exact number being difficult to pinpoint as new ones are constantly being developed and existing ones are adapted. However, some popular and well-established optimizers include Gradient Descent (and its variations like Stochastic Gradient Descent and Mini-batch Gradient Descent), Adagrad, RMSprop, Adam, and Adadelta. The choice of optimizer often depends on the specific problem, dataset size, and desired convergence speed.</p>
+                <p>Here's a breakdown of some key optimizer categories and examples:</p>
+                <p>1. Gradient Descent Based Optimizers</p>
+                <ul class="with-bullets">
+                    <li><p>Gradient Descent: The foundational optimizer that iteratively adjusts model parameters to minimize a loss function by moving in the direction of the steepest descent of the gradient.</p></li>
+                    <li><p>Stochastic Gradient Descent (SGD): Updates parameters using the gradient calculated on a single randomly selected data point (or a mini-batch). This is generally faster than vanilla gradient descent for large datasets.</p></li>
+                    <li><p>Mini-batch Gradient Descent: A variation of SGD that uses a small batch of data points for gradient calculation, offering a balance between speed and stability. </p></li>
+                </ul>
+
+                <p>2. Adaptive Learning Rate Optimizers</p>
+                <ul class="with-bullets">
+                    <li><p>Adagrad: Adapts the learning rate for each parameter based on the historical sum of squared gradients.</p></li>
+                    <li><p>RMSprop: Divides the learning rate by a moving average of the past squared gradients, making it suitable for non-convex problems.</p></li>
+                    <li><p>Adam: Combines the benefits of RMSprop and momentum by using exponentially decaying averages of past gradients and past squared gradients. It's often a good starting point for many deep learning tasks.</p></li>
+                </ul>
+
+                <p>3. Other Notable Optimizers</p>
+                <ul class="with-bullets">
+                    <li><p>Adadelta: An extension of Adagrad that addresses its diminishing learning rate issue by using a moving average of past updates.</p></li>
+                    <li><p>AdamW: A variant of Adam that decouples weight decay from the learning rate update, often leading to better generalization.</p></li>
+                    <li><p>Lion: A recently developed optimizer that addresses some limitations of Adam and is gaining traction.</p></li>
+                </ul>
+
+                <p>The best optimizer for a specific task is often determined through experimentation and by considering factors like the dataset size, the complexity of the model, and the desired convergence speed.</p>
+
                 <h3>2.6.1 Basic Usage</h3>
                 <p>To use torch.optim you have to construct an optimizer object that will hold the current state and will update the parameters based on the computed gradients.</p>
                 <p>To construct an Optimizer you have to give it an iterable containing the parameters (all should be Parameter s) or named parameters (tuples of (str, Parameter)) to optimize. Then, you can specify optimizer-specific options such as the learning rate, weight decay, etc. Example:</p>
