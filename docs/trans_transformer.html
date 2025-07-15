@@ -76,9 +76,23 @@
                 <p style="text-align: center; color: #555555;">Figure 4 - The Encoder Self-attention Distribution for the Word "it"</p>
 
                 <h3>7.1.1 Data Handling</h3>
-                <p>This section downloads the dataset and the subword tokenizer, from this tutorial, then wraps it all up in a <code></code> for training.</p>
+                <p>This section downloads the dataset and the subword tokenizer, then wraps it all up in a <code>torch.utils.data.Dataset</code> for training.</p>
+
+
 
                 <h4>7.1.1.1 Download the Dataset</h4>
+
+                <pre><code>import datasets
+
+dataset = datasets.load_dataset('ted_hrlr', 'pt_to_en', trust_remote_code=True)
+train_examples = dataset["train"]
+val_examples = dataset["validation"]
+
+print(f"Train examples: {len(train_examples)}")
+print(f"Validation examples: {len(val_examples)}")</code></pre>
+
+                <pre><samp>Train examples: 51786
+Validation examples: 1194</samp></pre>
 
                 <h3>7.1.2 Test the Dataset</h3>
 
