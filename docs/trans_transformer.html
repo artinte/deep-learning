@@ -99,9 +99,61 @@ Validation examples: 1194</samp></pre>
                 <pre><code>print(train_examples[0])</code></pre>
                 <pre><samp>{'translation': {'en': "amongst all the troubling deficits we struggle with today — we think of financial and economic primarily — the ones that concern me most is the deficit of political dialogue — our ability to address modern conflicts as they are , to go to the source of what they 're all about and to understand the key players and to deal with them .", 'pt': 'entre todas as grandes privações com que nos debatemos hoje — pensamos em financeiras e económicas primeiro — aquela que mais me preocupa é a falta de diálogo político — a nossa capacidade de abordar conflitos modernos como eles são , de ir à raiz do que eles são e perceber os agentes-chave e lidar com eles .'}}</samp></pre>
 
-                
+                <h4>7.1.1.2 Set Up the Tokenizer</h4>
+                <p>Now that you have loaded the dataset, you need to tokenize the text, so that each element is represented as a token or token ID (a numeric representation).</p>
+                <p>Tokenization is the process of breaking up text, into "tokens". Depending on the tokenizer, these tokens can represent sentence-pieces, words, subwords, or characters. To learn more about tokenization, visit <a href="word_embed.html">this guide</a> .</p>
+                <p>This tutorial uses the tokenizers from the <a href="https://huggingface.co/facebook/m2m100_418M">facebook/m2m100_418M</a> . M2M100 is a multilingual encoder-decoder (seq-to-seq) model trained for Many-to-Many multilingual translation.</p>
+                <pre><code># 'Helsinki-NLP/opus-mt-pt-en' is a good choice for Portuguese to English.
+tokenizer = transformers.AutoTokenizer.from_pretrained("facebook/m2m100_418M")
+tokenizer.src_lang = "pt"</code></pre>
+
+                <p>Defines a custom PyTorch Dataset called <code>TranslationDataset</code> . It's designed to prepare text translation data (Portuguese to English) for use in machine learning models:</p>
+                <pre><code># 3. Create a custom PyTorch Dataset class
+class TranslationDataset(torch.utils.data.Dataset):
+    def __init__(self, examples, tokenizer, max_length=128):
+        self.examples = examples
+        self.tokenizer = tokenizer
+        self.max_length = max_length
+    
+    def __len__(self):
+        return len(self.examples)
+    
+    def __getitem__(self, idx):
+        pair = self.examples[idx]['translation']
+        source_text = pair['pt']
+        target_text = pair['en']
+        
+        # Tokenize source and target texts
+        # add_special_tokens=True adds [CLS] and [SEP] tokens
+        # truncation=True truncates sequences longer than max_length
+        # padding='max_length' pads sequences shorter than max_length
+        # return_tensors='pt' returns PyTorch tensors
+        tokenized_source = self.tokenizer(
+            source_text,
+            max_length=self.max_length,
+            truncation=True,
+            padding='max_length',
+            return_tensors='pt'
+        )
+        tokenized_target = self.tokenizer(
+            target_text,
+            max_length=self.max_length,
+            truncation=True,
+            padding='max_length',
+            return_tensors='pt'
+        )
+        
+        # Remove the batch dimension (squeeze) as __getitem__ expects single examples
+        return {
+            'input_ids': tokenized_source['input_ids'].squeeze(0),
+            'attention_mask': tokenized_source['attention_mask'].squeeze(0),
+            # For translation, target input_ids are often used as labels
+            'labels': tokenized_target['input_ids'].squeeze(0) 
+        }</code></pre>
 
                 <h3>7.1.2 Test the Dataset</h3>
+
+                <img src="res/07/layer-words.png" alt="Input and Output" width="400">
 
                 <h3>7.1.3 Define the Components</h3>
 

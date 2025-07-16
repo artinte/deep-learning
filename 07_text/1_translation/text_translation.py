@@ -17,7 +17,8 @@ print(train_examples[0])
 # We'll use a pre-trained tokenizer suitable for sequence-to-sequence tasks (like translation).
 # 'Helsinki-NLP/opus-mt-pt-en' is a good choice for Portuguese to English.
 tokenizer = transformers.AutoTokenizer.from_pretrained("facebook/m2m100_418M")
-tokenizer.src_lang = "pt"
+tokenizer.src_lang = 'pt'
+tokenizer.tgt_lang = 'en'
 
 # 3. Create a custom PyTorch Dataset class
 class TranslationDataset(torch.utils.data.Dataset):
@@ -83,6 +84,12 @@ print(f"Original Source Text (PT): {original_src_text}")
 
 src_token_ids = sample_item['input_ids'].tolist()
 print(f"Source Token IDs: {src_token_ids}")
+
+attention_mask_values = sample_item['attention_mask'].tolist()
+print(f'Attention  Mask Values: {attention_mask_values}')
+
+tgt_token_ids = sample_item['labels'].tolist()
+print(f"Target (Label) Token IDs: {tgt_token_ids}")
 
 train_dataloader = torch.utils.data.DataLoader(train_dataset_pt, batch_size=16, shuffle=True)
 val_dataloader = torch.utils.data.DataLoader(val_dataset_pt, batch_size=16, shuffle=False)
