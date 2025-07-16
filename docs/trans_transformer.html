@@ -81,6 +81,7 @@
 
 
                 <h4>7.1.1.1 Download the Dataset</h4>
+                <p>Load the Portuguese-English translation dataset TED Talks Open Translation Project. This dataset contains approximately 52,000 training, 1,200 validation and 1,800 test examples.</p>
 
                 <pre><code>import datasets
 
@@ -93,6 +94,12 @@ print(f"Validation examples: {len(val_examples)}")</code></pre>
 
                 <pre><samp>Train examples: 51786
 Validation examples: 1194</samp></pre>
+                
+                <p>We can print the first example:</p>
+                <pre><code>print(train_examples[0])</code></pre>
+                <pre><samp>{'translation': {'en': "amongst all the troubling deficits we struggle with today — we think of financial and economic primarily — the ones that concern me most is the deficit of political dialogue — our ability to address modern conflicts as they are , to go to the source of what they 're all about and to understand the key players and to deal with them .", 'pt': 'entre todas as grandes privações com que nos debatemos hoje — pensamos em financeiras e económicas primeiro — aquela que mais me preocupa é a falta de diálogo político — a nossa capacidade de abordar conflitos modernos como eles são , de ir à raiz do que eles são e perceber os agentes-chave e lidar com eles .'}}</samp></pre>
+
+                
 
                 <h3>7.1.2 Test the Dataset</h3>
 
