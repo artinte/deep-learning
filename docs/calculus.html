@@ -58,7 +58,35 @@
                 <p>These two expressions for calculating the slope of a secant line are illustrated in Figure 1. We will see that each of these two methods for finding the slope of a secant line is of value. Depending on the setting, we can choose one or the other. The primary consideration in our choice usually depends on ease of calculation.</p>
                 <h5>The Derivative of a Function at a Point</h5>
                 <h4>1.4.3.2 The Derivative as a Function</h4>
+
+                <p>Let \(f\) be a function. The derivative function, denoted by \(f'\) , is the function whose domain consists of those values of \(x\) such that the following limit exists:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h}\)
+                </div>
+
                 <h4>1.4.3.3 Differentiation Rules</h4>
+
+                <h5>The Constant Rule</h5>
+                <p>We first apply the limit definition of the derivative to find the derivative of the constant function, \(f(x) = c\) . For this function, both \(f(x) = c\) and \(f(x+h) = c\) , so we obtain the following result:</p>
+
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h} = \lim_{h \to 0} \frac{0}{h} = 0\)
+                </div>
+                
+                <p>The rule for differentiating constant functions is called the constant rule. It states that the derivative of a constant function is zero; that is, since a constant function is a horizontal line, the slope, or the rate of change, of a constant function is 0. We restate this rule in the following theorem.</p>
+
+                <h5>The Power Rule</h5>
+
+                <p>Let \(n\) be a positive integer. If \(f(x) = x^n\) , then \(f'(x) = n x^{n-1}\) .</p>
+
+                <p>Alternatively, we may express this rule as \(frac{d}{x} x^n = n x^{n-1}\)</p>
+
+                <h5>The Sum, Difference, and Constant Multiple Rules</h5>
+                <p>Let \(f(x)\) and \(g(x)\) be differentiable functions and \(k\) be a constant. Then each of the following equations holds.</p>
+
+                <p>Sum Rule. The derivative of the sum of a function \(f\) and a function \(g\) is the same as the sum of the derivative of \(f\) and the derivative of \(g\) .</p>
+                
+                
                 <h4>1.4.3.4 Derivatives as Rates of Change</h4>
                 <h4>1.4.3.5 Derivatives of Trigonometric Functions</h4>
                 <h4 id="chain_rule">1.4.3.6 The Chain Rule</h4>
