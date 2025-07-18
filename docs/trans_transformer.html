@@ -83,8 +83,7 @@
                 <h4>7.1.1.1 Download the Dataset</h4>
                 <p>Load the Portuguese-English translation dataset TED Talks Open Translation Project. This dataset contains approximately 52,000 training, 1,200 validation and 1,800 test examples.</p>
 
-                <pre><code>import datasets
-
+                <pre><code># 1. Load the dataset
 dataset = datasets.load_dataset('ted_hrlr', 'pt_to_en', trust_remote_code=True)
 train_examples = dataset["train"]
 val_examples = dataset["validation"]
@@ -103,9 +102,12 @@ Validation examples: 1194</samp></pre>
                 <p>Now that you have loaded the dataset, you need to tokenize the text, so that each element is represented as a token or token ID (a numeric representation).</p>
                 <p>Tokenization is the process of breaking up text, into "tokens". Depending on the tokenizer, these tokens can represent sentence-pieces, words, subwords, or characters. To learn more about tokenization, visit <a href="word_embed.html">this guide</a> .</p>
                 <p>This tutorial uses the tokenizers from the <a href="https://huggingface.co/facebook/m2m100_418M">facebook/m2m100_418M</a> . M2M100 is a multilingual encoder-decoder (seq-to-seq) model trained for Many-to-Many multilingual translation.</p>
-                <pre><code># 'Helsinki-NLP/opus-mt-pt-en' is a good choice for Portuguese to English.
+                <pre><code># 2. Initialize a tokenizer
+# We'll use a pre-trained tokenizer suitable for sequence-to-sequence tasks (like translation).
+# 'Helsinki-NLP/opus-mt-pt-en' is a good choice for Portuguese to English.
 tokenizer = transformers.AutoTokenizer.from_pretrained("facebook/m2m100_418M")
-tokenizer.src_lang = "pt"</code></pre>
+tokenizer.src_lang = 'pt'
+tokenizer.tgt_lang = 'en'</code></pre>
 
                 <p>Defines a custom PyTorch Dataset called <code>TranslationDataset</code> . It's designed to prepare text translation data (Portuguese to English) for use in machine learning models:</p>
                 <pre><code># 3. Create a custom PyTorch Dataset class
@@ -153,6 +155,49 @@ class TranslationDataset(torch.utils.data.Dataset):
 
                 <h3>7.1.2 Test the Dataset</h3>
 
+                <pre><code># 4. Instantiate your PyTorch datasets
+max_seq_length = 128 # You can adjust this based on your data and model
+train_dataset_pt = TranslationDataset(train_examples, tokenizer, max_length=max_seq_length)
+val_dataset_pt = TranslationDataset(val_examples, tokenizer, max_length=max_seq_length)</code></pre>
+
+                <pre><code>print(f"PyTorch Training Dataset size: {len(train_dataset_pt)}")
+print(f"PyTorch Validation Dataset size: {len(val_dataset_pt)}")</code></pre>
+
+
+                <pre><code># Example of accessing an item from the PyTorch dataset
+sample_idx = random.randint(0, 100)
+sample_item = train_dataset_pt[sample_idx]
+print("Sample item from PyTorch training dataset:")
+print(f"Input IDs shape: {sample_item['input_ids'].shape}")
+print(f"Attention Mask shape: {sample_item['attention_mask'].shape}")
+print(f"Labels shape: {sample_item['labels'].shape}")</code></pre>
+
+                <pre><code>original_src_text = train_examples[sample_idx]['translation']['pt']
+print(f"Original Source Text (PT): {original_src_text}")
+
+src_token_ids = sample_item['input_ids'].tolist()
+print(f"Source Token IDs: {src_token_ids}")
+
+attention_mask_values = sample_item['attention_mask'].tolist()
+print(f'Attention  Mask Values: {attention_mask_values}')
+
+tgt_token_ids = sample_item['labels'].tolist()
+print(f"Target (Label) Token IDs: {tgt_token_ids}")</code></pre>
+
+                <pre><code>train_dataloader = torch.utils.data.DataLoader(train_dataset_pt, batch_size=16, shuffle=True)
+val_dataloader = torch.utils.data.DataLoader(val_dataset_pt, batch_size=16, shuffle=False)
+
+print(f"Number of batches in training DataLoader: {len(train_dataloader)}")
+print(f"Number of batches in validation DataLoader: {len(val_dataloader)}")
+
+# Example of iterating through a batch
+for batch in train_dataloader:
+    print("Sample batch from DataLoader:")
+    print(f"Input IDs batch shape: {batch['input_ids'].shape}")
+    print(f"Attention Mask batch shape: {batch['attention_mask'].shape}")
+    print(f"Labels batch shape: {batch['labels'].shape}")
+    break</code></pre>
+
                 <img src="res/07/layer-words.png" alt="Input and Output" width="400">
 
                 <h3>7.1.3 Define the Components</h3>
@@ -163,7 +208,29 @@ class TranslationDataset(torch.utils.data.Dataset):
                     <li><p>If you work through it step by step it will all make sense.</p></li>
                 </ol>
 
+                 <div class="image-container" style="text-align: center;">
+                    <img src="res/07/transformer_arch.png" alt="The Original Transformer Diagram">
+                    <img src="res/07/transformer_4layer.png" alt="A Representation of a 4-layer Transformer">
+                </div>
+                <p style="text-align: center; color: #555555;">Figure 5 - The Original Transformer Diagram<span style="margin: 0 30px;">|</span>A Representation of a 4-layer Transformer</p>
+
+                <p>Each of the components in these two diagrams will be explained as you progress through the tutorial.</p>
+
                 <h4>7.1.3.1 The Embedding and Positional Encoding Layer</h4>
+
+                <p>The inputs to both the encoder and decoder use the same embedding and positional encoding logic.</p>
+
+                <img src="res/07/positional_embed.png" alt="Positional Embedding">
+                <p style="text-align: center; color: #555555;">Figure 6 - Positional Embedding</p>
+
+                <p>Given a sequence of tokens, both the input tokens (Portuguese) and target tokens (English) have to be converted to vectors using a <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Embedding.html">torch.nn.Embedding</a> layer.</p>
+
+                <p>The attention layers used throughout the model see their input as a set of vectors, with no order. Since the model doesn't contain any recurrent or convolutional layers. It needs some way to identify word order, otherwise it would see the input sequence as a bag of words instance, <em class="highlight">how are you</em>, <em class="highlight">how you are</em>, <em class="highlight">you how are</em>, and so on, are indistinguishable.</p>
+
+                <p>A Transformer adds a "Positional Encoding" to the embedding vectors. It uses a set of sines and cosines at different frequencies (across the sequence). By definition nearby elements will have similar position encodings.</p>
+
+                <p>The original paper uses the following formula for calculating the positional encoding:</p>
+                
 
                 <h4>7.1.3.2 Add and Normalize</h4>
 
