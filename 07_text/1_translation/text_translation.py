@@ -2,6 +2,7 @@ import datasets
 import transformers
 import torch
 import random
+from matplotlib import pyplot
 
 # 1. Load the dataset
 dataset = datasets.load_dataset('ted_hrlr', 'pt_to_en', trust_remote_code=True)
@@ -104,3 +105,28 @@ for batch in train_dataloader:
     print(f"Attention Mask batch shape: {batch['attention_mask'].shape}")
     print(f"Labels batch shape: {batch['labels'].shape}")
     break
+
+def positional_encoding(length, depth):
+    depth = depth / 2
+    
+    # (seq, 1)
+    positions = torch.arange(length).unsqueeze(1)
+    # (1, depth)
+    depths = torch.arange(int(depth)).unsqueeze(0) / depth
+    # (1, depth)
+    angle_rates = 1 / (10000 ** depths)
+    # (pos, depth)
+    angle_rads = positions * angle_rates
+    
+    pos_encoding = torch.cat([torch.sin(angle_rads), torch.cos(angle_rads)], axis=-1)
+    return pos_encoding.float()
+
+    
+pos_encoding = positional_encoding(length=2048, depth=512)
+assert pos_encoding.shape == (2048, 512)
+# Plot the dimensions.
+pyplot.pcolormesh(pos_encoding.numpy().T, cmap='RdBu')
+pyplot.xlabel('Position')
+pyplot.ylabel('Depth')
+pyplot.colorbar()
+pyplot.show()

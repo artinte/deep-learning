@@ -230,9 +230,31 @@ for batch in train_dataloader:
                 <p>A Transformer adds a "Positional Encoding" to the embedding vectors. It uses a set of sines and cosines at different frequencies (across the sequence). By definition nearby elements will have similar position encodings.</p>
 
                 <p>The original paper uses the following formula for calculating the positional encoding:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \[
+                    \begin{flalign*}
+                    & {PE}_{(pos, 2i)} = sin(pos/{10000}^{2i/d_{model}}) \\
+                    & {PE}_{(pos, 2i+1)} = cos(pos/{10000}^{2i/d_{model}})
+                    \end{flalign*}
+                    \]
+                </div>
+
+                <p class="comment">Note: The code below implements it, but instead of interleaving the sines and cosines, the vectors of sines and cosines are simply concatenated. Permuting the channels like this is functionally equivalent, and just a little easier to implement and show in the plots below.</p>
+
                 
 
                 <h4>7.1.3.2 Add and Normalize</h4>
+
+                <p>These "Add & Norm" blocks are scattered throughout the model. Each one joins a residual connection and runs the result through a <code>LayerNormalization</code> layer.</p>
+
+                <img src="res/07/add_norm.png" alt="Add Normalize">
+                <p style="text-align: center; color: #555555;">Figure 7 - Add Normalize</p>
+
+                <p>The easiest way to organize the code is around these residual blocks. The following sections will define custom layer classes for each.</p>
+
+                <p>The residual "Add & Norm" blocks are included so that training is efficient. The residual connection provides a direct path for the gradient (and ensures that vectors are updated by the attention layers instead of replaced), while the normalization maintains a reasonable scale for the outputs.</p>
+
+                
 
                 <h4>7.1.3.3 The Base Attention Layer</h4>
 
