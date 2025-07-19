@@ -29,11 +29,24 @@
                     <li><p>Video - Rank-5 tensors of shape <span class="highlight">(samples, frames, height, width, channels)</span>, where each sample is a sequence (of length frames) of images.</p></li>
                 </ul>
                 <h3>1.3.1 Features</h3>
-                <p>The most simplest features is point, For example a point in a 2D space:</p>
-                <pre><code>point1 = torch.tensor([0.5, 1])</code></pre>
-                <p>It's common to picture a vector as an arrow linking the origin to the point, as show in figure:</p>
+                <p>The most simplest features is point, For example a point in a 2D space is defined by two coordinates, typically \((x, y)\):</p>
+                <pre><code>point_sample = torch.tensor([0.5, 1])</code></pre>
+                <p>Here, <code>point_sample</code> represents a point with an x-coordinate of 0.5 and a y-coordinate of 1.</p>
+                
+                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/01_basic/3_represent/features_1d.py">features_1d.py</a> uses the NumPy library to generate a dataset that simulate a linear relationship with added random noise.</p>
+
+                <pre><code>rng = numpy.random.default_rng(seed=0)
+random_numbers = rng.standard_normal(size=100)
+x_input_array = numpy.linspace(0, 4, 100)
+y_true_array = 3 * x_input_array + 4 + random_numbers</code></pre>
 
                 <img src="res/01/points_data.png" alt="Points Data" width="600">
+                <p style="text-align: center; color: #555555;">Figure 1 - Points Data</p>
+
+                <p>We can combines two separate lists of data (<code>x_input_array</code> and <code>y_true_array</code>) into a single, structure dataset called <code>point_dataset</code>.  The key takeaway is that the resulting <code>point_dataset</code> is organized into a <span class="highlight">(samples, features)</span> shape, which is a fundamental format for data in machine learning and data science.</p>
+                <pre><code>point_dataset = numpy.stack((x_input_array, y_true_array), axis=-1)
+assert point_dataset.shape == (100, 2)</code></pre>
+                
 
                 <h3 id="text">1.3.2 Text</h3>
                 <p><a href="https://ai.stanford.edu/%7Eamaas/data/sentiment/">Large Movie Review Dataset</a></p>
