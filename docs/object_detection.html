@@ -21,7 +21,7 @@
                 <h2 class="custom-title">9.1 Object Detection</h2>
                 <p class="title-subtext">TorchVision Object Detection Finetuning Tutorial</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-06-20</p>
-                <p>For this tutorial, we will be finetuning a pre-trained Mask R-CNN model on the Penn-Fudan Database for Pedestrian Detection and Segmentation. It contains 170 images with 345 instances of pedestrians, and we will use it to illustrate how to use the new features in torchvision in order to train an object detection and instance segmentation model on a custom dataset.</p>
+                <p>For this tutorial, we will be finetuning a pre-trained <a href="https://arxiv.org/abs/1703.06870">Mask R-CNN</a> model on the Penn-Fudan Database for Pedestrian Detection and Segmentation. It contains 170 images with 345 instances of pedestrians, and we will use it to illustrate how to use the new features in torchvision in order to train an object detection and instance segmentation model on a custom dataset.</p>
 
                 <h3>9.1.1 Defining the Dataset</h3>
                 <p>The reference scripts for training object detection, instance segmentation and person keypoint detection allows for easily supporting adding new custom datasets. The dataset should inherit from the standard torch.utils.data.Dataset class, and implement __len__ and __getitem__.</p>
