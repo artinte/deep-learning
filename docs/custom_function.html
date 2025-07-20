@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="laptop_coding_48.png" type="image/png">
-    <title>Custom Functions</title>
+    <title>Dispatcher</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="article_style.css" rel="stylesheet">
 </head>
@@ -18,49 +18,13 @@
             </nav>
 
             <main class="col-md-8 content">
-                <h2 class="custom-title">11.2 Custom Functions</h2>
+                <h2 class="custom-title">11.4 Dispatcher</h2>
                 <p class="title-subtext"></p>
-                <p style="color: #a0a0a0;">Created Date: 2025-07-03</p>
+                <p style="color: #a0a0a0;">Created Date: 2025-06-06</p>
 
-                <p>It is sometimes useful to run backwards twice through backward graph, for example to compute higher-order gradients. It takes an understanding of autograd and some care to support double backwards, however. Functions that support performing backward a single time are not necessarily equipped to support double backward. In this tutorial we show how to write a custom autograd function that supports double backward, and point out some things to look out for.</p>
-
-                <p>When writing a custom autograd function to backward through twice, it is important to know when operations performed in a custom function are recorded by autograd, when they aren’t, and most importantly, how save_for_backward works with all of this.</p>
-
-                <p>Custom functions implicitly affects grad mode in two ways:</p>
-                <ul class="with-bullets">
-                    <li><p>During forward, autograd does not record any the graph for any operations performed within the forward function. When forward completes, the backward function of the custom function becomes the grad_fn of each of the forward’s outputs.</p></li>
-                    <li><p>During backward, autograd records the computation graph used to compute the backward pass if create_graph is specified.</p></li>
-                </ul>
-
-                <p>Next, to understand how save_for_backward interacts with the above, we can explore a couple examples.</p>
-
-                <h3>11.2.1 Saving the Inputs</h3>
-                <p>Consider this simple squaring function. It saves an input tensor for backward. Double backward works automatically when autograd is able to record operations in the backward pass, so there is usually nothing to worry about when we save an input for backward as the input should have grad_fn if it is a function of any tensor that requires grad. This allows the gradients to be properly propagated.</p>
-
-                <p>We can use torchviz to visualize the graph to see why this works</p>
-
-                <p>We can see that the gradient wrt to x, is itself a function of x (dout/dx = 2x) And the graph of this function has been properly constructed</p>
-
-                <h3>11.2.2 Saving the Outputs</h3>
-                <p>A slight variation on the previous example is to save an output instead of input. The mechanics are similar because outputs are also associated with a grad_fn.</p>
-
-                <h3>11.2.3 Saving Intermediate Results</h3>
-                <p>A more tricky case is when we need to save an intermediate result. We demonstrate this case by implementing:</p>
-                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
-                    \(sinh(x) := frac{e^x - e^{-x}}{2}\)
-                </div>
-                <p>Since the derivative of sinh is cosh, it might be useful to reuse \(exp(x)\) and \(exp(-x)\), the two intermediate results in forward in the backward computation.</p>
-                <p>Intermediate results should not be directly saved and used in backward though. Because forward is performed in no-grad mode, if an intermediate result of the forward pass is used to compute gradients in the backward pass the backward graph of the gradients would not include the operations that computed the intermediate result. This leads to incorrect gradients.</p>
-
-                <p>Now we show what happens when we don’t also return our intermediate results as outputs: grad_x would not even have a backward graph because it is purely a function exp and expnegx, which don’t require grad.</p>
-
-                <p>Finally, let’s consider an example when it may not be possible for autograd to track gradients for a functions backward at all. We can imagine cube_backward to be a function that may require a non-PyTorch library like SciPy or NumPy, or written as a C++ extension. The workaround demonstrated here is to create another custom function CubeBackward where you also manually specify the backward of cube_backward!</p>
-
-                <p>To conclude, whether double backward works for your custom function simply depends on whether the backward pass can be tracked by autograd. With the first two examples we show situations where double backward works out of the box. With the third and fourth examples, we demonstrate techniques that enable a backward function to be tracked, when they otherwise would not be.</p>
-                
                 <div class="navigation">
-                    <a href="custom_operator.html">Prev: 11.1 Custom Operators</a>
-                    <a href="cpp_extension.html">Next: 11.3 C++ and CUDA Extensions</a>
+                    <a href="extend_script.html">Prev: 11.3 Extending TorchScript</a>
+                    <a href="onnx.html">Next: 12.1 ONNX</a>
                 </div>
             </main>
 
