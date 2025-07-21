@@ -19,9 +19,17 @@
 
             <main class="col-md-8 content">
                 <h2 class="custom-title">8.4 Music Transcription</h2>
-                <p class="title-subtext"></p>
+                <p class="title-subtext">Music Transcription with Transformers</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-07-18</p>
 
+                <p>Automatic Music Transcription (AMT) is the task of extracting symbolic representations of music from raw audio. AMT is valuable in that it not only helps with understanding, but also enables new forms of creation via training powerful language models (such as Music Transformer) and building interactive applications (such as Piano Genie and Magenta Studio) that rely on symbolic representations of music.</p>
+
+                <p>Notes are a powerful and intuitive such representation, motivating our effort to dramatically improve AMT in the past several years. We focused initially on piano transcription with the Onsets and Frames model by Hawthorne et al. and the MAESTRO piano dataset. In 2020, we expanded the set of instruments we’re able to transcribe by adapting Onsets and Frames to drum transcription. However, adding new instruments one at a time is tedious; furthermore these architectures are specifically designed for percussive instruments with well-defined note onsets and less suitable for other instruments.</p>
+
+                <p>Recently, we’ve been exploring how to make general-purpose music transcription systems — systems that don’t need to be redesigned by hand for each new instrument or task. In this blog post, we highlight some of our recent advances toward more general music transcription systems.</p>
+
+                
+                
                 <div class="navigation">
                     <a href="text_to_speech.html">Prev: 8.3 Text-to-Speech</a>
                     <a href="music_synthesis.html">Next: 8.5 Music Synthesis</a>
