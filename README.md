@@ -96,7 +96,7 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 
 - [ ] 11.1 [Custom Operators](https://artinte.github.io/deep-learning/custom_operator.html)
 - [ ] 11.2 [Custom C++ and CUDA Operators](https://artinte.github.io/deep-learning/cpp_cuda_operators.html)
-- [ ] 11.3 [Double Backward](https://artinte.github.io/deep-learning/cpp_cuda_operators.html)
+- [ ] 11.3 [Double Backward](https://artinte.github.io/deep-learning/double_backward.html)
 - [ ] 11.4 [Fusing Conv and Batch Norm](https://artinte.github.io/deep-learning/custom_function.html)
 
 ### 12 Deploying Models
@@ -126,8 +126,8 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 
 - [ ] 15.1 [Graph Foundation](https://artinte.github.io/deep-learning/graph_foundation.html)
 - [ ] 15.2 [Core Ideas](https://artinte.github.io/deep-learning/core_idea.html)
-- [ ] 15.3 [Mainstream Models](https://artinte.github.io/deep-learning/mainstream_model.html)
-- [ ] 15.4 [Common Tasks](https://artinte.github.io/deep-learning/common_task.html)
-- [ ] 15.5 [Advanced Topics](https://artinte.github.io/deep-learning/advanced_topic.html)
+- [ ] 15.3 [Design of GNN](https://artinte.github.io/deep-learning/design_of_gnn.html)
+- [ ] 15.4 [Use-Cases & Applications](https://artinte.github.io/deep-learning/use_cases.html)
+- [ ] 15.5 [Advanced Concepts](https://artinte.github.io/deep-learning/advanced_concepts.html)
 
 For more information, please visit website [Deep Learing with PyTorch](https://artinte.github.io/deep-learning/index.html).
