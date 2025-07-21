@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="laptop_coding_48.png" type="image/png">
+    <title>Mainstream Models</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="article_style.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="col-md-2 left-sidebar">
+
+            </nav>
+
+            <main class="col-md-8 content">
+                <h2 class="custom-title">15.3 Design of GNN</h2>
+                <p class="title-subtext">Design of Graph Neural Networks</p>
+                <p style="color: #a0a0a0;">Created Date: 2025-07-21</p>
+
+                <h3>15.3.1 Creating Message Passing Networks</h3>
+                <p>Generalizing the convolution operator to irregular domains is typically expressed as a <em>neighborhood aggregation</em> or <em>message passing</em> scheme. With \(\mathbf{x}^{(k-1)}_i \in \mathbb{R}^F\) denoting node features of node \(i\) in layer \((k-1)\) and \(\mathbf{e}_{j,i} \in \mathbb{R}^D\) denoting (optional) edge features from node \(j\) to node \(i\), message passing graph neural networks can be described as:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \[\mathbf{x}_i^{(k)} = \gamma^{(k)} \left( \mathbf{x}_i^{(k-1)}, \bigoplus_{j \in \mathcal{N}(i)} \, \phi^{(k)}\left(\mathbf{x}_i^{(k-1)}, \mathbf{x}_j^{(k-1)},\mathbf{e}_{j,i}\right) \right),\]
+                </div>
+                <p>where \(\bigoplus\) denotes a differentiable, permutation invariant function, <em>e.g.</em>, sum, mean or max, and \(\gamma\) and \(\phi\) denote differentiable functions such as MLPs (Multi Layer Perceptrons).</p>
+
+                <h4>15.3.1.1 The "MessagePassing" Base Class</h4>
+
+                
+                <h4>15.3.1.2 Implementing the GCN Layer</h4>
+                
+                <h4>15.3.1.3 Implementing the Edge Convolution</h4>
+
+                <h4>15.3.1.4 Exercises</h4>
+                
+                <div class="navigation">
+                    <a href="core_idea.html">Prev: 15.2 Core Ideas</a>
+                    <a href="use_cases.html">Next: 15.4 Use-Cases & Applications</a>
+                </div>
+            </main>
+
+            <aside class="col-md-2 right-sidebar">
+                <h5><a href="index.html#section15">Graph Netural Network</a></h5>
+                <ul id="dynamic-sidebar" class="nav flex-column">
+                </ul>
+            </aside>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="article_script.js"></script>
+</body>
+
+</html>
