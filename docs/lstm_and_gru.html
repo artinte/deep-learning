@@ -225,13 +225,25 @@ print(predictions)</code></pre>
                 <h4>4.4.3.5 SGD Implementation</h4>
                 <p>Now that we are able to calculate the gradients for our parameters we can implement SGD. I like to do this in two steps: 1. A function sdg_step that calculates the gradients and performs the updates for one batch. 2. An outer loop that iterates through the training set and adjusts the learning rate.</p>
 
-                <h3>4.4.4 Generating Text</h3>
+                <p>Done! Let’s try to get a sense of how long it would take to train our network: </p>
+
+                <p>Uh-oh, bad news. One step of SGD takes approximately 350 milliseconds on my laptop. We have about 80,000 examples in our training data, so one epoch (iteration over the whole data set) would take several hours. Multiple epochs would take days, or even weeks! And we’re still working with a small dataset compared to what’s being used by many of the companies and researchers out there. What now?</p>
+
+                <p>Fortunately there are many ways to speed up our code. We could stick with the same model and make our code run faster, or we could modify our model to be less computationally expensive, or both. Researchers have identified many ways to make models less computationally expensive, for example by using a hierarchical softmax or adding projection layers to avoid the large matrix multiplications (see also here or here). But I want to keep our model simple and go the first route: Make our implementation run faster using a GPU. Before doing that though, let’s just try to run SGD with a small dataset and check if the loss actually decreases:</p>
+
+                <p>Good, it seems like our implementation is at least doing something useful and decreasing the loss, just like we wanted.</p>
                 
+                <h3>4.4.4 Generating Text</h3>
+
+                <p>Now that we have our model we can ask it to generate new text for us! Let’s implement a helper function to generate new sentences:</p>
+                <p>Looking at the generated sentences there are a few interesting things to note. The model successfully learn syntax. It properly places commas and ends sentence with punctuation. Sometimes it mimics internet speech such as multiple exclamation marks or smileys.</p>
+                <p>However, the vast majority of generated sentences don’t make sense or have grammatical errors (I really picked the best ones above). One reason could be that we did not train our network long enough or didn’t use enough training data. That may be true, but it’s most likely not the main reason. Our vanilla RNN can’t generate meaningful text because it’s unable to learn dependencies between words that are several steps apart. That’s also why RNNs failed to gain popularity when they were first invented. They were beautiful in theory but didn’t work well in practice, and we didn’t immediately understand why.</p>
+                <p></p>
                 
                 <h3 id="lstm">4.4.5 Long Short-Term Memory Unit</h3>
                 <p>The Long Short-Term Memory (LSTM) unit was initially proposed by Hochreiter and Schmidhuber. Since then, a number of minor modifications to the original LSTM unit have been made. We follow the implementation of LSTM as used in Graves.</p>
 
-                <img src="res/04/lstm_arch.png" alt="LSTM Architecture">
+                <img src="res/04/lstm_arch.png" alt="LSTM Architecture" width="600">
                 <p style="text-align: center; color: #555555;">Figure 2 - LSTM Architecture</p>
                 
                 <p>Unlike to the recurrent unit which simply computes a weighted sum of the input signal and applies a nonlinear function, each \(j\)-th LSTM unit maintains a memory \(c_t^j\) at time \(t\). The output \(h_t^j\), or the activation, of the LSTM unit is then:</p>
@@ -261,6 +273,8 @@ print(predictions)</code></pre>
                 <p>Note tha \(V_f\) and \(V_i\) are diagonal matrices.</p>
 
                 <p>Unlike to the traditional recurrent unit which overwrites its content at each time-step, an LSTM unit is able to decide whether to keep the existing memory via the introduced gates. Intuitively, if the LSTM unit detects an important feature from an input sequence at early stage, it easily carries this information (the existence of the feature) over a long distance, hence, capturing potential long-distance dependencies.</p>
+
+                
                 
                 <h3 id="gru">4.4.6 Gated Recurrent Unit</h3>
                 <p>A gated recurrent unit (GRU) was proposed by Cho et al. [2014] to make each recurrent unit to adaptively capture dependencies of different time scales. Similarly to the LSTM unit, the GRU has gating units that modulate the flow of information inside the unit, however, without having a separate memory cells.</p>
