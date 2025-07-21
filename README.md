@@ -95,9 +95,9 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 ### 11 Extending PyTorch
 
 - [ ] 11.1 [Custom Operators](https://artinte.github.io/deep-learning/custom_operator.html)
-- [ ] 11.2 [Custom Functions](https://artinte.github.io/deep-learning/custom_function.html)
-- [ ] 11.3 [Extending TorchScript](https://artinte.github.io/deep-learning/extend_script.html)
-- [ ] 11.4 [Dispatcher](https://artinte.github.io/deep-learning/dispatcher.html)
+- [ ] 11.2 [Custom C++ and CUDA Operators](https://artinte.github.io/deep-learning/cpp_cuda_operators.html)
+- [ ] 11.3 [Double Backward](https://artinte.github.io/deep-learning/cpp_cuda_operators.html)
+- [ ] 11.4 [Fusing Conv and Batch Norm](https://artinte.github.io/deep-learning/custom_function.html)
 
 ### 12 Deploying Models
 
