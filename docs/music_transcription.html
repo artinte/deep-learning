@@ -28,7 +28,21 @@
 
                 <p>Recently, we’ve been exploring how to make general-purpose music transcription systems — systems that don’t need to be redesigned by hand for each new instrument or task. In this blog post, we highlight some of our recent advances toward more general music transcription systems.</p>
 
-                
+                <p>In short, the main things we’ve discovered recently are:</p>
+                <ol>
+                    <li><p>Off-the-shelf Transformers work at least as well as custom neural network architectures for piano transcription; we just train the model to take spectrograms as input and output a sequence of MIDI-like note events.</p></li>
+                    <li><p>For multi-instrument transcription, training a single model on basically all existing datasets is very helpful, especially for the smallest datasets.</p></li>
+                </ol>
+
+                <h3>8.4.1 Transformers for Piano Transcription</h3>
+
+                <p>Most work in music transcription over the years has focused on transcribing piano recordings. As we mentioned above, many researchers have hand-designed neural network architectures based on the specifics of how piano notes sound. A great example of this is the Onsets and Frames architecture, which has dedicated output “heads” for the piano note onset, the velocity of the note (how hard it is struck), and the continued presence of the note (i.e. “frames”). Some research goes even further, modeling piano pedal events or the ADSR curves of piano notes.</p>
+
+                <p>However, as piano transcription architectures became more task-specific, researchers in other areas of machine learning were using generalized architectures to solve multiple tasks; in particular, the Transformer architecture has shown remarkable performance on a diverse set of tasks within both language and vision. We wondered: is it possible to use Transformers for piano transcription?</p>
+
+                <p>To answer this question, we modeled piano transcription as a sequence-to-sequence task, using the Transformer architecture from T5 (“T5-small” to be specific). We used spectrogram frames as our input sequence, and output a sequence of tokens from a MIDI-like vocabulary to represent note onsets, velocities, and offsets. Despite the simplicity of our approach, we achieved similar or better piano transcription performance (as measured by the F1 metric over notes accounting for onset time, offset time, and velocity) than the previous state-of-the-art hand-designed piano transcription systems:</p>
+
+                <h3>8.4.2 Transcribing Multiple Instruments</h3>
                 
                 <div class="navigation">
                     <a href="text_to_speech.html">Prev: 8.3 Text-to-Speech</a>
