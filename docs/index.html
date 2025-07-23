@@ -647,25 +647,26 @@
 
                     <section id="section12" class="content-section">
                         <h2>12 Deploying Models</h2>
+
                         <h3 id="section12-sub1">
                             <a href="onnx.html" style="color: inherit;">12.1 ONNX</a>
                         </h3>
                         <p>ONNX is an open format built to represent machine learning models. ONNX defines a common set of operators - the building blocks of machine learning and deep learning models - and a common file format to enable AI developers to use models with a variety of frameworks, tools, runtimes, and compilers.</p>
+
                         <h3 id="section12-sub2">
-                            <a href="torch_script.html" style="color: inherit;">12.2 TorchScript</a>
-                        </h3>
-                        <h3 id="section12-sub3">
-                            <a href="execu_torch.html" style="color: inherit;">12.3 ExecuTorch</a>
+                            <a href="execu_torch.html" style="color: inherit;">12.2 ExecuTorch</a>
                         </h3>
                         <p>ExecuTorch is PyTorch’s solution to training and inference on the Edge.</p>
                         <p><a href="https://docs.pytorch.org/executorch/stable/getting-started.html">Getting Started with ExecuTorch</a></p>
 
-                        <h3 id="section12-sub4">
-                            <a href="tensorflow_lite.html" style="color: inherit;">12.4 TensorFlow Lite</a>
+                        <h3 id="section12-sub3">
+                            <a href="tensorflow_lite.html" style="color: inherit;">12.3 TensorFlow Lite</a>
                         </h3>
+                        <p>LiteRT (short for Lite Runtime), formerly known as TensorFlow Lite, is Google's high-performance runtime for on-device AI.</p>
                         <p><a href="https://ai.google.dev/edge/litert">LiteRT overview</a></p>
-                        <h3 id="section12-sub5">
-                            <a href="tensorflow_js.html" style="color: inherit;">12.5 TensorFlow.js</a>
+
+                        <h3 id="section12-sub4">
+                            <a href="tensorflow_js.html" style="color: inherit;">12.4 TensorFlow.js</a>
                         </h3>
                         <p>TensorFlow.js is a library for machine learning in JavaScript</p>
                         <p><a href="https://codelabs.developers.google.com/codelabs/tfjs-training-classfication">TensorFlow.js — Handwritten digit recognition with CNNs</a></p>
@@ -673,15 +674,18 @@
 
                     <section id="section13" class="content-section">
                         <h2>13 Model Optimization</h2>
+                        <p>This Chapter covers four key techniques used to improve the efficiency and performance of machine learning models.</p>
 
                         <h3 id="section13-sub1">
                             <a href="lora.html" style="color: inherit;">13.1 LoRA</a>
                         </h3>
+                        <p>We propose <strong>Low-Rank Adaptation, or LoRA</strong>, which freezes the pre-trained model weights and injects trainable rank decomposition matrices into each layer of the Transformer architecture, greatly reducing the number of trainable parameters for downstream tasks.</p>
                         <p><a href="https://arxiv.org/abs/2106.09685">LoRA: Low-Rank Adaptation of Large Language Models</a></p>
 
                         <h3 id="section13-sub2">
                             <a href="pruning.html" style="color: inherit;">13.2 Pruning</a>
                         </h3>
+                        <p>In this tutorial, we will learn how to use <code>torch.nn.utils.prune</code> to sparsify your neural networks, and how to extend it to implement your own custom pruning technique.</p>
                         <p><a href="https://docs.pytorch.org/tutorials/intermediate/pruning_tutorial.html">Pruning Tutorial</a></p>
 
                         <h3 id="section13-sub3">
