@@ -296,11 +296,37 @@ print(f"Device tensor is stored on: {tensor.device}")</code></pre>
                 <h5>Standard MumPy-like Indexing and Slicing</h5>
 
                 <h3>2.3.3 Datasets and DataLoaders</h3>
+                <p>Code for processing data samples can get messy and hard to maintain; we ideally want our dataset code to be decoupled from our model training code for better readability and modularity. PyTorch provides two data primitives: torch.utils.data.DataLoader and torch.utils.data.Dataset that allow you to use pre-loaded datasets as well as your own data. Dataset stores the samples and their corresponding labels, and DataLoader wraps an iterable around the Dataset to enable easy access to the samples.</p>
+                <p>PyTorch domain libraries provide a number of pre-loaded datasets (such as FashionMNIST) that subclass torch.utils.data.Dataset and implement functions specific to the particular data. They can be used to prototype and benchmark your model. You can find them here: Image Datasets, Text Datasets, and Audio Datasets</p>
+
+                <h4>2.3.3.1 Loading a Dataset</h4>
+                <h4>2.3.3.2 Iterating and Visualizing the Dataset</h4>
+                <h4>2.3.3.3 Creating a Custom Dataset</h4>
+
                 <h3>2.3.4 Transforms</h3>
-                <h3 id="build_model">2.3.5 Build Model</h3>
+
+                <h3 id="build-model">2.3.5 Build the Nerual Model</h3>
+
                 <h3>2.3.6 Automatic Differentiation</h3>
-                <h3>2.3.7 Optimization Loop</h3>
-                <h3>2.3.8 Save, Load and Use Model</h3>
+                <p>When training neural networks, the most frequently used algorithm is back propagation. In this algorithm, parameters (model weights) are adjusted according to the gradient of the loss function with respect to the given parameter.</p>
+                <p>To compute those gradients, PyTorch has a built-in differentiation engine called torch.autograd. It supports automatic computation of gradient for any computational graph.</p>
+                <p>Consider the simplest one-layer neural network, with input x, parameters w and b, and some loss function. It can be defined in PyTorch in the following manner:</p>
+                <pre><code># input tensor
+x = torch.ones(5)
+# expected output
+y = torch.zeros(3)
+w = torch.randn(5, 3, requires_grad=True)
+b = torch.randn(3, requires_grad=True)
+z = torch.matmul(x, w) + b
+loss = torch.nn.functional.binary_cross_entropy_with_logits(z, y)</code></pre>
+
+                
+
+                <h3>2.3.7 Optimization Model Parameters</h3>
+
+
+                <h3>2.3.8 Save and Load Model</h3>
+
                 <div class="navigation">
                     <a href="point_classify.html">Prev: 2.2 Points Classification</a>
                     <a href="activation_function.html">Next: 2.4 Activation Function</a>
