@@ -40,12 +40,10 @@
                 <p>The reference scripts for training object detection, instance segmentation and person keypoint detection allows for easily supporting adding new custom datasets. The dataset should inherit from the standard <a href="https://docs.pytorch.org/docs/stable/data.html#torch.utils.data.Dataset">torch.utils.data.Dataset</a> class, and implement <code>__len__</code> and <code>__getitem__</code> .</p>
                 <p>The only specificity that we require is that the dataset <code>__getitem__</code> should return a tuple:</p>
                 <ul class="with-bullets">
-                    <li><p><strong>image</strong>: <a>torchvision.tv_tensors.Image</a> of shape <code>[3, H, W]</code> , a pure tensor, or a PIL Image of size <code>(H, W)</code></p> .</li>
-                    <li>
-                        <p><strong>target</strong>: a dict containing the following fields - boxes, labels, image_id, area, iscrowd and masks.</p>
-                    </li>
+                    <li><p><strong>image</strong>: <a>torchvision.tv_tensors.Image</a> of shape <code>[3, H, W]</code> , a pure tensor, or a PIL Image of size <code>(H, W)</code> .</p></li>
+                    <li><p><strong>target</strong>: a dict containing the following fields - boxes, labels, image_id, area, iscrowd and masks.</p></li>
                 </ul>
-                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/09_image/1_object_detect/penn_fundan_dataset.py">penn_fundan_dataset.py</a> write a dataset for the PennFudan dataset. First, <a href="https://github.com/artinte/deep-learning/blob/develop/09_image/1_object_detect/finetunning.py">finetunning.py</a> download the dataset and extract the zip file:</p>
+                <p>First, <a href="https://github.com/artinte/deep-learning/blob/develop/09_image/1_object_detect/finetunning.py">finetunning.py</a> download the dataset and extract the zip file:</p>
                 <pre><code>file_path = download.download(url,
                               sha1_hash='88474aa75cc41dbb8d3c76d2f3c818e79fa0438d')
 print(file_path)
@@ -92,6 +90,73 @@ pyplot.show()</code></pre>
 
                 <img src="res/09/fudan_ped_data.jpg" alt="FudanPed Random Sample">
                 <p style="text-align: center; color: #555555;">Figure 2 - FudanPed Random Sample</p>
+
+                <p>So each image has a corresponding segmentation mask, where each color correspond to a different instance. File <a href="https://github.com/artinte/deep-learning/blob/develop/09_image/1_object_detect/penn_fundan_dataset.py">penn_fundan_dataset.py</a> write a torch.utils.data.Dataset class for this dataset. In the code below, we are wrapping images, bounding boxes and masks into torchvision.tv_tensors.TVTensor classes so that we will be able to apply torchvision built-in transformations (new Transforms API) for the given object detection and segmentation task.</p>
+                <p>Namely, image tensors will be wrapped by torchvision.tv_tensors.Image, bounding boxes into torchvision.tv_tensors.BoundingBoxes and masks into torchvision.tv_tensors.Mask. As torchvision.tv_tensors.TVTensor are torch.Tensor subclasses, wrapped objects are also tensors and inherit the plain torch.Tensor API. For more information about torchvision tv_tensors see <a href="https://pytorch.org/vision/main/auto_examples/transforms/plot_transforms_getting_started.html#what-are-tvtensors">this documentation</a> .</p>
+
+                <pre><code>import os
+import torch
+
+from torchvision.io import read_image
+from torchvision.ops.boxes import masks_to_boxes
+from torchvision import tv_tensors
+from torchvision.transforms.v2 import functional as F
+
+
+class PennFudanDataset(torch.utils.data.Dataset):
+    def __init__(self, root, transforms):
+        self.root = root
+        self.transforms = transforms
+        # load all image files, sorting them to
+        # ensure that they are aligned
+        self.imgs = list(sorted(os.listdir(os.path.join(root, "PNGImages"))))
+        self.masks = list(sorted(os.listdir(os.path.join(root, "PedMasks"))))
+
+    def __getitem__(self, idx):
+        # load images and masks
+        img_path = os.path.join(self.root, "PNGImages", self.imgs[idx])
+        mask_path = os.path.join(self.root, "PedMasks", self.masks[idx])
+        img = read_image(img_path)
+        mask = read_image(mask_path)
+        # instances are encoded as different colors
+        obj_ids = torch.unique(mask)
+        # first id is the background, so remove it
+        obj_ids = obj_ids[1:]
+        num_objs = len(obj_ids)
+
+        # split the color-encoded mask into a set
+        # of binary masks
+        masks = (mask == obj_ids[:, None, None]).to(dtype=torch.uint8)
+
+        # get bounding box coordinates for each mask
+        boxes = masks_to_boxes(masks)
+
+        # there is only one class
+        labels = torch.ones((num_objs,), dtype=torch.int64)
+
+        image_id = idx
+        area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
+        # suppose all instances are not crowd
+        iscrowd = torch.zeros((num_objs,), dtype=torch.int64)
+
+        # Wrap sample and targets into torchvision tv_tensors:
+        img = tv_tensors.Image(img)
+
+        target = {}
+        target["boxes"] = tv_tensors.BoundingBoxes(boxes, format="XYXY", canvas_size=F.get_size(img))
+        target["masks"] = tv_tensors.Mask(masks)
+        target["labels"] = labels
+        target["image_id"] = image_id
+        target["area"] = area
+        target["iscrowd"] = iscrowd
+
+        if self.transforms is not None:
+            img, target = self.transforms(img, target)
+
+        return img, target
+
+    def __len__(self):
+        return len(self.imgs)</code></pre>
 
 
                 <h3>9.1.2 Defining your model</h3>
