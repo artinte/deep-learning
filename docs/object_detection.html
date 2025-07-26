@@ -89,7 +89,7 @@ pyplot.title('Mask')
 pyplot.imshow(mask.permute(1, 2, 0))
 pyplot.show()</code></pre>
 
-                <img src="res/09/fudan_ped_data.jpg" alt="FudanPed Random Sample">
+                <img src="res/09/fudan_ped_data.jpg" alt="FudanPed Random Sample" width="600">
                 <p style="text-align: center; color: #555555;">Figure 2 - FudanPed Random Sample</p>
 
                 <p>So each image has a corresponding segmentation mask, where each color correspond to a different instance. File <a href="https://github.com/artinte/deep-learning/blob/develop/09_image/1_object_detect/penn_fundan_dataset.py">penn_fundan_dataset.py</a> write a torch.utils.data.Dataset class for this dataset. In the code below, we are wrapping images, bounding boxes and masks into torchvision.tv_tensors.TVTensor classes so that we will be able to apply torchvision built-in transformations (new Transforms API) for the given object detection and segmentation task.</p>
@@ -158,12 +158,26 @@ class PennFudanDataset(torch.utils.data.Dataset):
 
     def __len__(self):
         return len(self.imgs)</code></pre>
-                <p>hat’s all for the dataset. Now let’s define a model that can perform predictions on this dataset.</p>
+                <p>that’s all for the dataset. Now let’s define a model that can perform predictions on this dataset.</p>
 
 
                 <h3>9.1.2 Defining your model</h3>
                 <p>In this tutorial, we will be using Mask R-CNN, which is based on top of Faster R-CNN. <a href="https://arxiv.org/abs/1506.01497">Faster R-CNN</a> is a model that predicts both bounding boxes and class scores for potential objects in the image.</p>
+                <img src="res/09/faster_r_cnn.jpg" alt="Faster R-CNN" width="600">
+                <p style="text-align: center; color: #555555;">Figure 3 - Faster R-CNN Architecture</p>
+
                 <p>Mask R-CNN adds an extra branch into Faster R-CNN , which also predicts segmentation masks for each instance.</p>
+
+                <img src="res/09/mask_r_cnn.jpg" alt="Mask R-CNN Architecture" width="600">
+
+                <p>There are two common situations where one might want to modify one of the available models in TorchVision Model Zoo. The first is when we want to start from a pre-trained model, and just finetune the last layer. The other is when we want to replace the backbone of the model with a different one (for faster predictions, for example).</p>
+                <p>Let’s go see how we would do one or another in the following sections.</p>
+
+                <h4>9.1.2.1 Finetuning from a Pretrained Model</h4>
+                <p>Let’s suppose that you want to start from a model pre-trained on COCO and want to finetune it for your particular classes. Here is a possible way of doing it:</p>
+
+                <h4>9.1.2.2 Modifying the Model to Add a Different Backbone</h4>
+                
 
                 <h3>9.1.3 Putting Everything Together</h3>
 
