@@ -8,6 +8,7 @@
     <title>Object Detection</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="article_style.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
     <style>
         .image-container img {
             display: inline-block;
@@ -94,7 +95,7 @@ pyplot.show()</code></pre>
                 <p>So each image has a corresponding segmentation mask, where each color correspond to a different instance. File <a href="https://github.com/artinte/deep-learning/blob/develop/09_image/1_object_detect/penn_fundan_dataset.py">penn_fundan_dataset.py</a> write a torch.utils.data.Dataset class for this dataset. In the code below, we are wrapping images, bounding boxes and masks into torchvision.tv_tensors.TVTensor classes so that we will be able to apply torchvision built-in transformations (new Transforms API) for the given object detection and segmentation task.</p>
                 <p>Namely, image tensors will be wrapped by torchvision.tv_tensors.Image, bounding boxes into torchvision.tv_tensors.BoundingBoxes and masks into torchvision.tv_tensors.Mask. As torchvision.tv_tensors.TVTensor are torch.Tensor subclasses, wrapped objects are also tensors and inherit the plain torch.Tensor API. For more information about torchvision tv_tensors see <a href="https://pytorch.org/vision/main/auto_examples/transforms/plot_transforms_getting_started.html#what-are-tvtensors">this documentation</a> .</p>
 
-                <pre><code>import os
+                <pre><code class="language-python">import os
 import torch
 
 from torchvision.io import read_image
@@ -157,11 +158,12 @@ class PennFudanDataset(torch.utils.data.Dataset):
 
     def __len__(self):
         return len(self.imgs)</code></pre>
+                <p>hat’s all for the dataset. Now let’s define a model that can perform predictions on this dataset.</p>
 
 
                 <h3>9.1.2 Defining your model</h3>
-                <p>In this tutorial, we will be using Mask R-CNN, which is based on top of Faster R-CNN. Faster R-CNN is a model that predicts both bounding boxes and class scores for potential objects in the image.</p>
-                <p>Mask R-CNN adds an extra branch into Faster R-CNN, which also predicts segmentation masks for each instance.</p>
+                <p>In this tutorial, we will be using Mask R-CNN, which is based on top of Faster R-CNN. <a href="https://arxiv.org/abs/1506.01497">Faster R-CNN</a> is a model that predicts both bounding boxes and class scores for potential objects in the image.</p>
+                <p>Mask R-CNN adds an extra branch into Faster R-CNN , which also predicts segmentation masks for each instance.</p>
 
                 <h3>9.1.3 Putting Everything Together</h3>
 
@@ -189,6 +191,10 @@ class PennFudanDataset(torch.utils.data.Dataset):
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="text/javascript" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="article_script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>
+        hljs.highlightAll();
+    </script>
 </body>
 
 </html>
