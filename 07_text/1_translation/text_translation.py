@@ -24,6 +24,8 @@ tokenizer = transformers.AutoTokenizer.from_pretrained("facebook/m2m100_418M")
 tokenizer.src_lang = "pt"
 tokenizer.tgt_lang = "en"
 
+print(f"Vocab Size: {len(tokenizer)}")
+
 text = "Hello, how are you?"
 encoded = tokenizer(text, return_tensors="pt")
 print("Token IDs:", encoded["input_ids"])
@@ -175,10 +177,23 @@ class PositionalEmbedding(torch.nn.Module):
         return x_embed
 
 
-pe_layer = PositionalEmbedding(vocab_size=len(tokenizer),
-                               d_model=512,
-                               pad_token_id=tokenizer.pad_token_id)
+pe_layer = PositionalEmbedding(
+    vocab_size=len(tokenizer), d_model=512, pad_token_id=tokenizer.pad_token_id
+)
 
-sample_output = pe_layer(sample_batch['input_ids'])
+sample_output = pe_layer(sample_batch["input_ids"])
 # (batch_size, seq_len, d_model)
 print(sample_output.shape)
+
+
+class BaseAttention(torch.nn.Module):
+    def __init__(self, d_model, num_heads, dropout_rate, **kwargs):
+        super().__init__()
+        self.mha = torch.nn.MultiheadAttention(
+            embed_dim=d_model,
+            num_heads=num_heads,
+            dropout=dropout_rate,
+            batch_first=True,
+            **kwargs,
+        )
+        self.layernorm = torch.nn.LayerNorm(normalized_shape=d_model)
