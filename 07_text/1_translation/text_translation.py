@@ -318,3 +318,21 @@ ffn = FeedForward(d_model=512, d_ff=2048, dropout_rate=0.1)
 x = torch.randn(16, 128, 512)
 output = ffn(x)
 assert output.shape == (16, 128, 512)
+
+
+class EncoderLayer(torch.nn.Module):
+    def __init__(self, d_model, num_heads, d_ff, dropout_rate=0.1):
+        super().__init__()
+        self.self_attn = GlobalSelfAttention(d_model, num_heads, dropout_rate)
+        self.ffn = FeedForward(d_model, d_ff, dropout_rate)
+
+    def forward(self, x):
+        # x: (batch, seq_len, d_model)
+        x = self.self_attn(x)
+        x = self.ffn(x)
+        return x
+
+sample_encoder_layer = EncoderLayer(d_model=512, num_heads=4, d_ff=2048, dropout_rate=0.1)
+x = torch.randn(16, 128, 512)
+output = sample_encoder_layer(x)
+assert output.shape == (16, 128, 512)
