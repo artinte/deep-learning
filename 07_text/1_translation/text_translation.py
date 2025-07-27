@@ -197,3 +197,34 @@ class BaseAttention(torch.nn.Module):
             **kwargs,
         )
         self.layernorm = torch.nn.LayerNorm(normalized_shape=d_model)
+
+
+class CrossAttention(BaseAttention):
+    def forward(self, x, context):
+        # x: (batch, traget_seq_len, d_model)
+        # context: (batch, source_seq_len, d_model)
+        attn_output, attn_scores = self.mha(
+            query=x,
+            key=context,
+            value=context,
+            need_weights=True,
+            average_attn_weights=False
+        )
+        
+        # Cache the attention scores for plotting later.
+        self.last_attn_scores = attn_scores
+        
+        # Residual connection and layer norm.
+        x = x + attn_output
+        x = self.layernorm(x)
+        
+        return x
+
+cross_attn = CrossAttention(d_model=512, num_heads=4, dropout_rate=0.1)
+# target sequence
+x = torch.randn(16, 128, 512)
+# source sequence (e.g., encoder output)
+context = torch.randn(16, 64, 512)
+
+output = cross_attn(x, context)
+assert output.shape == (16, 128, 512)
