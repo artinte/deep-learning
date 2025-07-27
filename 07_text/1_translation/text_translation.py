@@ -136,11 +136,13 @@ def positional_encoding(length, depth):
     return pos_encoding.float()
 
     
-pos_encoding = positional_encoding(length=2048, depth=512)
-assert pos_encoding.shape == (2048, 512)
-# Plot the dimensions.
-pyplot.pcolormesh(pos_encoding.numpy().T, cmap='RdBu')
+pe = positional_encoding(length=100, depth=64)
+assert pe.shape == (100, 64)
+for i in range(5):
+    pyplot.plot(pe[:, i].numpy(), label=f'dim {i}')
+
 pyplot.xlabel('Position')
-pyplot.ylabel('Depth')
-pyplot.colorbar()
+pyplot.ylabel('Encoding Value')
+pyplot.legend()
+pyplot.grid(True)
 pyplot.show()
