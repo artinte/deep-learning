@@ -433,7 +433,7 @@ print(sample_output.shape)</code></pre>
                 <pre><samp>d = {'color': 'blue', 'age': 22, 'type': 'pickup'}
 result = d['color']</samp></pre>
                 
-                <ul>
+                <ul class="with-bullets">
                     <li><p>The querys is what you're trying to find.</p></li>
                     <li><p>The keys what sort of information the dictionary has.</p></li>
                     <li><p>The value is that information.</p></li>
@@ -443,9 +443,17 @@ result = d['color']</samp></pre>
                 <p>An attention layer does a fuzzy lookup like this, but it's not just looking for the best key. It combines the <span class="highlight">values</span> based on how well the <span class="highlight">query</span> matches each <span class="highlight">key</span> .</p>
                 <p>How does that work? In an attention layer the <span class="highlight">query</span> , <span class="highlight">key</span> , and <span class="highlight">value</span> are each vectors. Instead of doing a hash lookup the attention layer combines the query and key vectors to determine how well they match, the "attention score". The layer returns the average across all the <span class="highlight">values</span> , weighted by the "attention scores".</p>
                 
-
+                <p>Each location the query-sequence provides a query vector. The context sequence acts as the dictionary. At each location in the context sequence provides a key and value vector. The input vectors are not used directly, the <code>torch.nn.MultiHeadAttention</code> layer includes <code>torch.nn.Dense</code> layers to project the input vectors before using them.</p>
 
                 <h4>7.1.3.4 The Cross Attention Layer</h4>
+
+                At the literal center of the Transformer is the cross-attention layer. This layer connects the encoder and decoder. This layer is the most straight-forward use of attention in the model, it performs the same task as the attention block in the <a href="nmt_align.html">NMT with attention</a> tutorial.
+                
+                <img src="res/07/cross_attention.png" alt="The Cross Attention Layer" width="600">
+                <p style="text-align: center; color: #555555;">Figure 12 - The Cross Attention Layer</p>
+
+                <p>To implement this you pass the target sequence x as the query and the context sequence as the key/value when calling the mha layer:</p>
+
 
                 <h4>7.1.3.5 The Global Self-attention Layer</h4>
 
