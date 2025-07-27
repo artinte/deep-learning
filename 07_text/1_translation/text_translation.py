@@ -197,18 +197,28 @@ class BaseAttention(torch.nn.Module):
             **kwargs,
         )
         self.layernorm = torch.nn.LayerNorm(normalized_shape=d_model)
+        # To store the last attention scores for visualization
+        self.last_attn_scores = None
 
 
 class CrossAttention(BaseAttention):
-    def forward(self, x, context):
+    def __init__(self, d_model, num_heads, dropout_rate, **kwargs):
+        super().__init__(d_model, num_heads, dropout_rate, **kwargs)
+
+    def forward(self, x, context, key_padding_mask=None):
         # x: (batch, traget_seq_len, d_model)
         # context: (batch, source_seq_len, d_model)
+        if key_padding_mask is not None and key_padding_mask.device != x.device:
+            key_padding_mask = key_padding_mask.to(x.device)
+
         attn_output, attn_scores = self.mha(
             query=x,
             key=context,
             value=context,
             need_weights=True,
             average_attn_weights=False,
+            key_padding_mask=key_padding_mask,
+            attn_mask=None,
         )
 
         # Cache the attention scores for plotting later.
@@ -232,11 +242,23 @@ assert output.shape == (16, 128, 512)
 
 
 class GlobalSelfAttention(BaseAttention):
-    def forward(self, x):
+    def __init__(self, d_model, num_heads, dropout_rate, **kwargs):
+        super().__init__(d_model, num_heads, dropout_rate, **kwargs)
+
+    def forward(self, x, key_padding_mask=None):
         # query = key = value = x
         # # x: (batch, seq_len, d_model)
+        if key_padding_mask is not None and key_padding_mask.device != x.device:
+            key_padding_mask = key_padding_mask.to(x.device)
+
         attn_output, attn_scores = self.mha(
-            query=x, key=x, value=x, need_weights=True, average_attn_weights=False
+            query=x,
+            key=x,
+            value=x,
+            need_weights=True,
+            average_attn_weights=False,
+            key_padding_mask=key_padding_mask,
+            attn_mask=None,
         )
 
         # Cache the attention scores for plotting later.
@@ -256,18 +278,24 @@ assert output.shape == (16, 128, 512)
 
 
 class CausalSelfAttention(BaseAttention):
-    def forward(self, x):
+    def __init__(self, d_model, num_heads, dropout_rate, **kwargs):
+        super().__init__(d_model, num_heads, dropout_rate, **kwargs)
+
+    def forward(self, x, key_padding_mask=None):
         # query = key = value = x
         # x: (batch, seq_len, d_model)
-        causal_mask = torch.nn.Transformer.generate_square_subsequent_mask(x.size(1))
+        causal_mask = torch.nn.Transformer.generate_square_subsequent_mask(
+            x.size(1)
+        ).to(x.device)
+        causal_mask = causal_mask == float("-inf")
         attn_output, attn_scores = self.mha(
             query=x,
             key=x,
             value=x,
             need_weights=True,
             average_attn_weights=False,
-            is_causal=True,
             attn_mask=causal_mask,
+            key_padding_mask=key_padding_mask,
         )
 
         # Cache the attention scores for plotting later.
@@ -289,8 +317,10 @@ casual_attn_without_dropout = CausalSelfAttention(
     d_model=512, num_heads=4, dropout_rate=0.0
 )
 x = torch.randn(16, 128, 512)
-out1 = casual_attn_without_dropout(x[:, :3])
-out2 = casual_attn_without_dropout(x)[:, :3]
+dummy_mask = torch.zeros(16, 128, dtype=torch.bool, device=x.device)
+dummy_mask[:, -10:] = True
+out1 = casual_attn_without_dropout(x[:, :3], key_padding_mask=dummy_mask[:, :3])
+out2 = casual_attn_without_dropout(x, key_padding_mask=dummy_mask)[:, :3]
 torch.testing.assert_close(out1, out2, rtol=1e-5, atol=1e-5)
 print("Causal self-attention without dropout works as expected.")
 
@@ -306,13 +336,14 @@ class FeedForward(torch.nn.Module):
 
     def forward(self, x):
         # x: (batch, seq_len, d_model)
-        x = self.linear1(x)
-        x = self.relu(x)
-        x = self.dropout(x)
-        x = self.linear2(x)
+        x_ff = self.linear1(x)
+        x_ff = self.relu(x_ff)
+        x_ff = self.dropout(x_ff)
+        x_ff = self.linear2(x_ff)
 
         # Residual connection and layer norm.
-        x = x + self.layernorm(x)
+        x = x + x_ff
+        x = self.layernorm(x)
 
         return x
 
@@ -329,9 +360,9 @@ class EncoderLayer(torch.nn.Module):
         self.self_attn = GlobalSelfAttention(d_model, num_heads, dropout_rate)
         self.ffn = FeedForward(d_model, d_ff, dropout_rate)
 
-    def forward(self, x):
+    def forward(self, x, key_padding_mask=None):
         # x: (batch, seq_len, d_model)
-        x = self.self_attn(x)
+        x = self.self_attn(x, key_padding_mask=key_padding_mask)
         x = self.ffn(x)
         return x
 
@@ -348,11 +379,11 @@ class Encoder(torch.nn.Module):
     def __init__(self, d_model, num_heads, d_ff, num_layers, dropout_rate=0.1):
         super().__init__()
         self.pos_embedding = PositionalEmbedding(
-            vocab_size=tokenizer.vocab_size,
+            vocab_size=len(tokenizer),
             d_model=d_model,
             pad_token_id=tokenizer.pad_token_id,
         )
-        self.layers = torch.nn.ModuleList(
+        self.enc_layers = torch.nn.ModuleList(
             [
                 EncoderLayer(d_model, num_heads, d_ff, dropout_rate)
                 for _ in range(num_layers)
@@ -361,15 +392,16 @@ class Encoder(torch.nn.Module):
         self.layernorm = torch.nn.LayerNorm(normalized_shape=d_model)
         self.dropout = torch.nn.Dropout(dropout_rate)
 
-    def forward(self, x):
+    def forward(self, x, key_padding_mask=None):
         # x is token-IDs shape: (batch, seq_len)
         # (batch_size, seq_len, d_model)
         x = self.pos_embedding(x)
         # Add dropout.
         x = self.dropout(x)
         # Apply each encoder layer sequentially
-        for layer in self.layers:
-            x = layer(x)
+        key_padding_mask = key_padding_mask == 0
+        for layer in self.enc_layers:
+            x = layer(x, key_padding_mask=key_padding_mask)
         x = self.layernorm(x)
         # (batch_size, seq_len, d_model)
         return x
@@ -379,9 +411,123 @@ class Encoder(torch.nn.Module):
 sample_encoder = Encoder(
     d_model=512, num_heads=4, d_ff=2048, num_layers=6, dropout_rate=0.1
 )
-# Create a sample input (batch_size=16, seq_len=128)
-x = torch.randint(0, tokenizer.vocab_size, (16, 128))
-assert x.shape == (16, 128)
+sample_batch_encoder_input = next(iter(train_dataloader))
+encoder_input_ids = sample_batch_encoder_input["input_ids"]
+print(encoder_input_ids.shape)  # Should be (batch_size, seq_len)
+encoder_attention_mask = sample_batch_encoder_input["attention_mask"]
+
 # Forward pass through the encoder.
-output = sample_encoder(x)
+output = sample_encoder(encoder_input_ids, encoder_attention_mask)
+assert output.shape == (encoder_input_ids.shape[0], encoder_input_ids.shape[1], 512)
+print("Encoder forward pass successful with padding mask.")
+
+
+class DecoderLayer(torch.nn.Module):
+    def __init__(self, d_model, num_heads, d_ff, dropout_rate=0.1):
+        super().__init__()
+        self.causal_self_attn = CausalSelfAttention(d_model, num_heads, dropout_rate)
+        self.cross_attn = CrossAttention(d_model, num_heads, dropout_rate)
+        self.ffn = FeedForward(d_model, d_ff, dropout_rate)
+
+    def forward(
+        self, x, context, x_key_padding_mask=None, context_key_padding_mask=None
+    ):
+        # x: (batch, seq_len, d_model)
+        # context: (batch, source_seq_len, d_model)
+        x = self.causal_self_attn(x, key_padding_mask=x_key_padding_mask)
+        x = self.cross_attn(x, context, key_padding_mask=context_key_padding_mask)
+
+        # Cache the last attention scores for plotting later
+        self.last_attn_scores = self.cross_attn.last_attn_scores
+
+        # Apply the feed-forward network
+        x = self.ffn(x)
+        return x
+
+
+sample_decoder_layer = DecoderLayer(
+    d_model=512, num_heads=4, d_ff=2048, dropout_rate=0.1
+)
+# Create a sample input (batch_size=16, seq_len=128)
+x = torch.randn(16, 128, 512)
+# Create a sample context (batch_size=16, source_seq_len=64)
+context = torch.randn(16, 64, 512)
+# Forward pass through the decoder layer.
+output = sample_decoder_layer(x, context)
 assert output.shape == (16, 128, 512)
+
+
+class Decoder(torch.nn.Module):
+    def __init__(self, d_model, num_heads, d_ff, num_layers, dropout_rate=0.1):
+        super().__init__()
+        self.d_model = d_model
+        self.num_layers = num_layers
+        # To store the last attention scores for visualization
+        self.last_attn_scores = None
+
+        self.pos_embedding = PositionalEmbedding(
+            vocab_size=len(tokenizer),
+            d_model=d_model,
+            pad_token_id=tokenizer.pad_token_id,
+        )
+        self.dec_layers = torch.nn.ModuleList(
+            [
+                DecoderLayer(d_model, num_heads, d_ff, dropout_rate)
+                for _ in range(num_layers)
+            ]
+        )
+        self.layernorm = torch.nn.LayerNorm(normalized_shape=d_model)
+        self.dropout = torch.nn.Dropout(dropout_rate)
+
+    def forward(
+        self,
+        decoder_input_ids,
+        context,
+        x_key_padding_mask=None,
+        context_key_padding_mask=None,
+    ):
+        # x is token-IDs shape: (batch, seq_len)
+        # (batch_size, seq_len, d_model)
+        decoder_input_ids = self.pos_embedding(decoder_input_ids)
+        # Add dropout.
+        decoder_input_ids = self.dropout(decoder_input_ids)
+        # Apply each decoder layer sequentially
+        x_key_padding_mask = x_key_padding_mask == 0
+        context_key_padding_mask = context_key_padding_mask == 0
+        for layer in self.dec_layers:
+            decoder_input_ids = layer(
+                decoder_input_ids,
+                context,
+                x_key_padding_mask=x_key_padding_mask,
+                context_key_padding_mask=context_key_padding_mask,
+            )
+        decoder_input_ids = self.layernorm(decoder_input_ids)
+        self.last_attn_scores = self.dec_layers[-1].cross_attn.last_attn_scores
+        # (batch_size, seq_len, d_model)
+        return decoder_input_ids
+
+
+sample_decoder = Decoder(
+    d_model=512, num_heads=4, d_ff=2048, num_layers=6, dropout_rate=0.1
+)
+sample_batch_decoder_input = next(iter(val_dataloader))
+decoder_input_ids = sample_batch_decoder_input["labels"]
+decoder_attention_mask = (decoder_input_ids != tokenizer.pad_token_id).int()
+
+dummy_encoder_output_batch = next(iter(train_dataloader))
+context_tensor = torch.randn(
+    dummy_encoder_output_batch["input_ids"].shape[0],
+    dummy_encoder_output_batch["input_ids"].shape[1],
+    512,
+)
+context_attention_mask_for_decoder = dummy_encoder_output_batch["attention_mask"]
+
+output = sample_decoder(
+    decoder_input_ids,
+    context_tensor,
+    x_key_padding_mask=decoder_attention_mask,
+    context_key_padding_mask=context_attention_mask_for_decoder,
+)
+assert output.shape == (decoder_input_ids.shape[0], decoder_input_ids.shape[1], 512)
+print("Decoder forward pass successful with padding mask.")
+
