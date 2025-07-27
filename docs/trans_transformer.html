@@ -399,7 +399,7 @@ print(sample_output.shape)</code></pre>
                 <p>The residual "Add & Norm" blocks are included so that training is efficient. The residual connection provides a direct path for the gradient (and ensures that vectors are updated by the attention layers instead of replaced), while the normalization maintains a reasonable scale for the outputs.</p>
 
                 <h4>7.1.3.3 The Base Attention Layer</h4>
-                <p>Attention layers are used throughout the model. These are all identical except for how the attention is configured. Each one contains a <code>torch.nn.MultiheadAttention</code> , a <code>torch.nn.LayerNorm</code> and a <code>torch.nn.Add</code> .</p>
+                <p>Attention layers are used throughout the model. These are all identical except for how the attention is configured. Each one contains a <code>torch.nn.MultiheadAttention</code> , a <code>torch.nn.LayerNorm</code> and a add operation.</p>
 
                 <img src="res/07/base_attention.png" alt="The Base Attention Layer">
                 <p style="text-align: center; color: #555555;">Figure 10 - The Base Attention Layer</p>
@@ -455,7 +455,34 @@ print(sample_output.shape)</code></pre>
                 <h3>7.1.8 Export the Model</h3>
 
                 <h3>7.1.9 Conclusion</h3>
+                <p>In this tutorial you learned about:</p>
+                <ul class="with-bullets">
+                    <li><p>The Transformers and their significance in machine learning</p></li>
+                    <li><p>Attention, self-attention and multi-head attention</p></li>
+                    <li><p>Positional encoding with embeddings</p></li>
+                    <li><p>The encoder-decoder architecture of the original Transformer</p></li>
+                    <li><p>Masking in self-attention</p></li>
+                    <li><p>How to put it all together to translate text</p></li>
+                </ul>
+
+                <p>The downsides of this architecture are:</p>
+                <ul class="with-bullets">
+                    <li><p>For a time-series, the output for a time-step is calculated from the entire history instead of only the inputs and current hidden-state. This may be less efficient.</p></li>
+                    <li><p>If the input has a temporal/spatial relationship, like text or images, some positional encoding must be added or the model will effectively see a bag of words.</p></li>
+                </ul>
+
+                <p>If you want to practice, there are many things you could try with it. For example:</p>
+                <ul class="with-bullets">
+                    <li><p>Use a different dataset to train the Transformer.</p></li>
+                    <li><p>Create the "Base Transformer" or "Transformer XL" configurations from the original paper by changing the hyperparameters.</p></li>
+                    <li><p>Use the layers defined here to create an implementation of <a href="bert.html">BERT</a></p></li>
+                    <li><p>Use Beam search to get better predictions.</p></li>
+                </ul>
+
+                <p>There are a wide variety of Transformer-based models, many of which improve upon the 2017 version of the original Transformer with encoder-decoder, encoder-only and decoder-only architectures.</p>
                 
+
+
                 <div class="navigation">
                     <a href="latent_diffusion.html">Prev: 6.7 Latent Diffusion</a>
                     <a href="easy_ocr.html">Next: 7.2 Easy OCR</a>
