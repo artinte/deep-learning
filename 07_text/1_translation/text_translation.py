@@ -181,9 +181,9 @@ pe_layer = PositionalEmbedding(
     vocab_size=len(tokenizer), d_model=512, pad_token_id=tokenizer.pad_token_id
 )
 
-sample_output = pe_layer(sample_batch["input_ids"])
+sample_positional_output = pe_layer(sample_batch["input_ids"])
 # (batch_size, seq_len, d_model)
-print(sample_output.shape)
+print(sample_positional_output.shape)
 
 
 class BaseAttention(torch.nn.Module):
@@ -248,7 +248,46 @@ class GlobalSelfAttention(BaseAttention):
 
         return x
 
-attn = GlobalSelfAttention(d_model=512, num_heads=4, dropout_rate=0.1)
+
+causal_attn = GlobalSelfAttention(d_model=512, num_heads=4, dropout_rate=0.1)
 x = torch.randn(16, 128, 512)
-output = attn(x)
+output = causal_attn(x)
 assert output.shape == (16, 128, 512)
+
+
+class CausalSelfAttention(BaseAttention):
+    def forward(self, x):
+        # query = key = value = x
+        # x: (batch, seq_len, d_model)
+        causal_mask = torch.nn.Transformer.generate_square_subsequent_mask(x.size(1))
+        attn_output, attn_scores = self.mha(
+            query=x,
+            key=x,
+            value=x,
+            need_weights=True,
+            average_attn_weights=False,
+            is_causal=True,
+            attn_mask=causal_mask
+        )
+
+        # Cache the attention scores for plotting later.
+        self.last_attn_scores = attn_scores
+
+        # Residual connection and layer norm.
+        x = x + attn_output
+        x = self.layernorm(x)
+
+        return x
+
+
+causal_attn = CausalSelfAttention(d_model=512, num_heads=4, dropout_rate=0.1)
+x = torch.randn(16, 128, 512)
+output = causal_attn(x)
+assert output.shape == (16, 128, 512)
+
+casual_attn_without_dropout = CausalSelfAttention(d_model=512, num_heads=4, dropout_rate=0.0)
+x = torch.randn(16, 128, 512)
+out1 = casual_attn_without_dropout(x[:, :3])
+out2 = casual_attn_without_dropout(x)[:, :3]
+torch.testing.assert_close(out1, out2, rtol=1e-5, atol=1e-5)
+print('Causal self-attention without dropout works as expected.')
