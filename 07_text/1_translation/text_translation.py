@@ -267,7 +267,7 @@ class CausalSelfAttention(BaseAttention):
             need_weights=True,
             average_attn_weights=False,
             is_causal=True,
-            attn_mask=causal_mask
+            attn_mask=causal_mask,
         )
 
         # Cache the attention scores for plotting later.
@@ -290,4 +290,31 @@ x = torch.randn(16, 128, 512)
 out1 = casual_attn_without_dropout(x[:, :3])
 out2 = casual_attn_without_dropout(x)[:, :3]
 torch.testing.assert_close(out1, out2, rtol=1e-5, atol=1e-5)
-print('Causal self-attention without dropout works as expected.')
+print("Causal self-attention without dropout works as expected.")
+
+
+class FeedForward(torch.nn.Module):
+    def __init__(self, d_model, d_ff, dropout_rate=0.1):
+        super().__init__()
+        self.linear1 = torch.nn.Linear(d_model, d_ff)
+        self.relu = torch.nn.ReLU()
+        self.dropout = torch.nn.Dropout(dropout_rate)
+        self.linear2 = torch.nn.Linear(d_ff, d_model)
+        self.layernorm = torch.nn.LayerNorm(normalized_shape=d_model)
+
+    def forward(self, x):
+        # x: (batch, seq_len, d_model)
+        x = self.linear1(x)
+        x = self.relu(x)
+        x = self.dropout(x)
+        x = self.linear2(x)
+
+        # Residual connection and layer norm.
+        x = x + self.layernorm(x)
+
+        return x
+
+ffn = FeedForward(d_model=512, d_ff=2048, dropout_rate=0.1)
+x = torch.randn(16, 128, 512)
+output = ffn(x)
+assert output.shape == (16, 128, 512)
