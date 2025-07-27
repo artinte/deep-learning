@@ -32,7 +32,7 @@
 
                 <p>This tutorial demonstrates how to create and train a sequence-to-sequence Transformer model to translate Portuguese into English. The Transformer was originally proposed in <a href="transformer_paper.html">"Attention is all you need"</a> by Vaswani et al. (2017).</p>
 
-                <p>Transformers are deep neural networks that replace CNNs and RNNs with <a href="trans_transformer.html#self-attention">self-attention</a> . Self-attention allows Transformers to easily transmit information across the input sequences.</p>
+                <p>Transformers are deep neural networks that replace CNNs and RNNs with <a href="transformer_paper.html#self-attention">self-attention</a> . Self-attention allows Transformers to easily transmit information across the input sequences.</p>
 
                 <p>As explained in the <a href="https://research.google/blog/transformer-a-novel-neural-network-architecture-for-language-understanding/">Google AI Blog post</a> :</p>
 
@@ -45,15 +45,22 @@
 
                 <ul class="with-bullets">
                     <li><p>Prepare the data.</p></li>
-                    <li><p>Implement necessary components: 1. Positional embeddings; 2. Attention layers; 3. The encoder and decoder.</p></li>
+                    <li>
+                        <p>Implement necessary components:</p>
+                        <ol>
+                            <li><p>Positional embeddings;</p></li>
+                            <li><p>Attention layers;</p></li>
+                            <li><p>The encoder and decoder.</p></li>
+                        </ol>
+                    </li>
                     <li><p>Build & train the Transformer.</p></li>
                     <li><p>Generate translations.</p></li>
                     <li><p>Export the model.</p></li>
                 </ul>
 
-                <p>To get the most out of this tutorial, it helps if you know about <a href="lstm_and_gru.html#language_model">the basics of text generation</a> and attention mechanisms.</p>
+                <p>To get the most out of this tutorial, it helps if you know about <a href="text_generate_rnn.html">the basics of text generation</a> and <a href="attention_mechanism.html">attention mechanisms</a> .</p>
 
-                <p>A Transformer is a sequence-to-sequence encoder-decoder model similar to the model in the <a href="nmt_align.html">NMT with attention tutorial</a> . A single-layer Transformer takes a little more code to write, but is almost identical to that encoder-decoder RNN model. The only difference is that the RNN layers are replaced with self-attention layers. This tutorial builds a 4-layer Transformer which is larger and more powerful, but not fundamentally more complex.</p>
+                <p>A Transformer is a sequence-to-sequence encoder-decoder model similar to the model in the <a href="nmt_align.html">NMT with attention</a> tutorial. A single-layer Transformer takes a little more code to write, but is almost identical to that encoder-decoder RNN model. The only difference is that the RNN layers are replaced with self-attention layers. This tutorial builds a 4-layer Transformer which is larger and more powerful, but not fundamentally more complex.</p>
 
                 <div class="image-container" style="text-align: center;">
                     <img src="res/07/rnn_attention_words.png" alt="The RNN+Attention Model">
@@ -69,7 +76,7 @@
                 <ul class="with-bullets">
                     <li><p>Transformers excel at modeling sequential data, such as natural language.</p></li>
                     <li><p>Unlike <a href="rnn_classify_scratch.html">recurrent neural networks (RNNs)</a> , Transformers are parallelizable. This makes them efficient on hardware like GPUs and TPUs. The main reasons is that Transformers replaced recurrence with attention, and computations can happen simultaneously. Layer outputs can be computed in parallel, instead of a series like an RNN.</p></li>
-                    <li><p>Unlike RNNs (such as seq2seq, 2014) or convolutional neural networks (CNNs) (for example, ByteNet), Transformers are able to capture distant or long-range contexts and dependencies in the data between distant positions in the input or output sequences. Thus, longer connections can be learned. Attention allows each location to have access to the entire input at each layer, while in RNNs and CNNs, the information needs to pass through many processing steps to move a long distance, which makes it harder to learn.</p></li>
+                    <li><p>Unlike RNNs (such as <a href="text_generate_rnn.html#seq2seq">seq2seq</a> , 2014) or convolutional neural networks (CNNs) (for example, ByteNet), Transformers are able to capture distant or long-range contexts and dependencies in the data between distant positions in the input or output sequences. Thus, longer connections can be learned. Attention allows each location to have access to the entire input at each layer, while in RNNs and CNNs, the information needs to pass through many processing steps to move a long distance, which makes it harder to learn.</p></li>
                     <li><p>Transformers make no assumptions about the temporal/spatial relationships across the data. This is ideal for processing a set of objects (for example, <a href="https://deepmind.google/discover/blog/alphastar-mastering-the-real-time-strategy-game-starcraft-ii/">StarCraft</a> units).</p></li>
                 </ul>
                 <img src="res/07/self_attention_demo.png" alt="Self-attention Distribution" width="600">

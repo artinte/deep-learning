@@ -239,8 +239,10 @@ print(predictions)</code></pre>
                 <p>Looking at the generated sentences there are a few interesting things to note. The model successfully learn syntax. It properly places commas and ends sentence with punctuation. Sometimes it mimics internet speech such as multiple exclamation marks or smileys.</p>
                 <p>However, the vast majority of generated sentences don’t make sense or have grammatical errors (I really picked the best ones above). One reason could be that we did not train our network long enough or didn’t use enough training data. That may be true, but it’s most likely not the main reason. Our vanilla RNN can’t generate meaningful text because it’s unable to learn dependencies between words that are several steps apart. That’s also why RNNs failed to gain popularity when they were first invented. They were beautiful in theory but didn’t work well in practice, and we didn’t immediately understand why.</p>
                 <p></p>
-                
-                <h3 id="lstm">4.4.5 Long Short-Term Memory Unit</h3>
+
+                <h3 id="seq2seq">4.4.5 Seq2Seq</h3>
+
+                <h3 id="lstm">4.4.6 Long Short-Term Memory Unit</h3>
                 <p>The Long Short-Term Memory (LSTM) unit was initially proposed by Hochreiter and Schmidhuber. Since then, a number of minor modifications to the original LSTM unit have been made. We follow the implementation of LSTM as used in Graves.</p>
 
                 <img src="res/04/lstm_arch.png" alt="LSTM Architecture" width="600">
@@ -276,7 +278,7 @@ print(predictions)</code></pre>
 
                 
                 
-                <h3 id="gru">4.4.6 Gated Recurrent Unit</h3>
+                <h3 id="gru">4.4.7 Gated Recurrent Unit</h3>
                 <p>A gated recurrent unit (GRU) was proposed by Cho et al. [2014] to make each recurrent unit to adaptively capture dependencies of different time scales. Similarly to the LSTM unit, the GRU has gating units that modulate the flow of information inside the unit, however, without having a separate memory cells.</p>
                 <p>The activation \(h_t^j\) of the GRU at time \(t\) is a linear interpolation between the previous activation \(h_{t-1}^j\) and the candidate activation \({\tilde {h}}_t^j\):</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">

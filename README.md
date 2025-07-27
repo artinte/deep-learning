@@ -33,7 +33,7 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 - [x] 4.1 [RNN from Scratch](https://artinte.github.io/deep-learning/rnn_classify_scratch.html)
 - [x] 4.2 [Word Embeddings](https://artinte.github.io/deep-learning/word_embed.html)
 - [ ] 4.3 [Word2Vec](https://artinte.github.io/deep-learning/word2vec.html)
-- [ ] 4.4 [LTSM and GRU](https://artinte.github.io/deep-learning/lstm_and_gru.html)
+- [ ] 4.4 [Text Generation with RNN](https://artinte.github.io/deep-learning/text_generate_rnn.html)
 - [ ] 4.5 [Neural Machine Translation](https://artinte.github.io/deep-learning/nmt_align.html)
 - [ ] 4.6 [Attention-based NMT](https://artinte.github.io/deep-learning/attention_nmt.html)
 
