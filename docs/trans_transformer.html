@@ -419,7 +419,8 @@ print(sample_output.shape)</code></pre>
         self.layernorm = torch.nn.LayerNorm(normalized_shape=d_model)</code></pre>
 
                 <p>Before you get into the specifics of each usage, here is a quick refresher on how attention works:</p>
-
+                <img src="res/07/base_attention_qkv.png" alt="The Base Attention Layer" width="600">
+                <p style="text-align: center; color: #555555;">Figure 11 - The Base Attention Layer</p>
 
                 <p>There are two inputs:</p>
                 <ol>
@@ -427,6 +428,22 @@ print(sample_output.shape)</code></pre>
                     <li><p>The context sequence; the sequence being attended to (left).</p></li>
                 </ol>
                 <p>The output has the same shape as the query-sequence.</p>
+                <p>The common comparison is that this operation is like a dictionary lookup. A fuzzy, differentiable, vectorized dictionary lookup.</p>
+                <p>Here's a regular python dictionary, with 3 keys and 3 values being passed a single query.</p>
+                <pre><samp>d = {'color': 'blue', 'age': 22, 'type': 'pickup'}
+result = d['color']</samp></pre>
+                
+                <ul>
+                    <li><p>The querys is what you're trying to find.</p></li>
+                    <li><p>The keys what sort of information the dictionary has.</p></li>
+                    <li><p>The value is that information.</p></li>
+                </ul>
+                <p>When you look up a <span class="highlight">query</span> in a regular dictionary, the dictionary finds the matching <span class="highlight">key</span> , and returns its associated <span class="highlight">value</span> . The <span class="highlight">query</span> either has a matching <span class="highlight">key</span> or it doesn't. You can imagine a fuzzy dictionary where the keys don't have to match perfectly. If you looked up d["species"] in the dictionary above, maybe you'd want it to return "pickup" since that's the best match for the query.</p>
+
+                <p>An attention layer does a fuzzy lookup like this, but it's not just looking for the best key. It combines the <span class="highlight">values</span> based on how well the <span class="highlight">query</span> matches each <span class="highlight">key</span> .</p>
+                <p>How does that work? In an attention layer the <span class="highlight">query</span> , <span class="highlight">key</span> , and <span class="highlight">value</span> are each vectors. Instead of doing a hash lookup the attention layer combines the query and key vectors to determine how well they match, the "attention score". The layer returns the average across all the <span class="highlight">values</span> , weighted by the "attention scores".</p>
+                
+
 
                 <h4>7.1.3.4 The Cross Attention Layer</h4>
 
