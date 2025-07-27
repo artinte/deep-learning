@@ -208,17 +208,18 @@ class CrossAttention(BaseAttention):
             key=context,
             value=context,
             need_weights=True,
-            average_attn_weights=False
+            average_attn_weights=False,
         )
-        
+
         # Cache the attention scores for plotting later.
         self.last_attn_scores = attn_scores
-        
+
         # Residual connection and layer norm.
         x = x + attn_output
         x = self.layernorm(x)
-        
+
         return x
+
 
 cross_attn = CrossAttention(d_model=512, num_heads=4, dropout_rate=0.1)
 # target sequence
@@ -227,4 +228,27 @@ x = torch.randn(16, 128, 512)
 context = torch.randn(16, 64, 512)
 
 output = cross_attn(x, context)
+assert output.shape == (16, 128, 512)
+
+
+class GlobalSelfAttention(BaseAttention):
+    def forward(self, x):
+        # query = key = value = x
+        # # x: (batch, seq_len, d_model)
+        attn_output, attn_scores = self.mha(
+            query=x, key=x, value=x, need_weights=True, average_attn_weights=False
+        )
+
+        # Cache the attention scores for plotting later.
+        self.last_attn_scores = attn_scores
+
+        # Residual connection and layer norm.
+        x = x + attn_output
+        x = self.layernorm(x)
+
+        return x
+
+attn = GlobalSelfAttention(d_model=512, num_heads=4, dropout_rate=0.1)
+x = torch.randn(16, 128, 512)
+output = attn(x)
 assert output.shape == (16, 128, 512)

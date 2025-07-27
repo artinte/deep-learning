@@ -449,7 +449,7 @@ result = d['color']</samp></pre>
 
                 At the literal center of the Transformer is the cross-attention layer. This layer connects the encoder and decoder. This layer is the most straight-forward use of attention in the model, it performs the same task as the attention block in the <a href="nmt_align.html">NMT with attention</a> tutorial.
                 
-                <img src="res/07/cross_attention.png" alt="The Cross Attention Layer" width="600">
+                <img src="res/07/cross_attention.png" alt="The Cross Attention Layer" width="400">
                 <p style="text-align: center; color: #555555;">Figure 12 - The Cross Attention Layer</p>
 
                 <p>To implement this you pass the target sequence x as the query and the context sequence as the key/value when calling the mha layer:</p>
@@ -496,6 +496,58 @@ output = cross_attn(x, context)
 assert output.shape == (16, 128, 512)</code></pre>
 
                 <h4>7.1.3.5 The Global Self-attention Layer</h4>
+                <p>This layer is responsible for processing the context sequence, and propagating information along its length.</p>
+                <img src="res/07/self_attention_ori.png" alt="The Global Self-attention Layer" width="400">
+                <p style="text-align: center; color: #555555;">Figure 15 - The Global Self-attention Layer</p>
+
+                <p>Since the context sequence is fixed while the translation is being generated, information is allowed to flow in both directions.</p>
+                <p>Before Transformers and self-attention, models commonly used RNNs or CNNs to do this task:</p>
+
+                <img src="res/07/bidirectional_rnn.png" alt="Bidirectional RNN" width="400">
+                <p style="text-align: center; color: #555555;">Figure 16 - Bidirectional RNN</p>
+
+                <img src="res/07/bidirectional_cnn.png" alt="Bidirectional CNN" width="400">
+                <p style="text-align: center; color: #555555;">Figure 17 - Bidirectional CNN</p>
+
+                <p>RNNs and CNNs have their limitations:</p>
+                <ul class="with-bullets">
+                    <li><p>The RNN allows information to flow all the way across the sequence, but it passes through many processing steps to get there (limiting gradient flow). These RNN steps have to be run sequentially and so the RNN is less able to take advantage of modern parallel devices.</p></li>
+                    <li><p>In the CNN each location can be processed in parallel, but it only provides a limited receptive field. The receptive field only grows linearly with the number of CNN layers, You need to stack a number of Convolution layers to transmit information across the sequence (Wavenet reduces this problem by using dilated convolutions).</p></li>
+                </ul>
+
+                <p>The global self-attention layer on the other hand lets every sequence element directly access every other sequence element, with only a few operations, and all the outputs can be computed in parallel.</p>
+
+                <p>To implement this layer you just need to pass the target sequence, x, as both the query, and value arguments to the mha layer:</p>
+
+                <pre><code>class GlobalSelfAttention(BaseAttention):
+    def forward(self, x):
+        # query = key = value = x
+        # # x: (batch, seq_len, d_model)
+        attn_output, attn_scores = self.mha(
+            query=x, key=x, value=x, need_weights=True, average_attn_weights=False
+        )
+
+        # Cache the attention scores for plotting later.
+        self.last_attn_scores = attn_scores
+
+        # Residual connection and layer norm.
+        x = x + attn_output
+        x = self.layernorm(x)
+
+        return x
+
+attn = GlobalSelfAttention(d_model=512, num_heads=4, dropout_rate=0.1)
+x = torch.randn(16, 128, 512)
+output = attn(x)
+assert output.shape == (16, 128, 512)</code></pre>
+
+                <p>Sticking with the same style as before you could draw it like this:</p>
+                <img src="res/07/self_attention_diagram.png" alt="The Global Self-attention Layer Diagram" width="400">
+                <p style="text-align: center; color: #555555;">Figure 18 - The Global Self-attention Layer Diagram</p>
+
+                <p>Again, the residual connections are omitted for clarity. It's more compact, and just as accurate to draw it like this:</p>
+                <img src="res/07/self_attention_simple.png" alt="The Global Self-attention Layer Diagram Simplified" width="400">
+                <p style="text-align: center; color: #555555;">Figure 19 - The Global Self-attention Layer Diagram Simplified</p>
 
                 <h4>7.1.3.6 The Causal Self-attention Layer</h4>
 
