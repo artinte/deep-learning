@@ -6,11 +6,13 @@ from matplotlib import pyplot
 
 # 1. Load the dataset
 dataset = datasets.load_dataset('ted_hrlr', 'pt_to_en', trust_remote_code=True)
-train_examples = dataset["train"]
-val_examples = dataset["validation"]
+train_examples = dataset['train']
+val_examples = dataset['validation']
+test_examles = dataset['test']
 
-print(f"Train examples: {len(train_examples)}")
-print(f"Validation examples: {len(val_examples)}")
+print(f'Train examples: {len(train_examples)}')
+print(f'Validation examples: {len(val_examples)}')
+print(f'Test examples: {len(test_examles)}')
 
 print(train_examples[0])
 
@@ -20,6 +22,12 @@ print(train_examples[0])
 tokenizer = transformers.AutoTokenizer.from_pretrained("facebook/m2m100_418M")
 tokenizer.src_lang = 'pt'
 tokenizer.tgt_lang = 'en'
+
+text = 'Hello, how are you?'
+encoded = tokenizer(text, return_tensors='pt')
+print('Token IDs:', encoded['input_ids'])
+print('Tokens:', tokenizer.convert_ids_to_tokens(encoded['input_ids'][0]))
+
 
 # 3. Create a custom PyTorch Dataset class
 class TranslationDataset(torch.utils.data.Dataset):

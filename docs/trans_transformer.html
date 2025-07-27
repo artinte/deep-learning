@@ -84,21 +84,24 @@
                 <p style="text-align: center; color: #555555;">Figure 4 - The Encoder Self-attention Distribution for the Word "it"</p>
 
                 <h3>7.1.1 Data Handling</h3>
-                <p>This section downloads the dataset and the subword <a href="word_embed.html">tokenizer</a>, then wraps it all up in a <code>torch.utils.data.Dataset</code> for training.</p>
+                <p>This section downloads the dataset and the subword tokenizer, then wraps it all up in a <code>torch.utils.data.Dataset</code> for training.</p>
 
                 <h4>7.1.1.1 Download the Dataset</h4>
-                <p>Load the Portuguese-English translation dataset TED Talks Open Translation Project. This dataset contains approximately 52,000 training, 1,200 validation and 1,800 test examples.</p>
+                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/07_text/1_translation/text_translation.py">text_translation.py</a> load the Portuguese-English translation dataset TED Talks Open Translation Project. This dataset contains approximately 52,000 training, 1,200 validation and 1,800 test examples.</p>
 
                 <pre><code># 1. Load the dataset
 dataset = datasets.load_dataset('ted_hrlr', 'pt_to_en', trust_remote_code=True)
-train_examples = dataset["train"]
-val_examples = dataset["validation"]
+train_examples = dataset['train']
+val_examples = dataset['validation']
+test_examles = dataset['test']
 
-print(f"Train examples: {len(train_examples)}")
-print(f"Validation examples: {len(val_examples)}")</code></pre>
+print(f'Train examples: {len(train_examples)}')
+print(f'Validation examples: {len(val_examples)}')
+print(f'Test examples: {len(test_examles)}')</code></pre>
 
                 <pre><samp>Train examples: 51786
-Validation examples: 1194</samp></pre>
+Validation examples: 1194
+Test examples: 1804</samp></pre>
                 
                 <p>We can print the first example:</p>
                 <pre><code>print(train_examples[0])</code></pre>
@@ -107,13 +110,30 @@ Validation examples: 1194</samp></pre>
                 <h4>7.1.1.2 Set Up the Tokenizer</h4>
                 <p>Now that you have loaded the dataset, you need to tokenize the text, so that each element is represented as a token or token ID (a numeric representation).</p>
                 <p>Tokenization is the process of breaking up text, into "tokens". Depending on the tokenizer, these tokens can represent sentence-pieces, words, subwords, or characters. To learn more about tokenization, visit <a href="word_embed.html">this guide</a> .</p>
+
                 <p>This tutorial uses the tokenizers from the <a href="https://huggingface.co/facebook/m2m100_418M">facebook/m2m100_418M</a> . M2M100 is a multilingual encoder-decoder (seq-to-seq) model trained for Many-to-Many multilingual translation.</p>
+                
+                <p class="comment">Note: This is different from the <a href="transformer_paper.html#training-data">original paper</a> , where they used a single byte-pair tokenizer for both the source and target with a vocabulary-size of 37000.</p>
+                
                 <pre><code># 2. Initialize a tokenizer
 # We'll use a pre-trained tokenizer suitable for sequence-to-sequence tasks (like translation).
 # 'Helsinki-NLP/opus-mt-pt-en' is a good choice for Portuguese to English.
 tokenizer = transformers.AutoTokenizer.from_pretrained("facebook/m2m100_418M")
 tokenizer.src_lang = 'pt'
 tokenizer.tgt_lang = 'en'</code></pre>
+
+                <p>We can use text <code>"Hello, how are you?"</code> for test:</p>
+                <pre><code>text = 'Hello, how are you?'
+encoded = tokenizer(text, return_tensors='pt')
+print('Token IDs:', encoded['input_ids'])
+print('Tokens:', tokenizer.convert_ids_to_tokens(encoded['input_ids'][0]))</code></pre>
+                
+                <pre><samp>Token IDs: tensor([[128075,  65761,      4,  40288,   4234,   8251,     24,      2]])
+Tokens: ['__pt__', '▁Hello', ',', '▁how', '▁are', '▁you', '?', '</s>']</samp></pre>
+
+                <p>We can find two very interesting phenomena. The beginning and end of the sentence are marked with "__pt__" and "&lt;s&gt;" respectively. There is a "_" in front of the word, which means that they are not connected to the previous word.</p>
+
+                <h4>7.1.1.3 Define Custom Dataset</h4>
 
                 <p>Defines a custom PyTorch Dataset called <code>TranslationDataset</code> . It's designed to prepare text translation data (Portuguese to English) for use in machine learning models:</p>
                 <pre><code># 3. Create a custom PyTorch Dataset class
@@ -159,7 +179,15 @@ class TranslationDataset(torch.utils.data.Dataset):
             'labels': tokenized_target['input_ids'].squeeze(0) 
         }</code></pre>
 
+                <p>The structure returned by <code>__getitem__</code> is the key input for Transformer model training, including:</p>
+                <ul class="with-bullets">
+                    <li><p>input_ids: input sequence of the model (source language);</p></li>
+                    <li><p>attention_mask: mask attention with padding;</p></li>
+                    <li><p>labels: target langauge sequence (for training).</p></li>
+                </ul>
+
                 <h3>7.1.2 Test the Dataset</h3>
+                <p>Before we start training, we can observe the data and understand the input and output of the model.</p>
 
                 <pre><code># 4. Instantiate your PyTorch datasets
 max_seq_length = 128 # You can adjust this based on your data and model
