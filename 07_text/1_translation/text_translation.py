@@ -285,7 +285,9 @@ x = torch.randn(16, 128, 512)
 output = causal_attn(x)
 assert output.shape == (16, 128, 512)
 
-casual_attn_without_dropout = CausalSelfAttention(d_model=512, num_heads=4, dropout_rate=0.0)
+casual_attn_without_dropout = CausalSelfAttention(
+    d_model=512, num_heads=4, dropout_rate=0.0
+)
 x = torch.randn(16, 128, 512)
 out1 = casual_attn_without_dropout(x[:, :3])
 out2 = casual_attn_without_dropout(x)[:, :3]
@@ -314,6 +316,7 @@ class FeedForward(torch.nn.Module):
 
         return x
 
+
 ffn = FeedForward(d_model=512, d_ff=2048, dropout_rate=0.1)
 x = torch.randn(16, 128, 512)
 output = ffn(x)
@@ -332,7 +335,53 @@ class EncoderLayer(torch.nn.Module):
         x = self.ffn(x)
         return x
 
-sample_encoder_layer = EncoderLayer(d_model=512, num_heads=4, d_ff=2048, dropout_rate=0.1)
+
+sample_encoder_layer = EncoderLayer(
+    d_model=512, num_heads=4, d_ff=2048, dropout_rate=0.1
+)
 x = torch.randn(16, 128, 512)
 output = sample_encoder_layer(x)
+assert output.shape == (16, 128, 512)
+
+
+class Encoder(torch.nn.Module):
+    def __init__(self, d_model, num_heads, d_ff, num_layers, dropout_rate=0.1):
+        super().__init__()
+        self.pos_embedding = PositionalEmbedding(
+            vocab_size=tokenizer.vocab_size,
+            d_model=d_model,
+            pad_token_id=tokenizer.pad_token_id,
+        )
+        self.layers = torch.nn.ModuleList(
+            [
+                EncoderLayer(d_model, num_heads, d_ff, dropout_rate)
+                for _ in range(num_layers)
+            ]
+        )
+        self.layernorm = torch.nn.LayerNorm(normalized_shape=d_model)
+        self.dropout = torch.nn.Dropout(dropout_rate)
+
+    def forward(self, x):
+        # x is token-IDs shape: (batch, seq_len)
+        # (batch_size, seq_len, d_model)
+        x = self.pos_embedding(x)
+        # Add dropout.
+        x = self.dropout(x)
+        # Apply each encoder layer sequentially
+        for layer in self.layers:
+            x = layer(x)
+        x = self.layernorm(x)
+        # (batch_size, seq_len, d_model)
+        return x
+
+
+# Instaniate the encoder.
+sample_encoder = Encoder(
+    d_model=512, num_heads=4, d_ff=2048, num_layers=6, dropout_rate=0.1
+)
+# Create a sample input (batch_size=16, seq_len=128)
+x = torch.randint(0, tokenizer.vocab_size, (16, 128))
+assert x.shape == (16, 128)
+# Forward pass through the encoder.
+output = sample_encoder(x)
 assert output.shape == (16, 128, 512)
