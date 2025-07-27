@@ -129,9 +129,9 @@ print('Token IDs:', encoded['input_ids'])
 print('Tokens:', tokenizer.convert_ids_to_tokens(encoded['input_ids'][0]))</code></pre>
                 
                 <pre><samp>Token IDs: tensor([[128075,  65761,      4,  40288,   4234,   8251,     24,      2]])
-Tokens: ['__pt__', '▁Hello', ',', '▁how', '▁are', '▁you', '?', '</s>']</samp></pre>
+Tokens: ['__pt__', '▁Hello', ',', '▁how', '▁are', '▁you', '?', '&lt;/s&gt;']</samp></pre>
 
-                <p>We can find two very interesting phenomena. The beginning and end of the sentence are marked with "__pt__" and "&lt;s&gt;" respectively. There is a "_" in front of the word, which means that they are not connected to the previous word.</p>
+                <p>We can find two very interesting phenomena. The beginning and end of the sentence are marked with "__pt__" and "&lt;s&gt;" respectively. There is a "▁" in front of the word, which means that they are not connected to the previous word.</p>
 
                 <h4>7.1.1.3 Define Custom Dataset</h4>
 
@@ -182,7 +182,7 @@ class TranslationDataset(torch.utils.data.Dataset):
                 <p>The structure returned by <code>__getitem__</code> is the key input for Transformer model training, including:</p>
                 <ul class="with-bullets">
                     <li><p>input_ids: input sequence of the model (source language);</p></li>
-                    <li><p>attention_mask: mask attention with padding;</p></li>
+                    <li><p>attention_mask: attention mask, tell the model which tokens are valid (1) and which are padding (0);</p></li>
                     <li><p>labels: target langauge sequence (for training).</p></li>
                 </ul>
 
@@ -192,11 +192,16 @@ class TranslationDataset(torch.utils.data.Dataset):
                 <pre><code># 4. Instantiate your PyTorch datasets
 max_seq_length = 128 # You can adjust this based on your data and model
 train_dataset_pt = TranslationDataset(train_examples, tokenizer, max_length=max_seq_length)
-val_dataset_pt = TranslationDataset(val_examples, tokenizer, max_length=max_seq_length)</code></pre>
-
-                <pre><code>print(f"PyTorch Training Dataset size: {len(train_dataset_pt)}")
+val_dataset_pt = TranslationDataset(val_examples, tokenizer, max_length=max_seq_length)
+print(f"PyTorch Training Dataset size: {len(train_dataset_pt)}")
 print(f"PyTorch Validation Dataset size: {len(val_dataset_pt)}")</code></pre>
 
+                <p>Creates two instances of a custom TranslationDataset class: <code>train_dataset_pt</code> and <code>val_dataset_pt</code> .</p>
+
+                <pre><samp>PyTorch Training Dataset size: 51786
+PyTorch Validation Dataset size: 1194</samp></pre>
+
+                <p>Randomly select a sample and check the shape of the sample output data:</p>
 
                 <pre><code># Example of accessing an item from the PyTorch dataset
 sample_idx = random.randint(0, 100)
@@ -205,6 +210,13 @@ print("Sample item from PyTorch training dataset:")
 print(f"Input IDs shape: {sample_item['input_ids'].shape}")
 print(f"Attention Mask shape: {sample_item['attention_mask'].shape}")
 print(f"Labels shape: {sample_item['labels'].shape}")</code></pre>
+
+                <pre><samp>Sample item from PyTorch training dataset:
+Input IDs shape: torch.Size([128])
+Attention Mask shape: torch.Size([128])
+Labels shape: torch.Size([128])</samp></pre>
+
+                <p>We can view the information inside:</p>
 
                 <pre><code>original_src_text = train_examples[sample_idx]['translation']['pt']
 print(f"Original Source Text (PT): {original_src_text}")
@@ -217,6 +229,11 @@ print(f'Attention  Mask Values: {attention_mask_values}')
 
 tgt_token_ids = sample_item['labels'].tolist()
 print(f"Target (Label) Token IDs: {tgt_token_ids}")</code></pre>
+
+                <pre><samp>Original Source Text (PT): e o núcleo destes agentes-chave são grupos que representam interesses diferentes dentro de países .      
+Source Token IDs: [128075, 16, 25, 136, 10716, 47289, 89539, 543, 2264, 7, 207, 3591, 7611, 27262, 27, 17785, 99, 11737, 50, 15757, 14366, 6, 20594, 237, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+Attention  Mask Values: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Target (Label) Token IDs: [128075, 1019, 1197, 89193, 432, 107638, 29031, 898, 20949, 4234, 125115, 72886, 17785, 120954, 120669, 55, 122910, 125204, 237, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]</samp></pre>
 
                 <pre><code>train_dataloader = torch.utils.data.DataLoader(train_dataset_pt, batch_size=16, shuffle=True)
 val_dataloader = torch.utils.data.DataLoader(val_dataset_pt, batch_size=16, shuffle=False)
