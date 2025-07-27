@@ -100,6 +100,12 @@ print(f'Attention  Mask Values: {attention_mask_values}')
 tgt_token_ids = sample_item['labels'].tolist()
 print(f"Target (Label) Token IDs: {tgt_token_ids}")
 
+# Convert source token IDs to text.
+src_text = tokenizer.decode(src_token_ids, skip_special_tokens=True)
+print(f'Source Text: {src_text}')
+tgt_text = tokenizer.decode(tgt_token_ids, skip_special_tokens=True)
+print(f'Target (Label) Text: {tgt_text}')
+
 train_dataloader = torch.utils.data.DataLoader(train_dataset_pt, batch_size=16, shuffle=True)
 val_dataloader = torch.utils.data.DataLoader(val_dataset_pt, batch_size=16, shuffle=False)
 

@@ -225,15 +225,30 @@ src_token_ids = sample_item['input_ids'].tolist()
 print(f"Source Token IDs: {src_token_ids}")
 
 attention_mask_values = sample_item['attention_mask'].tolist()
-print(f'Attention  Mask Values: {attention_mask_values}')
+print(f'Attention Mask Values: {attention_mask_values}')
 
 tgt_token_ids = sample_item['labels'].tolist()
 print(f"Target (Label) Token IDs: {tgt_token_ids}")</code></pre>
 
+                <p>The tokenizer converts a batch of strings to a padded-batch of token IDs. This method splits punctuation, lowercases and unicode-normalizes the input before tokenizing, it standardization is not visible here because the input data is already standardized.</p>
+
                 <pre><samp>Original Source Text (PT): e o núcleo destes agentes-chave são grupos que representam interesses diferentes dentro de países .      
 Source Token IDs: [128075, 16, 25, 136, 10716, 47289, 89539, 543, 2264, 7, 207, 3591, 7611, 27262, 27, 17785, 99, 11737, 50, 15757, 14366, 6, 20594, 237, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-Attention  Mask Values: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Attention Mask Values: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 Target (Label) Token IDs: [128075, 1019, 1197, 89193, 432, 107638, 29031, 898, 20949, 4234, 125115, 72886, 17785, 120954, 120669, 55, 122910, 125204, 237, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]</samp></pre>
+
+                <p>The <code>tokenizer.decode</code> attempts to convert these token IDs back to human-readable text:</p>
+
+                <pre><code># Convert source token IDs to text.
+src_text = tokenizer.decode(src_token_ids, skip_special_tokens=True)
+print(f'Source Text: {src_text}')
+tgt_text = tokenizer.decode(tgt_token_ids, skip_special_tokens=True)
+print(f'Target (Label) Text: {tgt_text}')</code></pre>
+
+                <pre><samp>Source Text: e ele envolveu-se a falar profundamente resolvendo alguns dos assuntos mais complicados através de um processo de reconciliação e de verdade onde as pessoas vinham e falavam .
+Target (Label) Text: and he engaged talking profoundly by settling some of the most tricky issues through a truth and reconciliation process where people came and talked .</samp></pre>
+
+                <p>Sets up data loaders for training and validation datasets, configuring them for batch processing. It then prints the number of batches in each loader and shows an example of accessing the shape of <code>'input_ids'</code> , <code>'attention_mask'</code> , and <code>'labels'</code> within a single batch, demonstrating data structure:</p>
 
                 <pre><code>train_dataloader = torch.utils.data.DataLoader(train_dataset_pt, batch_size=16, shuffle=True)
 val_dataloader = torch.utils.data.DataLoader(val_dataset_pt, batch_size=16, shuffle=False)
@@ -248,6 +263,13 @@ for batch in train_dataloader:
     print(f"Attention Mask batch shape: {batch['attention_mask'].shape}")
     print(f"Labels batch shape: {batch['labels'].shape}")
     break</code></pre>
+
+                <pre><samp>Number of batches in training DataLoader: 3237
+Number of batches in validation DataLoader: 75
+Sample batch from DataLoader:
+Input IDs batch shape: torch.Size([16, 128])
+Attention Mask batch shape: torch.Size([16, 128])
+Labels batch shape: torch.Size([16, 128])</samp></pre>
 
                 <img src="res/07/layer-words.png" alt="Input and Output" width="400">
 
