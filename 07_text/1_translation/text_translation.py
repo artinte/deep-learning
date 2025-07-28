@@ -514,13 +514,12 @@ sample_batch_decoder_input = next(iter(val_dataloader))
 decoder_input_ids = sample_batch_decoder_input["labels"]
 decoder_attention_mask = (decoder_input_ids != tokenizer.pad_token_id).int()
 
-dummy_encoder_output_batch = next(iter(train_dataloader))
 context_tensor = torch.randn(
-    dummy_encoder_output_batch["input_ids"].shape[0],
-    dummy_encoder_output_batch["input_ids"].shape[1],
+    sample_batch_decoder_input["input_ids"].shape[0],
+    sample_batch_decoder_input["input_ids"].shape[1],
     512,
 )
-context_attention_mask_for_decoder = dummy_encoder_output_batch["attention_mask"]
+context_attention_mask_for_decoder = sample_batch_decoder_input["attention_mask"]
 
 output = sample_decoder(
     decoder_input_ids,

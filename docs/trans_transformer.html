@@ -232,11 +232,11 @@ print(f"Target (Label) Token IDs: {tgt_token_ids}")</code></pre>
 
                 <p>The tokenizer converts a batch of strings to a padded-batch of token IDs. This method splits punctuation, lowercases and unicode-normalizes the input before tokenizing, it standardization is not visible here because the input data is already standardized.</p>
 
-                <pre><samp>Original Source Text (PT): e o núcleo destes agentes-chave são grupos que representam interesses diferentes dentro de países .      
-Source Token IDs: [128075, 16, 25, 136, 10716, 47289, 89539, 543, 2264, 7, 207, 3591, 7611, 27262, 27, 17785, 99, 11737, 50, 15757, 14366, 6, 20594, 237, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-Attention Mask Values: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-Target (Label) Token IDs: [128075, 1019, 1197, 89193, 432, 107638, 29031, 898, 20949, 4234, 125115, 72886, 17785, 120954, 120669, 55, 122910, 125204, 237, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]</samp></pre>
-
+                <pre><samp>Original Source Text (PT): as regras de interacção : como falar , quando falar e como lidar com elas .
+Source Token IDs: [128075, 285, 29322, 46, 6, 54586, 1066, 146, 642, 30161, 221, 7392, 30161, 16, 642, 12175, 44, 446, 37708, 237, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+Attention  Mask Values: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Target (Label) Token IDs: [128075, 1197, 123735, 432, 119391, 146, 40288, 128, 118301, 221, 100975, 128, 118301, 221, 1019, 40288, 128, 62559, 9792, 30557, 237, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]</samp></pre>
+                
                 <p>The <code>tokenizer.decode</code> attempts to convert these token IDs back to human-readable text:</p>
 
                 <pre><code># Convert source token IDs to text.
@@ -245,24 +245,27 @@ print(f'Source Text: {src_text}')
 tgt_text = tokenizer.decode(tgt_token_ids, skip_special_tokens=True)
 print(f'Target (Label) Text: {tgt_text}')</code></pre>
 
-                <pre><samp>Source Text: e ele envolveu-se a falar profundamente resolvendo alguns dos assuntos mais complicados através de um processo de reconciliação e de verdade onde as pessoas vinham e falavam .
-Target (Label) Text: and he engaged talking profoundly by settling some of the most tricky issues through a truth and reconciliation process where people came and talked .</samp></pre>
+                <pre><samp>Source Text: as regras de interacção : como falar , quando falar e como lidar com elas .
+Target (Label) Text: the rules of engagement : how to talk , when to talk , and how to deal with them .</samp></pre>
 
                 <p>Sets up data loaders for training and validation datasets, configuring them for batch processing. It then prints the number of batches in each loader and shows an example of accessing the shape of <code>'input_ids'</code> , <code>'attention_mask'</code> , and <code>'labels'</code> within a single batch, demonstrating data structure:</p>
 
-                <pre><code>train_dataloader = torch.utils.data.DataLoader(train_dataset_pt, batch_size=16, shuffle=True)
-val_dataloader = torch.utils.data.DataLoader(val_dataset_pt, batch_size=16, shuffle=False)
+                <pre><code>train_dataloader = torch.utils.data.DataLoader(
+    train_dataset_pt, batch_size=16, shuffle=True
+)
+val_dataloader = torch.utils.data.DataLoader(
+    val_dataset_pt, batch_size=16, shuffle=False
+)
 
 print(f"Number of batches in training DataLoader: {len(train_dataloader)}")
 print(f"Number of batches in validation DataLoader: {len(val_dataloader)}")
 
 # Example of iterating through a batch
-for batch in train_dataloader:
-    print("Sample batch from DataLoader:")
-    print(f"Input IDs batch shape: {batch['input_ids'].shape}")
-    print(f"Attention Mask batch shape: {batch['attention_mask'].shape}")
-    print(f"Labels batch shape: {batch['labels'].shape}")
-    break</code></pre>
+sample_batch = next(iter(train_dataloader))
+print("Sample batch from DataLoader:")
+print(f"Input IDs batch shape: {sample_batch['input_ids'].shape}")
+print(f"Attention Mask batch shape: {sample_batch['attention_mask'].shape}")
+print(f"Labels batch shape: {sample_batch['labels'].shape}")</code></pre>
 
                 <pre><samp>Number of batches in training DataLoader: 3237
 Number of batches in validation DataLoader: 75
@@ -416,7 +419,9 @@ print(sample_output.shape)</code></pre>
             batch_first=True,
             **kwargs,
         )
-        self.layernorm = torch.nn.LayerNorm(normalized_shape=d_model)</code></pre>
+        self.layernorm = torch.nn.LayerNorm(normalized_shape=d_model)
+        # To store the last attention scores for visualization
+        self.last_attn_scores = None</code></pre>
 
                 <p>Before you get into the specifics of each usage, here is a quick refresher on how attention works:</p>
                 <img src="res/07/base_attention_qkv.png" alt="The Base Attention Layer" width="400">
@@ -454,24 +459,32 @@ result = d['color']</samp></pre>
 
                 <p>To implement this you pass the target sequence x as the query and the context sequence as the key/value when calling the mha layer:</p>
                 <pre><code>class CrossAttention(BaseAttention):
-    def forward(self, x, context):
+    def __init__(self, d_model, num_heads, dropout_rate, **kwargs):
+        super().__init__(d_model, num_heads, dropout_rate, **kwargs)
+
+    def forward(self, x, context, key_padding_mask=None):
         # x: (batch, traget_seq_len, d_model)
         # context: (batch, source_seq_len, d_model)
+        if key_padding_mask is not None and key_padding_mask.device != x.device:
+            key_padding_mask = key_padding_mask.to(x.device)
+
         attn_output, attn_scores = self.mha(
             query=x,
             key=context,
             value=context,
             need_weights=True,
-            average_attn_weights=False
+            average_attn_weights=False,
+            key_padding_mask=key_padding_mask,
+            attn_mask=None,
         )
-        
+
         # Cache the attention scores for plotting later.
         self.last_attn_scores = attn_scores
-        
+
         # Residual connection and layer norm.
         x = x + attn_output
         x = self.layernorm(x)
-        
+
         return x</code></pre>
 
                 <p>The caricature below shows how information flows through this layer. The columns represent the weighted sum over the context sequence.</p>
@@ -520,11 +533,23 @@ assert output.shape == (16, 128, 512)</code></pre>
                 <p>To implement this layer you just need to pass the target sequence, x, as both the query, and value arguments to the mha layer:</p>
 
                 <pre><code>class GlobalSelfAttention(BaseAttention):
-    def forward(self, x):
+    def __init__(self, d_model, num_heads, dropout_rate, **kwargs):
+        super().__init__(d_model, num_heads, dropout_rate, **kwargs)
+
+    def forward(self, x, key_padding_mask=None):
         # query = key = value = x
         # # x: (batch, seq_len, d_model)
+        if key_padding_mask is not None and key_padding_mask.device != x.device:
+            key_padding_mask = key_padding_mask.to(x.device)
+
         attn_output, attn_scores = self.mha(
-            query=x, key=x, value=x, need_weights=True, average_attn_weights=False
+            query=x,
+            key=x,
+            value=x,
+            need_weights=True,
+            average_attn_weights=False,
+            key_padding_mask=key_padding_mask,
+            attn_mask=None,
         )
 
         # Cache the attention scores for plotting later.
@@ -536,9 +561,9 @@ assert output.shape == (16, 128, 512)</code></pre>
 
         return x
 
-attn = GlobalSelfAttention(d_model=512, num_heads=4, dropout_rate=0.1)
+causal_attn = GlobalSelfAttention(d_model=512, num_heads=4, dropout_rate=0.1)
 x = torch.randn(16, 128, 512)
-output = attn(x)
+output = causal_attn(x)
 assert output.shape == (16, 128, 512)</code></pre>
 
                 <p>Sticking with the same style as before you could draw it like this:</p>
@@ -573,18 +598,24 @@ assert output.shape == (16, 128, 512)</code></pre>
                 <p>To build a causal self-attention layer, you need to use an appropriate mask when computing the attention scores and summing the attention values.</p>
                 <p>This is taken care of automatically if you use <code>torch.nn.Transformer.generate_square_subsequent_mask</code> to generate a mask and pass <code>is_causal = True</code> to the MultiHeadAttention layer when you call it:</p>
                 <pre><code>class CausalSelfAttention(BaseAttention):
-    def forward(self, x):
+    def __init__(self, d_model, num_heads, dropout_rate, **kwargs):
+        super().__init__(d_model, num_heads, dropout_rate, **kwargs)
+
+    def forward(self, x, key_padding_mask=None):
         # query = key = value = x
         # x: (batch, seq_len, d_model)
-        causal_mask = torch.nn.Transformer.generate_square_subsequent_mask(x.size(1))
+        causal_mask = torch.nn.Transformer.generate_square_subsequent_mask(
+            x.size(1)
+        ).to(x.device)
+        causal_mask = causal_mask == float("-inf")
         attn_output, attn_scores = self.mha(
             query=x,
             key=x,
             value=x,
             need_weights=True,
             average_attn_weights=False,
-            is_causal=True,
             attn_mask=causal_mask,
+            key_padding_mask=key_padding_mask,
         )
 
         # Cache the attention scores for plotting later.
@@ -605,17 +636,20 @@ assert output.shape == (16, 128, 512)</code></pre>
                 <p style="text-align: center; color: #555555;">Figure 23 - Casual Attention Layer Diagram Simplified</p>
 
                 <p>Test out the layer:</p>
-                <pre><code>
-attn = CausalSelfAttention(d_model=512, num_heads=4, dropout_rate=0.1)
+                <pre><code>causal_attn = CausalSelfAttention(d_model=512, num_heads=4, dropout_rate=0.1)
 x = torch.randn(16, 128, 512)
-output = attn(x)
+output = causal_attn(x)
 assert output.shape == (16, 128, 512)</code></pre>
 
                 <p>The output for early sequence elements doesn't depend on later elements, so it shouldn't matter if you trim elements before or after applying the layer:</p>
-                <pre><code>casual_attn_without_dropout = CausalSelfAttention(d_model=512, num_heads=4, dropout_rate=0.0)
+                <pre><code>casual_attn_without_dropout = CausalSelfAttention(
+    d_model=512, num_heads=4, dropout_rate=0.0
+)
 x = torch.randn(16, 128, 512)
-out1 = casual_attn_without_dropout(x[:, :3])
-out2 = casual_attn_without_dropout(x)[:, :3]
+dummy_mask = torch.zeros(16, 128, dtype=torch.bool, device=x.device)
+dummy_mask[:, -10:] = True
+out1 = casual_attn_without_dropout(x[:, :3], key_padding_mask=dummy_mask[:, :3])
+out2 = casual_attn_without_dropout(x, key_padding_mask=dummy_mask)[:, :3]
 torch.testing.assert_close(out1, out2, rtol=1e-5, atol=1e-5)
 print("Causal self-attention without dropout works as expected.")</code></pre>
 
@@ -639,13 +673,14 @@ print("Causal self-attention without dropout works as expected.")</code></pre>
 
     def forward(self, x):
         # x: (batch, seq_len, d_model)
-        x = self.linear1(x)
-        x = self.relu(x)
-        x = self.dropout(x)
-        x = self.linear2(x)
+        x_ff = self.linear1(x)
+        x_ff = self.relu(x_ff)
+        x_ff = self.dropout(x_ff)
+        x_ff = self.linear2(x_ff)
 
         # Residual connection and layer norm.
-        x = x + self.layernorm(x)
+        x = x + x_ff
+        x = self.layernorm(x)
 
         return x</code></pre>
 
@@ -667,14 +702,16 @@ assert output.shape == (16, 128, 512)</code></pre>
         self.self_attn = GlobalSelfAttention(d_model, num_heads, dropout_rate)
         self.ffn = FeedForward(d_model, d_ff, dropout_rate)
 
-    def forward(self, x):
+    def forward(self, x, key_padding_mask=None):
         # x: (batch, seq_len, d_model)
-        x = self.self_attn(x)
+        x = self.self_attn(x, key_padding_mask=key_padding_mask)
         x = self.ffn(x)
         return x</code></pre>
 
                 <p>And a quick test, the output will have the same shape as the input:</p>
-                <pre><code>sample_encoder_layer = EncoderLayer(d_model=512, num_heads=4, d_ff=2048, dropout_rate=0.1)
+                <pre><code>sample_encoder_layer = EncoderLayer(
+    d_model=512, num_heads=4, d_ff=2048, dropout_rate=0.1
+)
 x = torch.randn(16, 128, 512)
 output = sample_encoder_layer(x)
 assert output.shape == (16, 128, 512)</code></pre>
@@ -696,11 +733,11 @@ assert output.shape == (16, 128, 512)</code></pre>
     def __init__(self, d_model, num_heads, d_ff, num_layers, dropout_rate=0.1):
         super().__init__()
         self.pos_embedding = PositionalEmbedding(
-            vocab_size=tokenizer.vocab_size,
+            vocab_size=len(tokenizer),
             d_model=d_model,
             pad_token_id=tokenizer.pad_token_id,
         )
-        self.layers = torch.nn.ModuleList(
+        self.enc_layers = torch.nn.ModuleList(
             [
                 EncoderLayer(d_model, num_heads, d_ff, dropout_rate)
                 for _ in range(num_layers)
@@ -709,15 +746,16 @@ assert output.shape == (16, 128, 512)</code></pre>
         self.layernorm = torch.nn.LayerNorm(normalized_shape=d_model)
         self.dropout = torch.nn.Dropout(dropout_rate)
 
-    def forward(self, x):
+    def forward(self, x, key_padding_mask=None):
         # x is token-IDs shape: (batch, seq_len)
         # (batch_size, seq_len, d_model)
         x = self.pos_embedding(x)
         # Add dropout.
         x = self.dropout(x)
         # Apply each encoder layer sequentially
-        for layer in self.layers:
-            x = layer(x)
+        key_padding_mask = key_padding_mask == 0
+        for layer in self.enc_layers:
+            x = layer(x, key_padding_mask=key_padding_mask)
         x = self.layernorm(x)
         # (batch_size, seq_len, d_model)
         return x</code></pre>
@@ -727,12 +765,15 @@ assert output.shape == (16, 128, 512)</code></pre>
 sample_encoder = Encoder(
     d_model=512, num_heads=4, d_ff=2048, num_layers=6, dropout_rate=0.1
 )
-# Create a sample input (batch_size=16, seq_len=128)
-x = torch.randint(0, tokenizer.vocab_size, (16, 128))
-assert x.shape == (16, 128)
+sample_batch_encoder_input = next(iter(train_dataloader))
+encoder_input_ids = sample_batch_encoder_input["input_ids"]
+print(encoder_input_ids.shape)  # Should be (batch_size, seq_len)
+encoder_attention_mask = sample_batch_encoder_input["attention_mask"]
+
 # Forward pass through the encoder.
-output = sample_encoder(x)
-assert output.shape == (16, 128, 512)</code></pre>
+output = sample_encoder(encoder_input_ids, encoder_attention_mask)
+assert output.shape == (encoder_input_ids.shape[0], encoder_input_ids.shape[1], 512)
+print("Encoder forward pass successful with padding mask.")</code></pre>
 
 
                 <h4>7.1.3.10 The Decoder Layer</h4>
@@ -748,11 +789,13 @@ assert output.shape == (16, 128, 512)</code></pre>
         self.cross_attn = CrossAttention(d_model, num_heads, dropout_rate)
         self.ffn = FeedForward(d_model, d_ff, dropout_rate)
 
-    def forward(self, x, context):
+    def forward(
+        self, x, context, x_key_padding_mask=None, context_key_padding_mask=None
+    ):
         # x: (batch, seq_len, d_model)
         # context: (batch, source_seq_len, d_model)
-        x = self.causal_self_attn(x)
-        x = self.cross_attn(x, context)
+        x = self.causal_self_attn(x, key_padding_mask=x_key_padding_mask)
+        x = self.cross_attn(x, context, key_padding_mask=context_key_padding_mask)
 
         # Cache the last attention scores for plotting later
         self.last_attn_scores = self.cross_attn.last_attn_scores
@@ -773,7 +816,7 @@ context = torch.randn(16, 64, 512)
 output = sample_decoder_layer(x, context)
 assert output.shape == (16, 128, 512)</code></pre>
 
-                <h4>7.1.3.11 The Ddecoder</h4>
+                <h4>7.1.3.11 The Decoder</h4>
                 <p>Similar to the <code>Encoder</code> , the <code>Decoder</code> consists of a <code>PositionalEmbedding</code> , and a stack of <code>DecoderLayers</code> :</p>
                 <img src="res/07/decoder.png" alt="The Decoder" width="400">
                 <p style="text-align: center; color: #555555;">Figure 28 - The Decoder</p>
