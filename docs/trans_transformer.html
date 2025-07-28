@@ -998,9 +998,15 @@ attn_scores = trasnformer.decoder.last_attn_scores
 print("Attention scores shape:", attn_scores.shape)</p>
 
                 <pre><samp>torch.Size([16, 128, 128104])
-Attention scores shape: torch.Size([16, 8, 128, 128])</samp></pre>>
+Attention scores shape: torch.Size([16, 8, 128, 128])</samp></pre>
 
                 <h3>7.1.5 Training</h3>
+
+                <p>It's time to prepare the model and start training it.</p>
+                <p>Use the Adam optimizer with a custom learning rate scheduler according to the formula in the original Transformer paper.</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(lrate = d_{model}^{-0.5} \cdot min({step\_num}^{-0.5}, step\_num \cdot {warmup\_steps}^{-1.5})\)
+                </div>
 
                 <h3>7.1.6 Run Inference</h3>
 
