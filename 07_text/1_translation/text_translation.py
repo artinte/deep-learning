@@ -530,3 +530,93 @@ output = sample_decoder(
 assert output.shape == (decoder_input_ids.shape[0], decoder_input_ids.shape[1], 512)
 print("Decoder forward pass successful with padding mask.")
 
+
+class Transformer(torch.nn.Module):
+    def __init__(
+        self,
+        d_model,
+        num_heads,
+        d_ff,
+        num_layers,
+        dropout_rate=0.1,
+    ):
+        super().__init__()
+        self.encoder = Encoder(
+            d_model=d_model,
+            num_heads=num_heads,
+            d_ff=d_ff,
+            num_layers=num_layers,
+            dropout_rate=dropout_rate,
+        )
+        self.decoder = Decoder(
+            d_model=d_model,
+            num_heads=num_heads,
+            d_ff=d_ff,
+            num_layers=num_layers,
+            dropout_rate=dropout_rate,
+        )
+        self.final_layer = torch.nn.Linear(d_model, len(tokenizer))
+
+    def forward(
+        self,
+        encoder_input_ids,
+        encoder_attention_mask,
+        decoder_input_ids,
+        decoder_attention_mask,
+        context_attention_mask_for_decoder,
+    ):
+        # Forward pass through the encoder
+        encoder_output = self.encoder(encoder_input_ids, encoder_attention_mask)
+        # Forward pass through the decoder
+        decoder_output = self.decoder(
+            decoder_input_ids,
+            encoder_output,
+            x_key_padding_mask=decoder_attention_mask,
+            context_key_padding_mask=context_attention_mask_for_decoder,
+        )
+        # Final output layer to get logits
+        # (batch_size, target_len, target_vocab_size)
+        logits = self.final_layer(decoder_output)
+        # Return the final output and the attention weights.
+        return logits
+
+
+num_layers = 4
+d_model = 128
+dff = 512
+num_heads = 8
+dropout_rate = 0.1
+
+trasnformer = Transformer(
+    d_model=d_model,
+    num_heads=num_heads,
+    d_ff=dff,
+    num_layers=num_layers,
+    dropout_rate=dropout_rate,
+)
+sample_batch = next(iter(train_dataloader))
+encoder_input_ids = sample_batch["input_ids"]
+encoder_attention_mask = sample_batch_encoder_input["attention_mask"]
+decoder_input_ids = sample_batch["labels"]
+decoder_attention_mask = (decoder_input_ids != tokenizer.pad_token_id).int()
+
+context_tensor = torch.randn(
+    sample_batch_decoder_input["input_ids"].shape[0],
+    sample_batch_decoder_input["input_ids"].shape[1],
+    512,
+)
+context_attention_mask_for_decoder = sample_batch_decoder_input["attention_mask"]
+
+output = trasnformer(
+    encoder_input_ids,
+    encoder_attention_mask,
+    decoder_input_ids,
+    decoder_attention_mask,
+    context_attention_mask_for_decoder,
+)
+print(output.shape)
+
+attn_scores = trasnformer.decoder.last_attn_scores
+# (batch, heads, target_seq, input_seq)
+print("Attention scores shape:", attn_scores.shape)
+
