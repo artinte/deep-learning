@@ -875,7 +875,7 @@ assert output.shape == (16, 128, 512)</code></pre>
                 <pre><code>sample_decoder = Decoder(
     d_model=512, num_heads=4, d_ff=2048, num_layers=6, dropout_rate=0.1
 )
-sample_batch_decoder_input = next(iter(val_dataloader))
+sample_batch_decoder_input = next(iter(train_dataloader))
 decoder_input_ids = sample_batch_decoder_input["labels"]
 decoder_attention_mask = (decoder_input_ids != tokenizer.pad_token_id).int()
 
@@ -914,6 +914,91 @@ print("Decoder forward pass successful with padding mask.")</code></pre>
                 <p style="text-align: center; color: #555555;">Figure 30 - A 1-layer Transformer<span style="margin: 0 30px;">|</span>The RNN+Attention Model</p>
 
                 <p>Create the <code>Transformer</code> :</p>
+                <pre><code>class Transformer(torch.nn.Module):
+    def __init__(
+        self,
+        d_model,
+        num_heads,
+        d_ff,
+        num_layers,
+        dropout_rate=0.1,
+    ):
+        super().__init__()
+        self.encoder = Encoder(
+            d_model=d_model,
+            num_heads=num_heads,
+            d_ff=d_ff,
+            num_layers=num_layers,
+            dropout_rate=dropout_rate,
+        )
+        self.decoder = Decoder(
+            d_model=d_model,
+            num_heads=num_heads,
+            d_ff=d_ff,
+            num_layers=num_layers,
+            dropout_rate=dropout_rate,
+        )
+        self.final_layer = torch.nn.Linear(d_model, len(tokenizer))
+
+    def forward(
+        self,
+        encoder_input_ids,
+        encoder_attention_mask,
+        decoder_input_ids,
+        decoder_attention_mask,
+    ):
+        # Forward pass through the encoder
+        encoder_output = self.encoder(encoder_input_ids, encoder_attention_mask)
+        # Forward pass through the decoder
+        decoder_output = self.decoder(
+            decoder_input_ids,
+            encoder_output,
+            x_key_padding_mask=decoder_attention_mask,
+            context_key_padding_mask=encoder_attention_mask,
+        )
+        # Final output layer to get logits
+        # (batch_size, target_len, target_vocab_size)
+        logits = self.final_layer(decoder_output)
+        # Return the final output and the attention weights.
+        return logits</code></pre>
+
+                <p>To keep this example small and relatively fast, the number of layers (num_layers), the dimensionality of the embeddings (d_model), and the internal dimensionality of the FeedForward layer (dff) have been reduced.</p>
+                <pre><code>num_layers = 4
+d_model = 128
+dff = 512
+num_heads = 8
+dropout_rate = 0.1</code></pre>
+
+                <p>The base model described in the original Transformer paper used num_layers=6, d_model=512, and dff=2048.</p>
+
+                <p>Instantiate the Transformer model:</p>
+                <p>trasnformer = Transformer(
+    d_model=d_model,
+    num_heads=num_heads,
+    d_ff=dff,
+    num_layers=num_layers,
+    dropout_rate=dropout_rate,
+)
+sample_batch = next(iter(train_dataloader))
+encoder_input_ids = sample_batch["input_ids"]
+encoder_attention_mask = sample_batch["attention_mask"]
+decoder_input_ids = sample_batch["labels"]
+decoder_attention_mask = (decoder_input_ids != tokenizer.pad_token_id).int()
+
+output = trasnformer(
+    encoder_input_ids,
+    encoder_attention_mask,
+    decoder_input_ids,
+    decoder_attention_mask,
+)
+print(output.shape)
+
+attn_scores = trasnformer.decoder.last_attn_scores
+# (batch, heads, target_seq, input_seq)
+print("Attention scores shape:", attn_scores.shape)</p>
+
+                <pre><samp>torch.Size([16, 128, 128104])
+Attention scores shape: torch.Size([16, 8, 128, 128])</samp></pre>>
 
                 <h3>7.1.5 Training</h3>
 

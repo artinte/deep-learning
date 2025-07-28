@@ -510,7 +510,7 @@ class Decoder(torch.nn.Module):
 sample_decoder = Decoder(
     d_model=512, num_heads=4, d_ff=2048, num_layers=6, dropout_rate=0.1
 )
-sample_batch_decoder_input = next(iter(val_dataloader))
+sample_batch_decoder_input = next(iter(train_dataloader))
 decoder_input_ids = sample_batch_decoder_input["labels"]
 decoder_attention_mask = (decoder_input_ids != tokenizer.pad_token_id).int()
 
@@ -563,7 +563,6 @@ class Transformer(torch.nn.Module):
         encoder_attention_mask,
         decoder_input_ids,
         decoder_attention_mask,
-        context_attention_mask_for_decoder,
     ):
         # Forward pass through the encoder
         encoder_output = self.encoder(encoder_input_ids, encoder_attention_mask)
@@ -572,7 +571,7 @@ class Transformer(torch.nn.Module):
             decoder_input_ids,
             encoder_output,
             x_key_padding_mask=decoder_attention_mask,
-            context_key_padding_mask=context_attention_mask_for_decoder,
+            context_key_padding_mask=encoder_attention_mask,
         )
         # Final output layer to get logits
         # (batch_size, target_len, target_vocab_size)
@@ -596,27 +595,18 @@ trasnformer = Transformer(
 )
 sample_batch = next(iter(train_dataloader))
 encoder_input_ids = sample_batch["input_ids"]
-encoder_attention_mask = sample_batch_encoder_input["attention_mask"]
+encoder_attention_mask = sample_batch["attention_mask"]
 decoder_input_ids = sample_batch["labels"]
 decoder_attention_mask = (decoder_input_ids != tokenizer.pad_token_id).int()
-
-context_tensor = torch.randn(
-    sample_batch_decoder_input["input_ids"].shape[0],
-    sample_batch_decoder_input["input_ids"].shape[1],
-    512,
-)
-context_attention_mask_for_decoder = sample_batch_decoder_input["attention_mask"]
 
 output = trasnformer(
     encoder_input_ids,
     encoder_attention_mask,
     decoder_input_ids,
     decoder_attention_mask,
-    context_attention_mask_for_decoder,
 )
 print(output.shape)
 
 attn_scores = trasnformer.decoder.last_attn_scores
 # (batch, heads, target_seq, input_seq)
 print("Attention scores shape:", attn_scores.shape)
-
