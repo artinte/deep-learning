@@ -164,6 +164,66 @@ assert torch.isclose(w_torch, torch.tensor(w), atol=1e-6)</code></pre>
 
                 <h3>2.6.3 lr_scheduler</h3>
 
+                <p><a href="https://docs.pytorch.org/docs/stable/generated/torch.optim.lr_scheduler.LRScheduler.html">torch.optim.LRScheduler</a> Adjusts the learning rate during optimization.</p>
+                <pre><code>torch.optim.lr_scheduler.LRScheduler(optimizer, last_epoch=-1)</code></pre>
+
+                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/02_dnn/6_optimizer/simple_lr_scheduler.py">simple_lr_scheduler.py</a> defines a <code>CustomSchedule</code> :</p>
+
+                <pre><code>class CustomSchedule(torch.optim.lr_scheduler._LRScheduler):
+    """
+    Implements the learning rate schedule described in the Transformer paper.
+    lr = d_model^(-0.5) * min(step^(-0.5), step * warmup_steps^(-1.5))
+    """
+
+    def __init__(
+        self, optimizer, d_model: int, warmup_steps: int = 4000
+    ):  # Added type hints
+        self.d_model = float(d_model)  # Cast to float immediately
+        self.warmup_steps = float(warmup_steps)  # Cast to float
+        # Call super().__init__ after all self attributes are set if they are used in get_lr
+        super().__init__(optimizer)
+
+    def get_lr(self):
+        # self.last_epoch stores the current step/epoch count (0-indexed)
+        # We need to add 1 because step is typically 1-indexed in LR schedules.
+        step = self.last_epoch + 1
+        step_f = float(step)  # Ensure step is float for calculations
+
+        # Handle the case where step is 0 to avoid division by zero in rsqrt(0)
+        # For the original formula, step should start from 1.
+        # If last_epoch starts at -1 (default for _LRScheduler), step will be 0 on first call.
+        # For Transformer's LR, step=0 means LR=0.
+        if step_f == 0:
+            return [0.0] * len(self.optimizer.param_groups)
+
+        # Calculate arg1 and arg2
+        arg1 = torch.rsqrt(torch.tensor(step_f))
+        arg2 = torch.tensor(step_f) * (self.warmup_steps**-1.5)
+
+        # Calculate the final learning rate
+        lr = torch.rsqrt(torch.tensor(self.d_model)) * torch.min(arg1, arg2)
+
+        # Return a list of learning rates, one for each parameter group
+        # Since this schedule computes a single LR, we apply it to all groups.
+        return [lr.item()] * len(self.optimizer.param_groups)</code></pre>
+
+                <p>Define a model:</p>
+                <pre><code># --- Training Setup ---
+# 1. Define your model
+model = torch.nn.Linear(10, 1)  # Still a simple linear model
+
+# 2. Define your optimizer
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.98), eps=1e-9)
+
+# 3. Define your loss function
+criterion = torch.nn.MSELoss()
+
+# 4. Instantiate the custom learning rate schedule
+d_model = 512
+warmup_steps = 4000
+scheduler = CustomSchedule(optimizer, d_model, warmup_steps)</code></pre>
+                
+                
                 <div class="navigation">
                     <a href="loss_function.html">Prev: 2.5 Loss Function</a>
                     <a href="cnn_classify_stratch.html">Next: 3.1 CNN from Stratch</a>
