@@ -131,12 +131,32 @@ optimizer.step()
 assert torch.isclose(w_torch, torch.tensor(w), atol=1e-6)</code></pre>
 
                 <p>PyTorch class <a href="https://docs.pytorch.org/docs/stable/generated/torch.optim.SGD.html#torch.optim.SGD">torch.optim.SGD</a> Implements stochastic gradient descent (optionally with momentum).</p>
-                <pre><code></code></pre>
-                <p>Nesterov momentum is based on the formula from <a href="http://www.cs.toronto.edu/%7Ehinton/absps/momentum.pdf">On the importance of initialization and momentum in deep learning</a> .</p>
-                <p>Imagine you're still rolling a ball down the hilly landscape, but now the ball has momentum. If it's been rolling in a certain direction for a while, it gains speed and tends to continue in that direction, even if there's a small uphill slope or a flat region. This helps it overcome small obstacles and accelerate through consistent gradients.</p>
                 <pre><code>torch.optim.SGD(params, lr=0.001, momentum=0, dampening=0, weight_decay=0,
     nesterov=False, *, maximize=False, foreach=None, differentiable=False, fused=None)</code></pre>
+                <p>Nesterov momentum is based on the formula from <a href="http://www.cs.toronto.edu/%7Ehinton/absps/momentum.pdf">On the importance of initialization and momentum in deep learning</a> .</p>
+                <p>Imagine you're still rolling a ball down the hilly landscape, but now the ball has momentum. If it's been rolling in a certain direction for a while, it gains speed and tends to continue in that direction, even if there's a small uphill slope or a flat region. This helps it overcome small obstacles and accelerate through consistent gradients.</p>
                 
+                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/02_dnn/6_optimizer/sgd_momentum.py">sgd_momentum.py</a> Demonstrate how SGD (Stochastic Gradient Descent) with momentum can "jump over" a local minimum, where SGD without momentum might get stuck:</p>
+                <pre><code>for i in range(num_iterations):
+    # Optimization step for SGD with Momentum
+    optimizer_momentum.zero_grad()  # Clear previous gradients
+    loss_m = model_momentum()  # Compute loss
+    loss_m.backward()  # Backpropagate to compute gradients
+    optimizer_momentum.step()  # Update parameters
+    history_momentum_x.append(model_momentum.x.item())
+    history_momentum_loss.append(loss_m.item())
+
+    # Optimization step for SGD without Momentum
+    optimizer_nomomentum.zero_grad()
+    loss_nm = model_nomomentum()
+    loss_nm.backward()
+    optimizer_nomomentum.step()
+    history_nomomentum_x.append(model_nomomentum.x.item())
+    history_nomomentum_loss.append(loss_nm.item())</code></pre>
+
+                <img >src="res/02/sgd_momentum.png" alt="SGD Momentum" width="600">
+                <p style="text-align: center; color: #555555;">Figure 2 - SGD Momentum</p>
+                <p>In the figure, the gray line represents the Loss Landscape, showing how the loss changes with different values of \(x\). The blue line represents the path taken by SGD with momentum, while the yellow line shows the path taken by SGD without momentum. The brown dot indicates the local minimum that SGD without momentum gets stuck in, while the red pentagram shows how SGD with momentum can jump over this local minimum and continue to find a better solution.</p>
 
                 <h3 id="adam">2.6.2 Adam</h3>
                 <p>We propose Adam, a method for efficient stochastic optimization that only requires first-order gradients with little memory requirement. The method computes individual adaptive learning rates for different parameters from estimates of first and second moments of the gradients; the name Adam is derived from adaptive moment estimation.</p>
