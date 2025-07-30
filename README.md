@@ -18,7 +18,7 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 - [x] 2.3 [PyTorch Basics](https://artinte.github.io/deep-learning/pytorch_basics.html)
 - [ ] 2.4 [Activation Function](https://artinte.github.io/deep-learning/activation_function.html)
 - [ ] 2.5 [Loss Function](https://artinte.github.io/deep-learning/loss_function.html)
-- [ ] 2.6 [Optimizer](https://artinte.github.io/deep-learning/optimizer.html)
+- [x] 2.6 [Optimizer](https://artinte.github.io/deep-learning/optimizer.html)
 
 ### 03 Convolutional Network
 

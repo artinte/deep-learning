@@ -154,12 +154,12 @@ assert torch.isclose(w_torch, torch.tensor(w), atol=1e-6)</code></pre>
     history_nomomentum_x.append(model_nomomentum.x.item())
     history_nomomentum_loss.append(loss_nm.item())</code></pre>
 
-                <img >src="res/02/sgd_momentum.png" alt="SGD Momentum" width="600">
+                <img src="res/02/sgd_momentum.png" alt="SGD Momentum" width="600">
                 <p style="text-align: center; color: #555555;">Figure 2 - SGD Momentum</p>
                 <p>In the figure, the gray line represents the Loss Landscape, showing how the loss changes with different values of \(x\). The blue line represents the path taken by SGD with momentum, while the yellow line shows the path taken by SGD without momentum. The brown dot indicates the local minimum that SGD without momentum gets stuck in, while the red pentagram shows how SGD with momentum can jump over this local minimum and continue to find a better solution.</p>
 
-                <h3 id="adam">2.6.2 Adam</h3>
-                <p>We propose Adam, a method for efficient stochastic optimization that only requires first-order gradients with little memory requirement. The method computes individual adaptive learning rates for different parameters from estimates of first and second moments of the gradients; the name Adam is derived from adaptive moment estimation.</p>
+                <h3 id="adam">2.6.3 Adam</h3>
+                <p>We (Diederik P. Kingma, Jimmy Ba) propose <a href="https://arxiv.org/abs/1412.6980">Adam</a> , a method for efficient stochastic optimization that only requires first-order gradients with little memory requirement. The method computes individual adaptive learning rates for different parameters from estimates of first and second moments of the gradients; the name Adam is derived from adaptive moment estimation.</p>
                 <p>Algorithm: Adam, our proposed algorithm for stochastic optimization, and for a slightly more efficient (but less clear) order of computation. \(g_t^2\) indicates the elementwise square \(g_t \odot g_t\). Good default settings for the tested machine learning problem are \(\alpha = 0.001\), \(\beta_1 = 0.9\), \(\beta_2 = 0.999\) and \(\epsilon = 10^{-8}\). All operations on vectors are element-wise. With \(\beta_1^t\) and \(\beta_2^t\) we denote \(\beta_1\) and \(\beta_2\) to the power \(t\).</p>
 
                 <ul class="with-bullets">
@@ -171,10 +171,10 @@ assert torch.isclose(w_torch, torch.tensor(w), atol=1e-6)</code></pre>
                     <li><p>\(v_0 \leftarrow 0\): (Initialize \(2^{nd}\) moment vector);</p></li>
                     <li><p>\(t \leftarrow 0\): (Initialize timestep).</p></li>
                 </ul>
-                <p><strong>while</strong> \(\theta_t\) not converged <strong>do</strong></p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \[
                     \begin{flalign*}
+                    & \mathbf{while } \theta_t \text{ not converged } \mathbf{do} \\
                     & t \leftarrow t + 1 \\
                     & g_t \leftarrow \Delta_{\theta} f_t(\theta_{t-1}) \\
                     & m_t \leftarrow \beta_1 \cdot m_{t-1} + (1 - \beta_1) \cdot g_t \\
@@ -182,11 +182,11 @@ assert torch.isclose(w_torch, torch.tensor(w), atol=1e-6)</code></pre>
                     & \hat{m}_t \leftarrow m_t / (1 - \beta_2^t) \\
                     & \hat{v}_t \leftarrow v_t / (1 - \beta_2^t) \\
                     & \theta_t \leftarrow \theta_{t-1} - \alpha \cdot \hat{m}_t / (\sqrt{\hat{v}_t} + \epsilon) \\
+                    & \mathbf{end while} \\
+                    & \mathbf{return } \theta_t \text{ (Resulting parameters)}
                     \end{flalign*}
                     \]
                 </div>
-                <p><strong>end while</strong></p>
-                <p><strong>return</strong> \(\theta_t\) (Resulting parameters)</p>
 
                 <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/02_dnn/6_optimizer/simple_adam.py">simple_adam.py</a> implements a simplified version of the Adam optimizer in PyTorch to minimize the function \(f(x) = {(x - 3)}^2\). It tracks and plots the optimization process, showing how \(x\) converges towrad 3 and the loss decreases over 150 steps:</p>
                 <pre><code>class SimpleAdam:
@@ -223,7 +223,42 @@ assert torch.isclose(w_torch, torch.tensor(w), atol=1e-6)</code></pre>
                 <img src="res/02/simple_adam.png" alt="Simple Adam" width="600">
                 <p style="text-align: center; color: #555555;">Figure 2 - Simple Adam</p>
 
-                <h3>2.6.3 lr_scheduler</h3>
+                <pre><samp>Step 010 | x = 9.00517 | loss = 37.25632
+Step 020 | x = 8.04014 | loss = 26.36289
+Step 030 | x = 7.13265 | loss = 17.80930
+Step 040 | x = 6.30562 | loss = 11.45278
+Step 050 | x = 5.57491 | loss = 6.98728
+Step 060 | x = 4.94909 | loss = 4.02744
+Step 070 | x = 4.43005 | loss = 2.18219
+Step 080 | x = 4.01389 | loss = 1.10479
+Step 090 | x = 3.69198 | loss = 0.51877
+Step 100 | x = 3.45239 | loss = 0.22376
+Step 110 | x = 3.28132 | loss = 0.08747
+Step 120 | x = 3.16465 | loss = 0.03037
+Step 130 | x = 3.08909 | loss = 0.00905
+Step 140 | x = 3.04303 | loss = 0.00217
+Step 150 | x = 3.01703 | loss = 0.00036
+Adam.Scratch Final x: 3.01703, Final Loss: 0.00029</samp></pre>
+
+                <p>We can use <a href="https://docs.pytorch.org/docs/stable/generated/torch.optim.Adam.html#torch.optim.Adam">torch.optim.Adam</a> implement above training process:</p>
+                <pre><code># Another implementation with torch.optim.Adam
+x_torch_adam = torch.tensor([10.0], requires_grad=True)
+optimizer_torch_adam = torch.optim.Adam([x_torch_adam], lr=0.1)
+losses_torch_adam = []
+xs_torch_adam = []
+
+for step in range(150):
+    optimizer_torch_adam.zero_grad() # Same zero_grad call
+    loss = (x_torch_adam - 3) ** 2
+    loss.backward() # Same backward call
+    optimizer_torch_adam.step() # Same step call</code></pre>
+
+                <pre><samp>Step 050 | x = 5.57491 | loss = 6.98728
+Step 100 | x = 3.45239 | loss = 0.22375
+Step 150 | x = 3.01703 | loss = 0.00036
+Torch.Adam Final x: 3.01703, Final Loss: 0.00029</samp></pre>
+
+                <h3>2.6.4 lr_scheduler</h3>
 
                 <p><a href="https://docs.pytorch.org/docs/stable/generated/torch.optim.lr_scheduler.LRScheduler.html">torch.optim.LRScheduler</a> Adjusts the learning rate during optimization.</p>
                 <pre><code>torch.optim.lr_scheduler.LRScheduler(optimizer, last_epoch=-1)</code></pre>
@@ -303,6 +338,9 @@ scheduler = CustomSchedule(optimizer, d_model, warmup_steps)</code></pre>
     <script type="text/javascript" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script src="article_script.js"></script>
+    <script>
+        hljs.highlightAll();
+    </script>
 </body>
 
 </html>

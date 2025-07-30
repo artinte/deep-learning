@@ -48,10 +48,31 @@ for step in range(150):
 
     losses.append(loss.item())
     xs.append(x.item())
-    print(f"Step {step:03d} | x = {x.item():.5f} | loss = {loss.item():.5f}")
+    if (step + 1) % 10 == 0:
+        # Print every 10 step
+        print(f"Step {step+1:03d} | x = {x.item():.5f} | loss = {loss.item():.5f}")
+print(f"Adam.Scratch Final x: {x.item():.5f}, Final Loss: {((x - 3)**2).item():.5f}")
 
 pyplot.plot(losses, label="loss")
 pyplot.plot(xs, label="x")
 pyplot.legend()
 pyplot.grid(True)
 pyplot.show()
+
+# Another implementation with torch.optim.Adam
+x_torch_adam = torch.tensor([10.0], requires_grad=True)
+optimizer_torch_adam = torch.optim.Adam([x_torch_adam], lr=0.1)
+losses_torch_adam = []
+xs_torch_adam = []
+
+for step in range(150):
+    optimizer_torch_adam.zero_grad() # Same zero_grad call
+    loss = (x_torch_adam - 3) ** 2
+    loss.backward() # Same backward call
+    optimizer_torch_adam.step() # Same step call
+
+    losses_torch_adam.append(loss.item())
+    xs_torch_adam.append(x_torch_adam.item())
+    if (step + 1) % 50 == 0: # Print less frequently for brevity
+        print(f"Step {step+1:03d} | x = {x_torch_adam.item():.5f} | loss = {loss.item():.5f}")
+print(f"Torch.Adam Final x: {x_torch_adam.item():.5f}, Final Loss: {((x_torch_adam - 3)**2).item():.5f}\n")
