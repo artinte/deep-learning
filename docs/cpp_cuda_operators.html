@@ -19,10 +19,17 @@
             </nav>
 
             <main class="col-md-8 content">
-                <h2 class="custom-title">11.3 Extending TorchScript</h2>
+                <h2 class="custom-title">11.3 Custom C++ and CUDA Operators</h2>
                 <p class="title-subtext"></p>
-                <p style="color: #a0a0a0;">Created Date: 2025-06-06</p>
+                <p style="color: #a0a0a0;">Created Date: 2025-07-30</p>
 
+                <p>PyTorch offers a large library of operators that work on Tensors (e.g. torch.add, torch.sum, etc). However, you may wish to bring a new custom operator to PyTorch. This tutorial demonstrates the blessed path to authoring a custom operator written in C++/CUDA.</p>
+                <p>For our tutorial, we’ll demonstrate how to author a fused multiply-add C++ and CUDA operator that composes with PyTorch subsystems. The semantics of the operation are as follows:</p>
+
+                <pre><code>def mymuladd(a: Tensor, b: Tensor, c: float):
+    return a * b + c</code></pre>
+
+                
                 <div class="navigation">
                     <a href="custom_function.html">Prev: 11.2 Custom Functions</a>
                     <a href="dispatcher.html">Next: 11.5 Dispatcher</a>
