@@ -26,7 +26,7 @@
                 <p>There are many optimizers available for machine learning and deep learning, with the exact number being difficult to pinpoint as new ones are constantly being developed and existing ones are adapted. However, some popular and well-established optimizers include Gradient Descent (and its variations like Stochastic Gradient Descent and Mini-batch Gradient Descent), Adagrad, RMSprop, Adam, and Adadelta. The choice of optimizer often depends on the specific problem, dataset size, and desired convergence speed.</p>
                 <p>The image visually explains how an optimizer works by iteratively adjusting a parameter (w) from a random starting point to find the value that minimizes the loss function.</p>
                 
-                <img src="res/02/optimizer.png" alt="Optimizer" width="600">
+                <img src="res/02/optimizer.webp" alt="Optimizer" width="600">
                 <p style="text-align: center; color: #555555;">Figure 1 - Optimizer</p>
 
                 <p>We can set a constant <strong>learning rate</strong> of 0.001, or adjust the learning rate during training, which leads to different types of optimizers.</p>
@@ -85,27 +85,31 @@ optimizer = torch.optim.Adam([var1, var2], lr=0.0001)</code></pre>
                 <h3 id="sgd">2.6.2 Stochastic Gradient Descent (SGD)</h3>
 
                 <p><strong>Stochastic Gradient Descent (SGD)</strong> is an optimization algorithm used to minimize a loss function by updating the model’s parameters \(\theta\) in the direction of the negative gradient. It is a stochastic (randomized) version of standard gradient descent that updates parameters using only one data point at a time, rather than the entire dataset.</p>
-                <p>The update rule is:</p>
+                <p>The simple update rule is:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(\theta = \theta - \eta \cdot \nabla_\theta \cdot L_i(\theta)\)
                 </div>
-                <p>where \(\eta\) is the learning rate, \(\eta\) is learning rate, \(\nabla_\theta L_i(\theta)\) is the gradient of the loss function \(L\) with respect to the parameters \(\theta\) for the \(i\)-th data point.</p>
+                <p>where \(\eta\) is the learning rate, \(\nabla_\theta L_i(\theta)\) is the gradient of the loss function \(L\) with respect to the parameters \(\theta\) for the \(i\)-th data point.</p>
 
-                <p>File <a href="#">simple_sgd.py</a> show a simple example:</p>
+                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/02_dnn/6_optimizer/simple_sgd.py">simple_sgd.py</a> show a simple example:</p>
                 <pre><code># training data
 x = 1
 y = 2
 w = 0
-leanring_rate = 0.1
+learning_rate = 0.1
 
 y_pred = w * x
 loss = (y_pred - y) ** 2
 dw = 2 * (w * x - y) * x
-w = w - leanring_rate * dw
+w = w - learning_rate * dw
 
-print(f"w: {w}, loss: {loss}")</code></pre>
+print(f'Initial w: 0, learning_rate: {learning_rate}')
+print(f'After training: w: {w}, gradient dw: {dw}')</code></pre>
 
-                <pre><samp>w: 0.4, loss: 4</samp></pre>
+                <pre><samp>Initial w: 0, learning_rate: 0.1
+After training: w: 0.4, gradient dw: -4</samp></pre>
+                
+                <p>In this single step, \(w\) moved from 0 to 0.4.</p>
 
                 <p>In PyTorch, you can use the <code>torch.optim.SGD</code> class to implement SGD.</p>
                 <pre><code># implementation with torch
@@ -125,6 +129,14 @@ loss.backward()
 optimizer.step()
 
 assert torch.isclose(w_torch, torch.tensor(w), atol=1e-6)</code></pre>
+
+                <p>PyTorch class <a href="https://docs.pytorch.org/docs/stable/generated/torch.optim.SGD.html#torch.optim.SGD">torch.optim.SGD</a> Implements stochastic gradient descent (optionally with momentum).</p>
+                <pre><code></code></pre>
+                <p>Nesterov momentum is based on the formula from <a href="http://www.cs.toronto.edu/%7Ehinton/absps/momentum.pdf">On the importance of initialization and momentum in deep learning</a> .</p>
+                <p>Imagine you're still rolling a ball down the hilly landscape, but now the ball has momentum. If it's been rolling in a certain direction for a while, it gains speed and tends to continue in that direction, even if there's a small uphill slope or a flat region. This helps it overcome small obstacles and accelerate through consistent gradients.</p>
+                <pre><code>torch.optim.SGD(params, lr=0.001, momentum=0, dampening=0, weight_decay=0,
+    nesterov=False, *, maximize=False, foreach=None, differentiable=False, fused=None)</code></pre>
+                
 
                 <h3 id="adam">2.6.2 Adam</h3>
                 <p>We propose Adam, a method for efficient stochastic optimization that only requires first-order gradients with little memory requirement. The method computes individual adaptive learning rates for different parameters from estimates of first and second moments of the gradients; the name Adam is derived from adaptive moment estimation.</p>

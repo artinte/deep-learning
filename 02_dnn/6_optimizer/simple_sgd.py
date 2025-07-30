@@ -4,14 +4,15 @@ import torch
 x = 1
 y = 2
 w = 0
-leanring_rate = 0.1
+learning_rate = 0.1
 
 y_pred = w * x
 loss = (y_pred - y) ** 2
 dw = 2 * (w * x - y) * x
-w = w - leanring_rate * dw
+w = w - learning_rate * dw
 
-print(f"w: {w}, loss: {loss}")
+print(f'Initial w: 0, learning_rate: {learning_rate}')
+print(f'After training: w: {w}, gradient dw: {dw}')
 
 # implementation with torch
 x = torch.tensor(1.0)
