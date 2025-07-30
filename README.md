@@ -59,7 +59,7 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 
 ### 07 Text
 
-- [ ] 7.1 [Translate with Transformer](https://artinte.github.io/deep-learning/trans_transformer.html)
+- [x] 7.1 [Translate with Transformer](https://artinte.github.io/deep-learning/trans_transformer.html)
 - [ ] 7.2 [Easy OCR](https://artinte.github.io/deep-learning/easy_ocr.html)
 - [ ] 7.3 [Language Modeling](https://artinte.github.io/deep-learning/language_model.html)
 - [ ] 7.4 [Chatbots](https://artinte.github.io/deep-learning/chatbots.html)
