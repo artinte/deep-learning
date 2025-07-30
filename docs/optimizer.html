@@ -26,7 +26,7 @@
                 <p>There are many optimizers available for machine learning and deep learning, with the exact number being difficult to pinpoint as new ones are constantly being developed and existing ones are adapted. However, some popular and well-established optimizers include Gradient Descent (and its variations like Stochastic Gradient Descent and Mini-batch Gradient Descent), Adagrad, RMSprop, Adam, and Adadelta. The choice of optimizer often depends on the specific problem, dataset size, and desired convergence speed.</p>
                 <p>The image visually explains how an optimizer works by iteratively adjusting a parameter (w) from a random starting point to find the value that minimizes the loss function.</p>
                 
-                <img src="res/02/simple_optimizer.png" alt="Optimizer" width="600">
+                <img src="res/02/optimizer.png" alt="Optimizer" width="600">
                 <p style="text-align: center; color: #555555;">Figure 1 - Optimizer</p>
 
                 <p>We can set a constant <strong>learning rate</strong> of 0.001, or adjust the learning rate during training, which leads to different types of optimizers.</p>
@@ -56,12 +56,33 @@
                 <p>The best optimizer for a specific task is often determined through experimentation and by considering factors like the dataset size, the complexity of the model, and the desired convergence speed.</p>
 
                 <h3>2.6.1 Basic Usage</h3>
-                <p>To use torch.optim you have to construct an optimizer object that will hold the current state and will update the parameters based on the computed gradients.</p>
+                <p>To use <a href="https://docs.pytorch.org/docs/stable/optim.html">torch.optim</a> you have to construct an <strong>optimizer</strong> object that will hold the current state and will update the parameters based on the computed gradients.</p>
                 <p>To construct an Optimizer you have to give it an iterable containing the parameters (all should be Parameter s) or named parameters (tuples of (str, Parameter)) to optimize. Then, you can specify optimizer-specific options such as the learning rate, weight decay, etc. Example:</p>
-                <pre><code>optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
-optimizer = optim.Adam([var1, var2], lr=0.0001)</code></pre>
+                <pre><code>optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
+optimizer = torch.optim.Adam([var1, var2], lr=0.0001)</code></pre>
 
-                <h3 id="sgd">2.6.1 Stochastic Gradient Descent (SGD)</h3>
+                <p>All optimizers implement a <code>step()</code> method, that updates the parameters. It can be used in two ways:</p>
+                <pre><code>optimizer.step()</code></pre>
+                
+                <p>This is a simplified version supported by most optimizers. The function can be called once the gradients are computed using e.g. <code>backward()</code> .</p>
+                <pre><code>for input, target in dataset:
+    optimizer.zero_grad()
+    output = model(input)
+    loss = loss_fn(output, target)
+    loss.backward()
+    optimizer.step()</code></pre>
+
+                <p>Some optimization algorithms such as Conjugate Gradient and LBFGS need to reevaluate the function multiple times, so you have to pass in a closure that allows them to recompute your model. The closure should clear the gradients, compute the loss, and return it:</p>
+                <pre><code>for input, target in dataset:
+    def closure():
+        optimizer.zero_grad()
+        output = model(input)
+        loss = loss_fn(output, target)
+        loss.backward()
+        return loss
+    optimizer.step(closure)</code></pre>
+
+                <h3 id="sgd">2.6.2 Stochastic Gradient Descent (SGD)</h3>
 
                 <p><strong>Stochastic Gradient Descent (SGD)</strong> is an optimization algorithm used to minimize a loss function by updating the model’s parameters \(\theta\) in the direction of the negative gradient. It is a stochastic (randomized) version of standard gradient descent that updates parameters using only one data point at a time, rather than the entire dataset.</p>
                 <p>The update rule is:</p>
