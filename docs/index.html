@@ -727,17 +727,15 @@
 
                     <section id="section14" class="content-section">
                         <h2>14 Distributed Training</h2>
-
-                        <p><a href="https://docs.pytorch.org/tutorials/beginner/dist_overview.html">PyTorch Distributed Overview</a></p>
-                        <p><a href="https://docs.pytorch.org/tutorials/distributed/home.html">Distributed and Parallel Training Tutorials</a></p>
+                        <p>Distributed training is a model training paradigm that involves spreading training workload across multiple worker nodes, therefore significantly improving the speed of training and model accuracy. While distributed training can be used for any type of ML model training, it is most beneficial to use it for large models and compute demanding tasks as deep learning.</p>
+                        <p><a href="https://docs.pytorch.org/tutorials/distributed.html">Distributed - PyTorch</a></p>
 
                         <h3 id="section14-sub1">
                             <a href="distrib_parallel.html" style="color: inherit;">14.1 Distributed Data Parallel</a>
                         </h3>
                         <p>DistributedDataParallel (DDP) is a powerful module in PyTorch that allows you to parallelize your model across multiple machines, making it perfect for large-scale deep learning applications.</p>
                         <p><a href="https://docs.pytorch.org/tutorials/intermediate/ddp_tutorial.html">Getting Started with Distributed Data Parallel</a></p>
-                        <p><a href="https://docs.pytorch.org/tutorials/beginner/ddp_series_intro.html?utm_source=distr_landing&utm_medium=ddp_series_intro">Distributed Data Parallel in PyTorch - Video Tutorials</a></p>
-
+                        
                         <h3 id="section14-sub2">
                             <a href="fully_parallel.html" style="color: inherit;">14.2 Fully Sharded Data Parallel</a>
                         </h3>
@@ -761,12 +759,12 @@
                         <h3 id="section14-sub5">
                             <a href="remote_call.html" style="color: inherit;">14.5 Remote Procedure Call</a>
                         </h3>
-                        <p><a href="https://docs.pytorch.org/tutorials/advanced/rpc_ddp_tutorial.html?utm_source=distr_landing&utm_medium=rpc_plus_ddp">Combining Distributed DataParallel with Distributed RPC Framework</a></p>
+                        <p>This tutorial uses two simple examples to demonstrate how to build distributed training with the torch.distributed.rpc package.</p>
+                        <p><a href="https://docs.pytorch.org/tutorials/intermediate/rpc_tutorial.html">Getting Started with Distributed RPC Framework</a></p>
                     </section>
 
                     <section id="section15" class="content-section">
                         <h2>15 Graph Netural Network</h2>
-
                         <p><a href="https://pytorch-geometric.readthedocs.io/en/latest/">PyG (PyTorch Geometric)</a> is a library built upon PyTorch to easily write and train Graph Neural Networks (GNNs) for a wide range of applications related to structured data.</p>
 
                         <h3 id="section15-sub1">
@@ -782,14 +780,18 @@
                         <h3 id="section15-sub3">
                             <a href="design_of_gnn.html" style="color: inherit;">15.3 Design of GNN</a>
                         </h3>
+                        <p><a href="https://pytorch-geometric.readthedocs.io/en/latest/tutorial/gnn_design.html">Design of Graph Neural Networks</a></p>
 
                         <h3 id="section15-sub4">
                             <a href="use_cases.html" style="color: inherit;">15.4 Use-Cases & Applications</a>
                         </h3>
+                        <p><a href="https://pytorch-geometric.readthedocs.io/en/latest/tutorial/application.html">Use-Cases & Applications</a></p>
 
                         <h3 id="section15-sub5">
                             <a href="advanced_concepts.html" style="color: inherit;">15.5 Advanced Concepts</a>
                         </h3>
+                        <p><a href="https://pytorch-geometric.readthedocs.io/en/latest/advanced/batching.html">Advanced Mini-Batching</a></p>
+                        <p><a href="https://pytorch-geometric.readthedocs.io/en/latest/advanced/sparse_tensor.html">Memory-Efficient Aggregations</a></p>
                     </section>
                 </main>
 
