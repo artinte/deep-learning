@@ -20,9 +20,32 @@
 
             <main class="col-md-8 content">
                 <h2 class="custom-title">15.2 Core Ideas</h2>
-                <p class="title-subtext"></p>
-                <p style="color: #a0a0a0;">Created Date: 2025-06-11</p>
+                <p class="title-subtext">A Gentle Introduction to Graph Neural Networks</p>
+                <p style="color: #a0a0a0;">Created Date: 2025-07-31</p>
 
+                <p>Neural networks have been adapted to leverage the structure and properties of graphs. We explore the components needed for building a graph neural network - and motivate the design choices behind them.</p>
+
+                <p>Graphs are all around us; real world objects are often defined in terms of their connections to other things. A set of objects, and the connections between them, are naturally expressed as a graph. Researchers have developed neural networks that operate on graph data (called graph neural networks, or GNNs) for over a decade Recent developments have increased their capabilities and expressive power. We are starting to see practical applications in areas such as antibacterial discovery, physics simulations, fake news detection, traffic prediction, and recommendation systems.</p>
+
+                <p>This article explores and explains modern graph neural networks. We divide this work into four parts. First, we look at what kind of data is most naturally phrased as a graph, and some common examples. Second, we explore what makes graphs different from other types of data, and some of the specialized choices we have to make when using graphs. Third, we build a modern GNN, walking through each of the parts of the model, starting with historic modeling innovations in the field. We move gradually from a bare-bones implementation to a state-of-the-art GNN model. Fourth and finally, we provide a GNN playground where you can play around with a real-word task and dataset to build a stronger intuition of how each component of a GNN model contributes to the predictions it makes.</p>
+
+                <p>To start, let’s establish what a graph is. A graph represents the relations (edges) between a collection of entities (nodes).</p>
+
+                <p>To further describe each node, edge or the entire graph, we can store information in each of these pieces of the graph.</p>
+
+                <p>We can additionally specialize graphs by associating directionality to edges (directed, undirected).</p>
+
+                <p>Graphs are very flexible data structures, and if this seems abstract now, we will make it concrete with examples in the next section.</p>
+
+                <h3>15.2.1 Graphs and where to find them</h3>
+
+                <p>You’re probably already familiar with some types of graph data, such as social networks. However, graphs are an extremely powerful and general representation of data, we will show two types of data that you might not think could be modeled as graphs: images and text. Although counterintuitive, one can learn more about the symmetries and structure of images and text by viewing them as graphs,, and build an intuition that will help understand other less grid-like graph data, which we will discuss later.</p>
+
+                <h4>15.2.1.1 Images as graphs</h4>
+                <p>We typically think of images as rectangular grids with image channels, representing them as arrays (e.g., 244x244x3 floats). Another way to think of images is as graphs with regular structure, where each pixel represents a node and is connected via an edge to adjacent pixels. Each non-border pixel has exactly 8 neighbors, and the information stored at each node is a 3-dimensional vector representing the RGB value of the pixel.</p>
+
+                <p>A way of visualizing the connectivity of a graph is through its adjacency matrix. We order the nodes, in this case each of 25 pixels in a simple \(5 \times 5\) image of a smiley face, and fill a matrix of \(n_{nodes} \times n_{nodes}\) </p>
+                
                 <div class="navigation">
                     <a href="graph_foundation.html">Prev: 15.1 Graph Foundation</a>
                     <a href="design_of_gnn.html">Next: 15.3 Design of GNN</a>
