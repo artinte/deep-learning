@@ -20,7 +20,7 @@
 
             <main class="col-md-8 content">
                 <h2 class="custom-title">13.1 LoRA</h2>
-                <p class="title-subtext">LoRA: Low-Rank Adaptation of Large Language Models</p>
+                <p class="title-subtext"><a href="https://arxiv.org/abs/2106.09685">LoRA</a> : Low-Rank Adaptation of Large Language Models</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-06-07</p>
 
                 <p>An important paradigm of natural language processing consists of large-scale pretraining on general domain data and adaptation to particular tasks or domains. As we pre-train larger models, full fine-tuning, which retrains all model parameters, becomes less feasible.  Using GPT-3 175B as an example – deploying independent instances of fine-tuned models, each with 175B parameters, is prohibitively expensive.</p>
@@ -79,10 +79,17 @@
                 <p>LoRA also has its limitations. For example, it is not straightforward to batch inputs to different tasks with different A and B in a single forward pass, if one chooses to absorb A and B into W to eliminate additional inference latency. Though it is possible to not merge the weights and dynamically choose the LoRA modules to use for samples in a batch for scenarios where latency is not critical.</p>
                 
                 <h3>13.1.5 Empirical Experiments</h3>
+
                 <h3>13.1.6 Related Works</h3>
 
                 <h5>Transformer Language Models</h5>
+                <p><a href="transformer_paper.html">Transformer (Vaswani et al., 2017)</a> is a sequence-to-sequence architecture that makes heavy use of self-attention. Radford et al. (a) applied it to autoregressive language modeling by using a stack of Transformer decoders. Since then, Transformer-based language models have dominated NLP, achieving the state-of-the-art in many tasks.</p>
+                <p>A new paradigm emerged with BERT (Devlin et al., 2019b) and GPT-2 (Radford et al., b) – both are large Transformer language models trained on a large amount of text – where fine-tuning on task-specific data after pre-training on general domain data provides a significant performance gain compared to training on task-specific data directly.</p>
+                <p>Training larger Transformers generally results in better performance and remains an active research direction. GPT-3 (Brown et al., 2020) is the largest single Transformer language model trained to-date with 175B parameters.</p>
 
+                <h5>Prompt Engineering and Fine-Tuning</h5>
+                
+                
                 <h3>13.1.7 Understanding the Low-Rank Updates</h3>
 
                 <h3>13.1.8 Conclusion and Future Work</h3>
