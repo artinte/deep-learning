@@ -190,10 +190,19 @@ if __name__ == "__main__":
         else:
             os.makedirs(extract_dir, exist_ok=True)
             zip_ref.extractall(extract_dir)
+            
+    # print the contents of the extracted directory
+    for item in os.listdir(extract_dir):
+        item_path = os.path.join(extract_dir, item)
+        if os.path.isdir(item_path):
+            print(f"Directory: {item_path}")
+        else:
+            print(f"File: {item_path}")
 
-    data_dir = "data/hymenoptera_data"
+    # Load the data
+    print("Loading data...")
     image_datasets = {
-        x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x])
+        x: datasets.ImageFolder(os.path.join(extract_dir, x), data_transforms[x])
         for x in ["train", "val"]
     }
     dataloaders = {
@@ -204,6 +213,8 @@ if __name__ == "__main__":
     }
     dataset_sizes = {x: len(image_datasets[x]) for x in ["train", "val"]}
     class_names = image_datasets["train"].classes
+    print(f"Dataset sizes: {dataset_sizes}")
+    print(f"Class names: {class_names}")
 
     device = (
         torch.accelerator.current_accelerator().type
@@ -214,10 +225,8 @@ if __name__ == "__main__":
 
     # Get a batch of training data
     inputs, classes = next(iter(dataloaders["train"]))
-
     # Make a grid from batch
     out = torchvision.utils.make_grid(inputs)
-
     imshow(out, title=[class_names[x] for x in classes])
 
     model_ft = models.resnet18(weights='IMAGENET1K_V1')

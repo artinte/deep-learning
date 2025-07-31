@@ -19,7 +19,7 @@
 
             <main class="col-md-8 content">
                 <h2 class="custom-title">9.2 Transfer Learning</h2>
-                <p class="title-subtext">Transfer Learning for Computer Vision Tutorial</p>
+                <p class="title-subtext"><a href="https://docs.pytorch.org/tutorials/beginner/transfer_learning_tutorial.html">Transfer Learning</a> for Computer Vision Tutorial</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-06-23</p>
 
                 <p>In this tutorial, you will learn how to train a convolutional neural network for image classification using transfer learning. You can read more about the transfer learning at cs231n notes</p>
@@ -36,6 +36,103 @@
                 <p>We will use torchvision and torch.utils.data packages for loading the data.</p>
                 <p>The problem we’re going to solve today is to train a model to classify ants and bees. We have about 120 training images each for ants and bees. There are 75 validation images for each class. Usually, this is a very small dataset to generalize upon, if trained from scratch. Since we are using transfer learning, we should be able to generalize reasonably well.</p>
                 <p>This dataset is a very small subset of imagenet.</p>
+
+                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/09_image/2_transfer_learning/simple_transfer.py">simple_transfer.py</a> downloads the data and extract it to the current <span class="highlight">data/</span> directory:</p>
+                <pre><code>    file_path = download.download(
+        data_url, sha1_hash="c6ff178de032ee56fa5b35c2a6a9005c934faba0"
+    )
+    print(file_path)
+
+    base_name = os.path.splitext(os.path.basename(file_path))[0]
+    extract_dir = os.path.join(os.path.dirname(file_path), base_name)
+
+    with zipfile.ZipFile(file_path, "r") as zip_ref:
+        names = zip_ref.namelist()
+        top_level_dirs = {name.split("/")[0] for name in names if "/" in name}
+        if len(top_level_dirs) == 1 and base_name in top_level_dirs:
+            zip_ref.extractall(os.path.dirname(file_path))
+            os.rename(os.path.join(os.path.dirname(file_path), base_name), extract_dir)
+        else:
+            os.makedirs(extract_dir, exist_ok=True)
+            zip_ref.extractall(extract_dir)
+            
+    # print the contents of the extracted directory
+    for item in os.listdir(extract_dir):
+        item_path = os.path.join(extract_dir, item)
+        if os.path.isdir(item_path):
+            print(f"Directory: {item_path}")
+        else:
+            print(f"File: {item_path}")</code></pre>
+
+                <p>We print its sub-level results, which contains two directories, one for the train set and the other for the valid set:</p>
+                <pre><samp>Directory: ./data\hymenoptera_data\train
+Directory: ./data\hymenoptera_data\val</samp></pre>
+
+                <p>We can now load the data using torchvision’s <code>ImageFolder</code> and <code>DataLoader</code>:</p>
+                <pre><code># Load the data
+    print("Loading data...")
+    image_datasets = {
+        x: datasets.ImageFolder(os.path.join(extract_dir, x), data_transforms[x])
+        for x in ["train", "val"]
+    }
+    dataloaders = {
+        x: torch.utils.data.DataLoader(
+            image_datasets[x], batch_size=4, shuffle=True, num_workers=4
+        )
+        for x in ["train", "val"]
+    }
+    dataset_sizes = {x: len(image_datasets[x]) for x in ["train", "val"]}
+    class_names = image_datasets["train"].classes
+    print(f"Dataset sizes: {dataset_sizes}")
+    print(f"Class names: {class_names}")</code></pre>
+                <pre><samp>Dataset sizes: {'train': 244, 'val': 153}
+Class names: ['ants', 'bees']</samp></pre>
+
+                <p>We also define the data augmentation and normalization for training and validation:</p>
+                <pre><code># Data augmentation and normalization for training
+# Just normalization for validation
+data_transforms = {
+    "train": transforms.Compose(
+        [
+            transforms.RandomResizedCrop(224),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+        ]
+    ),
+    "val": transforms.Compose(
+        [
+            transforms.Resize(256),
+            transforms.CenterCrop(224),
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+        ]
+    ),
+}</code></pre>
+
+                <p>Let’s visualize a few training images so as to understand the data augmentations:</p>
+                <pre><code>def imshow(inp, title=None):
+    """Display image for Tensor."""
+    inp = inp.numpy().transpose((1, 2, 0))
+    mean = numpy.array([0.485, 0.456, 0.406])
+    std = numpy.array([0.229, 0.224, 0.225])
+    inp = std * inp + mean
+    inp = numpy.clip(inp, 0, 1)
+    pyplot.imshow(inp)
+    if title is not None:
+        pyplot.title(title)
+    pyplot.pause(0.001)  # pause a bit so that plots are updated
+    pyplot.show()</code></pre>
+
+                <pre><code># Get a batch of training data
+    inputs, classes = next(iter(dataloaders["train"]))
+    # Make a grid from batch
+    out = torchvision.utils.make_grid(inputs)
+    imshow(out, title=[class_names[x] for x in classes])</code></pre>
+
+                <img src="res/09/samples_bee_ant.png" alt="Sample Images of Bees and Ants" width="600">
+                <p style="text-align: center; color: #555555;">Figure 1 - Sample Images of Bees and Ants</p>
+
 
                 <h3>9.2.2 Training the Model</h3>
 
