@@ -19,7 +19,7 @@
 
             <main class="col-md-8 content">
                 <h2 class="custom-title">5.2 Attention Is All You Need</h2>
-                <p class="title-subtext">Attention Is All You Need</p>
+                <p class="title-subtext"><a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a></p>
                 <p style="color: #a0a0a0;">Created Date: 2025-06-23</p>
                 <p>The dominant sequence transduction models are based on complex recurrent or convolutional neural networks that include an encoder and a decoder. The best performing models also connect the encoder and decoder through an <a href="attention_mechansim.html">attention mechanism</a>.  We propose a new simple network architecture, the <strong>Transformer</strong>, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.</p>
                 <p>Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles, by over 2 BLEU. On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature.</p>
@@ -224,6 +224,8 @@
 
                 <p>For the base models, we used a single model obtained by averaging the last 5 checkpoints, which were written at 10-minute intervals. For the big models, we averaged the last 20 checkpoints. We used beam search with a beam size of 4 and length penalty \(\alpha = 0.6\). These hyperparameters were chosen after experimentation on the development set. We set the maximum output length during inference to input length \(+50\), but terminate early when possible.</p>
 
+                <p>Table 2 summarizes our results and compares our translation quality and training costs to other model architectures from the literature. We estimate the number of floating point operations used to train a model by multiplying the training time, the number of GPUs used, and an estimate of the sustained single-precision floating-point capacity of each GPU.</p>
+                
                 <h4>5.2.6.2 Model Variations</h4>
                 <p>To evaluate the importance of different components of the Transformer, we varied our base model in different ways, measuring the change in performance on English-to-German translation on the development set, newstest2013. We used beam search as described in the previous section, but no checkpoint averaging. We present these results in Table 2.</p>
 
