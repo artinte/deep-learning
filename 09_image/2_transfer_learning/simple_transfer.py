@@ -4,12 +4,11 @@ import os
 import numpy
 import torch
 import zipfile
-import time
-import tempfile
+import util
 from PIL import Image
 from matplotlib import pyplot
 import torchvision
-from torchvision import datasets, models, transforms
+from torchvision import datasets, transforms
 
 project_root = pathlib.Path(__file__).resolve().parents[2]
 sys.path.append(str(project_root))
@@ -54,84 +53,12 @@ def imshow(inp, title=None):
     pyplot.show()
 
 
-def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
-    since = time.time()
-
-    # Create a temporary directory to save training checkpoints
-    tempdir = 'temp/'
-    os.makedirs(tempdir, exist_ok=True)
-    best_model_params_path = os.path.join(tempdir, 'best_model_params.pt')
-
-    torch.save(model.state_dict(), best_model_params_path)
-    best_acc = 0.0
-
-    for epoch in range(num_epochs):
-        print(f'Epoch {epoch}/{num_epochs - 1}')
-        print('-' * 10)
-
-        # Each epoch has a training and validation phase
-        for phase in ['train', 'val']:
-            if phase == 'train':
-                model.train()  # Set model to training mode
-            else:
-                model.eval()   # Set model to evaluate mode
-
-            running_loss = 0.0
-            running_corrects = 0
-
-            # Iterate over data.
-            for inputs, labels in dataloaders[phase]:
-                inputs = inputs.to(device)
-                labels = labels.to(device)
-
-                # zero the parameter gradients
-                optimizer.zero_grad()
-
-                # forward
-                # track history if only in train
-                with torch.set_grad_enabled(phase == 'train'):
-                    outputs = model(inputs)
-                    _, preds = torch.max(outputs, 1)
-                    loss = criterion(outputs, labels)
-
-                    # backward + optimize only if in training phase
-                    if phase == 'train':
-                        loss.backward()
-                        optimizer.step()
-
-                # statistics
-                running_loss += loss.item() * inputs.size(0)
-                running_corrects += torch.sum(preds == labels.data)
-            if phase == 'train':
-                scheduler.step()
-
-            epoch_loss = running_loss / dataset_sizes[phase]
-            epoch_acc = running_corrects.double() / dataset_sizes[phase]
-
-            print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}')
-
-            # deep copy the model
-            if phase == 'val' and epoch_acc > best_acc:
-                best_acc = epoch_acc
-                torch.save(model.state_dict(), best_model_params_path)
-
-        print()
-
-    time_elapsed = time.time() - since
-    print(f'Training complete in {time_elapsed // 60:.0f}m {time_elapsed % 60:.0f}s')
-    print(f'Best val Acc: {best_acc:4f}')
-
-    # load best model weights
-    model.load_state_dict(torch.load(best_model_params_path, weights_only=True))
-    return model
-
-
 def visualize_model(model):
     was_training = model.training
     model.eval()
 
     with torch.no_grad():
-        inputs, labels = next(iter(dataloaders['val']))
+        inputs, labels = next(iter(dataloaders["val"]))
         inputs = inputs.to(device)
         labels = labels.to(device)
 
@@ -142,40 +69,20 @@ def visualize_model(model):
         axes = axes.flatten()
         for j in range(2 * 2):
             ax = axes[j]
-            ax.axis('off')
-            ax.set_title(f'predicted: {class_names[preds[j]]}')
-            image_to_show = numpy.array(inputs.cpu()[j].permute(1, 2, 0))
+            ax.axis("off")
+            ax.set_title(f"predicted: {class_names[preds[j]]}")
+            image_to_show = inputs.cpu()[j].permute(1, 2, 0).numpy()
             mean = numpy.array([0.485, 0.456, 0.406])
             std = numpy.array([0.229, 0.224, 0.225])
             image_to_show = image_to_show * std + mean
             image_to_show = numpy.clip(image_to_show, 0, 1)
             ax.imshow(image_to_show)
 
-    # Restore model to original training state     
+    # Restore model to original training state
     model.train(mode=was_training)
     pyplot.tight_layout()
     pyplot.show()
 
-
-def visualize_model_predictions(model,img_path):
-    was_training = model.training
-    model.eval()
-
-    img = Image.open(img_path)
-    img = data_transforms['val'](img)
-    img = img.unsqueeze(0)
-    img = img.to(device)
-
-    with torch.no_grad():
-        outputs = model(img)
-        _, preds = torch.max(outputs, 1)
-
-        ax = pyplot.subplot(2,2,1)
-        ax.axis('off')
-        ax.set_title(f'Predicted: {class_names[preds[0]]}')
-        imshow(img.cpu().data[0])
-
-        model.train(mode=was_training)
 
 if __name__ == "__main__":
     file_path = download.download(
@@ -195,7 +102,7 @@ if __name__ == "__main__":
         else:
             os.makedirs(extract_dir, exist_ok=True)
             zip_ref.extractall(extract_dir)
-            
+
     # print the contents of the extracted directory
     for item in os.listdir(extract_dir):
         item_path = os.path.join(extract_dir, item)
@@ -234,9 +141,8 @@ if __name__ == "__main__":
     out = torchvision.utils.make_grid(inputs)
     imshow(out, title=[class_names[x] for x in classes])
 
-
     print("Fine-tuning the convnet...")
-    model_ft = models.resnet18(weights='IMAGENET1K_V1')
+    model_ft = torchvision.models.resnet18(weights="IMAGENET1K_V1")
     num_ftrs = model_ft.fc.in_features
     # Here the size of each output sample is set to 2.
     # Alternatively, it can be generalized to ``nn.Linear(num_ftrs, len(class_names))``.
@@ -250,14 +156,23 @@ if __name__ == "__main__":
     optimizer_ft = torch.optim.SGD(model_ft.parameters(), lr=0.001, momentum=0.9)
 
     # Decay LR by a factor of 0.1 every 7 epochs
-    exp_lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
-    
-    model_ft = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler,
-                       num_epochs=25)
+    exp_lr_scheduler = torch.optim.lr_scheduler.StepLR(
+        optimizer_ft, step_size=7, gamma=0.1
+    )
+
+    model_ft = util.train_model(
+        model_ft,
+        dataloaders,
+        criterion,
+        optimizer_ft,
+        exp_lr_scheduler,
+        device,
+        num_epochs=25,
+    )
     visualize_model(model_ft)
 
-
-    model_conv = torchvision.models.resnet18(weights='IMAGENET1K_V1')
+    print("ConvNet as fixed feature extractor...")
+    model_conv = torchvision.models.resnet18(weights="IMAGENET1K_V1")
     for param in model_conv.parameters():
         param.requires_grad = False
 
@@ -274,20 +189,32 @@ if __name__ == "__main__":
     optimizer_conv = torch.optim.SGD(model_conv.fc.parameters(), lr=0.001, momentum=0.9)
 
     # Decay LR by a factor of 0.1 every 7 epochs
-    exp_lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer_conv, step_size=7, gamma=0.1)
-    
-    model_conv = train_model(model_conv, criterion, optimizer_conv,
-                         exp_lr_scheduler, num_epochs=25)
-    
-    visualize_model(model_conv)
-
-    pyplot.ioff()
-    pyplot.show()
-    
-    visualize_model_predictions(
-        model_conv,
-        img_path='data/hymenoptera_data/val/bees/72100438_73de9f17af.jpg'
+    exp_lr_scheduler = torch.optim.lr_scheduler.StepLR(
+        optimizer_conv, step_size=7, gamma=0.1
     )
 
-    pyplot.ioff()
-    pyplot.show()
+    model_conv = util.train_model(
+        model_conv,
+        dataloaders,
+        criterion,
+        optimizer_conv,
+        exp_lr_scheduler,
+        device,
+        num_epochs=25,
+    )
+    visualize_model(model_conv)
+
+    # Visualize predictions on custom images
+    img_path = "data/hymenoptera_data/val/bees/72100438_73de9f17af.jpg"
+    img = Image.open(img_path)
+    img = data_transforms["val"](img)
+    img = img.unsqueeze(0)
+    img = img.to(device)
+
+    model_conv.eval()
+    with torch.no_grad():
+        outputs = model_conv(img)
+        _, preds = torch.max(outputs, 1)
+
+    predicted_class = class_names[preds[0]]
+    print(f"Predicted class for the image {img_path}: {predicted_class}")

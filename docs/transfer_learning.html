@@ -218,8 +218,8 @@ imshow(out, title=[class_names[x] for x in classes])</code></pre>
                 <h3>9.2.3 Finetuning the ConvNet</h3>
 
                 <p>Load a pretrained model and reset final fully connected layer, we use <code>torch.nn.Linear(num_ftrs, 2)</code> replace the original <code>fc</code> layer:</p>
-                <pre><code>print("Fine-tuning the convnet...")
-model_ft = models.resnet18(weights='IMAGENET1K_V1')
+                <pre><code>print('Fine-tuning the convnet...')
+model_ft = torchvision.models.resnet18(weights='IMAGENET1K_V1')
 num_ftrs = model_ft.fc.in_features
 # Here the size of each output sample is set to 2.
 # Alternatively, it can be generalized to ``nn.Linear(num_ftrs, len(class_names))``.
@@ -319,10 +319,97 @@ Best val Acc: 0.947712</samp></pre>
 
                 <h3>9.2.4 ConvNet as Fixed Feature Extractor</h3>
 
+                <p>Here, we need to freeze all the network except the final layer. We need to set <code>requires_grad = False</code> to freeze the parameters so that the gradients are not computed in <code>backward()</code> .</p>
+                <p>You can read more about this in the documentation <a href="https://docs.pytorch.org/docs/2.7/notes/autograd.html">here</a> .</p>
+                <pre><code># ConvNet as fixed feature extractor
+    model_conv = torchvision.models.resnet18(weights='IMAGENET1K_V1')
+    for param in model_conv.parameters():
+        param.requires_grad = False
+
+    # Parameters of newly constructed modules have requires_grad=True by default
+    num_ftrs = model_conv.fc.in_features
+    model_conv.fc = torch.nn.Linear(num_ftrs, 2)
+
+    model_conv = model_conv.to(device)
+
+    criterion = torch.nn.CrossEntropyLoss()
+
+    # Observe that only parameters of final layer are being optimized as
+    # opposed to before.
+    optimizer_conv = torch.optim.SGD(model_conv.fc.parameters(), lr=0.001, momentum=0.9)
+
+    # Decay LR by a factor of 0.1 every 7 epochs
+    exp_lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer_conv, step_size=7, gamma=0.1)
+    
+    model_conv = train_model(model_conv, criterion, optimizer_conv,
+                         exp_lr_scheduler, num_epochs=25)    
+    visualize_model(model_conv)</code></pre>
+
+                <p>On CPU this will take about half the time compared to previous scenario. This is expected as gradients don’t need to be computed for most of the network. However, forward does need to be computed.</p>
+                <pre><samp>Epoch 0/24
+----------
+train Loss: 0.6208 Acc: 0.6803
+val Loss: 0.2300 Acc: 0.9346
+
+Epoch 1/24
+----------
+train Loss: 0.4223 Acc: 0.7787
+val Loss: 0.3591 Acc: 0.8301
+
+Epoch 2/24
+----------
+train Loss: 0.4029 Acc: 0.8197
+val Loss: 0.1928 Acc: 0.9216
+
+Epoch 3/24
+----------
+train Loss: 0.4109 Acc: 0.8238
+val Loss: 0.2031 Acc: 0.9542
+
+Epoch 4/24
+----------
+train Loss: 0.5877 Acc: 0.7418
+val Loss: 0.2598 Acc: 0.8954
+
+Epoch 5/24
+----------
+train Loss: 0.4726 Acc: 0.7910
+val Loss: 0.2156 Acc: 0.9216
+
+Epoch 6/24
+----------
+train Loss: 0.5094 Acc: 0.7582
+val Loss: 0.2600 Acc: 0.9020
+
+Epoch 7/24
+----------
+train Loss: 0.3974 Acc: 0.8402
+val Loss: 0.1795 Acc: 0.9477
+
+...
+
+Training complete in 8m 36s
+Best val Acc: 0.954248</samp></pre>
+                
                 <h3>9.2.5 Inference on Custom Images</h3>
 
-                <h3>9.2.6 Further Learning</h3>
+                <p>Use the trained model to make predictions on custom images and visualize the predicted class labels along with the images.</p>
+                <pre><code># Visualize predictions on custom images
+img_path = 'data/hymenoptera_data/val/bees/72100438_73de9f17af.jpg'
+img = Image.open(img_path)
+img = data_transforms['val'](img)
+img = img.unsqueeze(0)
+img = img.to(device)
 
+model_conv.eval()
+with torch.no_grad():
+    outputs = model_conv(img)
+    _, preds = torch.max(outputs, 1)
+
+predicted_class = class_names[preds[0]]
+print(f"Predicted class for the image {img_path}: {predicted_class}")</code></pre>
+
+                <pre><samp>Predicted class for the image data/hymenoptera_data/val/bees/72100438_73de9f17af.jpg: bees</samp></pre>
                 <div class="navigation">
                     <a href="object_detection.html">Prev: 9.1 Object Detection</a>
                     <a href="fgsm_attack.html">Next: 9.3 FGSM Attack</a>
