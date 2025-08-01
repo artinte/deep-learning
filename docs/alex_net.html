@@ -188,7 +188,7 @@
                 <p>Our final network contains five convolutional and three fully-connected layers, and this depth seems to be important: we found that removing any convolutional layer (each of which contains no more than 1% of the model’s parameters) resulted in inferior performance.</p>
                 <p>In the end, the network’s size is limited mainly by the amount of memory available on current GPUs and by the amount of training time that we are willing to tolerate. Our network takes between five and six days to train on two GTX 580 3GB GPUs. All of our experiments suggest that our results can be improved simply by waiting for faster GPUs and bigger datasets to become available.</p>
 
-                <h3>3.2.2 The Dataset</h3>
+                <h3 id="image-net">3.2.2 The Dataset</h3>
                 <p><a href="https://www.image-net.org/index.php">ImageNet</a> is a dataset of over 15 million labeled high-resolution images belonging to roughly 22,000 categories. The images were collected from the web and labeled by human labelers using Amazon’s Mechanical Turk crowd-sourcing tool. Starting in 2010, as part of the Pascal Visual Object Challenge, an annual competition called the <em>ImageNet Large-Scale Visual Recognition Challenge (ILSVRC)</em> has been held. ILSVRC uses a subset of ImageNet with roughly 1000 images in each of 1000 categories. In all, there are roughly 1.2 million training images, 50,000 validation images, and 150,000 testing images.</p>
                 <img src="res/03/sample_imagenet.jpg" alt="Sample Images" width="500">
                 <p style="text-align: center; color: #555555;">Figure 2 - Sample Images from ImageNet</p>
