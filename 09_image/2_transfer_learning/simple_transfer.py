@@ -138,13 +138,18 @@ def visualize_model(model):
         outputs = model(inputs)
         _, preds = torch.max(outputs, 1)
 
-        _, axes = pyplot.subplots(3, 2)
+        _, axes = pyplot.subplots(2, 2)
         axes = axes.flatten()
-        for j in range(6):
+        for j in range(2 * 2):
             ax = axes[j]
             ax.axis('off')
             ax.set_title(f'predicted: {class_names[preds[j]]}')
-            imshow(inputs.cpu()[j], ax=ax)
+            image_to_show = numpy.array(inputs.cpu()[j].permute(1, 2, 0))
+            mean = numpy.array([0.485, 0.456, 0.406])
+            std = numpy.array([0.229, 0.224, 0.225])
+            image_to_show = image_to_show * std + mean
+            image_to_show = numpy.clip(image_to_show, 0, 1)
+            ax.imshow(image_to_show)
 
     # Restore model to original training state     
     model.train(mode=was_training)
