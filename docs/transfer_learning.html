@@ -23,7 +23,7 @@
                 <p class="title-subtext"><a href="https://docs.pytorch.org/tutorials/beginner/transfer_learning_tutorial.html">Transfer Learning</a> for Computer Vision Tutorial</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-06-23</p>
 
-                <p>In this tutorial, we will learn how to train a <a href="https://docs.pytorch.org/tutorials/beginner/transfer_learning_tutorial.html">convolutional neural network</a> for image classification using transfer learning. You can read more about the transfer learning at <a href="https://cs231n.github.io/transfer-learning/">cs231n notes</a> .</p>
+                <p>In this tutorial, we will learn how to train a <a href="cnn_classify_stratch.html">convolutional neural network</a> for image classification using transfer learning. You can read more about the transfer learning at <a href="https://cs231n.github.io/transfer-learning/">cs231n notes</a> .</p>
                 
                 <p class="comment">In practice, very few people train an entire Convolutional Network from scratch (with random initialization), because it is relatively rare to have a dataset of sufficient size. Instead, it is common to pretrain a ConvNet on a very large dataset (e.g. <a href="alex_net.html#image-net">ImageNet</a> , which contains 1.2 million images with 1000 categories), and then use the ConvNet either as an initialization or a fixed feature extractor for the task of interest.</p>
 
@@ -34,36 +34,36 @@
                 </ul>
 
                 <h3>9.2.1 Load Data</h3>
-                <p>We will use torchvision and torch.utils.data packages for loading the data.</p>
+                <p>We will use torchvision and <a href="https://docs.pytorch.org/docs/stable/data.html">torch.utils.data</a> packages for loading the data.</p>
                 <p>The problem we’re going to solve today is to train a model to classify ants and bees. We have about 120 training images each for ants and bees. There are 75 validation images for each class. Usually, this is a very small dataset to generalize upon, if trained from scratch. Since we are using transfer learning, we should be able to generalize reasonably well.</p>
                 <p>This dataset is a very small subset of imagenet.</p>
 
                 <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/09_image/2_transfer_learning/simple_transfer.py">simple_transfer.py</a> downloads the data and extract it to the current <span class="highlight">data/</span> directory:</p>
-                <pre><code>    file_path = download.download(
-        data_url, sha1_hash="c6ff178de032ee56fa5b35c2a6a9005c934faba0"
-    )
-    print(file_path)
+                <pre><code>file_path = download.download(    
+    data_url, sha1_hash="c6ff178de032ee56fa5b35c2a6a9005c934faba0"
+)
+print(file_path)
 
-    base_name = os.path.splitext(os.path.basename(file_path))[0]
-    extract_dir = os.path.join(os.path.dirname(file_path), base_name)
+base_name = os.path.splitext(os.path.basename(file_path))[0]
+extract_dir = os.path.join(os.path.dirname(file_path), base_name)
 
-    with zipfile.ZipFile(file_path, "r") as zip_ref:
-        names = zip_ref.namelist()
-        top_level_dirs = {name.split("/")[0] for name in names if "/" in name}
-        if len(top_level_dirs) == 1 and base_name in top_level_dirs:
-            zip_ref.extractall(os.path.dirname(file_path))
-            os.rename(os.path.join(os.path.dirname(file_path), base_name), extract_dir)
-        else:
-            os.makedirs(extract_dir, exist_ok=True)
-            zip_ref.extractall(extract_dir)
-            
-    # print the contents of the extracted directory
-    for item in os.listdir(extract_dir):
-        item_path = os.path.join(extract_dir, item)
-        if os.path.isdir(item_path):
-            print(f"Directory: {item_path}")
-        else:
-            print(f"File: {item_path}")</code></pre>
+with zipfile.ZipFile(file_path, "r") as zip_ref:
+    names = zip_ref.namelist()
+    top_level_dirs = {name.split("/")[0] for name in names if "/" in name}
+    if len(top_level_dirs) == 1 and base_name in top_level_dirs:
+        zip_ref.extractall(os.path.dirname(file_path))
+        os.rename(os.path.join(os.path.dirname(file_path), base_name), extract_dir)
+    else:
+        os.makedirs(extract_dir, exist_ok=True)
+        zip_ref.extractall(extract_dir)
+        
+# print the contents of the extracted directory
+for item in os.listdir(extract_dir):
+    item_path = os.path.join(extract_dir, item)
+    if os.path.isdir(item_path):
+        print(f"Directory: {item_path}")
+    else:
+        print(f"File: {item_path}")</code></pre>
 
                 <p>We print its sub-level results, which contains two directories, one for the train set and the other for the valid set:</p>
                 <pre><samp>Directory: ./data\hymenoptera_data\train
@@ -71,21 +71,21 @@ Directory: ./data\hymenoptera_data\val</samp></pre>
 
                 <p>We can now load the data using torchvision’s <code>ImageFolder</code> and <code>DataLoader</code>:</p>
                 <pre><code># Load the data
-    print("Loading data...")
-    image_datasets = {
-        x: datasets.ImageFolder(os.path.join(extract_dir, x), data_transforms[x])
-        for x in ["train", "val"]
-    }
-    dataloaders = {
-        x: torch.utils.data.DataLoader(
-            image_datasets[x], batch_size=4, shuffle=True, num_workers=4
-        )
-        for x in ["train", "val"]
-    }
-    dataset_sizes = {x: len(image_datasets[x]) for x in ["train", "val"]}
-    class_names = image_datasets["train"].classes
-    print(f"Dataset sizes: {dataset_sizes}")
-    print(f"Class names: {class_names}")</code></pre>
+print("Loading data...")
+image_datasets = {
+    x: datasets.ImageFolder(os.path.join(extract_dir, x), data_transforms[x])
+    for x in ["train", "val"]
+}
+dataloaders = {
+    x: torch.utils.data.DataLoader(
+        image_datasets[x], batch_size=4, shuffle=True, num_workers=4
+    )
+    for x in ["train", "val"]
+}
+dataset_sizes = {x: len(image_datasets[x]) for x in ["train", "val"]}
+class_names = image_datasets["train"].classes
+print(f"Dataset sizes: {dataset_sizes}")
+print(f"Class names: {class_names}")</code></pre>
                 <pre><samp>Dataset sizes: {'train': 244, 'val': 153}
 Class names: ['ants', 'bees']</samp></pre>
 
@@ -126,18 +126,190 @@ data_transforms = {
     pyplot.show()</code></pre>
 
                 <pre><code># Get a batch of training data
-    inputs, classes = next(iter(dataloaders["train"]))
-    # Make a grid from batch
-    out = torchvision.utils.make_grid(inputs)
-    imshow(out, title=[class_names[x] for x in classes])</code></pre>
+inputs, classes = next(iter(dataloaders["train"]))
+# Make a grid from batch
+out = torchvision.utils.make_grid(inputs)
+imshow(out, title=[class_names[x] for x in classes])</code></pre>
 
                 <img src="res/09/samples_bee_ant.png" alt="Sample Images of Bees and Ants" width="600">
                 <p style="text-align: center; color: #555555;">Figure 1 - Sample Images of Bees and Ants</p>
 
 
                 <h3>9.2.2 Training the Model</h3>
+                <p>Now, let’s write a general function to train a model. Here, we will illustrate:</p>
+                <ul class="with-bullets">
+                    <li><p>Scheduling the learning rate</p></li>
+                    <li><p>Saving the best model</p></li>
+                </ul>
+                <p>In the following, parameter <code>scheduler</code> is an LR scheduler object from <a href="optimizer.html#lr_scheduler">torch.optim.lr_scheduler</a> :</p>
+                <pre><code>def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
+    since = time.time()
+
+    # Create a temporary directory to save training checkpoints
+    tempdir = 'temp/'
+    os.makedirs(tempdir, exist_ok=True)
+    best_model_params_path = os.path.join(tempdir, 'best_model_params.pt')
+
+    torch.save(model.state_dict(), best_model_params_path)
+    best_acc = 0.0
+
+    for epoch in range(num_epochs):
+        print(f'Epoch {epoch}/{num_epochs - 1}')
+        print('-' * 10)
+
+        # Each epoch has a training and validation phase
+        for phase in ['train', 'val']:
+            if phase == 'train':
+                model.train()  # Set model to training mode
+            else:
+                model.eval()   # Set model to evaluate mode
+
+            running_loss = 0.0
+            running_corrects = 0
+
+            # Iterate over data.
+            for inputs, labels in dataloaders[phase]:
+                inputs = inputs.to(device)
+                labels = labels.to(device)
+
+                # zero the parameter gradients
+                optimizer.zero_grad()
+
+                # forward
+                # track history if only in train
+                with torch.set_grad_enabled(phase == 'train'):
+                    outputs = model(inputs)
+                    _, preds = torch.max(outputs, 1)
+                    loss = criterion(outputs, labels)
+
+                    # backward + optimize only if in training phase
+                    if phase == 'train':
+                        loss.backward()
+                        optimizer.step()
+
+                # statistics
+                running_loss += loss.item() * inputs.size(0)
+                running_corrects += torch.sum(preds == labels.data)
+            if phase == 'train':
+                scheduler.step()
+
+            epoch_loss = running_loss / dataset_sizes[phase]
+            epoch_acc = running_corrects.double() / dataset_sizes[phase]
+
+            print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}')
+
+            # deep copy the model
+            if phase == 'val' and epoch_acc > best_acc:
+                best_acc = epoch_acc
+                torch.save(model.state_dict(), best_model_params_path)
+
+        print()
+
+    time_elapsed = time.time() - since
+    print(f'Training complete in {time_elapsed // 60:.0f}m {time_elapsed % 60:.0f}s')
+    print(f'Best val Acc: {best_acc:4f}')
+
+    # load best model weights
+    model.load_state_dict(torch.load(best_model_params_path, weights_only=True))
+    return model</code></pre>
+
+                <p>This is a typical neural network training process. We save the best training result in the <span class="highlight">best_model_params.pt</span> file.</p>
 
                 <h3>9.2.3 Finetuning the ConvNet</h3>
+
+                <p>Load a pretrained model and reset final fully connected layer, we use <code>torch.nn.Linear(num_ftrs, 2)</code> replace the original <code>fc</code> layer:</p>
+                <pre><code>print("Fine-tuning the convnet...")
+model_ft = models.resnet18(weights='IMAGENET1K_V1')
+num_ftrs = model_ft.fc.in_features
+# Here the size of each output sample is set to 2.
+# Alternatively, it can be generalized to ``nn.Linear(num_ftrs, len(class_names))``.
+model_ft.fc = torch.nn.Linear(num_ftrs, 2)
+
+model_ft = model_ft.to(device)
+
+criterion = torch.nn.CrossEntropyLoss()
+
+# Observe that all parameters are being optimized
+optimizer_ft = torch.optim.SGD(model_ft.parameters(), lr=0.001, momentum=0.9)
+
+# Decay LR by a factor of 0.1 every 7 epochs
+exp_lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
+
+model_ft = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler,
+                    num_epochs=25)</code></pre>
+
+                <pre><samp>Fine-tuning the convnet...
+Epoch 0/24
+----------
+train Loss: 0.6527 Acc: 0.6680
+val Loss: 0.3022 Acc: 0.8824
+
+Epoch 1/24
+----------
+train Loss: 0.5814 Acc: 0.7623
+val Loss: 0.7254 Acc: 0.7647
+
+Epoch 2/24
+----------
+train Loss: 0.5852 Acc: 0.7828
+val Loss: 0.2170 Acc: 0.9216
+
+Epoch 3/24
+----------
+train Loss: 0.5345 Acc: 0.7992
+val Loss: 0.3637 Acc: 0.8824
+
+Epoch 4/24
+----------
+train Loss: 0.6848 Acc: 0.7623
+val Loss: 0.3229 Acc: 0.8366
+
+Epoch 5/24
+----------
+train Loss: 0.5584 Acc: 0.7623
+val Loss: 0.2349 Acc: 0.9020
+
+Epoch 6/24
+----------
+train Loss: 0.4407 Acc: 0.8074
+val Loss: 0.3446 Acc: 0.8693
+
+Epoch 7/24
+----------
+train Loss: 0.3148 Acc: 0.8607
+val Loss: 0.2936 Acc: 0.8954
+
+Epoch 8/24
+----------
+train Loss: 0.3414 Acc: 0.8361
+val Loss: 0.2691 Acc: 0.9216
+
+Epoch 9/24
+----------
+train Loss: 0.2679 Acc: 0.8811
+val Loss: 0.2316 Acc: 0.9020
+
+Epoch 10/24
+----------
+train Loss: 0.2760 Acc: 0.9057
+val Loss: 0.2224 Acc: 0.9281
+
+Epoch 11/24
+----------
+train Loss: 0.2465 Acc: 0.8852
+val Loss: 0.2243 Acc: 0.9346
+
+Epoch 12/24
+----------
+train Loss: 0.3182 Acc: 0.8689
+val Loss: 0.2339 Acc: 0.9216
+
+Epoch 13/24
+----------
+train Loss: 0.2342 Acc: 0.9016
+val Loss: 0.2254 Acc: 0.9216
+
+...</samp></pre>
 
                 <h3>9.2.4 ConvNet as Fixed Feature Extractor</h3>
 
