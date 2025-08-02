@@ -56,7 +56,6 @@
                 </div>
                 <p>\(x\) and \(y\) are tensors of arbitrary shapes with a total of \(N\) elements each. The mean operation still operates over all the elements, and divides by \(N\). The division by \(N\) can be avoided if one sets <code>reduction = 'sum'</code> .</p>
 
-
                 <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/02_dnn/5_loss_function/mse_loss.py">mse_loss.py</a> defines <code>dervi_mse(y_pred, y_true)</code> computes the gradient of the Mean Squared Error (MSE) loss with respect to the predicted values:</p>
                 <pre><code>def dervi_mse(y_pred, y_true):
     return 2 * (y_pred - y_true) / len(y_true)
@@ -110,9 +109,12 @@ criterion = torch.nn.CrossEntropyLoss()
 loss = criterion(y_pred, y_true)
 print(f"CrossEntropyLoss: {loss.item():.4f}")</code></pre>
 
-                <p>CrossEntropyLoss: 0.3185</p>
+                <pre><samp>CrossEntropyLoss: 0.3185</samp></pre>
                
                 
+                <h3 id="bce-loss">2.5.3 BCELoss</h3>
+
+                <p><a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.BCELoss.html#torch.nn.BCELoss">torch.nn.BCELoss</a></p>
                 
                 <div class="navigation">
                     <a href="activation_function.html">Prev: 2.4 Activation Function</a>
