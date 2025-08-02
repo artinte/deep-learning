@@ -20,10 +20,10 @@
 
             <main class="col-md-8 content">
                 <h2 class="custom-title">2.5 Loss Function</h2>
-                <p class="title-subtext"></p>
+                <p class="title-subtext">A loss function in machine learning is used to measure how well a model performs by calculating how much its predictions deviate from the correct, or "ground truth," predictions.</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-10</p>
 
-                <p>In machine learning (ML), a loss function is used to measure model performance by calculating the deviation of a model’s predictions from the correct, “ground truth” predictions. Optimizing a model entails adjusting model parameters to minimize the output of some loss function.</p>
+                <p>In machine learning (ML), a <a href="https://docs.pytorch.org/docs/stable/nn.html#loss-functions">loss function</a> is used to measure model performance by calculating the deviation of a model’s predictions from the correct, “ground truth” predictions. Optimizing a model entails adjusting model parameters to minimize the output of some loss function.</p>
                 <p>Suppose we have the following data points for a simple linear model:</p>
                 <ul class="with-bullets">
                     <li><p>Actual values: [3, 4, 5]</p></li>
@@ -31,20 +31,33 @@
                 </ul>
                 <p>We can calculate the loss using a simple <a href="#mse-loss">mean squared error (MSE)</a> loss function:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
-                    \(loss = \frac{{(3 - 2.5)}^2 + {(4 - 4.5)}^2 + {(5 - 5.2)}^2}{3} = 0.54\)
+                    \(loss = \frac{{(3 - 2.5)}^2 + {(4 - 4.5)}^2 + {(5 - 5.2)}^2}{3} = 0.18\)
                 </div>
 
 
                 <h3 id="mse-loss">2.5.1 MSE Loss</h3>
                 <p>In statistics, the <strong>mean squared error (MSE)</strong> or <strong>mean squared deviation (MSD)</strong> of an estimator (of a procedure for estimating an unobserved quantity) measures the average of the squares of the errors—that is, the average squared difference between the estimated values and the true value.</p>
                 <p>We can view <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.MSELoss.html">torch.nn.MSELoss</a> to understand its calculation rules:</p>
+                <pre><code>CLASS torch.nn.MSELoss(size_average=None, reduce=None, reduction='mean')</code></pre>
                 <p>Creates a criterion that measures the mean squared error (squared L2 norm) between each element in the input \(x\) and target \(y\).</p>
+                <p>The unreduced (i.e. with <code>reduction</code> set to <code>'none'</code>) loss can be described as:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
-                    \(l(x, y) = L = {{l_1, \cdots, l_n}}^T, l_n = {(x_n - y_n)}^2\)
+                    \(\mathcal{l}(x, y) = L = {\{l_1, \cdots, l_n\}}^T, l_n = {(x_n - y_n)}^2\)
                 </div>
-                <p>where \(N\) is the batch size.</p>
+                <p>where \(N\) is the batch size. If <code>reduction</code> is not <code>'none'</code> (default <code>'mean'</code>), then:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \[
+                    \mathcal{l}(x, y) = 
+                    \begin{cases}
+                    \text{mean}(L), & \text{if } \texttt{reduction} = \texttt{mean} \\
+                    \text{sum}(L), & \text{if } \texttt{reduction} = \texttt{sum}
+                    \end{cases}
+                    \]
+                </div>
+                <p>\(x\) and \(y\) are tensors of arbitrary shapes with a total of \(N\) elements each. The mean operation still operates over all the elements, and divides by \(N\). The division by \(N\) can be avoided if one sets <code>reduction = 'sum'</code> .</p>
 
-                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/02_dnn/5_loss_function/mse_loss.py">mse_loss.py</a></p>
+
+                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/02_dnn/5_loss_function/mse_loss.py">mse_loss.py</a> defines <code>dervi_mse(y_pred, y_true)</code> computes the gradient of the Mean Squared Error (MSE) loss with respect to the predicted values:</p>
                 <pre><code>def dervi_mse(y_pred, y_true):
     return 2 * (y_pred - y_true) / len(y_true)
 
@@ -60,6 +73,7 @@ print(dl_dy)</code></pre>
                 <pre><samp>0.0856
 [ 0.08 -0.08  0.2   0.04  0.12]</samp></pre>
 
+                <p>In PyTorch, we can use the following code to compute the MSE loss and its gradient:</p>
                 <pre><code>y_true = torch.tensor(y_true, requires_grad=False)
 y_pred = torch.tensor(y_pred, requires_grad=True)
 
