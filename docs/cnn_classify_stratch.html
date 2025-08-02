@@ -316,7 +316,7 @@ assert output.shape == (13, 13, 8)</code></pre>
 
                 <h4>3.1.5.2 Cross-Entropy Loss</h4>
                 <p>You might have just thought to yourself, why bother transforming the outputs into probabilities? Won’t the highest output value always have the highest probability? If you did, you’re absolutely right. We don’t actually need to use softmax to predict a digit - we could just pick the digit with the highest output from the network!</p>
-                <p>What softmax really does is help us quantify how sure we are of our prediction, which is useful when training and evaluating our CNN. More specifically, using softmax lets us use cross-entropy loss, which takes into account how sure we are of each prediction. Here’s how we calculate <a href="loss_function.html#cross_entropy_loss">cross-entropy loss</a>:</p>
+                <p>What softmax really does is help us quantify how sure we are of our prediction, which is useful when training and evaluating our CNN. More specifically, using softmax lets us use cross-entropy loss, which takes into account how sure we are of each prediction. Here’s how we calculate <a href="loss_function.html#cross-entropy-loss">cross-entropy loss</a>:</p>
 
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(L = -ln(p_c)\)
