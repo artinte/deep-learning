@@ -40,7 +40,18 @@
                 <img src="res/09/fgsm_panda_image.jpg" alt="FGSM Panda Example" width="600">
                 <p style="text-align: center; color: #555555;">Figure 1 - FGSM Panda Example</p>
 
-                <p>From the figure, \(\mathbf{x}\)</p>
+                <p>From the figure, \(\mathbf{x}\) is the original input image correctly classified as a "panda" , \(y\) is the ground truth label for \(\mathbf{x}\) , \(\theta\) represents the model parameters, and \(J(\theta, x, y)\) is the loss that is used to train the network. The attack backpropagates the gradient back to the input data to calculate \(\Delta_x J(\theta, \mathbf{x}, y)\). Then, it adjusts the input data by a small step (\(\epsilon\) or 0.007 in the picture) in the direction (i.e. sign(\Delta J(\theta, \mathbf{x}, y)\)) that will maximize the loss. The resulting perturbed image, \(x'\) , is then misclassified by the target network as a "gibbon" when it is still clearly a "panda" .</p>
+                <p>Hopefully now the motivation for this tutorial is clear, so lets jump into the implementation.</p>
+
+                <h3>9.3.3 Implementation</h3>
+                <p>In this section, we will discuss the input parameters for the tutorial, define the model under attack, then code the attack and run some tests.</p>
+
+                <h4>9.3.3.1 Inputs</h4>
+                <p>There are only three inputs for this tutorial, and are defined as follows:</p>
+                <ul class="with-bullets">
+                    <li><p><code>epsilons</code> - List of epsilon values to use for the run. It is important to keep 0 in the list because it represents the model performance on the original test set. Also, intuitively we would expect the larger the epsilon, the more noticeable the perturbations but the more effective the attack in terms of degrading model accuracy. Since the data range here is  \([0,1]\), no epsilon value should exceed 1. </p></li>
+                    <li><p><code>pretrained_model</code> - path to the pretrained MNIST model which was trained with <a href="https://github.com/pytorch/examples/tree/main/mnist">pytorch/examples/mnist</a> . For simplicity, download the pretrained model <a >here</a> .</p></li>
+                </ul>
 
                 <div class="navigation">
                     <a href="transfer_learning.html">Prev: 9.2 Transfer Learning</a>
