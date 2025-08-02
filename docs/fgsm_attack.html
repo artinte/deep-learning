@@ -20,14 +20,28 @@
 
             <main class="col-md-8 content">
                 <h2 class="custom-title">9.3 FGSM Attack</h2>
-                <p class="title-subtext"></p>
+                <p class="title-subtext">Adversarial Example Generation</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-25</p>
-                <p>If you are reading this, hopefully you can appreciate how effective some machine learning models are. Research is constantly pushing ML models to be faster, more accurate, and more efficient. However, an often overlooked aspect of designing and training models is security and robustness, especially in the face of an adversary who wishes to fool the model.</p>
-                <p>This tutorial will raise your awareness to the security vulnerabilities of ML models, and will give insight into the hot topic of adversarial machine learning. You may be surprised to find that adding imperceptible perturbations to an image can cause drastically different model performance. Given that this is a tutorial, we will explore the topic via example on an image classifier. Specifically, we will use one of the first and most popular attack methods, the Fast Gradient Sign Attack (FGSM), to fool an MNIST classifier.</p>
+                <p>If you are reading <a href="https://docs.pytorch.org/tutorials/beginner/fgsm_tutorial.html">this</a> , hopefully you can appreciate how effective some machine learning models are. Research is constantly pushing ML models to be faster, more accurate, and more efficient. However, an often overlooked aspect of designing and training models is security and robustness, especially in the face of an adversary who wishes to fool the model.</p>
+                <p>This tutorial will raise your awareness to the security vulnerabilities of ML models, and will give insight into the hot topic of adversarial machine learning. You may be surprised to find that adding imperceptible perturbations to an image can cause drastically different model performance. Given that this is a tutorial, we will explore the topic via example on an image classifier. Specifically, we will use one of the first and most popular attack methods, the <strong>Fast Gradient Sign Attack (FGSM)</strong> , to fool an MNIST classifier.</p>
+
                 <h3>9.3.1 Threat Model</h3>
                 <p>For context, there are many categories of adversarial attacks, each with a different goal and assumption of the attacker’s knowledge. However, in general the overarching goal is to add the least amount of perturbation to the input data to cause the desired misclassification.</p>
+                <p>There are several kinds of assumptions of the attacker’s knowledge, two of which are: white-box and black-box. A white-box attack assumes the attacker has full knowledge and access to the model, including architecture, inputs, outputs, and weights. A black-box attack assumes the attacker only has access to the inputs and outputs of the model, and knows nothing about the underlying architecture or weights.</p>
+                <p>There are also several types of goals, including misclassification and source/target misclassification. A goal of misclassification means the adversary only wants the output classification to be wrong but does not care what the new classification is. A source/target misclassification means the adversary wants to alter an image that is originally of a specific source class so that it is classified as a specific target class.</p>
+                <p>In this case, the FGSM attack is a white-box attack with the goal of misclassification. With this background information, we can now discuss the attack in detail.</p>
+
+
                 <h3>9.3.2 Fast Gradient Sign Attack</h3>
+                <p>One of the first and most popular adversarial attacks to date is referred to as the Fast Gradient Sign Attack (FGSM) and is described by Goodfellow et. al. in <a href="https://arxiv.org/abs/1412.6572">Explaining and Harnessing Adversarial Examples</a> . The attack is remarkably powerful, and yet intuitive.</p>
+                <p>It is designed to attack neural networks by leveraging the way they learn, gradients. The idea is simple, rather than working to minimize the loss by adjusting the weights based on the backpropagated gradients, the attack adjusts the input data to maximize the loss based on the same backpropagated gradients. In other words, the attack uses the gradient of the loss w.r.t the input data, then adjusts the input data to maximize the loss.</p>
+                <p>Before we jump into the code, let’s look at the famous FGSM panda example and extract some notation.</p>
                 
+                <img src="res/09/fgsm_panda_image.jpg" alt="FGSM Panda Example" width="600">
+                <p style="text-align: center; color: #555555;">Figure 1 - FGSM Panda Example</p>
+
+                <p>From the figure, \(\mathbf{x}\)</p>
+
                 <div class="navigation">
                     <a href="transfer_learning.html">Prev: 9.2 Transfer Learning</a>
                     <a href="spatial_transformer.html">Next: 9.4 Spatial Transformer</a>
