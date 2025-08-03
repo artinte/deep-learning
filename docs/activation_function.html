@@ -24,13 +24,13 @@
                 <p style="color: #a0a0a0;">Created Date: 2025-05-10</p>
                 <p>The activation function of a node in an artificial neural network is a function that calculates the output of the node based on its individual inputs and their weights.</p>
 
-                <h3>2.4.1 Sigmoid Function</h3>
+                <h3 id="sigmoid">2.4.1 Sigmoid Function</h3>
                 <p>A <strong>sigmoid function</strong> is any mathematical function whose graph has a characteristic S-shaped or sigmoid curve.</p>
                 <p>A common example of a sigmoid function is the logistic function, which is defined by the formula:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(\sigma(x) = \frac{1}{1 + e^{-x}} = \frac{e^x}{1 + e^x}\)
                 </div>
-                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/02_dnn/4_activation/sigmoid.py">sigmoid.py</a></p>
+                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/02_dnn/4_activation/sigmoid_dmeo.py">sigmoid_demo.py</a> defines a sigmoid function and its derivative, and plots the function and its derivative.</p>
 
                 <pre><code>def sigmoid(x):
     return 1 / (1 + numpy.exp(-x))
@@ -54,12 +54,15 @@ print("The derivative at x = 2 is", numpy.round(deriv_sigmoid(2), 4))</code></pr
 
                 <pre><samp>The derivative at x = 2 from scratch is 0.105</samp></pre>
 
+                <p>To compute the derivative of the <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Sigmoid.html#torch.nn.Sigmoid">sigmoid function</a> using PyTorch, we can use the following code:</p>
+
                 <pre><code>x_val = torch.tensor([2.0], requires_grad=True)
 output = torch.sigmoid(x_val)
 output.backward()
 print("The derivative at x = 2 using PyTorch is", numpy.round(x_val.grad.item(), 4))</code></pre>
 
                 <pre><samp>The derivative at x = 2 using PyTorch is 0.105</samp></pre>
+
 
                 <h3 id="relu">2.4.2 ReLU Function</h3>
                 <p>One of the most popular and widely-used activation functions is <a href="https://docs.pytorch.org/docs/main/generated/torch.nn.ReLU.html#torch.nn.ReLU">ReLU</a> (rectified linear unit). As with other activation functions, it provides non-linearity to the model for better computation performance.</p>
@@ -106,7 +109,7 @@ print("Gradients:", gradients)</code></pre>
                 <pre><samp>Gradients: tensor([0., 1., 0., 0., 0., 0., 1., 1., 1., 0.])</samp></pre>
 
 
-                <h3>2.4.3 Tanh Function</h3>
+                <h3 id="tanh">2.4.3 Tanh Function</h3>
                 <div class="navigation">
                     <a href="pytorch_basics.html">Prev: 2.3 PyTorch Basics</a>
                     <a href="loss_function.html">Next: 2.5 Loss Function</a>
