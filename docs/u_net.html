@@ -65,6 +65,95 @@
                 <p>At each downsampling step we double the number of feature channels. Every step in the expansive path consists of an upsampling of the feature map followed by a \(2 \times 2\) convolution ("up-convolution") that halves the number of feature channels, a concatenation with the correspondingly cropped feature map from the contracting path, and two 3x3 convolutions, each followed by a ReLU.</p>
                 <p>The cropping is necessary due to the loss of border pixels in every convolution. At the final layer a 1x1 convolution is used to map each 64-component feature vector to the desired number of classes. In total the network has 23 convolutional layers.</p>
                 <p>To allow a seamless tiling of the output segmentation map, it is important to select the input tile size such that all \(2 \times 2\) max-pooling operations are applied to a layer with an even x- and y-size.</p>
+                
+                <pre><code>class DoubleConv(nn.Module):
+    """(conv => BN => ReLU) * 2"""
+
+    def __init__(self, in_channels, out_channels):
+        super().__init__()
+        self.double_conv = nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, 3, padding=1),
+            nn.BatchNorm2d(out_channels), nn.ReLU(inplace=True),
+            nn.Conv2d(out_channels, out_channels, 3, padding=1),
+            nn.BatchNorm2d(out_channels), nn.ReLU(inplace=True)
+        )
+
+    def forward(self, x):
+        return self.double_conv(x)</code></pre>
+                
+                <p>At each downsampling step we double the number of feature channels. Every step in the expansive path consists of an upsampling of the feature map followed by a 2x2 convolution ("up-convolution") that halves the number of feature channels, a concatenation with the correspondingly cropped feature map from the contracting path, and two 3x3 convolutions, each followed by a ReLU.</p>
+                
+                <pre><code>class Down(nn.Module):
+    """Downscaling with maxpool then double conv"""
+
+    def __init__(self, in_channels, out_channels):
+        super().__init__()
+        self.block = nn.Sequential(
+            nn.MaxPool2d(2),
+            DoubleConv(in_channels, out_channels)
+        )
+
+    def forward(self, x):
+        return self.block(x)
+
+
+class Up(nn.Module):
+    """Upscaling then double conv"""
+
+    def __init__(self, in_channels, out_channels, bilinear=True):
+        super().__init__()
+        if bilinear:
+            self.up = nn.Upsample(
+                scale_factor=2, mode='bilinear', align_corners=True)
+            self.conv = DoubleConv(in_channels, out_channels)
+        else:
+            self.up = nn.ConvTranspose2d(
+                in_channels // 2, in_channels // 2, 2, stride=2)
+            self.conv = DoubleConv(in_channels, out_channels)
+
+    def forward(self, x1, x2):
+        x1 = self.up(x1)
+
+        # Pad if needed (to match x2's size due to cropping in original U-Net)
+        diffY = x2.size()[2] - x1.size()[2]
+        diffX = x2.size()[3] - x1.size()[3]
+        x1 = F.pad(x1, [diffX // 2, diffX - diffX // 2,
+                        diffY // 2, diffY - diffY // 2])
+
+        x = torch.cat([x2, x1], dim=1)
+        return self.conv(x)</code></pre>
+                
+                <p>The cropping is necessary due to the loss of border pixels in every convolution. At the final layer a \(1x1\) convolution is used to map each 64-component feature vector to the desired number of classes. In total the network has 23 convolutional layers.</p>
+                
+                <pre><code>class UNet(nn.Module):
+    def __init__(self, in_channels=3, num_classes=1, bilinear=True):
+        super().__init__()
+        self.inc = DoubleConv(in_channels, 64)
+        self.down1 = Down(64, 128)
+        self.down2 = Down(128, 256)
+        self.down3 = Down(256, 512)
+        factor = 2 if bilinear else 1
+        self.down4 = Down(512, 1024 // factor)
+        self.up1 = Up(1024, 512 // factor, bilinear)
+        self.up2 = Up(512, 256 // factor, bilinear)
+        self.up3 = Up(256, 128 // factor, bilinear)
+        self.up4 = Up(128, 64, bilinear)
+        self.outc = OutConv(64, num_classes)
+
+    def forward(self, x):
+        x1 = self.inc(x)
+        x2 = self.down1(x1)
+        x3 = self.down2(x2)
+        x4 = self.down3(x3)
+        x5 = self.down4(x4)
+        x = self.up1(x5, x4)
+        x = self.up2(x, x3)
+        x = self.up3(x, x2)
+        x = self.up4(x, x1)
+        logits = self.outc(x)
+        return logits</code></pre>
+                
+                <p>To allow a seamless tiling of the output segmentation map, it is important to select the input tile size such that all 2x2 max-pooling operations are applied to a layer with an even x- and y-size.</p>
 
                 <h3>3.4.3 OxfordPets Dataset</h3>
                 <p><a href="https://www.robots.ox.ac.uk/~vgg/data/pets/">The Oxford-IIIT Pet Dataset</a> have 37 category pet dataset with roughly 200 images for each class. The images have a large variations in scale, pose and lighting. All images have an associated ground truth annotation of breed, head ROI, and pixel level trimap segmentation.</p>
@@ -104,6 +193,33 @@
 
                 <h3>3.4.4 Training</h3>
                 <p>The input images and their corresponding segmentation maps are used to train the network with the stochastic gradient descent implementation of PyTorch. Due to the unpadded convolutions, the output image is smaller than the input by a constant border width. To minimize the overhead and make maximum use of the GPU memory, we favor large input tiles over a large batch size and hence reduce the batch to a single image. Accordingly we use a high momentum (0.99) such that a large number of the previously seen training samples determine the update in the current optimization step.</p>
+                <pre><code>image_transform = T.Compose([
+    T.Resize((128, 128)),
+    T.ToTensor(),
+    T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+])
+
+mask_transform = T.Compose([
+    T.Resize((128, 128), interpolation=Image.NEAREST),
+    T.ToTensor()  # keep it [0, 1]
+])
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+train_dataset = OxfordPetsDataset(root='./data', split='train',
+                                  transform=image_transform,
+                                  target_transform=mask_transform)
+val_dataset = OxfordPetsDataset(root='./data', split='val',
+                                transform=image_transform,
+                                target_transform=mask_transform)
+
+train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True)
+val_loader = DataLoader(val_dataset, batch_size=8)
+
+model = UNet(in_channels=3, num_classes=1).to(device)
+criterion = nn.BCEWithLogitsLoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)</code></pre>
+                
                 <p>The energy function is computed by a pixel-wise soft-max over the final feature map combined with the cross entropy loss function. The soft-max is defined as \(p_k(x) = exp(a_k(x))/(\sum_{k'=1}^K exp(a_{k'}(x)))\) where \(a_k(x)\) denotes the activation in feature channel \(k\) at the pixel position \(x \in \Omega\) with \(\Omega \in \mathbb{Z}^2\).</p>
 
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
@@ -118,6 +234,38 @@
                 <p>where \(w_c : \Omega \rightarrow \mathbb{R}\) is the weight map to balance the class frequencies, \(d_1 : \Omega \rightarrow \mathbb{R}\) denotes the distance to the border of the nearest cell and \(d_2 : \Omega \rightarrow \mathbb{R}\) the distance to the border of the second nearest cell. In our experiments we set \(w_0 = 10\) and \(\sigma \approx 5\) pixels.</p>
                 <p>In deep networks with many convolutional layers and different paths through the network, a good initialization of the weights is extremely important. Otherwise, parts of the network might give excessive activations, while other parts never contribute.</p>
                 <p>Ideally the initial weights should be adapted such that each feature map in the network has approximately unit variance. For a network with our architecture (alternating convolution and ReLU layers) this can be achieved by drawing the initial weights from a Gaussian distribution with a standard deviation of \(\sqrt{2/N}\), where \(N\) denotes the number of incoming nodes of one neuron [5]. E.g. for a \(3 \times 3\) convolution and 64 feature channels in the previous layer \(N = 9 \cdot 64 = 576\).</p>
+
+                <pre><code>def train_epoch():
+    model.train()
+    total_loss = 0
+    for img, mask in train_loader:
+        img, mask = img.to(device), mask.to(device)
+        pred = model(img)
+        loss = criterion(pred, mask)
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+        total_loss += loss.item()
+    return total_loss / len(train_loader)
+
+
+def eval_epoch():
+    model.eval()
+    total_loss = 0
+    with torch.no_grad():
+        for img, mask in val_loader:
+            img, mask = img.to(device), mask.to(device)
+            pred = model(img)
+            loss = criterion(pred, mask)
+            total_loss += loss.item()
+    return total_loss / len(val_loader)
+
+
+for epoch in range(5):
+    train_loss = train_epoch()
+    val_loss = eval_epoch()
+    print(
+        f"Epoch {epoch+1}/{5} | Train Loss: {train_loss:.4f} | Val Loss: {val_loss:.4f}")</code></pre>
 
                 <h5>Data Augmentation</h5>
                 <p>Data augmentation is essential to teach the network the desired invariance and robustness properties, when only few training samples are available. In case of microscopical images we primarily need shift and rotation invariance as well as robustness to deformations and gray value variations. Especially random elastic deformations of the training samples seem to be the key concept to train a segmentation network with very few annotated images.</p>

@@ -180,8 +180,6 @@ model = UNet(in_channels=3, num_classes=1).to(device)
 criterion = nn.BCEWithLogitsLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 
-NUM_EPOCHS = 5
-
 
 def train_epoch():
     model.train()
@@ -209,11 +207,11 @@ def eval_epoch():
     return total_loss / len(val_loader)
 
 
-for epoch in range(NUM_EPOCHS):
+for epoch in range(5):
     train_loss = train_epoch()
     val_loss = eval_epoch()
     print(
-        f"Epoch {epoch+1}/{NUM_EPOCHS} | Train Loss: {train_loss:.4f} | Val Loss: {val_loss:.4f}")
+        f"Epoch {epoch+1}/{5} | Train Loss: {train_loss:.4f} | Val Loss: {val_loss:.4f}")
 
 
 model.eval()
