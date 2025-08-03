@@ -225,7 +225,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)</code></pre>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(E = \sum_{x \in \Omega} w(x) log(p_{l(x)}(x))\)
                 </div>
-                <p>where \(\mathcal{l} : \Omega \rightarrow {1, ... , K}\) is the true label of each pixel and \(w : \Omega \rightarrow mathbb{R}\) is a weight map that we introduced to give some pixels more importance in the training.</p>
+                <p>where \(\mathcal{l} : \Omega \rightarrow {1, ... , K}\) is the true label of each pixel and \(w : \Omega \rightarrow \mathbb{R}\) is a weight map that we introduced to give some pixels more importance in the training.</p>
                 <p>We pre-compute the weight map for each ground truth segmentation to compensate the different frequency of pixels from a certain class in the training data set, and to force the network to learn the small separation borders that we introduce between touching cells (See Figure 3c and d).</p>
                 <p>The separation border is computed using morphological operations. The weight map is then computed as:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
