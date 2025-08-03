@@ -90,11 +90,13 @@ const predictionTensor = model.predict(tf.tensor2d([5], [1, 1]));</code></pre>
 
                 <h3>12.4.2 MNIST</h3>
                 <p>TensorFlow.js also supports more complex models like the MNIST digit classification model.</p>
-                <h1>Draw a digit</h1>
+                <p>Draw a digit</p>
                 <canvas id="canvas" width="28" height="28" style="border:1px solid black;"></canvas><br/>
-                <button onclick="predict()">Predict</button>
-                <p id="result"></p>
-                
+                <button onclick="mnistPredict()">Predict</button>
+                <button onclick="clearCanvas()">Clear</button>
+                <p id="loading-status">Loading...</p>
+                <p id="mnist-result">Prediction: </p>
+                <p>Click the button above to predict the digit you drew on the canvas. The model will classify the digit and display the result.</p>
 
                 <h3>12.4.3 Piano Demo</h3>
 
@@ -178,10 +180,20 @@ const predictionTensor = model.predict(tf.tensor2d([5], [1, 1]));</code></pre>
     <script>
         let mnistModel;
 
-        tf.loadLayersModel('https://storage.googleapis.com/tfjs-models/tfjs/mnist/model.json')
+        tf.loadLayersModel('https://storage.googleapis.com/tfjs-models/tfjs/mnist_transfer_cnn_v1/model.json',
+           {
+                onProgress: (fraction) => {
+                const percent = Math.round(fraction * 100);
+                console.log(`Loading model: ${percent}%`);
+                document.getElementById('loading-status').innerText = `Loading: ${percent}%`;
+            }
+        })
         .then(m => {
             mnistModel = m;
             console.log("Model loaded.");
+        }).catch(err => {
+            console.error("Failed to load model:", err);
+            document.getElementById('loading-status').innerText = "Model loading failed!";
         });
 
         const canvas = document.getElementById('canvas');
@@ -201,14 +213,20 @@ const predictionTensor = model.predict(tf.tensor2d([5], [1, 1]));</code></pre>
             }
         };
 
-        async function predict() {
+        async function mnistPredict() {
             const imageData = tf.browser.fromPixels(canvas, 1);
             const input = imageData.toFloat().div(255).reshape([1, 28, 28, 1]);
             const prediction = mnistModel.predict(input);
             const result = prediction.argMax(-1);
             result.print();
-            document.getElementById('result').innerText =
+            document.getElementById('mnist-result').innerText =
                 'Prediction: ' + (await result.data())[0];
+        }
+
+         function clearCanvas() {
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            document.getElementById('mnist-result').innerText = 'Prediction: ';
         }
     </script>
 </body>
