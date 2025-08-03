@@ -179,8 +179,7 @@ for epoch in range(num_epochs):
     print(f"Epoch {epoch+1}/{num_epochs}, Loss: {total_loss/len(train_loader):.4f}")
 
 
-if not os.path.exists("temp"):
-    os.makedirs("temp")
+os.makedirs("temp", exist_ok=True)
 
 embedding_weights = model.embedding.weight.data.cpu().numpy()
 numpy.savetxt("temp/embedding_vectors.tsv", embedding_weights, delimiter="\t")
