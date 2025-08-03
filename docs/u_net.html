@@ -20,10 +20,10 @@
 
             <main class="col-md-8 content">
                 <h2 class="custom-title">3.4 U-Net</h2>
-                <p class="title-subtext">Convolutional Networks for Biomedical Image Segmentation</p>
+                <p class="title-subtext"><a href="https://arxiv.org/abs/1505.04597">U-Net</a> : Convolutional Networks for Biomedical Image Segmentation</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-16</p>
                 <p>There is large consent that successful training of deep networks requires many thousand annotated training samples. In this paper, we present a network and training strategy that relies on the strong use of <strong>data augmentation</strong> to use the available annotated samples more efficiently. The architecture consists of a contracting path to capture context and a symmetric expanding path that enables precise localization.</p>
-                <p>We show that such a network can be trained end-to-end from very few images and outperforms the prior best method (a sliding-window convolutional network) on the ISBI challenge for segmentation of neuronal structures in electron microscopic stacks. Using the same network trained on transmitted light microscopy images (phase contrast and DIC) we won the ISBI cell tracking challenge 2015 in these categories by a large margin. Moreover, the network is fast. Segmentation of a 512x512 image takes less than a second on a recent GPU.</p>
+                <p>We show that such a network can be trained end-to-end from very few images and outperforms the prior best method (a sliding-window convolutional network) on the ISBI challenge for segmentation of neuronal structures in electron microscopic stacks. Using the same network trained on transmitted light microscopy images (phase contrast and DIC) we won the ISBI cell tracking challenge 2015 in these categories by a large margin. Moreover, the network is fast. Segmentation of a 512x512 image takes less than a second on a recent GPU. The full implementation (based on Caffe) and the trained networks are available at <a href="https://github.com/artinte/deep-learning/blob/develop/03_cnn/4_unet/unet_torch.py">unet_torch.py</a> .</p>
 
                 <h3>3.4.1 Introduction</h3>
                 <p>In the last two years, deep convolutional networks have outperformed the state of the art in many visual recognition tasks. While convolutional networks have already existed for a long time, their success was limited due to the size of the available training sets and the size of the considered networks.</p>
@@ -62,7 +62,7 @@
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(E = \sum_{x \in \Omega} w(x) log(p_{l(x)}(x))\)
                 </div>
-                <p>where \(\mathcal{l} : \Omega \rightarrow {1, ... , K} is the true label of each pixel and \(w : \Omega \rightarrow mathbb{R}\) is a weight map that we introduced to give some pixels more importance in the training.</p>
+                <p>where \(\mathcal{l} : \Omega \rightarrow {1, ... , K}\) is the true label of each pixel and \(w : \Omega \rightarrow mathbb{R}\) is a weight map that we introduced to give some pixels more importance in the training.</p>
                 <p>We pre-compute the weight map for each ground truth segmentation to compensate the different frequency of pixels from a certain class in the training data set, and to force the network to learn the small separation borders that we introduce between touching cells (See Figure 3c and d).</p>
                 <p>The separation border is computed using morphological operations. The weight map is then computed as:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
