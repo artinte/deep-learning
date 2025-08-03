@@ -31,9 +31,35 @@
                     \(\sigma(x) = \frac{1}{1 + e^{-x}} = \frac{e^x}{1 + e^x}\)
                 </div>
                 <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/02_dnn/4_activation/sigmoid.py">sigmoid.py</a></p>
+
+                <pre><code>def sigmoid(x):
+    return 1 / (1 + numpy.exp(-x))
+
+
+def deriv_sigmoid(x):
+    return sigmoid(x) * (1 - sigmoid(x))
+
+x = numpy.linspace(-10, 10, 400)
+pyplot.plot(x, sigmoid(x), label="f(x) = 1 / (1 + e^-x)")
+pyplot.plot(x, deriv_sigmoid(x), label="f'(x) = f(x) * (1 - f(x))")
+pyplot.legend()
+pyplot.grid(True)
+pyplot.subplots_adjust(left=0.08, right=0.92, top=0.96, bottom=0.06)
+pyplot.show()
+
+print("The derivative at x = 2 is", numpy.round(deriv_sigmoid(2), 4))</code></pre>
+
                 <img src="res/02/sigmoid_func.png" alt="Sigmoid Function" width="600">
-                <p>Derivatives</p>
-                <img src="res/02/deriv_sigmoid.png" alt="Sigmoid Function" width="600">
+                <p style="text-align: center; color: #555555;">Figure 1 - Sigmoid Function</p>
+
+                <pre><samp>The derivative at x = 2 from scratch is 0.105</samp></pre>
+
+                <pre><code>x_val = torch.tensor([2.0], requires_grad=True)
+output = torch.sigmoid(x_val)
+output.backward()
+print("The derivative at x = 2 using PyTorch is", numpy.round(x_val.grad.item(), 4))</code></pre>
+
+                <pre><samp>The derivative at x = 2 using PyTorch is 0.105</samp></pre>
 
                 <h3 id="relu">2.4.2 ReLU Function</h3>
                 <p>One of the most popular and widely-used activation functions is <a href="https://docs.pytorch.org/docs/main/generated/torch.nn.ReLU.html#torch.nn.ReLU">ReLU</a> (rectified linear unit). As with other activation functions, it provides non-linearity to the model for better computation performance.</p>
@@ -43,7 +69,7 @@
                 </div>
                 <p>The ReLU function outputs the maximum between its input and zero, as shown by the graph. For positive inputs, the output of the function is equal to the input. For strictly negative inputs, the output of the function is equal to zero.</p>
                 <img src="res/02/relu_example.png" alt="ReLU Function" width="600">
-                <p style="text-align: center; color: #555555;">Figure 1 - ReLU Function</p>
+                <p style="text-align: center; color: #555555;">Figure 2 - ReLU Function</p>
                 
                 <pre><code># To see the gradients, we need to enable gradient tracking and perform a backward pass.
 input = torch.randn(10, requires_grad=True)
