@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torchvision.datasets import OxfordIIITPet
+import torchvision
 import torchvision.transforms as T
 from torch.utils.data import DataLoader, Dataset
 import os
@@ -108,7 +108,7 @@ class UNet(nn.Module):
 
 class OxfordPetsDataset(Dataset):
     def __init__(self, root, split="train", transform=None, target_transform=None):
-        self.dataset = OxfordIIITPet(
+        self.dataset = torchvision.datasets.OxfordIIITPet(
             root=root, download=True, target_types='segmentation')
         self.transform = transform
         self.target_transform = target_transform
@@ -159,6 +159,22 @@ val_dataset = OxfordPetsDataset(root='./data', split='val',
 
 train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True)
 val_loader = DataLoader(val_dataset, batch_size=8)
+
+fig, axes = pyplot.subplots(2, 3, figsize=(12, 8))
+images, masks = next(iter(train_loader))
+
+for i in range(3):
+    axes[0, i].imshow(images[i].permute(1, 2, 0).numpy())
+    axes[0, i].set_title("Image")
+    axes[0, i].axis('off')
+
+    axes[1, i].imshow(masks[i].squeeze().numpy(), cmap='gray')
+    axes[1, i].set_title("Mask")
+    axes[1, i].axis('off')
+
+pyplot.tight_layout()
+pyplot.show()
+
 
 model = UNet(in_channels=3, num_classes=1).to(device)
 criterion = nn.BCEWithLogitsLoss()

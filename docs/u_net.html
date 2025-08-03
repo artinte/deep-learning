@@ -47,21 +47,62 @@
                 <p>One important modification in our architecture is that in the upsampling part we have also a large number of feature channels, which allow the network to propagate context information to higher resolution layers. As a consequence, the expansive path is more or less symmetric to the contracting path, and yields a u-shaped architecture.</p>
                 <p>The network does not have any fully connected layers and only uses the valid part of each convolution, i.e., the segmentation map only contains the pixels, for which the full context is available in the input image.</p>
                 <p>This strategy allows the seamless segmentation of arbitrarily large images by an overlap-tile strategy (See below figure):</p>
+                <img src="res/03/overlap_tile.png" width="600" alt="Overlap-tile Strategy">
+                <p style="text-align: center; color: #555555;">Figure 3 - Overlap-tile Strategy</p>
 
                 <p>To predict the pixels in the border region of the image, the missing context is extrapolated by mirroring the input image. This tiling strategy is important to apply the network to large images, since otherwise the resolution would be limited by the GPU memory.</p>
                 <p>As for our tasks there is very little training data available, we use excessive data augmentation by applying elastic deformations to the available training images. This allows the network to learn invariance to such deformations, without the need to see these transformations in the annotated image corpus.</p>
                 <p>This is particularly important in biomedical segmentation, since deformation used to be the most common variation in tissue and realistic deformations can be simulated efficiently. The value of data augmentation for learning invariance has been shown in Dosovitskiy et al in the scope of unsupervised feature learning.</p>
                 <p>Another challenge in many cell segmentation tasks is the separation of touch ing objects of the same class; (See below image) To this end, we propose the use of a weighted loss, where the separating background labels between touching cells obtain a large weight in the loss function.</p>
+                <img src="res/03/hela_cell.png" width="600" alt="Hela Cells on glass recorded with DIC Microscopy">
+                <p style="text-align: center; color: #555555;">Figure 4 - Hela Cells on glass recorded with DIC Microscopy</p>
+                
                 <p>The resulting network is applicable to various biomedical segmentation problems. In this paper, we show results on the segmentation of neuronal structures in EM stacks (an ongoing competition started at ISBI 2012), where we outperformed the network of Ciresan et al.</p>
                 <p>Furthermore, we show results for cell segmentation in light microscopy images from the ISBI cell tracking challenge 2015. Here we won with a large margin on the two most challenging 2D transmitted light datasets.</p>
 
                 <h3>3.4.2 Network Architecture</h3>
-                <p>The network architecture is illustrated in first figure. It consists of a contracting path (left side) and an expansive path (right side). The contracting path follows the typical architecture of a convolutional network. It consists of the repeated application of two 3x3 convolutions (unpadded convolutions), each followed by a rectified linear unit (ReLU) and a 2x2 max pooling operation with stride 2 for downsampling.</p>
-                <p>At each downsampling step we double the number of feature channels. Every step in the expansive path consists of an upsampling of the feature map followed by a 2x2 convolution ("up-convolution") that halves the number of feature channels, a concatenation with the correspondingly cropped feature map from the contracting path, and two 3x3 convolutions, each followed by a ReLU.</p>
+                <p>The network architecture is illustrated in figure 2. It consists of a contracting path (left side) and an expansive path (right side). The contracting path follows the typical architecture of a convolutional network. It consists of the repeated application of two 3x3 convolutions (unpadded convolutions), each followed by a rectified linear unit (ReLU) and a 2x2 max pooling operation with stride 2 for downsampling.</p>
+                <p>At each downsampling step we double the number of feature channels. Every step in the expansive path consists of an upsampling of the feature map followed by a \(2 \times 2\) convolution ("up-convolution") that halves the number of feature channels, a concatenation with the correspondingly cropped feature map from the contracting path, and two 3x3 convolutions, each followed by a ReLU.</p>
                 <p>The cropping is necessary due to the loss of border pixels in every convolution. At the final layer a 1x1 convolution is used to map each 64-component feature vector to the desired number of classes. In total the network has 23 convolutional layers.</p>
-                <p>To allow a seamless tiling of the output segmentation map, it is important to select the input tile size such that all 2x2 max-pooling operations are applied to a layer with an even x- and y-size.</p>
+                <p>To allow a seamless tiling of the output segmentation map, it is important to select the input tile size such that all \(2 \times 2\) max-pooling operations are applied to a layer with an even x- and y-size.</p>
 
-                <h3>3.4.3 Training</h3>
+                <h3>3.4.3 OxfordPets Dataset</h3>
+                <p><a href="https://www.robots.ox.ac.uk/~vgg/data/pets/">The Oxford-IIIT Pet Dataset</a> have 37 category pet dataset with roughly 200 images for each class. The images have a large variations in scale, pose and lighting. All images have an associated ground truth annotation of breed, head ROI, and pixel level trimap segmentation.</p>
+                <img src="res/03/pet_annotations.jpg" width="600" alt="Oxford Pets Dataset">
+                <p style="text-align: center; color: #555555;">Figure 5 - Oxford Pets Dataset</p>
+
+                <p>The Oxford-IIIT Pet dataset and annotations are roughly 800 MB, we can use <code>torchvision.datasets.OxfordIIITPet</code> to download the datasets:</p>
+                <pre><code>class OxfordPetsDataset(Dataset):
+    def __init__(self, root, split="train", transform=None, target_transform=None):
+        self.dataset = torchvision.datasets.OxfordIIITPet(
+            root=root, download=True, target_types='segmentation')
+        self.transform = transform
+        self.target_transform = target_transform
+        self.split = split
+        self.indices = list(range(len(self.dataset)))
+        split_point = int(0.8 * len(self.dataset))
+        self.indices = self.indices[:split_point] if split == 'train' else self.indices[split_point:]
+
+    def __len__(self):
+        return len(self.indices)
+
+    def __getitem__(self, idx):
+        img, mask = self.dataset[self.indices[idx]]
+
+        # Segmentation mask: 1 = pet, 2 = border, 0 = background
+        # We'll convert to binary mask: pet (1), background/border (0)
+        mask = np.array(mask)
+        mask = (mask == 1).astype(np.float32)
+        mask = Image.fromarray(mask)
+
+        if self.transform:
+            img = self.transform(img)
+        if self.target_transform:
+            mask = self.target_transform(mask)
+
+        return img, mask</code></pre>
+
+                <h3>3.4.4 Training</h3>
                 <p>The input images and their corresponding segmentation maps are used to train the network with the stochastic gradient descent implementation of PyTorch. Due to the unpadded convolutions, the output image is smaller than the input by a constant border width. To minimize the overhead and make maximum use of the GPU memory, we favor large input tiles over a large batch size and hence reduce the batch to a single image. Accordingly we use a high momentum (0.99) such that a large number of the previously seen training samples determine the update in the current optimization step.</p>
                 <p>The energy function is computed by a pixel-wise soft-max over the final feature map combined with the cross entropy loss function. The soft-max is defined as \(p_k(x) = exp(a_k(x))/(\sum_{k'=1}^K exp(a_{k'}(x)))\) where \(a_k(x)\) denotes the activation in feature channel \(k\) at the pixel position \(x \in \Omega\) with \(\Omega \in \mathbb{Z}^2\).</p>
 
@@ -82,12 +123,12 @@
                 <p>Data augmentation is essential to teach the network the desired invariance and robustness properties, when only few training samples are available. In case of microscopical images we primarily need shift and rotation invariance as well as robustness to deformations and gray value variations. Especially random elastic deformations of the training samples seem to be the key concept to train a segmentation network with very few annotated images.</p>
                 <p>We generate smooth deformations using random displacement vectors on a coarse 3 by 3 grid. The displacements are sampled from a Gaussian distribution with 10 pixels standard deviation. Per-pixel displacements are then computed using bicubic interpolation. Drop-out layers at the end of the contracting path perform further implicit data augmentation.</p>
                 
-                <h3>3.4.4 Experiments</h3>
+                <h3>3.4.5 Experiments</h3>
                 <p>We demonstrate the application of the u-net to three different segmentation tasks. The first task is the segmentation of neuronal structures in electron microscopic recordings. An example of the data set and our obtained segmentation is displayed in Figure 2.</p>
                 <p>We provide the full result as Supplementary Material. The data set is provided by the EM segmentation challenge [14] that was started at ISBI 2012 and is still open for new contributions. The training data is a set of 30 images (512x512 pixels) from serial section transmission electron microscopy of the Drosophila first instar larva ventral nerve cord (VNC). Each image comes with a corresponding fully annotated ground truth segmentation map for cells (white) and membranes (black).</p>
                 <p>The test set is publicly available, but its segmentation maps are kept secret. An evaluation can be obtained by sending the predicted membrane probability map to the organizers. The evaluation is done by thresholding the map at 10 different levels and computation of the "warping error", the "Rand error" and the "pixel error".</p>
 
-                <h3>3.4.5 Conclusion</h3>
+                <h3>3.4.6 Conclusion</h3>
                 <p>The u-net architecture achieves very good performance on very different biomedical segmentation applications. Thanks to data augmentation with elastic deformations, it only needs very few annotated images and has a very reasonable training time of only 10 hours on a NVidia Titan GPU (6 GB). We are sure that the u-net architecture can be applied easily to many more tasks.</p>
                 <div class="navigation">
                     <a href="res_net.html">Prev: 3.3 ResNet</a>
