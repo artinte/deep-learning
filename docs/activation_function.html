@@ -20,7 +20,7 @@
 
             <main class="col-md-8 content">
                 <h2 class="custom-title">2.4 Activation Function</h2>
-                <p class="title-subtext">Some common activation functions are summarized and their derivatives are solved.</p>
+                <p class="title-subtext">Some common <a href="https://docs.pytorch.org/docs/stable/nn.html#non-linear-activations-weighted-sum-nonlinearity">activation functions</a> are summarized and their derivatives are solved.</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-10</p>
                 <p>The activation function of a node in an artificial neural network is a function that calculates the output of the node based on its individual inputs and their weights.</p>
 
@@ -36,13 +36,50 @@
                 <img src="res/02/deriv_sigmoid.png" alt="Sigmoid Function" width="600">
 
                 <h3 id="relu">2.4.2 ReLU Function</h3>
-                <p>One of the most popular and widely-used activation functions is ReLU (rectified linear unit). As with other activation functions, it provides non-linearity to the model for better computation performance. </p>
+                <p>One of the most popular and widely-used activation functions is <a href="https://docs.pytorch.org/docs/main/generated/torch.nn.ReLU.html#torch.nn.ReLU">ReLU</a> (rectified linear unit). As with other activation functions, it provides non-linearity to the model for better computation performance.</p>
                 <p>The ReLU activation function has the form:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(f(x) = max(0, x)\)
                 </div>
                 <p>The ReLU function outputs the maximum between its input and zero, as shown by the graph. For positive inputs, the output of the function is equal to the input. For strictly negative inputs, the output of the function is equal to zero.</p>
+                <img src="res/02/relu_example.png" alt="ReLU Function" width="600">
+                <p style="text-align: center; color: #555555;">Figure 1 - ReLU Function</p>
                 
+                <pre><code># To see the gradients, we need to enable gradient tracking and perform a backward pass.
+input = torch.randn(10, requires_grad=True)
+print("Input:", input)
+
+
+def relu_scratch(input):
+    # Custom implementation of ReLU activation function.
+    return torch.maximum(torch.tensor(0.0), input)
+
+
+output_scratch = relu_scratch(input)
+print("Output after ReLU activation:", output_scratch)</code></pre>
+
+                <pre><samp>Input: tensor([-1.7783,  1.1925, -0.1910, -0.7291, -1.3044, -0.1538,  1.3874,  2.5825,
+         0.4784, -0.2474], requires_grad=True)
+Output after ReLU activation: tensor([0.0000, 1.1925, 0.0000, 0.0000, 0.0000, 0.0000, 1.3874, 2.5825, 0.4784,
+        0.0000], grad_fn=&lt;MaximumBackward0&gt;)</samp></pre>
+
+                <pre><code>output_scratch = relu_scratch(input)
+print("Output after ReLU activation:", output_scratch)
+
+relu_torch = torch.nn.ReLU()
+output = relu_torch(input)
+print("Output after ReLU activation:", output)</code></pre>
+
+                <pre><samp>Output after ReLU activation: tensor([0.0000, 1.1925, 0.0000, 0.0000, 0.0000, 0.0000, 1.3874, 2.5825, 0.4784,
+        0.0000], grad_fn=&lt;ReluBackward0&gt;)</samp></pre>
+
+                <p>To compute the gradient of the ReLU function, we can use the following code:</p>
+                <pre><code>gradients = torch.autograd.grad(outputs=output.sum(), inputs=input)[0]
+print("Gradients:", gradients)</code></pre>
+
+                <pre><samp>Gradients: tensor([0., 1., 0., 0., 0., 0., 1., 1., 1., 0.])</samp></pre>
+
+
                 <h3>2.4.3 Tanh Function</h3>
                 <div class="navigation">
                     <a href="pytorch_basics.html">Prev: 2.3 PyTorch Basics</a>
