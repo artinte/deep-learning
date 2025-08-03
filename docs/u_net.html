@@ -27,15 +27,21 @@
 
                 <h3>3.4.1 Introduction</h3>
                 <p>In the last two years, deep convolutional networks have outperformed the state of the art in many visual recognition tasks. While convolutional networks have already existed for a long time, their success was limited due to the size of the available training sets and the size of the considered networks.</p>
-                <p>The breakthrough by <a href="alex_net.html">Krizhevsky et al</a> was due to supervised training of a large network with 8 layers and millions of parameters on the ImageNet dataset with 1 million training images. Since then, even larger and deeper networks have been trained.</p>
+                <p>The breakthrough by <a href="alex_net.html">Krizhevsky et al.</a> was due to supervised training of a large network with 8 layers and millions of parameters on the ImageNet dataset with 1 million training images. Since then, even larger and deeper networks have been trained.</p>
                 <p>The typical use of convolutional networks is on classification tasks, where the output to an image is a single class label. However, in many visual tasks, especially in biomedical image processing, the desired output should include localization, i.e., a class label is supposed to be assigned to each pixel. Moreover, thousands of training images are usually beyond reach in biomedical tasks.</p>
-                <p>Hence, <a href="https://people.idsia.ch/~ciresan/data/nips2012.pdf">Ciresan et al</a> trained a network in a sliding-window setup to predict the class label of each pixel by providing a local region (patch) around that pixel as input.</p>
-                <p>First, this network can localize. Secondly, the training data in terms of patches is much larger than the number of training images. The resulting network won the EM segmentation challenge at ISBI 2012 by a large margin.</p>
-                <p>Obviously, the strategy in Ciresan et al has two drawbacks. First, it is quite slow because the network must be run separately for each patch, and there is a lot of redundancy due to overlapping patches.</p>
+                <p>Hence, <a href="https://people.idsia.ch/~ciresan/data/nips2012.pdf">Ciresan et al.</a> trained a network in a sliding-window setup to predict the class label of each pixel by providing a local region (patch) around that pixel as input. First, this network can localize. Secondly, the training data in terms of patches is much larger than the number of training images. The resulting network won the EM segmentation challenge at ISBI 2012 by a large margin.</p>
+
+                <img src="res/03/segment_neuronal.jpg" width="600" alt="Segment Neuronal Membranes">
+                <p style="text-align: center; color: #555555;">Figure 1 - Segment Neuronal Membranes</p>
+
+                <p>Obviously, the strategy in Ciresan et al. has two drawbacks. First, it is quite slow because the network must be run separately for each patch, and there is a lot of redundancy due to overlapping patches.</p>
                 <p>Secondly, there is a trade-off between localization accuracy and the use of context. Larger patches require more max-pooling layers that reduce the localization accuracy, while small patches allow the network to see only little context. </p>
                 <p>More recent approaches proposed a classifier output that takes into account the features from multiple layers. Good localization and the use of context are possible at the same time.</p>
-                <p>In this paper, we build upon a more elegant architecture, the so-called "fully convolutional network". We modify and extend this architecture such that it works with very few training images and yields more precise segmentations; see below figure:</p>
+
+                <p>In this <a href="https://arxiv.org/abs/1505.04597">paper</a> , we build upon a more elegant architecture, the so-called "fully convolutional network". We modify and extend this architecture such that it works with very few training images and yields more precise segmentations; see below figure:</p>
                 <img src="res/03/u_net_arch.png" width="600" alt="U-Net Architecture">
+                <p style="text-align: center; color: #555555;">Figure 2 - U-Net Architecture</p>
+
                 <p>The main idea is to supplement a usual contracting network by successive layers, where pooling operators are replaced by upsampling operators.</p>
                 <p>Hence, these layers increase the resolution of the output. In order to localize, high resolution features from the contracting path are combined with the upsampled output. A successive convolution layer can then learn to assemble a more precise output based on this information.</p> 
                 <p>One important modification in our architecture is that in the upsampling part we have also a large number of feature channels, which allow the network to propagate context information to higher resolution layers. As a consequence, the expansive path is more or less symmetric to the contracting path, and yields a u-shaped architecture.</p>
