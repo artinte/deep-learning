@@ -1,4 +1,5 @@
 import warnings
+
 warnings.filterwarnings("ignore")
 from torch import multiprocessing
 
@@ -14,8 +15,13 @@ from torchrl.collectors import SyncDataCollector
 from torchrl.data.replay_buffers import ReplayBuffer
 from torchrl.data.replay_buffers.samplers import SamplerWithoutReplacement
 from torchrl.data.replay_buffers.storages import LazyTensorStorage
-from torchrl.envs import (Compose, DoubleToFloat, ObservationNorm, StepCounter,
-                          TransformedEnv)
+from torchrl.envs import (
+    Compose,
+    DoubleToFloat,
+    ObservationNorm,
+    StepCounter,
+    TransformedEnv,
+)
 from torchrl.envs.libs.gym import GymEnv
 from torchrl.envs.utils import check_env_specs, ExplorationType, set_exploration_type
 from torchrl.modules import ProbabilisticActor, TanhNormal, ValueOperator
@@ -23,7 +29,7 @@ from torchrl.objectives import ClipPPOLoss
 from torchrl.objectives.value import GAE
 from tqdm import tqdm
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     is_fork = multiprocessing.get_start_method() == "fork"
     device = (
         torch.device(0)
@@ -33,11 +39,11 @@ if __name__ == '__main__':
     num_cells = 256  # number of cells in each layer i.e. output dim.
     lr = 3e-4
     max_grad_norm = 1.0
-    
+
     frames_per_batch = 1000
     # For a complete training, bring the number of frames up to 1M
     total_frames = 50_000
-    
+
     sub_batch_size = 64  # cardinality of the sub-samples gathered from the current data in the inner loop
     num_epochs = 10  # optimization steps per batch of data collected
     clip_epsilon = (
@@ -46,9 +52,9 @@ if __name__ == '__main__':
     gamma = 0.99
     lmbda = 0.95
     entropy_eps = 1e-4
-    
+
     base_env = GymEnv("InvertedDoublePendulum-v4", device=device)
-    
+
     env = TransformedEnv(
         base_env,
         Compose(
@@ -58,22 +64,22 @@ if __name__ == '__main__':
             StepCounter(),
         ),
     )
-    
+
     env.transform[0].init_stats(num_iter=1000, reduce_dim=0, cat_dim=0)
-    
+
     print("normalization constant shape:", env.transform[0].loc.shape)
-    
+
     print("observation_spec:", env.observation_spec)
     print("reward_spec:", env.reward_spec)
     print("input_spec:", env.input_spec)
     print("action_spec (as defined by input_spec):", env.action_spec)
-    
+
     check_env_specs(env)
-    
+
     rollout = env.rollout(3)
     print("rollout of three steps:", rollout)
     print("Shape of the rollout TensorDict:", rollout.batch_size)
-    
+
     actor_net = nn.Sequential(
         nn.LazyLinear(num_cells, device=device),
         nn.Tanh(),
@@ -84,11 +90,11 @@ if __name__ == '__main__':
         nn.LazyLinear(2 * env.action_spec.shape[-1], device=device),
         NormalParamExtractor(),
     )
-    
+
     policy_module = TensorDictModule(
         actor_net, in_keys=["observation"], out_keys=["loc", "scale"]
     )
-    
+
     policy_module = ProbabilisticActor(
         module=policy_module,
         spec=env.action_spec,
@@ -101,7 +107,7 @@ if __name__ == '__main__':
         return_log_prob=True,
         # we'll need the log-prob for the numerator of the importance weights
     )
-    
+
     value_net = nn.Sequential(
         nn.LazyLinear(num_cells, device=device),
         nn.Tanh(),
@@ -116,10 +122,10 @@ if __name__ == '__main__':
         module=value_net,
         in_keys=["observation"],
     )
-    
+
     print("Running policy:", policy_module(env.reset()))
     print("Running value:", value_module(env.reset()))
-    
+
     collector = SyncDataCollector(
         env,
         policy_module,
@@ -128,14 +134,18 @@ if __name__ == '__main__':
         split_trajs=False,
         device=device,
     )
-    
+
     replay_buffer = ReplayBuffer(
         storage=LazyTensorStorage(max_size=frames_per_batch),
         sampler=SamplerWithoutReplacement(),
     )
-    
+
     advantage_module = GAE(
-        gamma=gamma, lmbda=lmbda, value_network=value_module, average_gae=True, device=device,
+        gamma=gamma,
+        lmbda=lmbda,
+        value_network=value_module,
+        average_gae=True,
+        device=device,
     )
 
     loss_module = ClipPPOLoss(
@@ -153,7 +163,7 @@ if __name__ == '__main__':
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
         optim, total_frames // frames_per_batch, 0.0
     )
-    
+
     logs = defaultdict(list)
     pbar = tqdm(total=total_frames)
     eval_str = ""
@@ -188,9 +198,7 @@ if __name__ == '__main__':
 
         logs["reward"].append(tensordict_data["next", "reward"].mean().item())
         pbar.update(tensordict_data.numel())
-        cum_reward_str = (
-            f"average reward={logs['reward'][-1]: 4.4f} (init={logs['reward'][0]: 4.4f})"
-        )
+        cum_reward_str = f"average reward={logs['reward'][-1]: 4.4f} (init={logs['reward'][0]: 4.4f})"
         logs["step_count"].append(tensordict_data["step_count"].max().item())
         stepcount_str = f"step count (max): {logs['step_count'][-1]}"
         logs["lr"].append(optim.param_groups[0]["lr"])
@@ -216,12 +224,14 @@ if __name__ == '__main__':
                     f"eval step-count: {logs['eval step_count'][-1]}"
                 )
                 del eval_rollout
-        pbar.set_description(", ".join([eval_str, cum_reward_str, stepcount_str, lr_str]))
+        pbar.set_description(
+            ", ".join([eval_str, cum_reward_str, stepcount_str, lr_str])
+        )
 
         # We're also using a learning rate scheduler. Like the gradient clipping,
         # this is a nice-to-have but nothing necessary for PPO to work.
         scheduler.step()
-        
+
     plt.figure(figsize=(10, 10))
     plt.subplot(2, 2, 1)
     plt.plot(logs["reward"])
