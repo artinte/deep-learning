@@ -31,6 +31,30 @@
                     <li><p>Deploy the model to the target platform using the ExecuTorch runtime.</p></li>
                 </ul>
 
+                <h3>12.2.1 Installation</h3>
+                <p>To use ExecuTorch, you will need to install both the Python package and the appropriate platform-specific runtime libraries. Pip is the recommended way to install the ExecuTorch python package.</p>
+                
+                <p>This package includes the dependencies needed to export a PyTorch model, as well as Python runtime bindings for model testing and evaluation. Consider installing ExecuTorch within a virtual environment, such as one provided by conda or venv.</p>
+
+                <pre><samp>pip install executorch</samp></pre>
+
+                <h3>12.2.2 Preparing the Model</h3>
+                <p>Exporting is the process of taking a PyTorch model and converting it to the .pte file format used by the ExecuTorch runtime. This is done using Python APIs. PTE files for common models, such as Llama 3.2, can be found on HuggingFace under ExecuTorch Community. These models have been exported and lowered for ExecuTorch, and can be directly deployed without needing to go through the lowering process.</p>
+
+                <h4>12.2.2.1 Exporting MobileNet V2</h4>
+
+                <p>A complete example of exporting, lowering, and verifying MobileNet V2 is available as a Colab notebook.</p>
+                
+                <p>ExecuTorch provides hardware acceleration for a wide variety of hardware. The most commonly used backends are XNNPACK, for Arm and x86 CPU, Core ML (for iOS), Vulkan (for Android GPUs), and Qualcomm (for Qualcomm-powered Android phones).</p>
+
+                <h4>12.2.2.2 Testing the Model</h4>
+
+                <p>After successfully generating a .pte file, it is common to use the Python runtime APIs to validate the model on the development platform. This can be used to evaluate model accuracy before running on-device.</p>
+                <p>For the MobileNet V2 model from torchvision used in this example, image inputs are expected as a normalized, float32 tensor with a dimensions of (batch, channels, height, width). The output See torchvision.models.mobilenet_v2 for more information on the input and output tensor format for this model.</p>
+
+                <h3>12.2.3 Running on Device</h3>
+                
+
                 <div class="navigation">
                     <a href="onnx.html">Prev: 12.1 ONNX</a>
                     <a href="tensorflow_lite.html">Next: 12.3 TensorFlow Lite</a>
