@@ -39,12 +39,12 @@
                 <p>Our aim will be to train a policy that tries to maximize the discounted, cumulative reward \(R_{t_0} = \sum_{t = t_0}^{\infty} {\gamma}^{t - t_0} \cdot r_t\), where \(R_{t_0}\) is also known as the return. The discount, \(\gamma\), should be a constant between 0 and 1 that ensures the sum converges. A lower \(\gamma\) makes rewards from the uncertain far future less important for our agent than the ones in the near future that it can be fairly confident about. It also encourages agents to collect reward closer in time than equivalent rewards that are temporally far away in the future.</p>
                 <p>The main idea behind Q-learning is that if we had a function \(Q^*: State \times Action \rightarrow \mathbb{R}\), that could tell us what our return would be, if we were to take an action in a given state, then we could easily construct a policy that maximizes our rewards:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
-                    
+                    \(\pi^*(s) = \arg\!\max_a \ Q^*(s, a)\)
                 </div>
                 <p>However, we don’t know everything about the world, so we don’t have access to \(Q^*\). But, since neural networks are universal function approximators, we can simply create one and train it to resemble \(Q^*\).</p>
                 <p>For our training update rule, we’ll use a fact that every \(Q\) function for some policy obeys the Bellman equation:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
-                    
+                    \(Q^{\pi}(s, a) = r + \gamma Q^{\pi}(s', \pi(s'))\)
                 </div>
                 <p>The difference between the two sides of the equality is known as the temporal difference error,:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
@@ -52,7 +52,13 @@
                 </div>
                 <p>To minimize this error, we will use the Huber loss. The Huber loss acts like the mean squared error when the error is small, but like the mean absolute error when the error is large - this makes it more robust to outliers when the estimates of \(Q\) are very noisy. We calculate this over a batch of transitions, \(B\), sampled from the replay memory:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
-                    \(\mathcal{L} = \frac{1}{|B|} \sum_{(s, a, s', r) \in B} \mathcal{L}(\gamma)\)
+                    \(\mathcal{L} = \frac{1}{|B|} \sum_{(s, a, s', r) \ \in B} \mathcal{L}(\delta)\)
+                </div>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \[\text{where} \quad \mathcal{L}(\delta) = \begin{cases}
+  \frac{1}{2}{\delta^2}  &amp; \text{for } |\delta| \le 1, \\
+  |\delta| - \frac{1}{2} &amp; \text{otherwise.}
+\end{cases}\]
                 </div>
 
                 <p>Our model will be a feed forward neural network that takes in the difference between the current and previous screen patches. It has two outputs, representing \(Q(s, left)\) and \(Q(s, right)\) (where \(s\) is the input to the network). In effect, the network is trying to predict the expected return of taking each action given the current input.</p>
