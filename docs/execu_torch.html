@@ -20,7 +20,7 @@
 
             <main class="col-md-8 content">
                 <h2 class="custom-title">12.2 ExecuTorch</h2>
-                <p class="title-subtext">Getting Started with ExecuTorch</p>
+                <p class="title-subtext">Getting Started with <a href="https://docs.pytorch.org/executorch/stable/getting-started.html">ExecuTorch</a></p>
                 <p style="color: #a0a0a0;">Created Date: 2025-07-20</p>
 
                 <p>This tutorial is intended to describe the necessary steps to take PyTorch model and run it using ExecuTorch. To use the framework, you will typically need to take the following steps:</p>
@@ -53,7 +53,18 @@
                 <p>For the MobileNet V2 model from torchvision used in this example, image inputs are expected as a normalized, float32 tensor with a dimensions of (batch, channels, height, width). The output See torchvision.models.mobilenet_v2 for more information on the input and output tensor format for this model.</p>
 
                 <h3>12.2.3 Running on Device</h3>
-                
+                <p>ExecuTorch provides runtime APIs in Java, Objective-C, and C++.</p>
+
+                <h4>12.2.3.1 Android</h4>
+                <p>ExecuTorch provides Java bindings for Android usage, which can be consumed from both Java and Kotlin. To add the library to your app, add the following dependency to gradle build rule.</p>
+
+                <h4>12.2.3.2 iOS</h4>
+                <p>ExecuTorch supports both iOS and MacOS via C++, as well as hardware backends for CoreML, MPS, and CPU. The iOS runtime library is provided as a collection of .xcframework targets and are made available as a Swift PM package.</p>
+
+                <h4>12.2.3.3 C++</h4>
+                <p>ExecuTorch provides C++ APIs, which can be used to target embedded or mobile devices. The C++ APIs provide a greater level of control compared to other language bindings, allowing for advanced memory management, data loading, and platform integration.</p>
+
+                <h3>12.2.4 Next Steps</h3>
 
                 <div class="navigation">
                     <a href="onnx.html">Prev: 12.1 ONNX</a>
