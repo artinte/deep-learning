@@ -36,6 +36,18 @@
 
 
                 <p>More specifically, the agent and environment interact at each of a sequence of discrete time steps, \(t = 1, 2, 3, \cdots\) . At each time step \(t\) the agent receives some representation of the environment’s state, \(S_t \in S\), and on that basis selects an action, \(A_t \in \mathcal{A}(s)\) . One </p>
+
+
+                <h3>10.2.2 Goals and Rewards</h3>
+                <p>In reinforcement learning, the purpose or goal of the agent is formalized in terms of a special signal, called the <strong>reward</strong> , passing from the environment to the agent. At each time step, the reward is a simple number, \(R_t \in \mathbf{R}\) . Informally, the agent's goal is to maximize the total amount of reward it receives. This means maximizing not immediate reward, but cumulative reward in the long run. We can clearly state this informal idea as the reward hypothesis:</p>
+                <p class="comment">That all of what we mean by goals and purposes can be well thought of as the maximization of the expected value of the cumulative sum of a received scalar signal (called reward).</p>
+
+                <p>The use of a reward signal to formalize the idea of a goal is one of the most distinctive features of reinforcement learning.</p>
+
+                <h3>10.2.3 Returns and Episodes</h3>
+                <p>So far we have discussed the objective of learning informally. We have said that the agent's goal is to maximize the cumulative reward it receives in the long run. How might this be defined formally? If the sequence of rewards received after time step \(t\) is denoted \(R_{t+1}, R_{t+2}, R_{t+3}, \cdots\) , then what precise aspect of this sequence do we wish to maximize?</p>
+
+                <p>In general, we seek to maximize the <strong>expected return</strong> , where the return, denoted \(G_t\) , is defined as some specific function of the reward sequence. In the simplest case the return is the sum of the rewards:</p>
                 
                 
                 <div class="navigation">
