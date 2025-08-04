@@ -40,6 +40,19 @@
                     <li><p>Atari - Emulator of Atari 2600 ROMs simulated that have a high range of complexity for agents to learn.</p></li>
                     <li><p>Third-party - A number of environments have been created that are compatible with the Gymnasium API. Be aware of the version that the software was created for and use the apply_env_compatibility in gymnasium.make if necessary.</p></li>
                 </ul>
+
+                <h3>10.1.5 An Extended Example: Tic-Tac-Toe</h3>
+                <p>o illustrate the general idea of reinforcement learning and contrast it with other approaches, we next consider a single example in more detail.</p>
+                <p>Consider the familiar child's game of tic-tac-toe. Two players take turns playing on a three-by-three board. One player plays Xs and the other Os until one player wins by placing three marks in a row, horizontally, vertically, or diagonally, as the X player has in the game. If the board fills up with neither player getting three in a row, then the game is a draw.</p>
+                <p>Because a skilled player can play so as never to lose, let us assume that we are playing against an imperfect player, one whose play is sometimes incorrect and allows us to win. For the moment, in fact, let us consider draws and losses to be equally bad for us. How might we construct a player that will find the imperfections in its opponent's play and learn to maximize its chances of winning?</p>
+
+                <p>Although this is a simple problem, it cannot readily be solved in a satisfactory way through classical techniques. For example, the classical "minimax" solution from game theory is not correct here because it assumes a particular way of playing by the opponent. For example, a minimax player would never reach a game state from which it could lose, even if in fact it always won from that state because of incorrect play by the opponent.</p>
+                <p>Classical optimization methods for sequential decision problems, such as dynamic programming, can compute an optimal solution for any opponent, but require as input a complete specification of that opponent, including the probabilities with which the opponent makes each move in each board state. Let us assume that this information is not available a priori for this problem, as it is not for the vast majority of problems of practical interest.</p>
+                <p>On the other hand, such information can be estimated from experience, in this case by playing many games against the opponent. About the best one can do on this problem is first to learn a model of the opponent’s behavior, up to some level of confidence, and then apply dynamic programming to compute an optimal solution given the approximate opponent model. In the end, this is not that different from some of the reinforcement learning methods we examine later in this book.</p>
+
+                <p>An evolutionary method applied to this problem would directly search the space of possible policies for one with a high probability of winning against the opponent. </p>
+
+                <p></p>
                 
                 <div class="navigation">
                     <a href="intro_auto_encoder.html">Prev: 9.8 Intro to Autoencoders</a>
