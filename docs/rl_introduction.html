@@ -42,8 +42,50 @@
                 </ul>
 
                 <h3>10.1.5 An Extended Example: Tic-Tac-Toe</h3>
-                <p>o illustrate the general idea of reinforcement learning and contrast it with other approaches, we next consider a single example in more detail.</p>
+                <p>To illustrate the general idea of reinforcement learning and contrast it with other approaches, we next consider a single example in more detail.</p>
                 <p>Consider the familiar child's game of tic-tac-toe. Two players take turns playing on a three-by-three board. One player plays Xs and the other Os until one player wins by placing three marks in a row, horizontally, vertically, or diagonally, as the X player has in the game. If the board fills up with neither player getting three in a row, then the game is a draw.</p>
+
+                <pre><code>class TicTacToe:
+    def __init__(self):
+        # The board state is represented as a tuple to make it hashable
+        self.board = (" ") * 9
+        self.players = ["X", "O"]
+
+    def is_winner(self, player):
+        winning_combinations = [
+            (0, 1, 2),
+            (3, 4, 5),
+            (6, 7, 8),  # Rows
+            (0, 3, 6),
+            (1, 4, 7),
+            (2, 5, 8),  # Columns
+            (0, 4, 8),
+            (2, 4, 6),  # Diagonals
+        ]
+        for combo in winning_combinations:
+            if (
+                self.board[combo[0]]
+                == self.board[combo[1]]
+                == self.board[combo[2]]
+                == player
+            ):
+                return True
+        return False
+
+    def is_draw(self):
+        return " " not in self.board
+
+    def get_available_moves(self):
+        return [i for i, spot in enumerate(self.board) if spot == " "]
+
+    def make_move(self, position, player):
+        if self.board[position] == " ":
+            new_board = list(self.board)
+            new_board[position] = player
+            self.board = tuple(new_board)
+            return True
+        return False</code></pre>
+
                 <p>Because a skilled player can play so as never to lose, let us assume that we are playing against an imperfect player, one whose play is sometimes incorrect and allows us to win. For the moment, in fact, let us consider draws and losses to be equally bad for us. How might we construct a player that will find the imperfections in its opponent's play and learn to maximize its chances of winning?</p>
 
                 <p>Although this is a simple problem, it cannot readily be solved in a satisfactory way through classical techniques. For example, the classical "minimax" solution from game theory is not correct here because it assumes a particular way of playing by the opponent. For example, a minimax player would never reach a game state from which it could lose, even if in fact it always won from that state because of incorrect play by the opponent.</p>
@@ -52,7 +94,8 @@
 
                 <p>An evolutionary method applied to this problem would directly search the space of possible policies for one with a high probability of winning against the opponent. </p>
 
-                <p></p>
+                <p>Here, a policy is a rule that tells the player what move to make for every state of the game—every possible configuration of Xs and Os on the three-by-three board. For each  policy considered, an estimate of its winning probability would be obtained by playing  some number of games against the opponent.</p>
+                <p> This evaluation would then direct which policy or policies were considered next. A typical evolutionary method would hill-climb  in policy space, successively generating and evaluating policies in an attempt to obtain  incremental improvements. Or, perhaps, a genetic-style algorithm could be used that  would maintain and evaluate a population of policies. Literally hundreds of di↵erent  optimization methods could be applied.</p>
                 
                 <div class="navigation">
                     <a href="intro_auto_encoder.html">Prev: 9.8 Intro to Autoencoders</a>
