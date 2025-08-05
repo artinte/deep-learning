@@ -1,0 +1,88 @@
+import random
+import string
+
+# Target string we want to evolve
+TARGET = "Hello, World!"
+# Size of our population
+POPULATION_SIZE = 100
+# Probability of mutation
+MUTATION_RATE = 0.01
+# Maximum number of generations to evolve
+MAX_GENERATIONS = 1000
+
+def generate_individual(length):
+    """Create a random individual (random string)"""
+    return ''.join(random.choice(string.printable) for _ in range(length))
+
+def calculate_fitness(individual):
+    """Calculate fitness: number of characters matching the target string"""
+    return sum(1 for i, j in zip(individual, TARGET) if i == j)
+
+def select_parents(population, fitnesses):
+    """Select parents based on fitness (roulette wheel selection)"""
+    total_fitness = sum(fitnesses)
+    if total_fitness == 0:
+        # If all individuals have zero fitness, choose randomly
+        return random.choices(population, k=2)
+    
+    # Calculate selection probabilities
+    probabilities = [f / total_fitness for f in fitnesses]
+    return random.choices(population, weights=probabilities, k=2)
+
+def crossover(parent1, parent2):
+    """Crossover: combine genes from two parents to create offspring"""
+    if len(parent1) != len(parent2):
+        raise ValueError("Parents must be of the same length")
+    
+    length = len(parent1)
+    # Randomly select crossover point
+    crossover_point = random.randint(1, length - 1)
+    # Create child by combining parts of both parents
+    child = parent1[:crossover_point] + parent2[crossover_point:]
+    return child
+
+def mutate(individual):
+    """Mutate: randomly change some genes in the individual"""
+    individual_list = list(individual)
+    for i in range(len(individual_list)):
+        if random.random() < MUTATION_RATE:
+            # Replace with random character with certain probability
+            individual_list[i] = random.choice(string.printable)
+    return ''.join(individual_list)
+
+def main():
+    # Initialize population with random individuals
+    population = [generate_individual(len(TARGET)) for _ in range(POPULATION_SIZE)]
+    
+    for generation in range(MAX_GENERATIONS):
+        # Calculate fitness for all individuals
+        fitnesses = [calculate_fitness(ind) for ind in population]
+        
+        # Find the best individual in current generation
+        best_idx = fitnesses.index(max(fitnesses))
+        best_individual = population[best_idx]
+        best_fitness = fitnesses[best_idx]
+        
+        print(f"Generation {generation}: Best individual = '{best_individual}', Fitness = {best_fitness}/{len(TARGET)}")
+        
+        # Stop early if we find a perfect match
+        if best_fitness == len(TARGET):
+            print(f"Found target string in generation {generation}!")
+            break
+        
+        # Create next generation
+        new_population = []
+        for _ in range(POPULATION_SIZE):
+            # Select parents
+            parent1, parent2 = select_parents(population, fitnesses)
+            # Crossover
+            child = crossover(parent1, parent2)
+            # Mutate
+            child = mutate(child)
+            # Add to new population
+            new_population.append(child)
+        
+        population = new_population
+
+if __name__ == "__main__":
+    main()
