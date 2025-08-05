@@ -1,9 +1,7 @@
 import os
 import numpy
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from torch import autocast
+import torch
 from diffusers import StableDiffusionPipeline
 from matplotlib import pyplot
 
@@ -31,3 +29,21 @@ image.save(f"temp/lovely_cat.png")
 pyplot.imshow(numpy.array(image))  # Convert PIL image to numpy array for display
 pyplot.axis('off')  # Hide axes
 pyplot.show()  # Display the image
+
+
+generator = torch.Generator("cuda").manual_seed(42)
+prompt = 'a sleeping cat enjoying the sunshine.'
+image = pipe(prompt, generator=generator).images[0]  # Generate image with a fixed seed
+image.save(f"temp/sleeping_cat_seed.png")
+pyplot.imshow(numpy.array(image))  # Convert PIL image to numpy array for display
+pyplot.axis('off')  # Hide axes
+pyplot.show()  # Display the image
+
+
+prompt = 'a sleeping cat enjoing the sunshine.'
+image = pipe(prompt, num_inference_steps=25).images[0]
+image.save(f"temp/sleeping_cat_25.png")
+pyplot.imshow(numpy.array(image))  # Convert PIL image to numpy array for display
+pyplot.axis('off')  # Hide axes
+pyplot.show()  # Display the image
+
