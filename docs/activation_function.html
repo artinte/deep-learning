@@ -110,12 +110,20 @@ print("Gradients:", gradients)</code></pre>
 
 
                 <h3 id="tanh">2.4.3 Tanh Function</h3>
+
+                <h3 id="softmax">2.4.4 Softmax Function</h3>
+                <p>The softmax function is a mathematical function that transforms a vector of numbers into a probability distribution. It's commonly used in the output layer of neural networks for multi-class classification, ensuring that the outputs are between 0 and 1 and sum up to 1. This allows the outputs to be interpreted as probabilities for each class:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(S(x_i) = \frac{e^{x_i}}{\sum_{j=1}^{n} e^{x_j}}\)
+                </div>
+                <p><a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Softmax.html">torch.nn.Softmax</a></p>
+                
                 <div class="navigation">
                     <a href="pytorch_basics.html">Prev: 2.3 PyTorch Basics</a>
                     <a href="loss_function.html">Next: 2.5 Loss Function</a>
                 </div>
 
-                <h3 id="softmax">Softmax Function</h3>
+                
             </main>
 
             <aside class="col-md-2 right-sidebar">
