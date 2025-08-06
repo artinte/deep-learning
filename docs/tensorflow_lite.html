@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="laptop_coding_48.png" type="image/png">
-    <title>TensorFlow Lite</title>
+    <title>LiteRT</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" rel="stylesheet">
     <link href="article_style.css" rel="stylesheet">
@@ -19,18 +19,37 @@
             </nav>
 
             <main class="col-md-8 content">
-                <h2 class="custom-title">12.3 TensorFlow Lite</h2>
+                <h2 class="custom-title">12.3 LiteRT</h2>
                 <p class="title-subtext"></p>
                 <p style="color: #a0a0a0;">Created Date: 2025-06-29</p>
 
                 <p><strong>LiteRT</strong> (short for Lite Runtime), formerly known as TensorFlow Lite, is Google's high-performance runtime for on-device AI. You can find ready-to-run LiteRT models for a wide range of ML/AI tasks, or convert and run TensorFlow, PyTorch, and JAX models to the TFLite format using the AI Edge conversion and optimization tools.</p>
 
-                <h3>12.3.1 Introduction</h3>
+                <h3>12.3.1 Identify the Most Suitable Solution</h3>
+                <p>LiteRT offers users a high level of flexibility and customizability when it comes to solving machine learning problems, making it a good fit for users who require a specific model or a specialized implementation. Users looking for plug-and-play solutions may prefer MediaPipe Tasks, which provides ready-made solutions for common machine learning tasks like object detection, text classification, and LLM inference.</p>
+
+                <p>Choose one of the following AI Edge frameworks:</p>
+                <ul class="with-bullets">
+                    <li><p><strong>LiteRT</strong> : Flexible and customizable runtime that can run a wide range of models. Choose a model for your use case, convert it to the LiteRT format (if necessary), and run it on-device. If you intend to use LiteRT, keep reading.</p></li>
+                    <li><p><strong>MediaPipe Tasks</strong> : Plug-and-play solutions with default models that allow for customization. Choose the task that solves your AI/ML problem, and implement it on multiple platforms. If you intend to use MediaPipe Tasks, refer to the MediaPipe Tasks documentation.</p></li>
+                </ul>
 
                 <h3>12.3.2 Create LiteRT Model</h3>
+                <p>A LiteRT model is represented in an efficient portable format known as <a href="https://flatbuffers.dev/">FlatBuffers</a> , which uses the <span class="highlight">.tflite</span> file extension.</p>
+
+                <p>You can use a LiteRT model in the following ways:</p>
+                <ul class="with-bullets">
+                    <li><p>Use an existing LiteRT model: The simplest approach is to use a LiteRT model already in the <span class="highlight">.tflite</span> format. These models do not require any added conversion steps. You can find LiteRT models on Kaggle Models.</p></li>
+                    <li><p>Convert a model into a LiteRT model: You can use the TensorFlow Converter, PyTorch Converter, or JAX converter to convert models to the FlatBuffers format (.tflite) and run them in LiteRT.</p></li>
+                </ul>
+
+                <p>A LiteRT model can optionally include metadata that contains human-readable model descriptions and machine-readable data for automatic generation of pre- and post-processing pipelines during on-device inference. Refer to Add metadata for more details.</p>
+
 
                 <h3>12.3.3 Run Inference</h3>
                 
+                <p>You can implement your LiteRT models to run inferences completely on-device on web, embedded, and mobile devices. LiteRT contains APIs for Python, Java and Kotlin for Android, Swift for iOS, and C++ for micro-devices.</p>
+
                 <div class="navigation">
                     <a href="execu_torch.html">Prev: 12.2 ExecuTorch</a>
                     <a href="tensorflow_js.html">Next: 12.4 TensorFlow.js</a>

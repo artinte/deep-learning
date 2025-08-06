@@ -103,7 +103,7 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 
 - [ ] 12.1 [ONNX](https://artinte.github.io/deep-learning/onnx.html)
 - [x] 12.2 [ExecuTorch](https://artinte.github.io/deep-learning/execu_torch.html)
-- [ ] 12.3 [TensorFlow Lite](https://artinte.github.io/deep-learning/tensorflow_lite.html)
+- [x] 12.3 [LiteRT](https://artinte.github.io/deep-learning/litert.html)
 - [x] 12.4 [TensorFlow.js](https://artinte.github.io/deep-learning/tensorflow_js.html)
 
 ### 13 Model Optimization
