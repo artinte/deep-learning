@@ -111,6 +111,24 @@ pyplot.show()  # Display the image</code></pre>
                 <h4>6.4.1.7 The Internal Structure of Model</h4>
 
                 <h3>6.4.2 Build Stable Diffusion U-Net Model</h3>
+
+                <p>In previous section, we went over the various components necessary to make an effective diffusion generative model like Stable Diffusion.</p>
+                <p>As a reminder, they are:</p>
+                <ul class="with-bullets">
+                    <li><p>Method of learning to generate new stuff (forward/reverse diffusion);</p></li>
+                    <li><p>Way to link text and images (text-image representation model like CLIP);</p></li>
+                    <li><p>Way to compress images (autoencoder);</p></li>
+                    <li><p>Way to add in good inductive biases (U-net architecture + self/cross-attention);</p></li>
+                </ul>
+                <p>In this section, you will implement pieces of each of the above, and by the end have a working Stable-Diffusion-like model.</p>
+                <p>In particular, you will implement parts of:</p>
+                <ul class="with-bullets">
+                    <li><p>Basic 1D forward/reverse diffusion;</p></li>
+                    <li><p>A U-Net Architecture for Working with Images;</p></li>
+                    <li><p>The Loss Associated with Learning the Score Function;</p></li>
+                    <li><p>An Attention Model for Conditional Generation;</p></li>
+                    <li><p>An Autoencoder</p></li>
+                </ul>
                 
                 <h4>6.4.2.1 Define our Unet Architecture</h4>
 
