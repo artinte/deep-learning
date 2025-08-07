@@ -31,6 +31,12 @@
 
                 <h3>10.3.1 Policy Evaluation (Prediction)</h3>
                 <p>First we consider how to compute the state-value function \(v_{\pi}\) for an arbitrary policy \(\pi\). This is called policy evaluation in the DP literature. We also refer to it as the prediction </p>
+
+                <h3>10.3.2 Policy Improvement</h3>
+                <p>Our reason for computing the value function for a policy is to help find better policies. Suppose we have determined the value function \(v_{\pi}\) for an arbitrary deterministic policy \(\pi\). For some state \(s\) we would like to know whether or not we should change the policy to deterministically choose an action \(a \ne \pi(s)\).</p>
+                <p>We know how good it is to follow the current policy from \(s\) - that is \(v_{\pi}(s)\) - but would it be better or worse to change to the new policy? One way to answer this question is to consider selecting \(a\) in \(s\) and thereafter following the existing policy, \(\pi\). The value of this way of behaving is:</p>
+
+                <p>The key criterion is whether this is greater than or less than \(v_{\pi}(s)\) . If it is greater - that is, if it is better to select a once in s and thereafter follow \(\pi\) than it would be to follow \(\pi\) all the time - then one would expect it to be better still to select a every time s is encountered, and that the new policy would in fact be a better one overall.</p>
                 
                 <div class="navigation">
                     <a href="markov_process.html">Prev: 10.2 Markov Decision Processes</a>
