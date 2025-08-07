@@ -20,12 +20,70 @@
 
             <main class="col-md-8 content">
                 <h2 class="custom-title">12.1 ONNX</h2>
-                <p class="title-subtext">Open Neural Network Exchange</p>
+                <p class="title-subtext"><a href="https://onnx.ai/">ONNX</a> : Open Neural Network Exchange</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-06-26</p>
 
                 <p>ONNX is an open format built to represent machine learning models. ONNX defines a common set of operators - the building blocks of machine learning and deep learning models - and a common file format to enable AI developers to use models with a variety of frameworks, tools, runtimes, and compilers.</p>
 
                 <h3>12.1.1 Build Model</h3>
+                <p>Building an ONNX model primarily involves defining a computational graph using ONNX operators and then serializing it into the ONNX format. While you typically train a model in a framework like PyTorch or TensorFlow and then export it to ONNX, you can also construct an ONNX graph directly using the onnx Python library.</p>
+
+                <h4>12.1.1.1 Construct Directly</h4>
+
+                <p>Here's how you can conceptualize building an ONNX model:</p>
+                <ol>
+                    <li>
+                        <p>Define the Computational Graph:</p>
+                        <ul class="with-bullets>
+                            <li><p>An ONNX model is essentially a graph of interconnected nodes, where each node represents an operation (e.g., Conv, Relu, MatMul, Add).</p></li>
+                            <li><p>You define the inputs and outputs of the graph using make_tensor_value_info, specifying their names, data types, and shapes.</p></li>
+                            <li><p>You create each operation node using make_node, providing the operator type, its input names, and its output names.</p></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <p>Assemble the Graph:The individual nodes are then combined into a complete graph using make_graph. This function takes a list of nodes, the graph's name, and the input/output definitions.</p>
+                    </li>
+                    <li>
+                        <p>Create the Model: Finally, the graph is wrapped into an ONNX model object using make_model. This function also allows you to add metadata like the model's version, author, and documentation.</p>
+                    </li>
+                </ol>
+
+                <pre><code>import onnx
+from onnx import helper
+from onnx import TensorProto
+
+# 1. Define inputs and outputs
+X = helper.make_tensor_value_info('X', TensorProto.FLOAT, [None, 3, 224, 224]) # Input tensor
+Y = helper.make_tensor_value_info('Y', TensorProto.FLOAT, [None, 10]) # Output tensor
+
+# 2. Define nodes (example: a simple linear layer)
+# Node for matrix multiplication
+node_matmul = helper.make_node(
+    'MatMul',
+    inputs=['X', 'W'], # Assume 'W' is another input or an initializer
+    outputs=['Z']
+)
+# Node for addition (bias)
+node_add = helper.make_node(
+    'Add',
+    inputs=['Z', 'B'], # Assume 'B' is another input or an initializer
+    outputs=['Y']
+)
+
+# 3. Assemble the graph
+graph_def = helper.make_graph(
+    [node_matmul, node_add],
+    'simple_linear_model',
+    [X, helper.make_tensor_value_info('W', TensorProto.FLOAT, [3*224*224, 10]), helper.make_tensor_value_info('B', TensorProto.FLOAT, [10])], # Include weights/bias as inputs for simplicity
+    [Y]
+)
+
+# 4. Create the model
+model_def = helper.make_model(graph_def, producer_name='my_producer')
+
+# Save the model
+# onnx.save(model_def, "my_model.onnx")</code></pre>
+
 
                 <h3>12.1.2 Export to ONNX Format</h3>
 
