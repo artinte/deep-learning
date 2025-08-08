@@ -25,7 +25,7 @@
 
                 <p>The rising popularity of intelligent mobile devices and the daunting computational cost of deep learning-based models call for efficient and accurate on-device inference schemes.</p>
 
-                <p>We propose a quantization scheme that allows inference to be carried out using integer-only arithmetic, which can be implemented more efficiently than floating point inference on commonly available integer-only hardware.</p>
+                <p>We propose a <a href="https://arxiv.org/abs/1712.05877">quantization scheme</a> that allows inference to be carried out using integer-only arithmetic, which can be implemented more efficiently than floating point inference on commonly available integer-only hardware.</p>
 
                 <p>We also co-design a training procedure to preserve end-to-end model accuracy post quantization. As a result, the proposed quantization scheme improves the tradeoff between accuracy and on-device latency. The improvements are significant even on MobileNets, a model family known for run-time efficiency, and are demonstrated in ImageNet classification and COCO detection on popular CPUs.</p>
 
@@ -36,7 +36,18 @@
                 <h3>13.3.2 Quantized Inference</h3>
 
                 <h4>13.3.2.1 Quantization Scheme</h4>
+                <p>In this section, we describe our general quantization scheme, that is, the correspondence between the bit-representation of values (denoted q below, for "quantized value") and their interpretation as mathematical real numbers (denoted r below, for "real value").</p>
+                <p>Our quantization scheme is implemented using integer-only arithmetic during inference and floating-point arithmetic during training, with both implementations maintaining a high degree of correspondence with each other. We achieve this by first providing a mathematically rigorous definition of our quantization scheme, and separately adopting this scheme for both integer-arithmetic inference and floating-point training.</p>
 
+                <p>A basic requirement of our quantization scheme is that it permits efficient implementation of all arithmetic using only integer arithmetic operations on the quantized values (we eschew implementations requiring lookup tables because these tend to perform poorly compared to pure arithmetic on SIMD hardware). This is equivalent to requiring that the quantization scheme be an affine mapping of integers \(q\) to real numbers \(r\) , i.e. of the form:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(r = S(q - z)\)
+                </div>
+
+                <p>for some constants \(S\) and \(Z\) . Equation is our quantization scheme and the constants \(S\) and \(Z\) are our quantization parameters. Our quantization scheme uses a single set of quantization parameters for all values within each activations array and within each weights array; separate arrays use separate quantization parameters.</p>
+
+                <p>For 8-bit quantization, q is quantized as an 8-bit integer (for B-bit quantization, q is quantized as an B-bit integer). Some arrays, typically bias vectors, are quantized as 32-bit integers.</p>
+                
                 <h4>13.3.2.2 Integer-arithmetic-only Matrix Multiplication</h4>
 
                 <h4>13.3.2.3 Efficient Handling of Zero-points</h4>
