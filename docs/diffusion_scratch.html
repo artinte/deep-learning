@@ -130,7 +130,54 @@ pyplot.show()</code></pre>
                 <img src="res/06/sleeping_cat_neg.jpg" alt="Sleeping Cat with Negative Prompt">
                 <p style="text-align: center; color: #555555;">Figure 4 - A Sleeping Cat with Negative Prompt</p>
 
+
                 <h4>6.4.1.3 Visualizing the Diffusion in Action</h4>
+
+                <p>To visualize the diffusion process, you can use a callback function that saves intermediate images at each step of the diffusion process. File <a href="https://github.com/artinte/deep-learning/blob/develop/06_diffusion/4_scratch/diffusion_visualize.py">diffusion_visualize.py</a> is an example of how to implement such a callback function and use it during the image generation process:</p>
+                <pre><code>image_reservoir = []
+latents_reservoir = []
+
+
+@torch.no_grad()
+def saveimg_callback(pipe, step_index, timestep, callback_kwargs, frequency=10):
+    # You can get the latents from the kwargs
+    latents = callback_kwargs["latents"]
+
+    # Add your existing logic here, perhaps with a frequency check
+    if step_index % frequency == 0:
+        # Example of how to access and save the image
+        image = pipe.vae.decode(1 / 0.18215 * latents).sample
+        image = (image / 2 + 0.5).clamp(0, 1)
+        image_np = image.cpu().permute(0, 2, 3, 1).float().numpy()[0]
+        pil_image = pipe.numpy_to_pil(image_np)[0]
+        pil_image.save(f"temp/diffprocess/step_{step_index:04d}_{timestep}.png")
+        image_reservoir.append(image_np)
+        latents_reservoir.append(latents.detach().cpu())
+    # Important: The function must return the callback_kwargs
+    return callback_kwargs</code></pre>
+
+                <p>Now, you can use this callback function during the image generation process. The following code generates an image while saving intermediate steps:</p>
+                <pre><code>image_reservoir = []
+latents_reservoir = []
+prompt = "a lovely cat running in the desert in Van Gogh style, trending art."
+with torch.no_grad():
+    image = pipe(
+        prompt,
+        callback_on_step_end=functools.partial(saveimg_callback, frequency=1),
+        callback_on_step_end_tensor_inputs=["latents"],
+    ).images[0]
+image.save(f"temp/lovely_cat_vangogh.png")
+mediapy.write_video("temp/lavely_cat_vangopy.mp4", image_reservoir, fps=10)
+print("Lantents shape:", latents_reservoir[0].shape)
+latents_np_seq = [
+    tsr[0, [0, 1, 2]].permute(1, 2, 0).numpy() for tsr in latents_reservoir
+]
+mediapy.write_video("temp/latents_seq.mp4", latents_np_seq, fps=10)</code></pre>
+
+                <img src="res/06/lovely_cat_vangogh.jpg" alt="Lovely Cat in Van Gogh Style">
+                <p style="text-align: center; color: #555555;">Figure 5 - A Lovely Cat in Van Gogh Style</p>
+
+                <pre><samp>Lantents shape: torch.Size([1, 4, 64, 64])</samp></pre>
 
                 <h4>6.4.1.4 Write a Simple text2img Sampling Function</h4>
 

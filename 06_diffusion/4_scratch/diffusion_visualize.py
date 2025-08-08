@@ -26,11 +26,6 @@ latents_reservoir = []
 
 
 @torch.no_grad()
-def save_latents(i, t, latents):
-    latents_reservoir.append(latents.detach().cpu())
-
-
-@torch.no_grad()
 def saveimg_callback(pipe, step_index, timestep, callback_kwargs, frequency=10):
     # You can get the latents from the kwargs
     latents = callback_kwargs["latents"]
@@ -76,9 +71,8 @@ with torch.no_grad():
     ).images[0]
 image.save(f"temp/lovely_cat_vangogh.png")
 mediapy.write_video("temp/lavely_cat_vangopy.mp4", image_reservoir, fps=10)
-
-
-print('Lantents shape:', latents_reservoir[0].shape)
-latents_np_seq = [tsr[0, [0, 1, 2]].permute(1, 2, 0).numpy() for tsr in latents_reservoir]
+print("Lantents shape:", latents_reservoir[0].shape)
+latents_np_seq = [
+    tsr[0, [0, 1, 2]].permute(1, 2, 0).numpy() for tsr in latents_reservoir
+]
 mediapy.write_video("temp/latents_seq.mp4", latents_np_seq, fps=10)
-

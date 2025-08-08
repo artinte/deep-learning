@@ -53,6 +53,20 @@
                     <li><p><code>pretrained_model</code> - path to the pretrained MNIST model which was trained with <a href="https://github.com/pytorch/examples/tree/main/mnist">pytorch/examples/mnist</a> . For simplicity, download the pretrained model <a >here</a> .</p></li>
                 </ul>
 
+                <h4>9.3.3.2 Model Under Attack</h4>
+                <p>As mentioned, the model under attack is the same MNIST model from <a href="https://github.com/pytorch/examples/tree/master/mnist">pytorch/examples/mnist</a> . You may train and save your own MNIST model or you can download and use the provided model. The Net definition and test dataloader here have been copied from the MNIST example. The purpose of this section is to define the model and dataloader, then initialize the model and load the pretrained weights.</p>
+
+                <h4>9.3.3.3 FGSM Attack</h4>
+                <p>Now, we can define the function that creates the adversarial examples by perturbing the original inputs. The fgsm_attack function takes three inputs, image is the original clean image \((x)\) , epsilon is the pixel-wise perturbation amount \((\epsilon)\) , and data_grad is gradient of the loss w.r.t the input image \((\nabla_{x} J(\mathbf{\theta}, \mathbf{x}, y))\) . The function then creates perturbed image as:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(perturbed\_image = image + epsilon*sign(data\_grad) = x + \epsilon * sign(\nabla_{x} J(\mathbf{\theta}, \mathbf{x}, y))\)
+                </div>
+
+                <p>Finally, in order to maintain the original range of the data, the perturbed image is clipped to range \([0, 1]\) .</p>
+
+                <h4>9.3.3.4 Testing Function</h4>
+                <p>Finally, the central result of this tutorial comes from the <code>test</code> function. Each call to this test function performs a full test step on the MNIST test set and reports a final accuracy. </p>
+
                 <div class="navigation">
                     <a href="transfer_learning.html">Prev: 9.2 Transfer Learning</a>
                     <a href="spatial_transformer.html">Next: 9.4 Spatial Transformer</a>
