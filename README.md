@@ -6,7 +6,7 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 - [x] 1.1 [Install PyTorch](https://artinte.github.io/deep-learning/pytorch_install.html)
 - [x] 1.2 [Introduction to Tensors](https://artinte.github.io/deep-learning/tensor_intro.html)
 - [x] 1.3 [Data Representation](https://artinte.github.io/deep-learning/data_represent.html)
-- [ ] 1.4 [Principles of Deep Learning](https://artinte.github.io/deep-learning/principle_learn.html)
+- [x] 1.4 [Principles of Deep Learning](https://artinte.github.io/deep-learning/principle_learn.html)
 - [x] 1.5 [Calculus](https://artinte.github.io/deep-learning/calculus.html)
 - [x] 1.6 [Gradient Descent](https://artinte.github.io/deep-learning/gradient_descent.html)
 - [x] 1.7 [Neural Network from Scratch](https://artinte.github.io/deep-learning/network_scratch.html)
