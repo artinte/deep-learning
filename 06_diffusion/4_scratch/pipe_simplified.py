@@ -128,3 +128,14 @@ image.save(f"temp/lovely_cat_simplified.png")
 pyplot.imshow(numpy.array(image))
 pyplot.axis("off")
 pyplot.show()
+
+
+image = pipe_simplified(
+    prompt = ["a cat dressed like a ballerina"],
+    negative_prompt = [""],)
+# The two lines below are the problem. Remove them.
+image = pipe.numpy_to_pil(image)[0]
+image.save(f"temp/dressed_car_simplified.png")
+pyplot.imshow(numpy.array(image))
+pyplot.axis("off")
+pyplot.show()
