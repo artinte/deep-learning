@@ -97,16 +97,49 @@ model.summary()</code></pre>
 
                 <p>Looking at the intermediate output process of the neural network, we can clearly see that as the number of layers increases, the output becomes increasingly difficult to recognize, and outputs abstract information that is difficult for humans to understand.</p>
 
+                <pre><code># visual hidden layer
+layer_outputs = []
+layer_names = []
+for index, layer in enumerate(model.layers):
+    if isinstance(layer, keras.layers.Conv2D) and index % 5 == 0:
+        layer_outputs.append(layer.output)
+        layer_names.append(f"Layer {index+1} - {layer.name}")
+
+activation_model = keras.Model(inputs=model.input, outputs=layer_outputs)
+activations = activation_model.predict(img_tensor)
+
+os.makedirs("temp", exist_ok=True)
+for layer_name, activation in zip(layer_names, activations):
+    print(activation.shape)
+    pyplot.matshow(activation[0, :, :, 0])
+    pyplot.title(layer_name)
+    pyplot.axis("off")
+    pyplot.savefig(os.path.join("temp", layer_name + ".png"))
+    # pyplot.show()
+    pyplot.close()</code></pre>
+
                 <p>So that’s what deep learning is, technically: a multistage way to learn data representations. It’s a simple idea—but, as it turns out, very simple mechanisms, sufficiently scaled, can end up looking like magic.</p>
 
                 <h3>1.4.4 Understanding How Deep Learning Works</h3>
 
-                <p>As illustrate below figure, the model, composed of layers that are chained together, maps the input data to predictions. The loss function then compares these predictions to the targets, producing a loss value: a measure of how well the model’s predictions match what was expected. The optimizer uses this loss value to update the model’s weights.</p>
+                <p>At this point, you know that machine learning is about mapping inputs (such as  images) to targets (such as the label "cat"), which is done by observing many examples  of input and targets. You also know that deep neural networks do this input-to-target  mapping via a deep sequence of simple data transformations (layers) and that these data transformations are learned by exposure to examples. Now let’s look at how this  learning happens, concretely.</p>
+
+                <p>The specification of what a layer does to its input data is stored in the layer's weights, which in essence are a bunch of numbers. In technical terms, we’d say that the transformation implemented by a layer is parameterized by its weights.  (Weights are also sometimes called the parameters of a layer.)</p>
+                <p>In this context, learning  means finding a set of values for the weights of all layers in a network, such that the  network will correctly map example inputs to their associated targets. But here’s the  thing: a deep neural network can contain tens of millions of parameters. Finding the  correct values for all of them may seem like a daunting task, especially given that modifying the value of one parameter will affect the behavior of all the others!</p>
+                
+                <p>To control something, first you need to be able to observe it. To control the output of  a neural network, you need to be able to measure how far this output is from what you  expected. This is the job of the loss function of the network, also sometimes called the  objective function or cost function.</p>
+                <p>The loss function takes the predictions of the network and the true target (what you wanted the network to output) and computes a distance  score, capturing how well the network has done on this specific example.</p>
+
                 <a href="https://drive.google.com/file/d/10vsogu9y0Rfo6fiCp6AFNdUhgFBL8SDT/view?usp=sharing">
                     <img src="res/01/relation_deep_learn.png" alt="Relationship between the Network">
                 </a>
                 <p style="text-align: center; color: #555555;">Figure 3 - Relationship between the Network</p>
 
+                <p>The fundamental trick in deep learning is to use this score as a feedback signal to  adjust the value of the weights a little, in a direction that will lower the loss score for the current example.</p>
+                <p>This adjustment is the job of the optimizer, which implements what’s called the <a href="gradient_descent.html">Backpropagation</a> algorithm: the central algorithm in deep learning. </p>
+
+                <p>Initially, the weights of the network are assigned random values, so the network  merely implements a series of random transformations. Naturally, its output is far  from what it should ideally be, and the loss score is accordingly very high. But with every example the network processes, the weights are adjusted a little in the correct  direction, and the loss score decreases.</p>
+                <p>This is the training loop, which, repeated a sufficient number of times (typically tens of iterations over thousands of examples), yields weight values that minimize the loss function. A network with a minimal loss is one for which the outputs are as close as they can be to the targets: a trained network. Once  again, it’s a simple mechanism that, once scaled, ends up looking like magic.</p>
 
                 <h3>1.4.5 Simple Example</h3>
                 <p>Now that we have introduced the principles of neural networks, we can look at a very simple example. It is to find the best fitting curve for some randomly distributed points. The file <a href="https://github.com/artinte/deep-learning/blob/develop/01_basic/4_principle/simple_train_anim.py">simple_train_anim.py</a> plots the distribution of points, as shown below:</p>
