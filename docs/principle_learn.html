@@ -83,11 +83,43 @@ NO</samp></pre>
 
 
                 <h3>1.4.5 Simple Example</h3>
+                <p>Now that we have introduced the principles of neural networks, we can look at a very simple example. It is to find the best fitting curve for some randomly distributed points. The file <a href="https://github.com/artinte/deep-learning/blob/develop/01_basic/4_principle/simple_train_anim.py">simple_train_anim.py</a> plots the distribution of points, as shown below:</p>
                 
-                <p>File <a href=""></a></p>
+                <pre><code>LEARN_RATE = 0.01
+EPOCHS = 5
+rng = numpy.random.default_rng(seed=0)
+random_numbers = rng.standard_normal(size=100)
+x_input_array = numpy.linspace(0, 4, 100)
+y_true_array = 3 * x_input_array + 4 + random_numbers</code></pre>
 
+                <p>Using traditional methods, we calculate the distance from each point to the line, convert it into a function of the slope, and find the minimum value of the function to get the fitted line. However, this calculation process is complicated. We can use deep learning to find an approximate line. The steps are as follows:</p>
+                <ul class="with-bullets">
+                    <li><p>Set the line \(y = param * x + 4\) , the initial value of param is 1.0;</p></li>
+                    <li><p>For each input point \((x, y)\), using \(y = param * x + 4\) , calculate the predicted value \(y'\);</p></li>
+                    <li><p>Compared \(y'\) with true value \(y\), if \(y' \gt y\), \(param = param - 0.01\) ; else if \(y' \lt y\), then \(param = param + 0.01\) ;</p></li>
+                    <li><p>Repeat process 2 and 3 until param becomes stable (the random points can be traversed for multiple rounds).</p></li>
+                </ul>
+
+                <p>Convert the above process into executable code:</p>
+                <pre><code>param = 1.0
+history = []
+
+for _ in range(EPOCHS):
+    for index, x_input in enumerate(x_input_array):
+        y_pred = param * x_input + 4
+        if y_pred &lt; y_true_array[index]:
+            param += LEARN_RATE
+        else:
+            param -= LEARN_RATE
+        history.append(param)</code></pre>
+
+                <p>The final calculated param value is 3.02, and the drawn image is shown below:</p>
                 <img src="res/01/simple_train_anim.gif" alt="Simple Training Animation" width="600">
-                <p style="text-align: center; color: #555555;">Figure 1 - Simple Training Animation</p>
+                <p style="text-align: center; color: #555555;">Figure 4 - Simple Training Animation</p>
+
+                <p>The following figure shows the slope changes throughout the entire process. When the slope reaches 3, it gradually stabilizes. During training, we can use this signal to determine whether to end training:</p>
+                <img src="res/01/simple_train_param.png" alt="Simple Training Param" width="600">
+                <p style="text-align: center; color: #555555;">Figure 5 - Simple Training Parameter</p>
 
                 <h3>1.4.6 Implementation with PyTorch</h3>
 

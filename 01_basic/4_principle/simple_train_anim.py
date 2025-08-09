@@ -8,9 +8,9 @@ rng = numpy.random.default_rng(seed=0)
 random_numbers = rng.standard_normal(size=100)
 x_input_array = numpy.linspace(0, 4, 100)
 y_true_array = 3 * x_input_array + 4 + random_numbers
+
 param = 1.0
 history = []
-
 for _ in range(EPOCHS):
     for index, x_input in enumerate(x_input_array):
         y_pred = param * x_input + 4
@@ -19,6 +19,13 @@ for _ in range(EPOCHS):
         else:
             param -= LEARN_RATE
         history.append(param)
+
+pyplot.plot(range(len(history)), history)
+pyplot.xlabel('Steps')
+pyplot.ylabel('Param Value')
+pyplot.title('Parameter Value over Time')
+pyplot.grid(True)
+pyplot.show()
 
 fig, ax = pyplot.subplots()
 line, = ax.plot(x_input_array, x_input_array + 4)
