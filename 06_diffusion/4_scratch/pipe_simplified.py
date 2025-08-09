@@ -17,18 +17,25 @@ pipe = StableDiffusionPipeline.from_pretrained(
 ).to("cuda")
 
 
-def generate_simplified(
-    prompt = ["a lovely cat"],
-    negative_prompt = [""],
-    num_inference_steps = 50,
-    guidance_scale = 7.5):
-    # do_classifier_free_guidance
-    batch_size = 1
-    height, width = 512, 512
-    generator = None
+def pipe_simplified(
+    prompt=["a lovely cat"],
+    negative_prompt=[""],
+    # `num_inference_steps` is the number of denoising steps. More denoising steps usually lead to a higher quality image at the expense of slower inference.
+    # It is recommended to use between 50 and 150 denoising steps, with 50 being a good default.
+    num_inference_steps=50,
     # here `guidance_scale` is defined analog to the guidance weight `w` of equation (2)
     # of the Imagen paper: https://arxiv.org/pdf/2205.11487.pdf . `guidance_scale = 1`
     # corresponds to doing no classifier free guidance.
+    # Higher guidance scale encourages to generate images closely linked to the text `prompt`,
+    # usually at the expense of lower image quality.
+    # Guidance scale of 7.5 is a good default value.
+    # Guidance scale of 1.0 is equivalent to doing no classifier free guidance.
+    guidance_scale=7.5,
+):
+
+    batch_size = 1
+    height, width = 512, 512
+    generator = None
 
     # get prompt text embeddings
     text_inputs = pipe.tokenizer(
@@ -40,6 +47,7 @@ def generate_simplified(
     text_input_ids = text_inputs.input_ids
     text_embeddings = pipe.text_encoder(text_input_ids.to(pipe.device))[0]
     bs_embed, seq_len, _ = text_embeddings.shape
+    print(f"Text embeddings shape: {text_embeddings.shape}")
 
     # get negative prompts  text embedding
     max_length = text_input_ids.shape[-1]
@@ -51,6 +59,7 @@ def generate_simplified(
         return_tensors="pt",
     )
     uncond_embeddings = pipe.text_encoder(uncond_input.input_ids.to(pipe.device))[0]
+    print(f"Unconditional text embeddings shape: {uncond_embeddings.shape}")
 
     # duplicate unconditional embeddings for each generation per prompt, using mps friendly method
     seq_len = uncond_embeddings.shape[1]
@@ -61,14 +70,16 @@ def generate_simplified(
     # Here we concatenate the unconditional and text embeddings into a single batch
     # to avoid doing two forward passes
     text_embeddings = torch.cat([uncond_embeddings, text_embeddings])
+    print(f"Concatenated text embeddings shape: {text_embeddings.shape}")
 
     # get the initial random noise unless the user supplied it
     # Unlike in other pipelines, latents need to be generated in the target device
     # for 1-to-1 results reproducibility with the CompVis implementation.
-    # However this currently doesn't work in `mps`.
     latents_shape = (batch_size, pipe.unet.in_channels, height // 8, width // 8)
     latents_dtype = text_embeddings.dtype
-    latents = torch.randn(latents_shape, generator=generator, device=pipe.device, dtype=latents_dtype)
+    latents = torch.randn(
+        latents_shape, generator=generator, device=pipe.device, dtype=latents_dtype
+    )
 
     # set timesteps
     pipe.scheduler.set_timesteps(num_inference_steps)
@@ -84,12 +95,20 @@ def generate_simplified(
         latent_model_input = torch.cat([latents] * 2)
         latent_model_input = pipe.scheduler.scale_model_input(latent_model_input, t)
         # predict the noise residual
-        noise_pred = pipe.unet(latent_model_input, t, encoder_hidden_states=text_embeddings).sample
+        noise_pred = pipe.unet(
+            latent_model_input, t, encoder_hidden_states=text_embeddings
+        ).sample
         # perform guidance
         noise_pred_uncond, noise_pred_text = noise_pred.chunk(2)
-        noise_pred = noise_pred_uncond + guidance_scale * (noise_pred_text - noise_pred_uncond)
+        noise_pred = noise_pred_uncond + guidance_scale * (
+            noise_pred_text - noise_pred_uncond
+        )
         # compute the previous noisy sample x_t -> x_t-1
-        latents = pipe.scheduler.step(noise_pred, t, latents, ).prev_sample
+        latents = pipe.scheduler.step(
+            noise_pred,
+            t,
+            latents,
+        ).prev_sample
 
     latents = 1 / 0.18215 * latents
     image = pipe.vae.decode(latents).sample
@@ -99,9 +118,10 @@ def generate_simplified(
     return image
 
 
-image = generate_simplified(
-    prompt = ["a lovely cat"],
-    negative_prompt = ["Sunshine"],)
+image = pipe_simplified(
+    prompt=["a lovely cat"],
+    negative_prompt=["Sunshine"],
+)
 # The two lines below are the problem. Remove them.
 image = pipe.numpy_to_pil(image)[0]
 image.save(f"temp/lovely_cat_simplified.png")
