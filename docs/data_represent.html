@@ -50,10 +50,12 @@ assert point_dataset.shape == (100, 2)</code></pre>
                 
 
                 <h3 id="text">1.3.2 Text</h3>
-                <p><a href="https://ai.stanford.edu/%7Eamaas/data/sentiment/">Large Movie Review Dataset</a></p>
-                <p>This is a dataset for binary sentiment classification containing substantially more data than previous benchmark datasets. We provide a set of 25,000 highly polar movie reviews for training, and 25,000 for testing.</p>
+                <p><a href="https://ai.stanford.edu/%7Eamaas/data/sentiment/">Large Movie Review Dataset</a> is a dataset for binary sentiment classification containing substantially more data than previous benchmark datasets. We provide a set of 25,000 highly polar movie reviews for training, and 25,000 for testing.</p>
+                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/01_basic/3_represent/text_data.py">text_data.py</a> downloads the Large Movie Review Dataset (aclImdb), a sentiment analysis benchmark, from a Stanford server. The script uses a sha1_hash to ensure the downloaded file's integrity. It then extracts the compressed data, organizing it into a folder structure with separate subdirectories for positive and negative reviews:</p>
                 <pre><code>import sys
 import pathlib
+import os
+import tarfile
 
 project_root = pathlib.Path(__file__).resolve().parents[2]
 sys.path.append(str(project_root))
@@ -62,7 +64,34 @@ from common import download
 
 url = 'https://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz'
 
-file_path = download.download(url, sha1_hash='01ada507287d82875905620988597833ad4e0903')</code></pre>
+file_path = download.download(url, sha1_hash='01ada507287d82875905620988597833ad4e0903')
+
+extract_dir = os.path.dirname(file_path)
+os.makedirs(extract_dir, exist_ok=True)
+
+with tarfile.open(file_path, 'r:gz') as tar:
+    tar.extractall(path=extract_dir)
+
+extract_file_dir = os.path.join(extract_dir, 'aclImdb')
+print('Successfully extracted to:', extract_file_dir)
+
+train_dir = os.path.join(extract_file_dir, 'train')
+print(os.listdir(train_dir))
+
+train_pos_dir = os.path.join(extract_file_dir, 'train/pos')
+train_neg_dir = os.path.join(extract_file_dir, 'train/neg')
+print('Train positive dir:', train_pos_dir)
+print('Train negative dir:', train_neg_dir)
+
+train_pos_files = os.listdir(train_pos_dir)
+train_neg_files = os.listdir(train_neg_dir)
+
+examples_files = train_pos_files[:3]
+for index, fname in enumerate(examples_files):
+    fpath = os.path.join(train_pos_dir, fname)
+    with open(fpath, 'r', encoding='utf-8') as f:
+        content = f.read()
+        print(str(index + 1) + ':', content)</code></pre>
 
                 <pre><samp>1: For a movie that gets no respect there sure are a lot of memorable quotes listed for this gem. Imagine a movie where Joe Piscopo is actually funny! Maureen Stapleton is a scene stealer. The Moroni character is an absolute scream. Watch for Alan "The Skipper" Hale jr. as a police Sgt.
 2: Bizarre horror movie filled with famous faces but stolen by Cristina Raines (later of TV's "Flamingo Road") as a pretty but somewhat unstable model with a gummy smile who is slated to pay for her attempted suicides by guarding the Gateway to Hell! The scenes with Raines modeling are very well captured, the mood music is perfect, Deborah Raffin is charming as Cristina's pal, but when Raines moves into a creepy Brooklyn Heights brownstone (inhabited by a blind priest on the top floor), things really start cooking. The neighbors, including a fantastically wicked Burgess Meredith and kinky couple Sylvia Miles & Beverly D'Angelo, are a diabolical lot, and Eli Wallach is great fun as a wily police detective. The movie is nearly a cross-pollination of "Rosemary's Baby" and "The Exorcist"--but what a combination! Based on the best-seller by Jeffrey Konvitz, "The Sentinel" is entertainingly spooky, full of shocks brought off well by director Michael Winner, who mounts a thoughtfully downbeat ending with skill. ***1/2 from ****
