@@ -65,13 +65,39 @@ NO</samp></pre>
                     <li><p><strong>A way to measure whether the algorithm is doing a good job</strong> - This is necessary in order to determine the distance between the algorithm’s current output and its expected output. The measurement is used as a feedback signal to adjust the  way the algorithm works. This adjustment step is what we call <strong>learning</strong> .</p></li>
                 </ul>
 
-                
+                <p> A machine learning model transforms its input data into meaningful outputs, a process that is "learned" from exposure to known examples of inputs and outputs. Therefore, the central problem in machine learning and deep learning is to meaningfully transform data: in other words, to learn useful representations of the input data at hand—representations that get us closer to the expected output.</p>
+   
+                <p>Before we go any further: what’s a representation? At its core, it’s a different way to  look at data—to represent or encode data. For instance, a color image can be encoded  in the RGB format (red-green-blue) or in the HSV format (hue-saturation-value):  these are two different representations of the same data.</p>
+                <p>Some tasks that may be difficult with one representation can become easy with another. For example, the task "select all red pixels in the image" is simpler in the RGB format, whereas "make the image less saturated” is simpler in the HSV format. Machine learning models are all  about finding appropriate representations for their input data—transformations of  the data that make it more amenable to the task at hand.</p>
+
+
                 <h3>1.4.3 The "Deep" in Deep Learning</h3>
 
-                <p><a href="">cnn_activation_visual.py</a></p>
+                <p>Deep learning is a specific subfield of machine learning: a new take on learning representations from data that puts an emphasis on learning successive layers of increaingly meaningful representations. The "deep" in "deep learning" isn't a reference to  any kind of deeper understanding achieved by the approach; rather, it stands for  this idea of successive layers of representations.</p>
+                <p>How many layers contribute to a model of the data is called the depth of the model. Other appropriate names for the field could have been layered representations learning or hierarchical representations learning. Modern deep learning often involves tens or even hundreds of successive layers of representations, and they’re all learned automatically from exposure to training  data.</p>
+                <p>Meanwhile, other approaches to machine learning tend to focus on learning  only one or two layers of representations of the data (say, taking a pixel histogram  and then applying a classification rule); hence, they’re sometimes called shallow  learning.</p>
 
-                <img src="https://img-datasets.s3.amazonaws.com/cat.jpg" alt="Siamese Cat" width="400">
-                <p style="text-align: center; color: #555555;">Figure 2 - Siamese Cat</p>
+                <p>In deep learning, these layered representations are learned via models called neural networks, structured in literal layers stacked on top of each other. The term "neural  network" refers to neurobiology, but although some of the central concepts in deep  learning were developed in part by drawing inspiration from our understanding of  the brain (in particular, the visual cortex), deep learning models are not models of  the brain.</p>
+                <p>There’s no evidence that the brain implements anything like the learning mechanisms used in modern deep learning models. You may come across pop-science articles proclaiming that deep learning works like the brain or was modeled after the  brain, but that isn’t the case.</p>
+                <p>It would be confusing and counterproductive for newcomers to the field to think of deep learning as being in any way related to neurobiology; you don’t need that shroud of "just like our minds" mystique and mystery, and you may as well forget anything you may have read about hypothetical links between deep learning and biology. For our purposes, deep learning is a mathematical framework for learning representations from data.</p>
+
+                <p>What do the representations learned by a deep learning algorithm look like? At the end of 2015, the paper <a href="res_net.html">Deep Residual Learning for Image Recognition</a> proposed a residual network, which achieved an error of 3.57% on the ImageNet test set. Let's see how the model recognizes a cat. Consider a photo of a cat, 224 x 224 pixels in size, as shown below:</p>
+                <img src="res/01/sample_cat.jpg" alt="Cat Image">
+                <p style="text-align: center; color: #555555;">Figure 2 - Cat Image</p>
+
+                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/01_basic/4_principle/cnn_activation_visual.py">cnn_activation_visual.py</a> quickly introduce trained models:</p>
+                <pre><code># Build a ResNet50V2 model loaded with pre-trained ImageNet weights
+model = keras.applications.ResNet50V2(weights="imagenet")
+model.summary()</code></pre>
+
+                <p>The network has 192 layers and 25,613,800 parameters. When the neural network is given the image above, it predicts with a 93% probability that it is a Siamese cat.</p>
+                <pre><samp>1: Siamese_cat (0.93)
+2: lynx (0.05)
+3: Egyptian_cat (0.02)</samp></pre>
+
+                <p>Looking at the intermediate output process of the neural network, we can clearly see that as the number of layers increases, the output becomes increasingly difficult to recognize, and outputs abstract information that is difficult for humans to understand.</p>
+
+                <p>So that’s what deep learning is, technically: a multistage way to learn data representations. It’s a simple idea—but, as it turns out, very simple mechanisms, sufficiently scaled, can end up looking like magic.</p>
 
                 <h3>1.4.4 Understanding How Deep Learning Works</h3>
 
