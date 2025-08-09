@@ -13,7 +13,7 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 
 ### 02 Fully Connected Network
 
-- [ ] 2.1 [Linear Algebra](https://artinte.github.io/deep-learning/linear_algebra.html)
+- [x] 2.1 [Linear Algebra](https://artinte.github.io/deep-learning/linear_algebra.html)
 - [x] 2.2 [Points Classification](https://artinte.github.io/deep-learning/point_classify.html)
 - [x] 2.3 [PyTorch Basics](https://artinte.github.io/deep-learning/pytorch_basics.html)
 - [x] 2.4 [Activation Function](https://artinte.github.io/deep-learning/activation_function.html)
