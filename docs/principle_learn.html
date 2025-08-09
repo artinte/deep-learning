@@ -23,8 +23,8 @@
                 <p class="title-subtext"></p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-10</p>
 
-                <p>Use <a href="https://github.com/tensorflow/tfjs">tensorflow/tfjs</a> to anmiation MNIST train and predict process!</p>
-
+                <p>In this tutorial, we will explore the fundamental principles of deep learning, including the concepts of machine learning, rules and representations, neural networks, and optimization techniques such as gradient descent. Understanding these principles is crucial for building and training effective deep learning models.</p>
+            
                 <h3>1.4.1 Machine learning</h3>
                 <p>The usual way to make a computer do useful work is to have a human programmer write down rules — a computer program — to be followed to turn input data into appropriate answers.</p>
                 <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/01_basic/4_principle/classical_program.py">classical_program.py</a> can enter the user's age and income to determine whether to lend him a loan.</p>
@@ -46,31 +46,50 @@ NO</samp></pre>
                 <a href="https://drive.google.com/file/d/1vVVEHNSx9SIUQyMvndkg_LveToTBBCxm/view?usp=sharing">
                     <img src="res/01/paradigm_ml.png" alt="Paradigm of Machine Learning">
                 </a>
+                <p style="text-align: center; color: #555555;">Figure 1 - Paradigm of Machine Learning</p>
+
                 <p>A machine learning system is trained rather than explicitly programmed. It’s presented with many examples relevant to a task, and it finds statistical structure in these examples that eventually allows the system to come up with rules for automating the task. For instance, if you wished to automate the task of tagging your vacation pictures, you could present a machine learning system with many examples of pictures already tagged by humans, and the system would learn statistical rules for associating specific pictures to specific tags.</p>
                 
-                <p><a href="">cnn_activation_visual.py</a></p>
+                <p>Although machine learning only started to flourish in the 1990s, it has quickly become the most popular and most successful subfield of AI, a trend driven by the  availability of faster hardware and larger datasets. Machine learning is related to mathematical statistics, but it differs from statistics in several important ways, in the same sense that medicine is related to chemistry but cannot be reduced to chemistry, as  medicine deals with its own distinct systems with their own distinct properties.</p>
 
-                <img src="https://img-datasets.s3.amazonaws.com/cat.jpg" alt="Siamese Cat" width="400">
+                <p>Unlike statistics, machine learning tends to deal with large, complex datasets (such as a dataset of millions of images, each consisting of tens of thousands of pixels) for which classical statistical analysis such as Bayesian analysis would be impractical. As a result,  machine learning, and especially deep learning, exhibits comparatively little mathematical theory—maybe too little—and is fundamentally an engineering discipline.</p>
+
+                <p>Unlike theoretical physics or mathematics, machine learning is a very hands-on field  driven by empirical findings and deeply reliant on advances in software and hardware.</p>
 
                 
-                <h3>1.4.2 Rules and Representations</h3>
+                <h3>1.4.2 Learning Rules and Representations from Data</h3>
                 <p>To define deep learning and understand the difference between deep learning and other machine learning approaches, first we need some idea of what machine learning algorithms do. We just stated that machine learning discovers rules for executing a data processing task, given examples of what’s expected. So, to do machine learning, we need three things:</p>
                 <ul class="with-bullets">
                     <li><p><strong>Input data points</strong> - For instance, if the task is speech recognition, these data points could be sound files of people speaking. If the task is image tagging, they could be pictures.</p></li>
                     <li><p><strong>Examples of the expected output</strong> - In a speech-recognition task, these could be human-generated transcripts of sound files. In an image task, expected outputs could be tags such as "dog", "cat" and so on.</p></li>
-                    <li><p><strong>A way to measure whether the algorithm is doing a good job</strong> - </p></li>
+                    <li><p><strong>A way to measure whether the algorithm is doing a good job</strong> - This is necessary in order to determine the distance between the algorithm’s current output and its expected output. The measurement is used as a feedback signal to adjust the  way the algorithm works. This adjustment step is what we call <strong>learning</strong> .</p></li>
                 </ul>
+
+                
+                <h3>1.4.3 The "Deep" in Deep Learning</h3>
+
+                <p><a href="">cnn_activation_visual.py</a></p>
+
+                <img src="https://img-datasets.s3.amazonaws.com/cat.jpg" alt="Siamese Cat" width="400">
+                <p style="text-align: center; color: #555555;">Figure 2 - Siamese Cat</p>
+
+                <h3>1.4.4 Understanding How Deep Learning Works</h3>
+
                 <p>As illustrate below figure, the model, composed of layers that are chained together, maps the input data to predictions. The loss function then compares these predictions to the targets, producing a loss value: a measure of how well the model’s predictions match what was expected. The optimizer uses this loss value to update the model’s weights.</p>
                 <a href="https://drive.google.com/file/d/10vsogu9y0Rfo6fiCp6AFNdUhgFBL8SDT/view?usp=sharing">
-                    <img src="res/01/relation_deep_learn.png" alt="Relationship between the network, layers, loss function, and optimizer">
+                    <img src="res/01/relation_deep_learn.png" alt="Relationship between the Network">
                 </a>
+                <p style="text-align: center; color: #555555;">Figure 3 - Relationship between the Network</p>
 
 
-                <h3>1.4.5 Gradient Descent</h3>
-                <p>Gradient descent is a fundamental optimization algorithm used in machine learning and other mathematical fields to find the minimum of a function. Imagine you are on a foggy mountain and want to find the lowest point (the valley). You can't see the whole landscape, but you can feel the slope of the ground beneath your feet. Gradient descent works similarly: it iteratively takes steps in the steepest downward direction to reach a local or global minimum of a function.</p>
-                <p>In summary, gradient descent is a powerful and widely used iterative optimization algorithm that forms the backbone of training many machine learning models. By repeatedly moving in the direction opposite to the gradient of a cost function, it efficiently searches for the optimal parameters that minimize the model's error. Understanding its principles, variations, and challenges is crucial for anyone working in machine learning.</p>
+                <h3>1.4.5 Simple Example</h3>
                 
-                
+                <p>File <a href=""></a></p>
+
+                <img src="res/01/simple_train_anim.gif" alt="Simple Training Animation" width="600">
+                <p style="text-align: center; color: #555555;">Figure 1 - Simple Training Animation</p>
+
+                <h3>1.4.6 Implementation with PyTorch</h3>
 
                 <div class="navigation">
                     <a href="data_represent.html">Prev: 1.3 Data Representation</a>
