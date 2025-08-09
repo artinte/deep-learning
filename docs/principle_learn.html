@@ -90,7 +90,70 @@ NO</samp></pre>
 model = keras.applications.ResNet50V2(weights="imagenet")
 model.summary()</code></pre>
 
-                <p>The network has 192 layers and 25,613,800 parameters. When the neural network is given the image above, it predicts with a 93% probability that it is a Siamese cat.</p>
+                <p>The network has 192 layers and 25,613,800 parameters. Run <span class="highlight">python cnn_activation_visual.py</span> will show all of them:</p>
+                <div class="d-flex justify-content-center align-items-center" style="overflow-x: auto; width: 100%;">
+                    <table class="table table-light text-center" style="width: 80%;">
+                        <thead>
+                            <tr>
+                                <th>Layer (type)</th>
+                                <th>Output Shape</th>
+                                <th>Param #</th>
+                                <th>Connected to</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>input_layer (InputLayer)</td>
+                                <td>(None, 224, 224, 3)</td>
+                                <td>0</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>conv1_pad (ZeroPadding2D)</td>
+                                <td>(None, 230, 230, 3)</td>
+                                <td>0</td>
+                                <td>input_layer[0][0]</td>
+                            </tr>
+                            <tr>
+                                <td>conv1_conv (Conv2D)</td>
+                                <td>(None, 230, 230, 3)</td>
+                                <td>9,472</td>
+                                <td>conv1_pad[0][0]</td>
+                            </tr>
+                            <tr>
+                                <td>pool1_pad (ZeroPadding2D)</td>
+                                <td>(None, 114, 114, 64)</td>
+                                <td>0</td>
+                                <td>conv1_conv[0][0]</td>
+                            </tr>
+                            <tr>
+                                <td>pool1_pool (MaxPooling2D)</td>
+                                <td>(None, 56, 56, 64) </td>
+                                <td>pool1_pad[0][0] </td>
+                            </tr>
+                            <tr>
+                                <td>conv2_block1_preact_bn</td>
+                                <td>(None, 56, 56, 64)</td>
+                                <td>256</td>
+                                <td>pool1_pool[0][0]</td>
+                            </tr>
+                            <tr>
+                                <td>conv2_block1_preact_relu</td>
+                                <td>(None, 56, 56, 64)</td>
+                                <td>0</td>
+                                <td>conv2_block1_preact_bn[0]…</td>
+                            </tr>
+                            <tr>
+                                <td>...</td>
+                                <td>...</td>
+                                <td>...</td>
+                                <td>...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>When the neural network is given the image above, it predicts with a 93% probability that it is a Siamese cat.</p>
                 <pre><samp>1: Siamese_cat (0.93)
 2: lynx (0.05)
 3: Egyptian_cat (0.02)</samp></pre>
