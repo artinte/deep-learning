@@ -129,6 +129,50 @@
                     \[\begin{split}\begin{bmatrix}f(x) \\f(x_1) \\ \vdots \\ f(x_n) \end{bmatrix}\sim \mathcal{N}\left(\mu, \begin{bmatrix}k(x,x) &amp; k(x, x_1) &amp; \dots &amp; k(x,x_n) \\ k(x_1,x) &amp; k(x_1,x_1) &amp; \dots &amp; k(x_1,x_n) \\ \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\ k(x_n, x) &amp; k(x_n, x_1) &amp; \dots &amp; k(x_n,x_n) \end{bmatrix}\right)\end{split}\]
                 </div>
 
+                <p>Equation above specifies a GP prior. We can compute the conditional distribution of \(f(x)\) for any \(x\) given \(f(x_1), \dots , f(x_n)\) , the function values we have observed. This conditional distribution is called the posterior, and it is what we use to make predictions.</p>
+
+                <p>In particular,</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \[f(x) | f(x_1), \dots, f(x_n) \sim \mathcal{N}(m,s^2)\]
+                </div>
+
+                <p>where</p>
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \[m = k(x,x_{1:n}) k(x_{1:n},x_{1:n})^{-1} f(x_{1:n})\]
+                </p>
+
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \[s^2 = k(x,x) - k(x,x_{1:n})k(x_{1:n},x_{1:n})^{-1}k(x,x_{1:n})\]
+                </p>
+
+                <p>where \(k(x,x_{1:n})\) is a \(1 \times n\) vector formed by evaluating \(k(x,x_{i})\) for \(i=1,\dots,n\) and \(k(x_{1:n},x_{1:n})\) is an \(n \times n\) matrix formed by what we can use as a point predictor for any \(x\) , and \(s^2\) is what we use for uncertainty: if we want to create an interval with a 95% probability that f(x) is in the interval, we would use \(m \pm 2s\).</p>
+                <p>The predictive means and uncertainties for all the above figures were created using these equations. The observed data points were given by \(f(x_1), \dots, f(x_n)\) and chose a fine grained set of \(x\) points to make predictions.</p>
+
+                <p>Let’s suppose we observe a single datapoint, \(f(x_1)\) , and we want to determine the value of \(f(x)\) at some \(x\). Because \(f(x)\) is described by a Gaussian process, we know the joint distribution over \((f(x), f(x_1))\) is Gaussian:</p>
+
+                <p class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \[\begin{split}\begin{bmatrix}
+                    f(x) \\
+                    f(x_1) \\
+                    \end{bmatrix}
+                    \sim
+                    \mathcal{N}\left(\mu,
+                    \begin{bmatrix}
+                    k(x,x) &amp; k(x, x_1) \\
+                    k(x_1,x) &amp; k(x_1,x_1)
+                    \end{bmatrix}
+                    \right)\end{split}\]
+                </p>
+
+                <p>The off-diagonal expression \(k(x,x_1) = k(x_1,x)\) tells us how correlated the function values will be — how strongly determined \(f(x)\) will be from \(f(x_1)\). We have seen already that if we use a large length-scale, relative to the distance between \(x\) and \(x_1\) , \(||x-x_1||\) , then the function values will be highly correlated.</p>
+                <p>We can visualize the process of determining \(f(x)\) from \(f(x_1)\) both in the space of functions, and in the joint distribution over \(f(x_1), f(x)\) .</p>
+                
+                <p>Let's initially consider an \(x\) such that \(k(x, x_1) = 0.9\) , and \(k(x, x) = 1\) , meaning that the value \(f(x)\)  is moderately correlated with the value of \(f(x_1)\) . In the joint distribution, the contours of constant probability will be relatively narrow ellipses.</p>
+
+                <p>Suppose we observe \(f(x_1) = 1.2\) . To condition on this value of \(f(x_1)\) ,  we can draw a horizontal line at 1.2 on our plot of the density, and see that the value of \(f(x)\) is mostly constrained to \([0.64, 1.52]\). We have also drawn this plot in function space, showing the observed point \(f(x_1)\) in orange, and 1 standard deviation of the Gaussian process predictive distribution for \(f(x)\) in blue, about the mean value of 1.08 .</p>
+                
+
+
                 <p>In typical machine learning, we specify a function with some free parameters (such as a neural network and its weights), and we focus on estimating those parameters, which may not be interpretable. With a Gaussian process, we instead reason about distributions over functions directly, which enables us to reason about the high-level properties of the solutions. These properties are controlled by a covariance function (kernel), which often has a few highly interpretable hyperparameters. These hyperparameters include the length-scale, which controls how rapidly (how wiggily) the functions are. Another hyperparameter is the amplitude, which controls the vertical scale over which our functions are varying. Representing many different functions that can fit the data, and combining them all together into a predictive distribution, is a distinctive feature of Bayesian methods. Because there is a greater amount of variability between possible solutions far away from the data, our uncertainty intuitively grows as we move from the data.</p>
 
                 <p>A Gaussian process represents a distribution over functions by specifying a multivariate normal (Gaussian) distribution over all possible function values. It is possible to easily manipulate Gaussian distributions to find the distribution of one function value based on the values of any set of other values. In other words, if we observe a set of points, then we can condition on these points and infer a distribution over what the value of the function might look like at any other input. How we model the correlations between these points is determined by the covariance function and is what defines the generalization properties of the Gaussian process. While it takes time to get used to Gaussian processes, they are easy to work with, have many applications, and help us understand and develop other model classes, like neural networks.</p>
