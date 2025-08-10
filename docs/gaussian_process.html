@@ -22,14 +22,14 @@
                 <h2 class="custom-title">6.2 Gaussian Processes</h2>
                 <p class="title-subtext"></p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-18</p>
-                <p>Gaussian processes (GPs) are ubitiquous. You have already encountered many examples of GPs without realizing it. Any model that is linear in its parameters with a Gaussian distribution over the parameters is a Gaussian process. This class spans discrete models, including random walks, and autoregressive processes, as well as continuous models, including Bayesian linear regression models, polynomials, Fourier series, radial basis functions, and even neural networks with an infinite number of hidden units. There is a running joke that "everything is a special case of a Gaussian process".</p>
+                <p><strong>Gaussian processes (GPs)</strong> are ubitiquous. You have already encountered many examples of GPs without realizing it. Any model that is linear in its parameters with a Gaussian distribution over the parameters is a Gaussian process. This class spans discrete models, including random walks, and autoregressive processes, as well as continuous models, including Bayesian linear regression models, polynomials, Fourier series, radial basis functions, and even neural networks with an infinite number of hidden units. There is a running joke that "everything is a special case of a Gaussian process".</p>
                 <p>Learning about Gaussian processes is important for three reasons:</p>
                 <ol>
                     <li><p>They provide a function space perspective of modelling, which makes understanding a variety of model classes, including deep neural networks, much more approachable;</p></li>
                     <li><p>They have an extraordinary range of applications where they are state-of-the-art, including active learning, hyperparameter learning, auto-ML, and spatiotemporal regression;</p></li>
-                    <li><p>Iver the last few years, algorithmic advances have made Gaussian processes increasingly scalable and relevant, harmonizing with deep learning through frameworks such as <a href="https://gpytorch.ai/">GPyTorch</a> (Gardner et al., 2018).</p></li>
+                    <li><p>Over the last few years, algorithmic advances have made Gaussian processes increasingly scalable and relevant, harmonizing with deep learning through frameworks such as <a href="https://gpytorch.ai/">GPyTorch</a> (Gardner et al., 2018).</p></li>
                 </ol>
-                <p>Indeed, GPs and and deep neural networks are not competing approaches, but highly complementary, and can be combined to great effect. These algorithmic advances are not just relevant to Gaussian processes, but provide a foundation in numerical methods that is broadly useful in deep learning.</p>
+                <p>Indeed, GPs and deep neural networks are not competing approaches, but highly complementary, and can be combined to great effect. These algorithmic advances are not just relevant to Gaussian processes, but provide a foundation in numerical methods that is broadly useful in deep learning.</p>
                 <p>In this chapter, we introduce Gaussian processes. In the introductory notebook, we start by reasoning intuitively about what Gaussian processes are and how they directly model functions. In the priors notebook, we focus on how to specify Gaussian process priors. We directly connect the tradiational weight-space approach to modelling to function space, which will help us reason about constructing and understanding machine learning models, including deep neural networks.</p>
                 <p>We then introduce popular covariance functions, also known as kernels, which control the generalization properties of a Gaussian process. A GP with a given kernel defines a prior over functions. In the inference notebook, we will show how to use data to infer a posterior, in order to make predictions. This notebook contains from-scratch code for making predictions with a Gaussian process, as well as an introduction to GPyTorch.</p>
                 <p>In upcoming notebooks, we will introduce the numerics behind Gaussian processes, which is useful for scaling Gaussian processes but also a powerful general foundation for deep learning, and advanced use-cases such as hyperparameter tuning in deep learning. Our examples will make use of GPyTorch, which makes Gaussian processes scale, and is closely integrated with deep learning functionality and PyTorch.</p>
@@ -41,16 +41,33 @@
                 <p>Suppose we observe the following dataset, of regression targets (outputs) \(y\), indexed by inputs \(x\). As an example, the targets could be changes in carbon dioxide concentrations, and the inputs could be the times at which these targets have been recorded.</p>
                 <p>What are some features of the data? How quickly does it seem to varying? Do we have data points collected at regular intervals, or are there missing inputs? How would you imagine filling in the missing regions, or forecasting up until \(x = 25\)?</p>
                 <img src="res/06/gp_observed_data.png" alt="GP Observed Data" width="400">
+                <p style="text-align: center; color: #555555;">Figure 1 - Observed Data</p>
+                
                 <p>In order to fit the data with a Gaussian process, we start by specifying a prior distribution over what types of functions we might believe to be reasonable. Here we show several sample functions from a Gaussian process. Does this prior look reasonable?</p>
                 <p>Note here we are not looking for functions that fit our dataset, but instead for specifying reasonable high-level properties of the solutions, such as how quickly they vary with inputs. Note that we will see code for reproducing all of the plots in this notebook, in the next notebooks on priors and inference.</p>
+
                 <img src="res/06/sample_prior_func.png" alt="Sample Prior Functions" width="400">
+                <p style="text-align: center; color: #555555;">Figure 2 - Sample Prior Functions</p>
+                
                 <p>Once we condition on data, we can use this prior to infer a posterior distribution over functions that could fit the data. Here we show sample posterior functions.</p>
+
+                <img src="res/06/sample_posterior_func.png" alt="Sample Posterior Functions" width="400">
+                <p style="text-align: center; color: #555555;">Figure 3 - Sample Posterior Functions</p>
 
                 <p>We see that each of these functions are entirely consistent with our data, perfectly running through each observation. In order to use these posterior samples to make predictions, we can average the values of every possible sample function from the posterior, to create the curve below, in thick blue. Note that we do not actually have to take an infinite number of samples to compute this expectation; as we will see later, we can compute the expectation in closed form.</p>
 
+                <img src="res/06/posterior_samples.png" alt="Posterior Samples" width="400">
+                <p style="text-align: center; color: #555555;">Figure 4 - Posterior Samples</p>
+
                 <p>We may also want a representation of uncertainty, so we know how confident we should be in our predictions. Intuitively, we should have more uncertainty where there is more variability in the sample posterior functions, as this tells us there are many more possible values the true function could take. This type of uncertainty is called epistemic uncertainty, which is the reducible uncertainty associated with lack of information. As we acquire more data, this type of uncertainty disappears, as there will be increasingly fewer solutions consistent with what we observe. Like with the posterior mean, we can compute the posterior variance (the variability of these functions in the posterior) in closed form. With shade, we show two times the posterior standard deviation on either side of the mean, creating a credible interval that has a 95% probability of containing the true value of the function for any input \(x\).</p>
 
+                <img src="res/06/posterior_samples_95.png" alt="Posterior Samples, Including 95% Credible Set" width="400">
+                <p style="text-align: center; color: #555555;">Figure 5 - Posterior Samples, Including 95% Credible Set</p>
+
                 <p>The plot looks somewhat cleaner if we remove the posterior samples, simply visualizing the data, posterior mean, and 95% credible set. Notice how the uncertainty grows away from the data, a property of epistemic uncertainty.</p>
+
+                <img src="res/06/point_predictions.png" alt="Point Predictions" width="400">
+                <p style="text-align: center; color: #555555;">Figure 6 - Point Predictions, and Credible Set</p>
 
                 <p>The properties of the Gaussian process that we used to fit the data are strongly controlled by what’s called a covariance function, also known as a kernel. The covariance function we used is called the RBF (Radial Basis Function) kernel, which has the form:</p>
 
