@@ -170,7 +170,7 @@
                 <p>Let's initially consider an \(x\) such that \(k(x, x_1) = 0.9\) , and \(k(x, x) = 1\) , meaning that the value \(f(x)\)  is moderately correlated with the value of \(f(x_1)\) . In the joint distribution, the contours of constant probability will be relatively narrow ellipses.</p>
 
                 <p>Suppose we observe \(f(x_1) = 1.2\) . To condition on this value of \(f(x_1)\) ,  we can draw a horizontal line at 1.2 on our plot of the density, and see that the value of \(f(x)\) is mostly constrained to \([0.64, 1.52]\). We have also drawn this plot in function space, showing the observed point \(f(x_1)\) in orange, and 1 standard deviation of the Gaussian process predictive distribution for \(f(x)\) in blue, about the mean value of 1.08 .</p>
-                
+
 
 
                 <p>In typical machine learning, we specify a function with some free parameters (such as a neural network and its weights), and we focus on estimating those parameters, which may not be interpretable. With a Gaussian process, we instead reason about distributions over functions directly, which enables us to reason about the high-level properties of the solutions. These properties are controlled by a covariance function (kernel), which often has a few highly interpretable hyperparameters. These hyperparameters include the length-scale, which controls how rapidly (how wiggily) the functions are. Another hyperparameter is the amplitude, which controls the vertical scale over which our functions are varying. Representing many different functions that can fit the data, and combining them all together into a predictive distribution, is a distinctive feature of Bayesian methods. Because there is a greater amount of variability between possible solutions far away from the data, our uncertainty intuitively grows as we move from the data.</p>
@@ -181,11 +181,13 @@
                 <p>Understanding Gaussian processes (GPs) is important for reasoning about model construction and generalization, and for achieving state-of-the-art performance in a variety of applications, including active learning, and hyperparameter tuning in deep learning. GPs are everywhere, and it is in our interests to know what they are and how we can use them.</p>
                 <p>In this section, we introduce Gaussian process priors over functions. In the next notebook, we show how to use these priors to do posterior inference and make predictions. The next section can be viewed as “GPs in a nutshell”, quickly giving what you need to apply Gaussian processes in practice.</p>
 
-                <h3>6.2.2.1 Definition</h3>
+                <h4>6.2.2.1 Definition</h4>
                 <p>A Gaussian process is defined as a collection of random variables, any finite number of which have a joint Gaussian distribution. If a function \(f(x)\) is a Gaussian process, with mean function \(m(x)\) and covariance function or kernel \(k(x, x')\), \(f(x) ~ GP(m, k)\), then any collection of function values queried at any collection of input points \(x\) (times, spatial locations, image pixels, etc.), has a joint multivariate Gaussian distribution with mean vector \(u\) and covariance matrix \(K\):</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(f(x_1), \cdots, f(x_n) ~ N(u, k), where u_i = E[f(x_i)] = m(x_i) and K_{ij} = Cov(f(x_i), f(x_j)) = k(x_i, x_j).\)
                 </div>
+
+                <h4></h4>
 
                 <h3>6.2.3 GP Inference</h3>
 
