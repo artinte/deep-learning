@@ -253,9 +253,35 @@
                 <ul class="with-bullets">
                     <li><p>\(Y_i\) is the approximation of the solution at time \(t_i\).</p></li>
                     <li><p>\(\Delta t = t_{i+1} - t_{i}\) is the time step.</p></li>
-                    <li><p>\(\Delta W_i = W_{t_{i+1}} - W_{t_i}\) is the Wiener process increment over the time step \(\Delta t\) , This increment is a random variable drawn from a normal distribution with mean 0 and variance \(\Delta{t}\) (i.e., \(\Nable(0, \Delta{t})\)).</p></li>
+                    <li><p>\(\Delta W_i = W_{t_{i+1}} - W_{t_i}\) is the Wiener process increment over the time step \(\Delta t\) , This increment is a random variable drawn from a normal distribution with mean 0 and variance \(\Delta{t}\) (i.e., \(\mathcal{N}(0, \Delta{t})\)).</p></li>
                 </ul>
+
+                <p>The <code>simulate_gbm</code> function simulates a single path of a Geometric Brownian Motion (GBM) using the Euler-Maruyama method. This is a common way to model asset prices, as it incorporates both a deterministic growth trend and a stochastic (random) component.</p>
+                <pre><code>def simulate_gbm(mu=0.1, sigma=0.2, s0=1.0, T=1.0, N=1000, seed=1):
+    rng = numpy.random.default_rng(seed)
+    dt = T / N
+    sqrt_dt = numpy.sqrt(dt)
+    t = numpy.linspace(0, T, N+1)
+    S = numpy.empty(N+1)
+    S[0] = s0
+    for i in range(N):
+        dW = sqrt_dt * rng.standard_normal()
+        S[i+1] = S[i] + mu * S[i] * dt + sigma * S[i] * dW
+    return t, S
+
+t, S = simulate_gbm()</code></pre>
+                <p>The code implements the discretized version of the GBM stochastic differential equation (SDE):</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(dS_t = \mu S_t d_t + \sigma S_t dW_t\)
+                </div>
+                <p>which is approximated by the Euler-Maruyama formula:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(S_{i+1} = S_i + \mu S_i \Delta t + \sigma S_i \Delta W_i\)
+                </div>
+                <p>The returned arrays \(t, S\) can then be plotted to visualize the simulated path of the Geometric Brownian Motion</p>
                 
+                <img src="res/06/simulate_gbm.png" width="600">
+                <p style="text-align: center; color: #555555;">Figure 6 - Geometric Brownian Motion</p>
 
                 <h3 id="heat_kernel">6.1.4 Heat Kernel</h3>
 
