@@ -129,4 +129,8 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 - [ ] 15.4 [Use-Cases & Applications](https://artinte.github.io/deep-learning/use_cases.html)
 - [ ] 15.5 [Advanced Concepts](https://artinte.github.io/deep-learning/advanced_concepts.html)
 
+### 16 Bayesian Statistics
+
+
+
 For more information, please visit website [Deep Learing with PyTorch](https://artinte.github.io/deep-learning/index.html).
