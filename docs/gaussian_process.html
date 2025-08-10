@@ -9,6 +9,14 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" rel="stylesheet">
     <link href="article_style.css" rel="stylesheet">
+    <style>
+        .image-container img {
+            display: inline-block;
+            width: 300px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+  </style>
 </head>
 
 <body>
@@ -69,17 +77,47 @@
                 <img src="res/06/point_predictions.png" alt="Point Predictions" width="400">
                 <p style="text-align: center; color: #555555;">Figure 6 - Point Predictions, and Credible Set</p>
 
-                <p>The properties of the Gaussian process that we used to fit the data are strongly controlled by what’s called a covariance function, also known as a kernel. The covariance function we used is called the RBF (Radial Basis Function) kernel, which has the form:</p>
+                <p>The properties of the Gaussian process that we used to fit the data are strongly controlled by what’s called a <strong>covariance function</strong> , also known as a kernel. The covariance function we used is called the RBF (Radial Basis Function) kernel, which has the form:</p>
 
-                <p>The hyperparameters of this kernel are interpretable. The amplitude parameter \(a\) controls the vertical scale over which the function is varying, and the length-scale parameter \(\mathcal{l}\) controls the rate of variation (the wiggliness) of the function. Larger \(a\) means larger function values, and larger \(\mathcal{l}\) means more slowly varying functions. Let’s see what happens to our sample prior and posterior functions as we vary \(a\) and \(\mathcal{l}\).</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(k_{\textrm{RBF}}(x,x') = \textrm{Cov}(f(x),f(x')) = a^2 \exp\left(-\frac{1}{2\ell^2}||x-x'||^2\right)\)
+                </div>
 
-                <p>The length-scale has a particularly pronounced effect on the predictions and uncertainty of a GP. At \(||x - x'|| = \mathcal{l}\), the covariance between a pair of function values is \(a^2 exp(-0.5)\). At larger distances than \(\mathcal{l}\) the values of the function values becomes nearly uncorrelated. This means that if we want to make a prediction at a point \(x_*\), then function values with inputs \(x\) such that \(||x - x'|| \gt \mathcal{l}\) will not have a strong effect on our predictions.</p>
+                <p>The hyperparameters of this kernel are interpretable. The amplitude parameter \(a\) controls the vertical scale over which the function is varying, and the length-scale parameter \(\ell\) controls the rate of variation (the wiggliness) of the function. Larger \(a\) means larger function values, and larger \(\ell\) means more slowly varying functions. Let’s see what happens to our sample prior and posterior functions as we vary \(a\) and \(\ell\).</p>
+
+
+                <p>The length-scale has a particularly pronounced effect on the predictions and uncertainty of a GP. At \(||x - x'|| = \ell\), the covariance between a pair of function values is \(a^2 exp(-0.5)\). At larger distances than \(\ell\) the values of the function values becomes nearly uncorrelated. This means that if we want to make a prediction at a point \(x_*\), then function values with inputs \(x\) such that \(||x - x'|| \gt \ell\) will not have a strong effect on our predictions.</p>
 
                 <p>Let’s see how changing the lengthscale affects sample prior and posterior functions, and credible sets. The above fits use a length-scale of 2. Let’s now consider \(\mathcal{l} = 0.1, 0.5, 2, 5, 10\). A length-scale of 0.1  is very small relative to the range of the input domain we are considering, 25.</p>
                 <p>For example, the values of the function at \(x = 5\) and \(x = 10\) will have essentially no correlation at such a length-scale. On the other hand, for a length-scale of 10, the function values at these inputs will be highly correlated. Note that the vertical scale changes in the following figures.</p>
 
-                <p>Notice as the length-scale increases the ‘wiggliness’ of the functions decrease, and our uncertainty decreases. If the length-scale is small, the uncertainty will quickly increase as we move away from the data, as the datapoints become less informative about the function values.</p>
+                <div class="image-container" style="text-align: center;">
+                    <img src="res/06/length_scale/gp_prior_l1.png" alt="GP Prior Point 1">
+                    <img src="res/06/length_scale/gp_post_l1.png" alt="GP Post Point 1">
+                </div>
+                <p style="text-align: center; color: #555555;">Figure 7 - Lengthscale \(\ell = 0.100\) Amplitude \(a = 1\)</p>
+
+                <div class="image-container" style="text-align: center;">
+                    <img src="res/06/length_scale/gp_prior_l2.png" alt="GP Prior Point 2">
+                    <img src="res/06/length_scale/gp_post_l2.png" alt="GP Post Point 2">
+                </div>
+                <p style="text-align: center; color: #555555;">Figure 8 - Lengthscale \(\ell = 2.000\) Amplitude \(a = 1\)</p>
+
+                <p>Notice as the length-scale increases the 'wiggliness' of the functions decrease, and our uncertainty decreases. If the length-scale is small, the uncertainty will quickly increase as we move away from the data, as the datapoints become less informative about the function values.</p>
                 <p>Now, let’s vary the amplitude parameter, holding the length-scale fixed at 2. Note the vertical scale is held fixed for the prior samples, and varies for the posterior samples, so you can clearly see both the increasing scale of the function, and the fits to the data.</p>
+
+                <div class="image-container" style="text-align: center;">
+                    <img src="res/06/length_scale/gp_prior_a2.png" alt="GP Prior Point 1">
+                    <img src="res/06/length_scale/gp_post_a2.png" alt="GP Post Point 1">
+                </div>
+                <p style="text-align: center; color: #555555;">Figure 9 - Lengthscale \(\ell = 2\) Amplitude \(a = 2.000\)</p>
+
+                <div class="image-container" style="text-align: center;">
+                    <img src="res/06/length_scale/gp_prior_a8.png" alt="GP Prior Point 2">
+                    <img src="res/06/length_scale/gp_post_a8.png" alt="GP Post Point 2">
+                </div>
+                <p style="text-align: center; color: #555555;">Figure 10 - Lengthscale \(\ell = 2\) Amplitude \(a = 8.000\)</p>
+
 
                 <h5>Summay</h5>
                 <p>In typical machine learning, we specify a function with some free parameters (such as a neural network and its weights), and we focus on estimating those parameters, which may not be interpretable. With a Gaussian process, we instead reason about distributions over functions directly, which enables us to reason about the high-level properties of the solutions. These properties are controlled by a covariance function (kernel), which often has a few highly interpretable hyperparameters. These hyperparameters include the length-scale, which controls how rapidly (how wiggily) the functions are. Another hyperparameter is the amplitude, which controls the vertical scale over which our functions are varying. Representing many different functions that can fit the data, and combining them all together into a predictive distribution, is a distinctive feature of Bayesian methods. Because there is a greater amount of variability between possible solutions far away from the data, our uncertainty intuitively grows as we move from the data.</p>
