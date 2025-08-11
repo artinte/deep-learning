@@ -12,8 +12,22 @@ import numpy
 
 data_url = 'https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt'
 
+data_dir = os.path.join(os.path.dirname(__file__), 'data')
+os.makedirs(data_dir, exist_ok=True)
+input_file_path = os.path.join(data_dir, 'input.txt')
+
+if not os.path.exists(input_file_path):
+    with open(input_file_path, 'w') as f:
+      f.write(requests.get(data_url).text)
+
+with open(input_file_path, 'r') as f:
+    data = f.read()
+
+print("Length of dataset in characters:", len(data))
+
 chars = sorted(list(set(data)))
 vocab_size = len(chars)
+print("All the unique characters:", "".join(chars))
 print(f"Vocab size: {vocab_size}")
 
 # Create a mapping from characters to integers.
@@ -26,4 +40,4 @@ def encode(s):
 
 def decode(l):
   # decoder: take a list integers, output a string
-  return ' '.join(itos[i] for i in l])
+  return ' '.join([itos[i] for i in l])
