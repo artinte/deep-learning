@@ -32,10 +32,10 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 
 - [x] 4.1 [RNN from Scratch](https://artinte.github.io/deep-learning/rnn_classify_scratch.html)
 - [x] 4.2 [Word Embeddings](https://artinte.github.io/deep-learning/word_embed.html)
-- [ ] 4.3 [Word2Vec](https://artinte.github.io/deep-learning/word2vec.html)
-- [ ] 4.4 [Text Generation with RNN](https://artinte.github.io/deep-learning/text_generate_rnn.html)
-- [ ] 4.5 [Neural Machine Translation](https://artinte.github.io/deep-learning/nmt_align.html)
-- [ ] 4.6 [Attention-based NMT](https://artinte.github.io/deep-learning/attention_nmt.html)
+- [x] 4.3 [Word2Vec](https://artinte.github.io/deep-learning/word2vec.html)
+- [x] 4.4 [Text Generation with RNN](https://artinte.github.io/deep-learning/text_generate_rnn.html)
+- [x] 4.5 [Neural Machine Translation](https://artinte.github.io/deep-learning/nmt_align.html)
+- [x] 4.6 [Attention-based NMT](https://artinte.github.io/deep-learning/attention_nmt.html)
 
 ### 05 Transformer
 
@@ -101,7 +101,7 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 
 ### 12 Deploying Models
 
-- [ ] 12.1 [ONNX](https://artinte.github.io/deep-learning/onnx.html)
+- [x] 12.1 [ONNX](https://artinte.github.io/deep-learning/onnx.html)
 - [x] 12.2 [ExecuTorch](https://artinte.github.io/deep-learning/execu_torch.html)
 - [x] 12.3 [LiteRT](https://artinte.github.io/deep-learning/litert.html)
 - [x] 12.4 [TensorFlow.js](https://artinte.github.io/deep-learning/tensorflow_js.html)
