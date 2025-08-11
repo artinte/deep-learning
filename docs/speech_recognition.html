@@ -20,10 +20,10 @@
 
             <main class="col-md-8 content">
                 <h2 class="custom-title">8.2 Automatic Speech Recognition</h2>
-                <p class="title-subtext"></p>
+                <p class="title-subtext">Robust Speech Recognition via Large-Scale Weak Supervision</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-31</p>
 
-                <p>We’ve trained and are open-sourcing a neural net called <strong>Whisper</strong> that approaches human level robustness and accuracy on English speech recognition.</p>
+                <p>We’ve trained and are open-sourcing a neural net called <a href="https://arxiv.org/abs/2212.04356">Whisper</a> that approaches human level robustness and accuracy on English speech recognition.</p>
                 <p>Whisper is an automatic speech recognition (ASR) system trained on 680,000 hours of multilingual and multitask supervised data collected from the web. We show that the use of such a large and diverse dataset leads to improved robustness to accents, background noise and technical language. Moreover, it enables transcription in multiple languages, as well as translation from those languages into English. We are open-sourcing models and inference code to serve as a foundation for building useful applications and for further research on robust speech processing.</p>
 
                 <p>The Whisper architecture is a simple end-to-end approach, implemented as an encoder-decoder Transformer. Input audio is split into 30-second chunks, converted into a log-Mel spectrogram, and then passed into an encoder. A decoder is trained to predict the corresponding text caption, intermixed with special tokens that direct the single model to perform tasks such as language identification, phrase-level timestamps, multilingual speech transcription, and to-English speech translation.</p>
@@ -60,9 +60,29 @@
                 <p>We train a suite of models of various sizes in order to study the scaling properties of Whisper. Please see Table 1 for an overview.</p>
 
                 <h4>8.2.2.4 Training Details</h4>
+                <p>We train a suite of models of various sizes in order to study the scaling properties of Whisper. Please see Table 1 for an overview. We train with data parallelism across accelerators using FP16 with dynamic loss scaling and activation checkpointing. Models were trained with AdamW and gradient norm clipping with a linear learning rate decay to zero after a warmup over the first 2048 updates. A batch size of 256 segments was used, and the models are trained for \(2^{20}\) updates which is between two and three passes over the dataset.</p>
+                <p>Due to only training for a few epochs, over-fitting is not a large concern, and we do not use any data augmentation or regularization and instead rely on the diversity contained within such a large dataset to encourage generalization and robustness. Please see Appendix F for full training hyperparameters.</p>
+
+                <p>During early development and evaluation we observed that Whisper models had a tendency to transcribe plausible but almost always incorrect guesses for the names of speakers. This happens because many transcripts in the pre-training dataset include the name of the person who is speaking, encouraging the model to try to predict them, but this information is only rarely inferable from only the most recent 30seconds of audio context. To avoid this, we fine-tune Whisper models briefly on the subset of transcripts that do not include speaker annotations which removes this behavior.</p>
 
                 <h3>8.2.3 Experiments</h3>
 
+                <h4>8.2.3.1 Zero-shot Evaluation</h4>
+                <p>The goal of Whisper is to develop a single robust speech processing system that works reliably without the need for dataset specific fine-tuning to achieve high-quality results on specific distributions.  To study this capability, we reuse a wide set of existing speech processing datasets to check whether Whisper is able to generalize well across domains, tasks, and languages.</p>
+                <p>Instead of using the standard evaluation protocol for these datasets, which include both a train and test split, we evaluate Whisper in a zero-shot setting without using any of the training data for each of these datasets so that we are measuring broad generalization.</p>
+
+                <h4>8.2.3.2 Evaluation Metrics</h4>
+                <p>Speech recognition research typically evaluates and compares systems based on the word error rate (WER) metric. However, WER, which is based on string edit distance, penalizes all differences between the model's output and the reference transcript including innocuous differences in transcript style.</p>
+                <p>As a result, systems that output transcripts that would be judged as correct by humans can still have a large WER due to minor formatting differences. While this poses a problem for all transcribers, it is particularly acute for zero-shot models like Whisper, which do not observe any examples of specific datasets transcript formats.</p>
+
+                <h4>8.2.3.3 English Speech Recognition</h4>
+
+                <h4>8.2.3.4 Multi-lingual Speech Recognition</h4>
+
+                <h4>8.2.3.5 Translation</h4>
+
+                <h4>8.2.3.6 Language Identification</h4>
+                
                 <h3>8.2.4 Analysis and Ablations</h3>
 
                 <h3>8.2.5 Related Work</h3>
