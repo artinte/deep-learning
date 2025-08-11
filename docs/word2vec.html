@@ -20,7 +20,7 @@
 
             <main class="col-md-8 content">
                 <h2 class="custom-title">4.3 Word2Vec</h2>
-                <p class="title-subtext">Implement a skip-gram word2vec model with negative sampling from scratch!</p>
+                <p class="title-subtext">Implement a skip-gram <a href="https://www.tensorflow.org/text/tutorials/word2vec">word2vec</a> model with negative sampling from scratch!</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-24</p>
                 <p><span class="highlight">word2vec</span> is not a singular algorithm, rather, it is a family of model architectures and optimizations that can be used to learn word embeddings from large datasets. Embeddings learned through <sapn class="highlight">word2vec</sapn> have proven to be successful on a variety of downstream natural language processing tasks.</p>
                 <p class="comment">Note: This tutorial is based on <a href="https://arxiv.org/abs/1301.3781">Efficient estimation of word representations in vector space</a> and <a href="https://arxiv.org/abs/1310.4546">Distributed representations of words and phrases and their compositionality</a>. It is not an exact implementation of the papers. Rather, it is intended to illustrate the key ideas.</p>
@@ -56,17 +56,51 @@
 
                 <h3>4.3.2 Setup</h3>
 
+                <h4>4.3.2.1 Vectorize an Example Sentence</h4>
+
+                <p>Consider the following sentence:</p>
+                <pre><samp>The wide road shimmered in the hot sun.</samp></pre>
+
+                <p>Create a vocabulary to save mappings from tokens to integer indices:</p>
+
+                <p>Create an inverse vocabulary to save mappings from integer indices to tokens:</p>
+
+                <h4>4.3.2.2 Generate Skip-grams from One Sentence</h4>
+
+                <h4>4.3.2.3 Negative Sampling for One Skip-gram</h4>
+
+                <h4>4.3.2.4 Construct One Training Example</h4>
+                
                 <h3>4.3.3 Compile All Steps Into One Function</h3>
+
+                <p>A large dataset means larger vocabulary with higher number of more frequent words such as stopwords. Training examples obtained from sampling commonly occurring words (such as the, is, on) don't add much useful information for the model to learn from. Mikolov et al. suggest subsampling of frequent words as a helpful practice to improve embedding quality.</p>
+
+                <p>Compile all the steps described above into a function that can be called on a list of vectorized sentences obtained from any text dataset. Notice that the sampling table is built before sampling skip-gram word pairs. You will use this function in the later sections.</p>
 
                 <h3>4.3.4 Prepare Training Data For word2vec</h3>
 
+                <p>With an understanding of how to work with one sentence for a skip-gram negative sampling based word2vec model, you can proceed to generate training examples from a larger list of sentences!</p>
+
+                <h4>4.3.4.1 Download Text Corpus</h4>
+
+                <h4>4.3.4.2 Vectorize Sentences from the Corpus</h4>
+
+                <h4>4.3.4.3 Generate Training Examples from Sequences</h4>
+
                 <h3>4.3.5 Model and Training</h3>
+
+                <p>The word2vec model can be implemented as a classifier to distinguish between true context words from skip-grams and false context words obtained through negative sampling. You can perform a dot product multiplication between the embeddings of target and context words to obtain predictions for labels and compute the loss function against true labels in the dataset.</p>
+
+                <h4>4.3.5.1 Subclassed word2vec Model</h4>
+
+                <h4>4.3.5.2 Define Loss Function and Compile Model</h4>
+
+                
 
                 <h3>4.3.6 Embedding Lookup and Analysis</h3>
 
-                <h3></h3>
+                <p>This tutorial has shown you how to implement a skip-gram word2vec model with negative sampling from scratch and visualize the obtained word embeddings.</p>
 
-                
                 <div class="navigation">
                     <a href="word_embed.html">Prev: 4.2 Word Embeddings</a>
                     <a href="text_generate_rnn.html">Next: 4.4 Text Generation with RNN</a>
