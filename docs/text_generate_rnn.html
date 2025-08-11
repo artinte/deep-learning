@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="laptop_coding_48.png" type="image/png">
-    <title>LSTM and GRU</title>
+    <title>Text Generation with RNN</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" rel="stylesheet">
     <link href="article_style.css" rel="stylesheet">
@@ -19,7 +19,7 @@
             </nav>
 
             <main class="col-md-8 content">
-                <h2 class="custom-title">4.4 LTSM and GRU</h2>
+                <h2 class="custom-title">4.4 Text Generation with RNN</h2>
                 <p class="title-subtext">Empirical Evaluation of Gated Recurrent Neural Networks on Sequence Modeling</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-06-23</p>
 
@@ -239,9 +239,10 @@ print(predictions)</code></pre>
                 <p>Now that we have our model we can ask it to generate new text for us! Let’s implement a helper function to generate new sentences:</p>
                 <p>Looking at the generated sentences there are a few interesting things to note. The model successfully learn syntax. It properly places commas and ends sentence with punctuation. Sometimes it mimics internet speech such as multiple exclamation marks or smileys.</p>
                 <p>However, the vast majority of generated sentences don’t make sense or have grammatical errors (I really picked the best ones above). One reason could be that we did not train our network long enough or didn’t use enough training data. That may be true, but it’s most likely not the main reason. Our vanilla RNN can’t generate meaningful text because it’s unable to learn dependencies between words that are several steps apart. That’s also why RNNs failed to gain popularity when they were first invented. They were beautiful in theory but didn’t work well in practice, and we didn’t immediately understand why.</p>
-                <p></p>
 
                 <h3 id="seq2seq">4.4.5 Seq2Seq</h3>
+
+                <p>In <a href="https://arxiv.org/abs/1409.3215">this</a> paper, we present a general end-to-end approach to sequence learning that makes minimal assumptions on the sequence structure. Our method uses a multilayered Long Short-Term Memory (LSTM) to map the input sequence to a vector of a fixed dimensionality, and then another deep LSTM to decode the target sequence from the vector. Our main result is that on an English to French translation task from the WMT'14 dataset, the translations produced by the LSTM achieve a BLEU score of 34.8 on the entire test set, where the LSTM's BLEU score was penalized on out-of-vocabulary words.</p>
 
                 <h3 id="lstm">4.4.6 Long Short-Term Memory Unit</h3>
                 <p>The Long Short-Term Memory (LSTM) unit was initially proposed by Hochreiter and Schmidhuber. Since then, a number of minor modifications to the original LSTM unit have been made. We follow the implementation of LSTM as used in Graves.</p>
