@@ -23,7 +23,7 @@
                 <p class="title-subtext">Effective Approaches to Attention-based Neural Machine Translation</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-19</p>
                 <p>An attentional mechanism has lately been used to improve neural machine translation (NMT) by selectively focusing on parts of the source sentence during translation.  However, there has been little work exploring useful architectures for attention-based NMT.</p>
-                <p>This paper examines two simple and effective classes of attentional mechanism: a global approach which always attends to all source words and a local one that only looks at a subset of source words at a time.</p>
+                <p><a href="https://arxiv.org/abs/1508.04025">This</a> paper examines two simple and effective classes of attentional mechanism: a global approach which always attends to all source words and a local one that only looks at a subset of source words at a time.</p>
                 <p>We demonstrate the effectiveness of both approaches on the WMT translation tasks between English and German in both directions. With local attention, we achieve a significant gain of 5.0 BLEU points over non-attentional systems that already incorporate known techniques such as dropout. Our ensemble model using different attention architectures yields a new state-of-the-art result inthe WMT'15 English to German translation task with 25.9 BLEU points, an improvement of 1.0 BLEU points over the existing best system backed by NMT and an n-gram reranker.</p>
 
                 <h3>4.6.1 Introduction</h3>
@@ -53,10 +53,23 @@
                 <p>Specifically, given the target hidden state \(h_t\) and the source-side context vector \(c_t\), we employ a simple concatenation layer to combine the information from both vectors to produce an attentional hidden state as follows:</p>
 
                 <h4>4.6.3.1 Global Attention</h4>
+                <p>The idea of a global attentional model is to consider all the hidden states of the encoder when deriving the context vector \(c_t\) . In this model type, a variable-length alignment vector \(a_t\) , whose size equals the number of time steps on the source side, is derived by comparing the current target hidden state \(h_t\) with each source hidden state \(\hat{h}_s\):</p>
+
+                <p>Here, score is referred as a content-based function for which we consider three different alternative:</p>
+
+                <p>Besides, in our early attempts to build attention-based models, we use a location-based function in which the alignment scores are computed from solely the target hidden state \(h_t\) as follow:</p>
 
                 <h4>4.6.3.2 Local Attention</h4>
 
+                <p>The global attention has a drawback that it has to attend to all words on the source side for each target word, which is expensive and can potentially render it impractical to translate longer sequences, e.g., paragraphs or documents. To address this deficiency, we propose a local attentional mechanism that chooses to focus only on a small subset of the source positions per target word.</p>
+
+                <p>This model takes inspiration from the tradeoff between the soft and hard attentional models proposed by Xu et al. (2015) to tackle the image caption generation task.</p>
+
                 <h4>4.6.3.3 Input-feeding Approach</h4>
+
+                <p>In our proposed global and local approaches, the attentional decisions are made independently, which is suboptimal. Whereas, in standard MT, a coverage set is often maintained during the translation process to keep track of which source words have been translated.</p>
+
+                <p>Likewise, in attentional NMTs, alignment decisions should be made jointly taking into account past alignment information. To address that, we propose an input-feeding approach in which attentional vectors </p>
 
                 <h3>4.6.4 Experiments</h3>
 
