@@ -20,10 +20,11 @@
 
             <main class="col-md-8 content">
                 <h2 class="custom-title">5.6 BRET</h2>
-                <p class="title-subtext">BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding</p>
+                <p class="title-subtext"><a href="https://arxiv.org/abs/1810.04805">BERT</a> : Pre-training of Deep Bidirectional Transformers for Language Understanding</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-27</p>
                 <p>We introduce a new language representation model called BERT, which stands for Bidirectional Encoder Representations from Transformers. Unlike recent language representation models, BERT is designed to pre-train deep bidirectional representations from unlabeled text by jointly conditioning on both left and right context in all layers. As a result, the pre-trained BERT model can be fine-tuned with just one additional output layer to create state-of-the-art models for a wide range of tasks, such as question answering and language inference, without substantial task-specific architecture modifications.</p>
                 <p>BERT is conceptually simple and empirically powerful. It obtains new state-of-the-art results on eleven natural language processing tasks, including pushing the GLUE score to 80.5% (7.7% point absolute improvement), MultiNLI accuracy to 86.7% (4.6% absolute improvement), SQuAD v1.1 question answering Test F1 to 93.2 (1.5 point absolute improvement) and SQuAD v2.0 Test F1 to 83.1 (5.1 point absolute improvement).</p>
+
                 <h3>5.6.1 Introduction</h3>
                 <p>Language model pre-training has been shown to be effective for improving many natural language processing tasks. These include sentence-level tasks such as natural language inference and paraphrasing, which aim to predict the relationships between sentences by analyzing them holistically, as well as token-level tasks such as named entity recognition and question answering, where models are required to produce fine-grained output at the token level.</p>
                 <p>There are two existing strategies for applying pre-trained language representations to downstream tasks: feature-based and fine-tuning. The feature-based approach, such as ELMo, uses task-specific architectures that include the pre-trained representations as additional features. The fine-tuning approach, such as the Generative Pre-trained Transformer (OpenAI GPT), introduces minimal task-specific parameters, and is trained on the downstream tasks by simply fine-tuning all pretrained parameters. The two approaches share the same objective function during pre-training, where they use unidirectional language models to learn general language representations.</p>
@@ -100,8 +101,25 @@
                 
                 
                 <h3>5.6.4 Experiments</h3>
+
+                <p>In this section, we present BERT fine-tuning results on 11 NLP tasks.</p>
+
+                <h4>5.6.4.1 GLUE</h4>
+
+                <h4>5.6.4.2 SQuAD v1.1</h4>
+
+                <h4>5.6.4.3 SQuAD v2.0</h4>
+
+                <h4>5.6.4.4 SWAG</h4>
         
                 <h3>5.6.5 Ablation Studies</h3>
+                <p>In this section, we perform ablation experiments over a number of facets of BERT in order to better understand their relative importance.</p>
+
+                <h4>5.6.5.1 Effect of Pre-training Tasks</h4>
+
+                <h4>5.6.5.2 Effect of Model Size</h4>
+
+                <h4>5.6.5.3 Feature-based Approach with BERT</h4>
         
                 <h3>5.6.6 Conclusion</h3>
                 <p>Recent empirical improvements due to transfer learning with language models have demonstrated that rich, unsupervised pre-training is an integral part of many language understanding systems. In particular, these results enable even low-resource tasks to benefit from deep unidirectional architectures. Our major contribution is further generalizing these findings to deep bidirectional architectures, allowing the same pre-trained model to successfully tackle a broad set of NLP tasks.</p>
