@@ -23,7 +23,7 @@
                 <p class="title-subtext">Neural Machine Translation by Jointly Learning to Align and Translate</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-19</p>
                 <p>Neural machine translation is a recently proposed approach to machine translation.  Unlike the traditional statistical machine translation, the neural machine translation aims at building a single neural network that can be jointly tuned to maximize the translation performance. The models proposed recently for neural machine translation often belong to a family of encoder–decoders and encode a source sentence into a fixed-length vector from which a decoder generates a translation.</p>
-                <p>In this paper, we conjecture that the use of a fixed-length vector is a bottleneck in improving the performance of this basic encoder–decoder architecture, and propose to extend this by allowing a model to automatically (soft-)search for parts of a source sentence that are relevant to predicting a target word, without having to form these parts as a hard segment explicitly. </p>
+                <p>In <a href="https://arxiv.org/abs/1409.0473">this</a> paper, we conjecture that the use of a fixed-length vector is a bottleneck in improving the performance of this basic encoder–decoder architecture, and propose to extend this by allowing a model to automatically (soft-)search for parts of a source sentence that are relevant to predicting a target word, without having to form these parts as a hard segment explicitly. </p>
                 <p> With this new approach, we achieve a translation performance comparable to the existing state-of-the-art phrase-based system on the task of English-to-French translation. Furthermore, qualitative analysis reveals that the (soft-)alignments found by the model agree well with our intuition.</p>
 
                 <h3>4.5.1 Introduction</h3>
@@ -50,7 +50,13 @@
                 <p>where \(h_t \in \mathbb{R}^n\) is a hidden state at time \(t\), and \(c\) is a vector generated from the sequence of the hidden states. \(f\) and \(q\) are some nonlinear functions. Sutskever et al. (2014) used an LSTM as \(f\) and</p>
 
                 <h3>4.5.3 Learning to Align And Translate</h3>
+                <p>In this section, we propose a novel architecture for neural machine translation. The new architecture consists of a bidirectional RNN as an encoder (Sec. 3.2) and a decoder that emulates searching through a source sentence during decoding a translation (Sec. 3.1)</p>
 
+                <h4>4.5.3.1 Decoder: General Description</h4>
+                <p>In a new model architecture, we define each conditional probabilit</p>
+
+                <h4>4.5.3.2 Encoder: Bidirectional RNN for Annotating Sequences</h4>
+                
                 <h3>4.5.4 Experiment Settings</h3>
 
                 <h3>4.5.5 Results</h3>
