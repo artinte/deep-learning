@@ -27,7 +27,8 @@
 
                 <p>But how does it work? DDP uses collective communications from the <a href="https://pytorch.org/tutorials/intermediate/dist_tuto.html">torch.distributed</a> package to synchronize gradients and buffers across all processes. This means that each process will have its own copy of the model, but they’ll all work together to train the model as if it were on a single machine.</p>
                 <p>To make this happen, DDP registers an autograd hook for each parameter in the model. When the backward pass is run, this hook fires and triggers gradient synchronization across all processes. This ensures that each process has the same gradients, which are then used to update the model.</p>
-                <p>For more information on how DDP works and how to use it effectively, be sure to check out the DDP design note. With DDP, you can train your models faster and more efficiently than ever before!</p>
+                <p>For more information on how DDP works and how to use it effectively, be sure to check out the <a href="https://pytorch.org/docs/master/notes/ddp.html">DDP design note</a> . With DDP, you can train your models faster and more efficiently than ever before!</p>
+    
                 <p>The recommended way to use DDP is to spawn one process for each model replica. The model replica can span multiple devices. DDP processes can be placed on the same machine or across machines. Note that GPU devices cannot be shared across DDP processes (i.e. one GPU for one DDP process).</p>
                 <p>In this tutorial, we’ll start with a basic DDP use case and then demonstrate more advanced use cases, including checkpointing models and combining DDP with model parallel.</p>
 
@@ -35,29 +36,35 @@
                 <p>Before we dive in, let’s clarify why you would consider using <code>DistributedDataParallel</code> over <code>DataParallel</code> , despite its added complexity:</p>
 
                 <ul class="with-bullets">
-                    <li><p>First, DataParallel is single-process, multi-threaded, but it only works on a single machine. In contrast, DistributedDataParallel is multi-process and supports both single- and multi- machine training. Due to GIL contention across threads, per-iteration replicated model, and additional overhead introduced by scattering inputs and gathering outputs, DataParallel is usually slower than DistributedDataParallel even on a single machine.</p></li>
-                    <li><p>Recall from the prior tutorial that if your model is too large to fit on a single GPU, you must use model parallel to split it across multiple GPUs. DistributedDataParallel works with model parallel, while DataParallel does not at this time. When DDP is combined with model parallel, each DDP process would use model parallel, and all processes collectively would use data parallel.</p></li>
+                    <li><p>First, <code>DataParallel</code> is single-process, multi-threaded, but it only works on a single machine. In contrast, <code>DistributedDataParallel</code> is multi-process and supports both single- and multi- machine training. Due to GIL contention across threads, per-iteration replicated model, and additional overhead introduced by scattering inputs and gathering outputs, <code>DataParallel</code> is usually slower than <code>DistributedDataParallel</code> even on a single machine.</p></li>
+                    <li><p>If your model is too large to fit on a single GPU, you must use model parallel to split it across multiple GPUs. DistributedDataParallel works with model parallel, while DataParallel does not at this time. When DDP is combined with model parallel, each DDP process would use model parallel, and all processes collectively would use data parallel.</p></li>
                 </ul>
                 
                 
                 <h3>14.1.2 Basic Use Case</h3>
-                <p>To create a DDP module, you must first set up process groups properly. More details can be found in Writing Distributed Applications with PyTorch.</p>
+                <p>To create a DDP module, you must first set up process groups properly. More details can be found in <a href="https://pytorch.org/tutorials/intermediate/dist_tuto.html">Writing Distributed Applications with PyTorch</a> .</p>
 
                 <p>Now, let’s create a toy module, wrap it with DDP, and feed it some dummy input data. Please note, as DDP broadcasts model states from rank 0 process to all other processes in the DDP constructor, you do not need to worry about different DDP processes starting from different initial model parameter values.</p>
 
-                
+                <p>As you can see, DDP wraps lower-level distributed communication details and provides a clean API as if it were a local model. Gradient synchronization communications take place during the backward pass and overlap with the backward computation. When the backward() returns, param.grad already contains the synchronized gradient tensor. For basic use cases, DDP only requires a few more lines of code to set up the process group. When applying DDP to more advanced use cases, some caveats require caution.</p>
 
                 <h3>14.1.3 Skewed Processing Speeds</h3>
-                <p></p>
+
+                <p>In DDP, the constructor, the forward pass, and the backward pass are distributed synchronization points. Different processes are expected to launch the same number of synchronizations and reach these synchronization points in the same order and enter each synchronization point at roughly the same time. Otherwise, fast processes might arrive early and timeout while waiting for stragglers. Hence, users are responsible for balancing workload distributions across processes. Sometimes, skewed processing speeds are inevitable due to, e.g., network delays, resource contentions, or unpredictable workload spikes. To avoid timeouts in these situations, make sure that you pass a sufficiently large timeout value when calling init_process_group.</p>
 
                 <h3>14.1.4 Save and Load Checkpoints</h3>
 
+                <p>It’s common to use torch.save and torch.load to checkpoint modules during training and recover from checkpoints. See SAVING AND LOADING MODELS for more details. When using DDP, one optimization is to save the model in only one process and then load it on all processes, reducing write overhead. This works because all processes start from the same parameters and gradients are synchronized in backward passes, and hence optimizers should keep setting parameters to the same values. If you use this optimization (i.e. save on one process but restore on all), make sure no process starts loading before the saving is finished.</p>
+                <p>Additionally, when loading the module, you need to provide an appropriate map_location argument to prevent processes from stepping into others’ devices. If map_location is missing, torch.load will first load the module to CPU and then copy each parameter to where it was saved, which would result in all processes on the same machine using the same set of devices. For more advanced failure recovery and elasticity support, please refer to TorchElastic.</p>
+
                 <h3>14.1.5 Combining DDP with Model Parallelism</h3>
+
+                <p>DDP also works with multi-GPU models. DDP wrapping multi-GPU models is especially helpful when training large models with a huge amount of data.</p>
+                
 
                 <h3>14.1.6 Initialize DDP with torch.distributed.run/torchrun</h3>
                 
                 <p>Implement distributed data parallelism based on <code>torch.distributed</code> at module level.</p>
-
                 <p>This container provides data parallelism by synchronizing gradients across each model replica. The devices to synchronize across are specified by the input process_group, which is the entire world by default. Note that <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html">DistributedDataParallel</a> does not chunk or otherwise shard the input across participating GPUs; the user is responsible for defining how to do so, for example through the use of a DistributedSampler.</p>
 
                 <p>Creation of this class requires that torch.distributed to be already initialized, by calling torch.distributed.init_process_group().</p>
@@ -66,7 +73,6 @@
 
                 <p>To use DistributedDataParallel on a host with N GPUs, you should spawn up N processes, ensuring that each process exclusively works on a single GPU from 0 to N-1. This can be done by either setting CUDA_VISIBLE_DEVICES for every process or by calling:</p>
 
-                
                 
                 <div class="navigation">
                     <a href="distillation.html">Prev: 13.4 Distillation</a>
