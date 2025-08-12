@@ -25,9 +25,43 @@
 
                 <p>The simplest, fastest repository for training/finetuning medium-sized GPTs. It is a rewrite of minGPT that prioritizes teeth over education. Still under active development, but currently the file train.py reproduces GPT-2 (124M) on OpenWebText, running on a single 8XA100 40GB node in about 4 days of training. The code itself is plain and readable: train.py is a ~300-line boilerplate training loop and model.py a ~300-line GPT model definition, which can optionally load the GPT-2 weights from OpenAI. That's it.</p>
 
-                <h3>5.5.1 Quick Start</h3>
+                <h3>5.5.1 Character-Level GPT</h3>
                 <p>If you are not a deep learning professional and you just want to feel the magic and get your feet wet, the fastest way to get started is to train a character-level GPT on the works of Shakespeare. First, we download it as a single (1MB) file and turn it from raw text into one large stream of integers:</p>
                 <pre><samp>python data/shakespeare_char/prepare.py</samp></pre>
+
+                <h4>5.5.1.1 Shakespeare Dataset</h4>
+                <p>William Shakespeare was an English playwright, poet and actor. He is widely regarded as the greatest writer in the English language and the world's pre-eminent dramatist.</p>
+                <p>The <a href="https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt">text</a> for training is a collection of excerpts from several of Shakespeare's classic plays, mainly including the following works:</p>
+                <ul class="with-bullets">
+                    <li><p>Coriolanus: Accounting for the largest proportion, it presents the complete tragic arc of the protagonist Caius Marcius (later known as Coriolanus) – from a Roman hero to being exiled, eventually allying with former enemies, and finally abandoning his revenge due to his mother's persuasion. It involves class conflicts, personal honor, and power struggles.</p></li>
+                    <li><p>Richard III: It tells the story of Richard III's conspiracies and rule, including his usurpation of the throne, elimination of political opponents, and eventual downfall, demonstrating the desire for power and the distortion of human nature.</p></li>
+                    <li><p>Richard II: Centering on the overthrow of Richard II by Henry Bolingbroke (later Henry IV), it explores the themes of the legitimacy of royal power and betrayal.</p></li>
+                </ul>
+                <p>Here is a small excerpt from Coriolanus:</p>
+                <pre><samp>First Citizen:
+Before we proceed any further, hear me speak.
+
+All:
+Speak, speak.
+
+First Citizen:
+You are all resolved rather to die than to famish?
+
+All:
+Resolved. resolved.
+
+First Citizen:
+First, you know Caius Marcius is chief enemy to the people.
+
+All:
+We know't, we know't.</samp></pre>
+
+                <h4>5.5.1.2 Model Architecture</h4>
+
+                <h4>5.5.1.3 Training</h4>
+
+                <h4>5.5.1.4 Inference</h4>
+                
                 <h3>5.5.2 Reproducing GPT-2</h3>
 
                 <h3>5.5.3 Finetuning</h3>
