@@ -51,18 +51,18 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 
 - [x] 6.1 [Probability Theory](https://artinte.github.io/deep-learning/prob_theory.html)
 - [x] 6.2 [Gaussian Processes](https://artinte.github.io/deep-learning/gaussian_process.html)
-- [ ] 6.3 [Mathematical Foundation](https://artinte.github.io/deep-learning/diffusion_math.html)
+- [x] 6.3 [Mathematical Foundation](https://artinte.github.io/deep-learning/diffusion_math.html)
 - [ ] 6.4 [Diffusion from Scratch](https://artinte.github.io/deep-learning/diffusion_scratch.html)
-- [ ] 6.5 [Estimating Gradients](https://artinte.github.io/deep-learning/estimate_gradients.html)
-- [ ] 6.6 [Diffusion Probability Model](https://artinte.github.io/deep-learning/dd_prob_model.html)
-- [ ] 6.7 [Latent Diffusion](https://artinte.github.io/deep-learning/latent_diffusion.html)
+- [x] 6.5 [Estimating Gradients](https://artinte.github.io/deep-learning/estimate_gradients.html)
+- [x] 6.6 [Diffusion Probability Model](https://artinte.github.io/deep-learning/dd_prob_model.html)
+- [x] 6.7 [Latent Diffusion](https://artinte.github.io/deep-learning/latent_diffusion.html)
 
 ### 07 Text
 
 - [x] 7.1 [Translate with Transformer](https://artinte.github.io/deep-learning/trans_transformer.html)
-- [ ] 7.2 [Easy OCR](https://artinte.github.io/deep-learning/easy_ocr.html)
-- [ ] 7.3 [Language Modeling](https://artinte.github.io/deep-learning/language_model.html)
-- [ ] 7.4 [Chatbots](https://artinte.github.io/deep-learning/chatbots.html)
+- [x] 7.2 [Easy OCR](https://artinte.github.io/deep-learning/easy_ocr.html)
+- [x] 7.3 [Language Modeling](https://artinte.github.io/deep-learning/language_model.html)
+- [x] 7.4 [Chatbots](https://artinte.github.io/deep-learning/chatbots.html)
 
 ### 08 Audio
 
@@ -76,28 +76,28 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 
 - [x] 9.1 [Object Detection](https://artinte.github.io/deep-learning/object_detection.html)
 - [x] 9.2 [Transfer Learning](https://artinte.github.io/deep-learning/transfer_learning.html)
-- [ ] 9.3 [FGSM Attack](https://artinte.github.io/deep-learning/fgsm_attack.html)
-- [ ] 9.4 [Spatial Transformer](https://artinte.github.io/deep-learning/spatial_transformer.html)
-- [ ] 9.5 [DeepFaceLab](https://artinte.github.io/deep-learning/deep_face_lab.html)
-- [ ] 9.6 [DeepFaceLive](https://artinte.github.io/deep-learning/deep_face_live.html)
-- [ ] 9.7 [Segment Anything](https://artinte.github.io/deep-learning/segment_anything.html)
+- [x] 9.3 [FGSM Attack](https://artinte.github.io/deep-learning/fgsm_attack.html)
+- [x] 9.4 [Spatial Transformer](https://artinte.github.io/deep-learning/spatial_transformer.html)
+- [x] 9.5 [DeepFaceLab](https://artinte.github.io/deep-learning/deep_face_lab.html)
+- [x] 9.6 [DeepFaceLive](https://artinte.github.io/deep-learning/deep_face_live.html)
+- [x] 9.7 [Segment Anything](https://artinte.github.io/deep-learning/segment_anything.html)
 - [x] 9.8 [Intro to Autoencoders](https://artinte.github.io/deep-learning/intro_auto_encoder.html)
 
 ### 10 Reinforcement Learning
 
-- [ ] 10.1 [Introduction RL Problems](https://artinte.github.io/deep-learning/rl_introduction.html)
-- [ ] 10.2 [Markov Decision Processes](https://artinte.github.io/deep-learning/markov_process.html)
-- [ ] 10.3 [Dynamic Programming](https://artinte.github.io/deep-learning/dynamic_program.html)
-- [ ] 10.4 [DQN](https://artinte.github.io/deep-learning/dqn.html)
-- [ ] 10.5 [PPO](https://artinte.github.io/deep-learning/ppo.html)
-- [ ] 10.6 [Function Approximation](https://artinte.github.io/deep-learning/function_appro.html)
+- [x] 10.1 [Introduction RL Problems](https://artinte.github.io/deep-learning/rl_introduction.html)
+- [x] 10.2 [Markov Decision Processes](https://artinte.github.io/deep-learning/markov_process.html)
+- [x] 10.3 [Dynamic Programming](https://artinte.github.io/deep-learning/dynamic_program.html)
+- [x] 10.4 [DQN](https://artinte.github.io/deep-learning/dqn.html)
+- [x] 10.5 [PPO](https://artinte.github.io/deep-learning/ppo.html)
+- [x] 10.6 [Function Approximation](https://artinte.github.io/deep-learning/function_appro.html)
 
 ### 11 Extending PyTorch
 
-- [ ] 11.1 [Custom Operators](https://artinte.github.io/deep-learning/custom_operator.html)
-- [ ] 11.2 [Custom C++ and CUDA Operators](https://artinte.github.io/deep-learning/cpp_cuda_operators.html)
-- [ ] 11.3 [Double Backward](https://artinte.github.io/deep-learning/double_backward.html)
-- [ ] 11.4 [Fusing Conv and Batch Norm](https://artinte.github.io/deep-learning/custom_function.html)
+- [x] 11.1 [Custom Operators](https://artinte.github.io/deep-learning/custom_operator.html)
+- [x] 11.2 [Custom C++ and CUDA Operators](https://artinte.github.io/deep-learning/cpp_cuda_operators.html)
+- [x] 11.3 [Double Backward](https://artinte.github.io/deep-learning/double_backward.html)
+- [x] 11.4 [Fusing Conv and Batch Norm](https://artinte.github.io/deep-learning/custom_function.html)
 
 ### 12 Deploying Models
 
@@ -108,26 +108,26 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 
 ### 13 Model Optimization
 
-- [ ] 13.1 [LoRA](https://artinte.github.io/deep-learning/lora.html)
-- [ ] 13.2 [Pruning](https://artinte.github.io/deep-learning/pruning.html)
-- [ ] 13.3 [Quantization](https://artinte.github.io/deep-learning/quantization.html)
-- [ ] 13.4 [Distillation](https://artinte.github.io/deep-learning/distillation.html)
+- [x] 13.1 [LoRA](https://artinte.github.io/deep-learning/lora.html)
+- [x] 13.2 [Pruning](https://artinte.github.io/deep-learning/pruning.html)
+- [x] 13.3 [Quantization](https://artinte.github.io/deep-learning/quantization.html)
+- [x] 13.4 [Distillation](https://artinte.github.io/deep-learning/distillation.html)
 
 ### 14 Distributed Training
 
-- [ ] 14.1 [Distributed Data Parallel](https://artinte.github.io/deep-learning/distrib_parallel.html)
-- [ ] 14.2 [Fully Sharded Data Parallel](https://artinte.github.io/deep-learning/fully_parallel.html)
-- [ ] 14.3 [Tensor Parallel](https://artinte.github.io/deep-learning/tensor_parallel.html)
-- [ ] 14.4 [Device Mesh](https://artinte.github.io/deep-learning/device_mesh.html)
-- [ ] 14.5 [Remote Procedure Call](https://artinte.github.io/deep-learning/remote_call.html)
+- [x] 14.1 [Distributed Data Parallel](https://artinte.github.io/deep-learning/distrib_parallel.html)
+- [x] 14.2 [Fully Sharded Data Parallel](https://artinte.github.io/deep-learning/fully_parallel.html)
+- [x] 14.3 [Tensor Parallel](https://artinte.github.io/deep-learning/tensor_parallel.html)
+- [x] 14.4 [Device Mesh](https://artinte.github.io/deep-learning/device_mesh.html)
+- [x] 14.5 [Remote Procedure Call](https://artinte.github.io/deep-learning/remote_call.html)
 
 ### 15 Graph Netural Network
 
-- [ ] 15.1 [Graph Foundation](https://artinte.github.io/deep-learning/graph_foundation.html)
-- [ ] 15.2 [Core Ideas](https://artinte.github.io/deep-learning/core_idea.html)
-- [ ] 15.3 [Design of GNN](https://artinte.github.io/deep-learning/design_of_gnn.html)
-- [ ] 15.4 [Use-Cases & Applications](https://artinte.github.io/deep-learning/use_cases.html)
-- [ ] 15.5 [Advanced Concepts](https://artinte.github.io/deep-learning/advanced_concepts.html)
+- [x] 15.1 [Graph Foundation](https://artinte.github.io/deep-learning/graph_foundation.html)
+- [x] 15.2 [Core Ideas](https://artinte.github.io/deep-learning/core_idea.html)
+- [x] 15.3 [Design of GNN](https://artinte.github.io/deep-learning/design_of_gnn.html)
+- [x] 15.4 [Use-Cases & Applications](https://artinte.github.io/deep-learning/use_cases.html)
+- [x] 15.5 [Advanced Concepts](https://artinte.github.io/deep-learning/advanced_concepts.html)
 
 ### 16 Bayesian Statistics
 
