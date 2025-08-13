@@ -26,7 +26,7 @@
                 <p>If you're curious about how AI products like ChatGPT work, this tutorial is for you. We'll start from the very beginning, and all you need is a solid grasp of the Python language. Any other concepts will be referenced as we go. Most importantly, we'll be studying the <a href="https://github.com/artinte/deep-learning">nanoGPT</a> library, an excellent resource for learning how to build large language models from scratch, which was written by the renowned AI educator Andrej Karpathy.</p>
                 <p>nanoGPT is the simplest, fastest repository for training/finetuning medium-sized GPTs. It is a rewrite of <a href="https://github.com/karpathy/minGPT">minGPT</a> that prioritizes teeth over education. Still under active development, but currently the file <span class="highlight">train.py</span> reproduces GPT-2 (124M) on OpenWebText, running on a single 8XA100 40GB node in about 4 days of training. The code itself is plain and readable: <span class="highlight">train.py</span> is a ~300-line boilerplate training loop and <span class="highlight">model.py</span> a ~300-line GPT model definition, which can optionally load the GPT-2 weights from OpenAI. That's it.</p>
 
-                <img src="res/05/nanogpt.jpg" alt="The Different Between nanoGPT and ChatGPT">
+                <img src="res/05/nanogpt.jpg" alt="The Different Between nanoGPT and ChatGPT" width="600">
                 <p style="text-align: center; color: #555555;">Figure 1 - The Different Between nanoGPT and ChatGPT</p>
 
                 <p>The tutorial is split into two phases. In the first phase, we'll write a character-level generative model from scratch, using Shakespeare's complete works as our training data. This will result in a model that can write in the style of Shakespeare. The second phase involves running a pre-trained GPT model. We won't train it ourselves, as that's too computationally expensive for a personal computer. Instead, we'll download its pre-trained parameters to run inference, and we'll also have the option to finetune it.</p>
@@ -78,7 +78,7 @@ print("Length of dataset in characters:", len(data))</code></pre>
 
                 <pre><samp>Length of dataset in characters: 1115394</samp></pre>
 
-                <p>Get all the unique characters taht occur in this text:</p>
+                <p>Get all the unique characters that occur in this text:</p>
                 <pre><code>chars = sorted(list(set(data)))
 vocab_size = len(chars)
 print("All the unique characters:", "".join(chars))
@@ -97,6 +97,8 @@ print(stoi)</code></pre>
                 
                 <pre><samp>{'\n': 0, ' ': 1, '!': 2, '$': 3, '&': 4, "'": 5, ',': 6, '-': 7, '.': 8, '3': 9, ':': 10, ';': 11, '?': 12, 'A': 13, 'B': 14, 'C': 15, 'D': 16, 'E': 17, 'F': 18, 'G': 19, 'H': 20, 'I': 21, 'J': 22, 'K': 23, 'L': 24, 'M': 25, 'N': 26, 'O': 27, 'P': 28, 'Q': 29, 'R': 30, 'S': 31, 'T': 32, 'U': 33, 'V': 34, 'W': 35, 'X': 36, 'Y': 37, 'Z': 38, 'a': 39, 'b': 40, 'c': 41, 'd': 42, 'e': 43, 'f': 44, 'g': 45, 'h': 46, 'i': 47, 'j': 48, 'k': 49, 'l': 50, 'm': 51, 'n': 52, 'o': 53, 'p': 54, 'q': 55, 'r': 56, 's': 57, 't': 58, 'u': 59, 'v': 60, 'w': 61, 'x': 62, 'y': 63, 'z': 64}</samp></pre>
 
+                <p>Why do we need to tokenize? It's because machines can only process numbers, while words and text are abstractions created by humans. Tokenization is the process of converting these human abstractions into a numerical format that a machine can understand and work with. Therefore, we've defined the <code>encode</code> and <code>decode</code> functions to act as a bridge between humans and machines:</p>
+
                 <pre><code>def encode(s):
     # encoder: take a string, output a list of integers
     return [stoi[c] for c in s]
@@ -106,7 +108,7 @@ def decode(l):
     return ''.join([itos[i] for i in l])</code></pre>
 
 
-                <p>Convert the text <em>Hello, World!</em>into tokens. In this case, each character is a token. The <code>encode</code> function maps each character to a unique integer ID. For example, 'H' might become 12, 'e' might become 5, and so on. We can use the <code>decode</code> function to perform the reverse operation: converting a list of numerical tokens back into human-readable text.</p>
+                <p>Convert the text <em>Hello, World!</em> into tokens. In this case, each character is a token. The <code>encode</code> function maps each character to a unique integer ID. For example, 'H' might become 12, 'e' might become 5, and so on. We can use the <code>decode</code> function to perform the reverse operation: converting a list of numerical tokens back into human-readable text.</p>
                 <pre><code>sample_text = 'Hello, World!'
 print('Tokenize', encode(sample_text))
 print('Decode:', decode(encode(sample_text)))</code></pre>
@@ -114,6 +116,7 @@ print('Decode:', decode(encode(sample_text)))</code></pre>
                 <pre><samp>Tokenize [20, 43, 50, 50, 53, 6, 1, 35, 53, 56, 50, 42, 2]
 Decode: Hello, World!</samp></pre>
 
+                <p>Use Python's slicing method to split our data into two categories: a training set (90%) and a validation set (10%). The training set is used to teach the model, while the validation set is used to evaluate its performance.</p>
                 <pre><code># create the train and val splits
 n = len(data)
 train_data = data[:int(n*0.9)]
@@ -125,17 +128,18 @@ val_ids = encode(val_data)
 print(f'Train has {len(train_ids)} tokens')
 print(f'Val has {len(val_ids)} tokens')</code></pre>
 
-                <p>Train has 1003854 tokens
-Val has 111540 tokens</p>
+                <pre><samp>Train has 1003854 tokens
+Val has 111540 tokens</samp></pre>
 
+                <p>Save <code>train_ids</code> and <code>val_ids</code> in this binary format makes them much faster to load later when the training process begins:</p>
                 <pre><code># export to bin files
 train_ids = numpy.array(train_ids, dtype=numpy.uint16)
 val_ids = numpy.array(val_ids, dtype=numpy.uint16)
 train_ids.tofile(os.path.join(data_dir, "train.bin"))
 val_ids.tofile(os.path.join(data_dir, "val.bin"))</code></pre>
 
-                <pre><code># save the meta information as well, to help us encode/decode later
-meta = {
+                <p>Save the meta information as well, to help us encode/decode later:</p>
+                <pre><code>meta = {
     "vocab_size": vocab_size,
     "itos": itos,
     "stoi": stoi,
