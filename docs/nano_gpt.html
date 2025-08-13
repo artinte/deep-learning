@@ -88,7 +88,29 @@ print(f"Vocab size: {vocab_size}")</code></pre>
  !$&',-.3:;?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz
 Vocab size: 65</samp></pre>
 
-                <p>The vocab <code>chars</code> contains  the entire char for our generative model. Predicting the next char means computing the probability of every char in this vocabulary, and then selecting the one with the highest probability to be the predicted output.</p>
+                <p>The vocab <code>chars</code> contains  the entire character for our generative model. Predicting the next character means computing the probability of every character in this vocabulary, and then selecting the one with the highest probability to be the predicted output.</p>
+
+                <pre><code># create a mapping from characters to integers
+stoi = {ch: i for i, ch in enumerate(chars)}
+itos = {i: ch for i, ch in enumerate(chars)}
+print(stoi)</code></pre>
+
+                <pre><code>def encode(s):
+    # encoder: take a string, output a list of integers
+    return [stoi[c] for c in s]
+
+def decode(l):
+    # decoder: take a list integers, output a string
+    return ''.join([itos[i] for i in l])</code></pre>
+
+    
+                <p>Convert the text <em>Hello, World!</em>into tokens. In this case, each character is a token. The <code>encode</code> function maps each character to a unique integer ID. For example, 'H' might become 12, 'e' might become 5, and so on. We can use the <code>decode</code> function to perform the reverse operation: converting a list of numerical tokens back into human-readable text.</p>
+                <pre><code>sample_text = 'Hello, World!'
+print('Tokenize', encode(sample_text))
+print('Decode:', decode(encode(sample_text)))</code></pre>
+
+                <pre><samp>Tokenize [20, 43, 50, 50, 53, 6, 1, 35, 53, 56, 50, 42, 2]
+Decode: Hello, World!</samp></pre>
 
                 <h4>5.5.1.2 Model Architecture</h4>
 

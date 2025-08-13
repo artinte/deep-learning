@@ -32,9 +32,10 @@ vocab_size = len(chars)
 print("All the unique characters:", "".join(chars))
 print(f"Vocab size: {vocab_size}")
 
-# Create a mapping from characters to integers.
+# create a mapping from characters to integers
 stoi = {ch: i for i, ch in enumerate(chars)}
 itos = {i: ch for i, ch in enumerate(chars)}
+print(stoi)
 
 
 def encode(s):
@@ -44,4 +45,8 @@ def encode(s):
 
 def decode(l):
     # decoder: take a list integers, output a string
-    return " ".join([itos[i] for i in l])
+    return ''.join([itos[i] for i in l])
+
+sample_text = 'Hello, World!'
+print('Tokenize', encode(sample_text))
+print('Decode:', decode(encode(sample_text)))
