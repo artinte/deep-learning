@@ -24,17 +24,19 @@
                 <p style="color: #a0a0a0;">Created Date: 2025-08-12</p>
 
                 <p>If you're curious about how AI products like ChatGPT work, this tutorial is for you. We'll start from the very beginning, and all you need is a solid grasp of the Python language. Any other concepts will be referenced as we go. Most importantly, we'll be studying the <a href="https://github.com/artinte/deep-learning">nanoGPT</a> library, an excellent resource for learning how to build large language models from scratch, which was written by the renowned AI educator Andrej Karpathy.</p>
-                <p>nanoGPT is the simplest, fastest repository for training/finetuning medium-sized GPTs. It is a rewrite of <a href="https://github.com/karpathy/minGPT">minGPT</a> that prioritizes teeth over education. Still under active development, but currently the file <span class="highlight">train.py</span> reproduces GPT-2 (124M) on OpenWebText, running on a single 8XA100 40GB node in about 4 days of training. The code itself is plain and readable: <a class="highlight">train.py</a> is a ~300-line boilerplate training loop and <a class="highlight">model.py</a> a ~300-line GPT model definition, which can optionally load the GPT-2 weights from OpenAI. That's it.</p>
+                <p>nanoGPT is the simplest, fastest repository for training/finetuning medium-sized GPTs. It is a rewrite of <a href="https://github.com/karpathy/minGPT">minGPT</a> that prioritizes teeth over education. Still under active development, but currently the file <span class="highlight">train.py</span> reproduces GPT-2 (124M) on OpenWebText, running on a single 8XA100 40GB node in about 4 days of training. The code itself is plain and readable: <span class="highlight">train.py</span> is a ~300-line boilerplate training loop and <span class="highlight">model.py</span> a ~300-line GPT model definition, which can optionally load the GPT-2 weights from OpenAI. That's it.</p>
+
+                <img src="res/05/nanogpt.jpg" alt="The Different Between nanoGPT and ChatGPT">
+                <p style="text-align: center; color: #555555;">Figure 1 - The Different Between nanoGPT and ChatGPT</p>
 
                 <p>The tutorial is split into two phases. In the first phase, we'll write a character-level generative model from scratch, using Shakespeare's complete works as our training data. This will result in a model that can write in the style of Shakespeare. The second phase involves running a pre-trained GPT model. We won't train it ourselves, as that's too computationally expensive for a personal computer. Instead, we'll download its pre-trained parameters to run inference, and we'll also have the option to finetune it.</p>
 
                 <h3>5.5.1 Character-Level GPT</h3>
-                <p>If you are not a deep learning professional and you just want to feel the magic and get your feet wet, the fastest way to get started is to train a character-level GPT on the works of Shakespeare. First, we download it as a single (1MB) file and turn it from raw text into one large stream of integers:</p>
-                <pre><samp>python data/shakespeare_char/prepare.py</samp></pre>
+                <p>If you are not a deep learning professional and you just want to feel the magic and get your feet wet, the fastest way to get started is to train a character-level GPT on the works of Shakespeare.</p>
 
                 <h4>5.5.1.1 Shakespeare Dataset</h4>
-                <p>William Shakespeare was an English playwright, poet and actor. He is widely regarded as the greatest writer in the English language and the world's pre-eminent dramatist.</p>
-                <p>The <a href="https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt">text</a> for training is a collection of excerpts from several of Shakespeare's classic plays, mainly including the following works:</p>
+                <p><a href="https://en.wikipedia.org/wiki/William_Shakespeare">William Shakespeare</a> was an English playwright, poet and actor. He is widely regarded as the greatest writer in the English language and the world's pre-eminent dramatist.</p>
+                <p>The training <a href="https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt">text</a> is a collection of excerpts from several of Shakespeare's classic plays, mainly including the following works:</p>
                 <ul class="with-bullets">
                     <li><p>Coriolanus: Accounting for the largest proportion, it presents the complete tragic arc of the protagonist Caius Marcius (later known as Coriolanus) – from a Roman hero to being exiled, eventually allying with former enemies, and finally abandoning his revenge due to his mother's persuasion. It involves class conflicts, personal honor, and power struggles.</p></li>
                     <li><p>Richard III: It tells the story of Richard III's conspiracies and rule, including his usurpation of the throne, elimination of political opponents, and eventual downfall, demonstrating the desire for power and the distortion of human nature.</p></li>
@@ -58,6 +60,35 @@ First, you know Caius Marcius is chief enemy to the people.
 
 All:
 We know't, we know't.</samp></pre>
+                
+                <p>Download the <a href="https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt">input.txt</a> to local <span class="highlight">data/</span> directory, and read it in code:</p>
+                <pre><code>data_dir = os.path.join(os.path.dirname(__file__), "data")
+os.makedirs(data_dir, exist_ok=True)
+input_file_path = os.path.join(data_dir, "input.txt")
+
+# download the tiny shakespeare dataset
+if not os.path.exists(input_file_path):
+    with open(input_file_path, "w") as f:
+        f.write(requests.get(data_url).text)
+
+with open(input_file_path, "r") as f:
+    data = f.read()
+
+print("Length of dataset in characters:", len(data))</code></pre>
+
+                <pre><samp>Length of dataset in characters: 1115394</samp></pre>
+
+                <p>get all the unique characters taht occur in this text</p>
+                <pre><code>chars = sorted(list(set(data)))
+vocab_size = len(chars)
+print("All the unique characters:", "".join(chars))
+print(f"Vocab size: {vocab_size}")</code></pre>
+
+                <pre><samp>All the unique characters: 
+ !$&',-.3:;?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz
+Vocab size: 65</samp></pre>
+
+                <p>The vocab <code>chars</code> contains  the entire char for our generative model. Predicting the next char means computing the probability of every char in this vocabulary, and then selecting the one with the highest probability to be the predicted output.</p>
 
                 <h4>5.5.1.2 Model Architecture</h4>
 
