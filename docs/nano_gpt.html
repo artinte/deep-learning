@@ -88,7 +88,11 @@ print(f"Vocab size: {vocab_size}")</code></pre>
  !$&',-.3:;?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz
 Vocab size: 65</samp></pre>
 
-                <p>The vocab <code>chars</code> contains  the entire character for our generative model. Predicting the next character means computing the probability of every character in this vocabulary, and then selecting the one with the highest probability to be the predicted output.</p>
+                <p>The vocab <code>chars</code> contains the entire character for our generative model. Predicting the next character means computing the probability of every character in this vocabulary, and then selecting the one with the highest probability to be the predicted output.</p>
+                <a href="https://drive.google.com/file/d/1t49XsswoXnbTJt8T2MdO0ESfLLT9zseB/view?usp=sharing">
+                    <img src="res/05/next_char_pred.jpg" alt="Predict Next Word">
+                </a>
+                <p style="text-align: center; color: #555555;">Figure 2 - Predict Next Word</p>
 
                 <pre><code># create a mapping from characters to integers
 stoi = {ch: i for i, ch in enumerate(chars)}
