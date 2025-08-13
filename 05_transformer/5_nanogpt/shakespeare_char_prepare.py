@@ -45,8 +45,39 @@ def encode(s):
 
 def decode(l):
     # decoder: take a list integers, output a string
-    return ''.join([itos[i] for i in l])
+    return "".join([itos[i] for i in l])
 
-sample_text = 'Hello, World!'
-print('Tokenize', encode(sample_text))
-print('Decode:', decode(encode(sample_text)))
+
+sample_text = "Hello, World!"
+print("Tokenize", encode(sample_text))
+print("Decode:", decode(encode(sample_text)))
+
+
+# create the train and val splits
+n = len(data)
+train_data = data[: int(n * 0.9)]
+val_data = data[int(n * 0.9) :]
+
+# encode both to integers
+train_ids = encode(train_data)
+val_ids = encode(val_data)
+print(f"Train has {len(train_ids)} tokens")
+print(f"Val has {len(val_ids)} tokens")
+
+
+# export to bin files
+train_ids = numpy.array(train_ids, dtype=numpy.uint16)
+val_ids = numpy.array(val_ids, dtype=numpy.uint16)
+train_ids.tofile(os.path.join(data_dir, "train.bin"))
+val_ids.tofile(os.path.join(data_dir, "val.bin"))
+
+
+# save the meta information as well, to help us encode/decode later
+meta = {
+    "vocab_size": vocab_size,
+    "itos": itos,
+    "stoi": stoi,
+}
+
+with open(os.path.join(data_dir, "meta.pkl"), "wb") as f:
+    pickle.dump(meta, f)
