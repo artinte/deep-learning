@@ -109,16 +109,15 @@ class Block(torch.nn.Module):
 @dataclass
 class GPTConfig:
     block_size: int = 1024
-    vocab_size: int = (
-        50304  # GPT-2 vocab_size of 50257, padded up to nearest multiple of 64 for efficiency
-    )
+    # GPT-2 vocab_size of 50257, padded up to nearest multiple of 64 (50304) for efficiency.
+    # For our simple character GPT, 128 enough.
+    vocab_size: int = (128)
     n_layer: int = 12
     n_head: int = 12
     n_embd: int = 768
     dropout: float = 0.0
-    bias: bool = (
-        True  # True: bias in Linears and LayerNorms, like GPT-2. False: a bit better and faster
-    )
+    # True: bias in Linears and LayerNorms, like GPT-2. False: a bit better and faster
+    bias: bool = (True)
 
 
 class GPT(torch.nn.Module):
