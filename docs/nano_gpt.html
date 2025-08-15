@@ -170,14 +170,15 @@ with open(os.path.join(data_dir, "meta.pkl"), "wb") as f:
                 </a>
                 <p style="text-align: center; color: #555555;">Figure 3 - GPT Architecture</p>
 
-                <p><a href="word_embed.html">Embedding</a> , <a href="activation_function.html">softmax</a> , <a href="network_scratch.html">linear layer</a> and <a href="res_net.html">Residual network</a> as mentioned in the previous tutorial, the attention module will be covered in the next section. File <a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/5_nanogpt/train.py">train.py</a> can implement the architecture:</p>
+                <p><a href="word_embed.html">Embedding</a> , <a href="activation_function.html">softmax</a> , <a href="network_scratch.html">linear layer</a> and <a href="res_net.html">Residual network</a> as mentioned in the previous tutorial, the attention module will be covered in the next section. File <a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/5_nanogpt/train.py">train.py</a> implements the architecture, let's break this down into a few parts.</p>
                 
+
 
                 
                 <h5>Causal Self Attention</h5>
 
                 <img src="res/05/casual_self_attention.webp" alt="Casual Self Attention" width="550">
-                <p style="text-align: center; color: #555555;">Figure 3 - Casual Self Attention</p>
+                <p style="text-align: center; color: #555555;">Figure 4 - Casual Self Attention</p>
 
                 <pre><code>class CausalSelfAttention(torch.nn.Module):
     def __init__(self, config):

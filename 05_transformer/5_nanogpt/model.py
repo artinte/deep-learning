@@ -4,20 +4,6 @@ import torch
 from dataclasses import dataclass
 
 
-class LayerNorm(torch.nn.Module):
-    """LayerNorm but with an optional bias. PyTorch doesn't support simply bias=False"""
-
-    def __init__(self, ndim, bias):
-        super().__init__()
-        self.weight = torch.nn.Parameter(torch.ones(ndim))
-        self.bias = torch.nn.Parameter(torch.zeros(ndim)) if bias else None
-
-    def forward(self, input):
-        return torch.nn.functional.layer_norm(
-            input, self.weight.shape, self.weight, self.bias, 1e-5
-        )
-
-
 class CausalSelfAttention(torch.nn.Module):
     def __init__(self, config):
         super().__init__()
@@ -109,9 +95,9 @@ class MLP(torch.nn.Module):
 class Block(torch.nn.Module):
     def __init__(self, config):
         super().__init__()
-        self.ln_1 = LayerNorm(config.n_embd, bias=config.bias)
+        self.ln_1 = torch.nn.LayerNorm(config.n_embd, bias=config.bias)
         self.attn = CausalSelfAttention(config)
-        self.ln_2 = LayerNorm(config.n_embd, bias=config.bias)
+        self.ln_2 = torch.nn.LayerNorm(config.n_embd, bias=config.bias)
         self.mlp = MLP(config)
 
     def forward(self, x):
@@ -148,7 +134,7 @@ class GPT(torch.nn.Module):
                 wpe=torch.nn.Embedding(config.block_size, config.n_embd),
                 drop=torch.nn.Dropout(config.dropout),
                 h=torch.nn.ModuleList([Block(config) for _ in range(config.n_layer)]),
-                ln_f=LayerNorm(config.n_embd, bias=config.bias),
+                ln_f=torch.nn.LayerNorm(config.n_embd, bias=config.bias),
             )
         )
         self.lm_head = torch.nn.Linear(config.n_embd, config.vocab_size, bias=False)
