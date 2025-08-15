@@ -165,6 +165,11 @@ with open(os.path.join(data_dir, "meta.pkl"), "wb") as f:
                 <p>A GPT decoder-only model is a type of Transformer architecture (Figure 3) , as the name suggests, only uses the decoder portion of the original Transformer model. Unlike the original encoder-decoder model, which has separate components for processing the input (encoder) and generating the output (decoder), a decoder-only model combines these two functions into a single unit. This architecture is particularly well-suited for text generation tasks, as it is designed to predict the next word or token in a sequence. ChatGPT and other large language models (LLMs) are prime examples of this architecture.</p>
                 <p>While removing the encoder, the cross attention in the decoder is also removed. Therefore, the architecture of GPT becomes very simple, as shown below:</p>
 
+                <a href="https://drive.google.com/file/d/1KpA0x-iUqkq1lw4KyTiTWxQvEUrzwoNT/view?usp=sharing">
+                    <img src="res/05/simple_gpt.jpg" alt="GPT Architecture">
+                </a>
+                <p style="text-align: center; color: #555555;">Figure 3 - GPT Architecture</p>
+
                 <p>Embedding, softmax, linear layer and Residual network as mentioned in the previous tutorial, the attention module will be covered in the next section. We can implement the architecture:</p>
                 
                 <h5>Causal Self Attention</h5>
