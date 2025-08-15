@@ -12,7 +12,7 @@ import numpy
 
 data_url = "https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt"
 
-data_dir = os.path.join(os.path.dirname(__file__), "data")
+data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "data")
 os.makedirs(data_dir, exist_ok=True)
 input_file_path = os.path.join(data_dir, "input.txt")
 

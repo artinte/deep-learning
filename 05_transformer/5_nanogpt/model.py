@@ -136,10 +136,11 @@ class GPTConfig:
 
 
 class GPT(torch.nn.Module):
-    def __init(self, config):
+    def __init__(self, config):
         super().__init__()
         assert config.vocab_size is not None
         assert config.block_size is not None
+        self.config = config
 
         self.transformer = torch.nn.ModuleDict(
             dict(
