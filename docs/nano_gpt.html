@@ -162,7 +162,7 @@ with open(os.path.join(data_dir, "meta.pkl"), "wb") as f:
                 </ul>
 
                 <h5>Decoder Only</h5>
-                <p>A GPT decoder-only model is a type of Transformer architecture (Figure 3) , as the name suggests, only uses the decoder portion of the original Transformer model. Unlike the original encoder-decoder model, which has separate components for processing the input (encoder) and generating the output (decoder), a decoder-only model combines these two functions into a single unit. This architecture is particularly well-suited for text generation tasks, as it is designed to predict the next word or token in a sequence. ChatGPT and other large language models (LLMs) are prime examples of this architecture.</p>
+                <p>A GPT decoder-only model is a type of Transformer architecture (Figure 4) , as the name suggests, only uses the decoder portion of the original Transformer model. Unlike the original encoder-decoder model, which has separate components for processing the input (encoder) and generating the output (decoder), a decoder-only model combines these two functions into a single unit. This architecture is particularly well-suited for text generation tasks, as it is designed to predict the next word or token in a sequence. ChatGPT and other large language models (LLMs) are prime examples of this architecture.</p>
                 <p>While removing the encoder, the cross attention in the decoder is also removed. Therefore, the architecture of GPT becomes very simple, as shown below:</p>
 
                 <a href="https://drive.google.com/file/d/1KpA0x-iUqkq1lw4KyTiTWxQvEUrzwoNT/view?usp=sharing">
@@ -172,7 +172,7 @@ with open(os.path.join(data_dir, "meta.pkl"), "wb") as f:
 
                 <p><a href="word_embed.html">Embedding</a> , <a href="activation_function.html">softmax</a> , <a href="network_scratch.html">linear layer</a> and <a href="res_net.html">Residual network</a> as mentioned in the previous tutorial, the attention module will be covered in the next section. File <a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/5_nanogpt/train.py">train.py</a> implements the architecture, let's break this down into a few parts.</p>
                 
-                <p>Here is a every common multilayer perceptron (MLP) , it's composed mainly of two symmetric <code>torch.nn.Linear</code>:</p>
+                <p>Here is a every common multilayer perceptron (MLP) , it's composed mainly of two symmetric <code>torch.nn.Linear</code> :</p>
                 <pre><code>class MLP(torch.nn.Module):
     def __init__(self, config):
         super().__init__()
@@ -205,7 +205,7 @@ with open(os.path.join(data_dir, "meta.pkl"), "wb") as f:
         return x</code></pre>
 
                 <h5>Parameters</h5>
-                <p></p>
+                <p>Before we dive into the deep code details, let's first go over the initial parameters of the system:</p>
                 <pre><code>@dataclass
 class GPTConfig:
     block_size: int = 1024
@@ -218,6 +218,16 @@ class GPTConfig:
     dropout: float = 0.0
     # True: bias in Linears and LayerNorms, like GPT-2. False: a bit better and faster
     bias: bool = (True)</code></pre>
+                <p>Here are the parameters defined in the <code>GPTConfig</code> class:</p>
+                <ul class="with-bullets">
+                    <li><p><code>block_size</code> : This is the maximum context length or the number of tokens the model can look back at to make a prediction. A value of 1024 is standard for many models, but it can be adjusted depending on the task and available memory.</p></li>
+                    <li><p><code>vocab_size</code> : This specifies the size of the vocabulary, which is the total number of unique tokens the model can understand. For the character-level GPT, 128 is sufficient to cover all standard ASCII characters. GPT-2, for example, has a much larger vocabulary of 50,257.</p></li>
+                    <li><p><code>n_layer</code> : This is the number of transformer blocks (or layers) stacked on top of each other. More layers allow the model to learn more complex patterns but also increase computational cost. A value of 12 is a common choice for smaller models.</p></li>
+                    <li><p><code>n_head</code> : This is the number of attention heads in the multi-head attention mechanism. Each head can learn different aspects of the input sequence. A value of 12 means the model will split the embedding dimension into 12 parts and apply attention to each part independently.</p></li>
+                    <li><p><code>n_embd</code> : This is the size of the embedding dimension. It represents the size of the vector used to represent each token in the model. A larger embedding dimension allows for a richer representation of each token's meaning.</p></li>
+                    <li><p><code>dropout</code> : This is a regularization technique used to prevent overfitting. It sets a fraction of the layer's inputs to zero during training. A dropout rate of 0.0 means no dropout is applied.</p></li>
+                    <li><p><code>bias</code> : This is a boolean flag that determines whether a bias term is used in the linear layers and LayerNorms. The original GPT-2 used a bias, but setting it to False can sometimes lead to slightly better performance and faster training.</p></li>
+                </ul>
 
                 <h5>Causal Self Attention</h5>
                 <p>Causal self-attention is a specific type of self-attention mechanism used in transformer models, particularly for tasks like text generation. Unlike standard self-attention, which allows a token to attend to all other tokens in a sequence, causal self-attention enforces a crucial constraint: a token can only attend to the tokens that come before it in the sequence, and not to the tokens that come after.</p>
