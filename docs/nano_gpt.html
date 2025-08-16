@@ -435,11 +435,67 @@ return y</code></pre>
 
 
                 <h5>GPT Struct</h5>
+                <p>Next, we will assemble the components we've discussed above to create a GPT structure. The following code defines a complete GPT model, which consists of token embeddings, positional encodings, multiple Transformer blocks, and a final classifier head.</p>
 
+                <pre><code>class GPT(torch.nn.Module):
+    def __init__(self, config):
+        super().__init__()
+        assert config.vocab_size is not None
+        assert config.block_size is not None
+        self.config = config
+
+        self.transformer = torch.nn.ModuleDict(
+            dict(
+                wte=torch.nn.Embedding(config.vocab_size, config.n_embd),
+                wpe=torch.nn.Embedding(config.block_size, config.n_embd),
+                drop=torch.nn.Dropout(config.dropout),
+                h=torch.nn.ModuleList([Block(config) for _ in range(config.n_layer)]),
+                ln_f=torch.nn.LayerNorm(config.n_embd, bias=config.bias),
+            )
+        )
+        self.lm_head = torch.nn.Linear(config.n_embd, config.vocab_size, bias=False)
+
+        self.transformer.wte.weight = self.lm_head.weight
+
+        # init all weights
+        self.apply(self._init_weights)
+        # apply special scaled init to the residual projections, per GPT-2 paper
+        for pn, p in self.named_parameters():
+            if pn.endswith("c_proj.weight"):
+                torch.nn.init.normal_(
+                    p, mean=0.0, std=0.02 / math.sqrt(2 * config.n_layer)
+                )
+
+        # report number of parameters
+        print("number of parameters: %.2fM" % (self.get_num_params() / 1e6,))
+
+    def get_num_params(self, non_embedding=True):
+        """
+        Return the number of parameters in the model.
+        For non-embedding count (default), the position embeddings get subtracted.
+        The token embeddings would too, except due to the parameter sharing these
+        params are actually used as weights in the final layer, so we include them.
+        """
+        n_params = sum(p.numel() for p in self.parameters())
+        if non_embedding:
+            n_params -= self.transformer.wpe.weight.numel()
+        return n_params
+
+    def _init_weights(self, module):
+        if isinstance(module, torch.nn.Linear):
+            torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
+            if module.bias is not None:
+                torch.nn.init.zeros_(module.bias)
+        elif isinstance(module, torch.nn.Embedding):
+            torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)</code></pre>
 
                 <h4>5.5.1.3 Training</h4>
 
+                <p><a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/5_nanogpt/train.py">train.py</a> </p>
+
                 <h4>5.5.1.4 Inference</h4>
+
+                <p><a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/5_nanogpt/sample.py">sample.py</a></p>
                 
                 <h3>5.5.2 Reproducing GPT-2</h3>
                 <p>In February 14, 2019, OpenAI release GPT-2, it was trained simply to predict the next word in 40GB of Internet text. GPT‑2 is a large transformer⁠(opens in a new window)-based language model with 1.5 billion parameters, trained on a dataset of 8 million web pages. GPT‑2 is trained with a simple objective: predict the next word, given all of the previous words within some text. The diversity of the dataset causes this simple goal to contain naturally occurring demonstrations of many tasks across diverse domains. GPT‑2 is a direct scale-up of GPT, with more than 10X the parameters and trained on more than 10X the amount of data.</p>

@@ -134,11 +134,7 @@ class GPT(torch.nn.Module):
             )
         )
         self.lm_head = torch.nn.Linear(config.n_embd, config.vocab_size, bias=False)
-        # with weight tying when using torch.compile() some warnings get generated:
-        # "UserWarning: functional_call was passed multiple values for tied weights.
-        # This behavior is deprecated and will be an error in future versions"
-        # not 100% sure what this is, so far seems to be harmless. TODO investigate
-        # # https://paperswithcode.com/method/weight-tying
+
         self.transformer.wte.weight = self.lm_head.weight
 
         # init all weights
