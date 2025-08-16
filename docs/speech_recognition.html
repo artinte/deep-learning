@@ -24,73 +24,21 @@
                 <p style="color: #a0a0a0;">Created Date: 2025-05-31</p>
 
                 <p>We’ve trained and are open-sourcing a neural net called <a href="https://arxiv.org/abs/2212.04356">Whisper</a> that approaches human level robustness and accuracy on English speech recognition.</p>
+
                 <p>Whisper is an automatic speech recognition (ASR) system trained on 680,000 hours of multilingual and multitask supervised data collected from the web. We show that the use of such a large and diverse dataset leads to improved robustness to accents, background noise and technical language. Moreover, it enables transcription in multiple languages, as well as translation from those languages into English. We are open-sourcing models and inference code to serve as a foundation for building useful applications and for further research on robust speech processing.</p>
-
-                <p>The Whisper architecture is a simple end-to-end approach, implemented as an encoder-decoder Transformer. Input audio is split into 30-second chunks, converted into a log-Mel spectrogram, and then passed into an encoder. A decoder is trained to predict the corresponding text caption, intermixed with special tokens that direct the single model to perform tasks such as language identification, phrase-level timestamps, multilingual speech transcription, and to-English speech translation.</p>
-
-                
-                <h3>8.2.1 Introduction</h3>
-                <p>Progress in speech recognition has been energized by the development of unsupervised pre-training techniques exemplified by Wav2Vec 2.0 (Baevski et al., 2020). Since these methods learn directly from raw audio without the need for human labels, they can productively use large datasets of unlabeled speech and have been quickly scaled up to 1,000,000 hours of training data (Zhang et al., 2021), far more than the 1,000 or so hours typical of an academic supervised dataset. When fine-tuned on standard benchmarks, this approach has improved the state of the art, especially in a low-data setting.</p>
-
-                <p>These pre-trained audio encoders learn high-quality representations of speech, but because they are purely unsupervised they lack an equivalently performant decoder mapping those representations to usable outputs, necessitating a finetuning stage in order to actually perform a task such as speech recognition.</p>
-                <p>This unfortunately limits their usefulness and impact as fine-tuning can still be a complex process requiring a skilled practitioner. There is an additional risk with requiring fine-tuning.</p>
-
-                <p>Machine learning methods are exceedingly adept at finding patterns within a training dataset which boost performance on held-out data from the same dataset.</p>
-
-                <h3>8.2.2 Approach</h3>
-
-                <h4>8.2.2.1 Data Processing</h4>
-                <p>Following the trend of recent work leveraging web-scale text from the internet for training machine learning systems, we take a minimalist approach to data pre-processing. In contrast to a lot of work on speech recognition, we train Whisper models to predict the raw text of transcripts without any significant standardization, relying on the expressiveness of sequence-to-sequence models to learn to map between utterances and their transcribed form. This simplifies the speech recognition pipeline since it removes the need for a separate inverse text normalization step in order to produce naturalistic transcriptions.</p>
-                <p>We construct the dataset from audio that is paired with transcripts on the Internet. This results in a very diverse dataset covering a broad distribution of audio from many different environments, recording setups, speakers, and languages.</p>
-                <p>While diversity in audio quality can help train a model to be robust, diversity in transcript quality is not similarly beneficial. Initial inspection showed a large amount of subpar transcripts in the raw dataset. To address this, we developed several automated filtering methods to improve transcript quality.</p>
-
-                <h4>8.2.2.2 Model</h4>
-                <p>Since the focus of our work is on studying the capabilities of large-scale supervised pre-training for speech recognition, we use an off-the-shelf architecture to avoid confounding our findings with model improvements. We chose an encoder-decoder Transformer (Vaswani et al., 2017) as this architecture has been well validated to scale reliably.</p>
-                <p>All audio is re-sampled to 16,000 Hz, and an 80-channel log-magnitude Mel spectrogram representation is computed on 25-millisecond windows with a stride of 10 milliseconds. For feature normalization, we globally scale the input to be between -1 and 1 with approximately zero mean across the pre-training dataset.</p>
-
-                <p>The encoder processes this input representation with a small stem consisting of two convolution layers with a filter width of 3 and the GELU activation function (Hendrycks & Gimpel, 2016) where the second convolution layer has a stride of two. Sinusoidal position embeddings are then added to the output of the stem after which the encoder Transformer blocks are applied.</p>
-                <p>The transformer uses pre-activation residual blocks (Child et al., 2019), and a final layer normalization is applied to the encoder output. The decoder uses learned position embeddings and tied input-output token representations (Press & Wolf, 2017). The encoder and decoder have the same width and number of transformer blocks. Figure 1 summarizes the model architecture.</p>
                 
                 <img src="res/08/whisper_arch.jpg" alt="Whisper Architecture" width="600">
                 <p style="text-align: center; color: #555555;">Figure 1 - Whisper Architecture</p>
-
-                <p>We use the same byte-level BPE text tokenizer used in GPT-2 (Sennrich et al., 2015; Radford et al., 2019) for the English-only models and refit the vocabulary (but keep the same size) for the multilingual models to avoid excessive fragmentation on other languages since the GPT-2 BPE vocabulary is English only.</p>
-
-                <h4>8.2.2.3 Multitask Format</h4>
-                <p>We train a suite of models of various sizes in order to study the scaling properties of Whisper. Please see Table 1 for an overview.</p>
-
-                <h4>8.2.2.4 Training Details</h4>
-                <p>We train a suite of models of various sizes in order to study the scaling properties of Whisper. Please see Table 1 for an overview. We train with data parallelism across accelerators using FP16 with dynamic loss scaling and activation checkpointing. Models were trained with AdamW and gradient norm clipping with a linear learning rate decay to zero after a warmup over the first 2048 updates. A batch size of 256 segments was used, and the models are trained for \(2^{20}\) updates which is between two and three passes over the dataset.</p>
-                <p>Due to only training for a few epochs, over-fitting is not a large concern, and we do not use any data augmentation or regularization and instead rely on the diversity contained within such a large dataset to encourage generalization and robustness. Please see Appendix F for full training hyperparameters.</p>
-
-                <p>During early development and evaluation we observed that Whisper models had a tendency to transcribe plausible but almost always incorrect guesses for the names of speakers. This happens because many transcripts in the pre-training dataset include the name of the person who is speaking, encouraging the model to try to predict them, but this information is only rarely inferable from only the most recent 30seconds of audio context. To avoid this, we fine-tune Whisper models briefly on the subset of transcripts that do not include speaker annotations which removes this behavior.</p>
-
-                <h3>8.2.3 Experiments</h3>
-
-                <h4>8.2.3.1 Zero-shot Evaluation</h4>
-                <p>The goal of Whisper is to develop a single robust speech processing system that works reliably without the need for dataset specific fine-tuning to achieve high-quality results on specific distributions.  To study this capability, we reuse a wide set of existing speech processing datasets to check whether Whisper is able to generalize well across domains, tasks, and languages.</p>
-                <p>Instead of using the standard evaluation protocol for these datasets, which include both a train and test split, we evaluate Whisper in a zero-shot setting without using any of the training data for each of these datasets so that we are measuring broad generalization.</p>
-
-                <h4>8.2.3.2 Evaluation Metrics</h4>
-                <p>Speech recognition research typically evaluates and compares systems based on the word error rate (WER) metric. However, WER, which is based on string edit distance, penalizes all differences between the model's output and the reference transcript including innocuous differences in transcript style.</p>
-                <p>As a result, systems that output transcripts that would be judged as correct by humans can still have a large WER due to minor formatting differences. While this poses a problem for all transcribers, it is particularly acute for zero-shot models like Whisper, which do not observe any examples of specific datasets transcript formats.</p>
-
-                <h4>8.2.3.3 English Speech Recognition</h4>
-
-                <h4>8.2.3.4 Multi-lingual Speech Recognition</h4>
-
-                <h4>8.2.3.5 Translation</h4>
-
-                <h4>8.2.3.6 Language Identification</h4>
                 
-                <h3>8.2.4 Analysis and Ablations</h3>
+                <p>The Whisper architecture is a simple end-to-end approach, implemented as an encoder-decoder Transformer. Input audio is split into 30-second chunks, converted into a log-Mel spectrogram, and then passed into an encoder. A decoder is trained to predict the corresponding text caption, intermixed with special tokens that direct the single model to perform tasks such as language identification, phrase-level timestamps, multilingual speech transcription, and to-English speech translation.</p>
 
-                <h3>8.2.5 Related Work</h3>
+                <h2>8.2.1 Quick Start</h2>
 
-                <h3>8.2.6 Limitations and Future Work</h3>
+                
 
-                <h3>8.2.7 Conclusion</h3>
-                <p>Whisper suggests that scaling weakly supervised pretraining has been underappreciated so far in speech recognition research. We achieve our results without the need for the self-supervision and self-training techniques that have been a mainstay of recent large-scale speech recognition work and demonstrate how simply training on a large and diverse supervised dataset and focusing on zero-shot transfer can significantly improve the robustness of a speech recognition system.</p>
+
+
+                
 
                 <div class="navigation">
                     <a href="speech_feature.html">Prev: 8.1 Speech Feature Extraction</a>
