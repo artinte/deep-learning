@@ -38,7 +38,7 @@ warmup_iters = 20  # how many steps to warm up for
 lr_decay_iters = 500  # should be ~= max_iters per Chinchilla
 min_lr = 6e-5  # minimum learning rate, should be ~= learning_rate/10 per Chinchilla
 
-
+os.makedirs(out_dir, exist_ok=True)
 dtype = "bfloat16"
 device = "cuda" if torch.cuda.is_available() else "cpu"
 ctx = (
