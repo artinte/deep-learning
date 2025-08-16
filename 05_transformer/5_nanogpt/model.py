@@ -9,9 +9,7 @@ class CausalSelfAttention(torch.nn.Module):
         super().__init__()
         assert config.n_embd % config.n_head == 0
         # key, query, value projections for all heads, but in a batch
-        self.c_attn = torch.nn.Linear(
-            config.n_embd, 3 * config.n_embd, bias=config.bias
-        )
+        self.c_attn = torch.nn.Linear(config.n_embd, 3 * config.n_embd, bias=config.bias)
         # output projection
         self.c_proj = torch.nn.Linear(config.n_embd, config.n_embd, bias=config.bias)
         # regularization
@@ -36,7 +34,7 @@ class CausalSelfAttention(torch.nn.Module):
 
     def forward(self, x):
         # batch size, sequence length, embedding dimensionality (n_embd)
-        B, T, C = (x.size())
+        B, T, C = x.size()
 
         # calculate query, key, values for all heads in batch and move head forward to be the batch dim
         q, k, v = self.c_attn(x).split(self.n_embd, dim=2)
@@ -110,13 +108,13 @@ class GPTConfig:
     block_size: int = 1024
     # GPT-2 vocab_size of 50257, padded up to nearest multiple of 64 (50304) for efficiency.
     # For our simple character GPT, 128 enough.
-    vocab_size: int = (128)
+    vocab_size: int = 128
     n_layer: int = 12
     n_head: int = 12
     n_embd: int = 768
     dropout: float = 0.0
     # True: bias in Linears and LayerNorms, like GPT-2. False: a bit better and faster
-    bias: bool = (True)
+    bias: bool = True
 
 
 class GPT(torch.nn.Module):

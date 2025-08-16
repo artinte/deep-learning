@@ -230,7 +230,7 @@ class GPTConfig:
                 </ul>
 
                 <h5>Causal Self Attention</h5>
-                <p>Causal self-attention is a specific type of self-attention mechanism used in transformer models, particularly for tasks like text generation. Unlike standard self-attention, which allows a token to attend to all other tokens in a sequence, causal self-attention enforces a crucial constraint: a token can only attend to the tokens that come before it in the sequence, and not to the tokens that come after.</p>
+                <p><strong>Causal self-attention</strong> is a specific type of self-attention mechanism used in transformer models, particularly for tasks like text generation. Unlike standard self-attention, which allows a token to attend to all other tokens in a sequence, causal self-attention enforces a crucial constraint: a token can only attend to the tokens that come before it in the sequence, and not to the tokens that come after.</p>
                 <img src="res/05/casual_self_attention.webp" alt="Casual Self Attention" width="550">
                 <p style="text-align: center; color: #555555;">Figure 4 - Casual Self Attention</p>
 
@@ -306,9 +306,41 @@ class GPTConfig:
         return y</code></pre>
 
                 <p>We can understand the code by reading it line by line.</p>
-
+                <p>Define a <code>CausalSelfAttention</code> , which is subclass of <code>torch.nn.Module</code> , <code>assert</code> ensure the embedding dimension (n_embd) is divisible by the number of attention heads (n_head) :</p>
+                <pre><code>class CausalSelfAttention(torch.nn.Module):
+    def __init__(self, config):
+        super().__init__()
+        assert config.n_embd % config.n_head == 0</code></pre>
                 
+                <p>Define two <code>torch.nn.Linear</code> and <code>torch.nn.Dropout</code> layer.</p>
+                <p>The first linear layer that performs the combined projection for query (Q), key (K) and value (v) vectors. Instead of having three separate linear layers for Q, K, and V, this one layer takes the input embedding (config.n_embd) and projects it to a size that's three times larger (3 * config.n_embd).</p>
+                <p>The second linear layer takes the concatenated output from all attention heads (config.n_embd) and projects it back to the original embedding dimension.</p>
+                <pre><code># key, query, value projections for all heads, but in a batch
+self.c_attn = torch.nn.Linear(config.n_embd, 3 * config.n_embd, bias=config.bias)
+# output projection
+self.c_proj = torch.nn.Linear(config.n_embd, config.n_embd, bias=config.bias)
+# regularization
+self.attn_dropout = torch.nn.Dropout(config.dropout)
+self.resid_dropout = torch.nn.Dropout(config.dropout)</code></pre>
 
+                <p>These is simple, define some variables, because version of PyTorch is great 2.0, so <code>self.flash</code> is <code>True</code> :</p>
+                <pre><code>self.n_head = config.n_head
+self.n_embd = config.n_embd
+self.dropout = config.dropout
+# flash attention make GPU go brrrrr but support is only in PyTorch >= 2.0
+self.flash = hasattr(torch.nn.functional, "scaled_dot_product_attention")
+if not self.flash:
+    print(
+        "WARNING: using slow attention. Flash Attention requires PyTorch >= 2.0"
+    )
+    # causal mask to ensure that attention is only applied to the left in the input sequence
+    self.register_buffer(
+        "bias",
+        torch.tril(torch.ones(config.block_size, config.block_size)).view(
+            1, 1, config.block_size, config.block_size
+        ),
+    )</code></pre>
+                
                 
 
 
