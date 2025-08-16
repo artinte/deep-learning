@@ -349,7 +349,7 @@ if not self.flash:
                 <p>This is where the magic of the combined projection happens. The input x is passed through the c_attn linear layer, and the resulting tensor is split into three equal parts along the last dimension, giving us the query, key, and value tensors.</p>
                 <pre><code># calculate query, key, values for all heads in batch and move head forward to be the batch dim
 q, k, v = self.c_attn(x).split(self.n_embd, dim=2)</code></pre>
-                <p>We can write a simple demo to understand above process:</p>
+                <p>We can write a <a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/5_nanogpt/simple_demo.py">simple demo</a> to understand above process:</p>
 
                 <pre><code>batch_size = 2
 seq_length = 3
@@ -371,6 +371,52 @@ Result shape: torch.Size([2, 3, 12])
 Query shape: torch.Size([2, 3, 4])
 Key shape: torch.Size([2, 3, 4])
 Value shape: torch.Size([2, 3, 4])</samp></pre>
+
+                <p>The q, k and v varialbe is the same shape of x , because we use multi-head, so q, k and v need divide <code>self.n_head</code> parts:</p>
+                <pre><code># (B, nh, T, hs)
+k = k.view(B, T, self.n_head, C // self.n_head).transpose(1, 2)
+# (B, nh, T, hs)
+q = q.view(B, T, self.n_head, C // self.n_head).transpose(1, 2)
+# (B, nh, T, hs)
+v = v.view(B, T, self.n_head, C // self.n_head).transpose(1, 2)</code></pre>
+
+                <p>After being divided, the <code>transpose</code> operation will swap the <code>n_head</code> and <code>seq_len</code> dimensions, like the demo shown:</p>
+                <p>Query divided shape: torch.Size([2, 2, 3, 2])
+Key divided shape torch.Size([2, 2, 3, 2])
+Value divied shape torch.Size([2, 2, 3, 2])</p>
+                <pre><code>n_head = 2
+q = q.view(batch_size, seq_length, n_head, n_embed // n_head).transpose(1, 2)
+k = k.view(batch_size, seq_length, n_head, n_embed // n_head).transpose(1, 2)
+v = v.view(batch_size, seq_length, n_head, n_embed // n_head).transpose(1, 2)
+print('Query divided shape:', q.shape)
+print('Key divided shape', k.shape)
+print('Value divied shape', v.shape)</code></pre>
+
+                <pre><samp>Query divided shape: torch.Size([2, 2, 3, 2])
+Key divided shape torch.Size([2, 2, 3, 2])
+Value divied shape torch.Size([2, 2, 3, 2])</samp></pre>
+
+                <p>Function <code>torch.nn.functional.scaled_dot_product_attention</code> calculate the scaled dot product attention, remember we should set <code>is_causal = True</code> :</p>
+                <pre><code># causal self-attention; Self-attend: (B, nh, T, hs) x (B, nh, hs, T) -> (B, nh, T, T)
+if self.flash:
+    # efficient attention using Flash Attention CUDA kernels
+    y = torch.nn.functional.scaled_dot_product_attention(
+        q,
+        k,
+        v,
+        attn_mask=None,
+        dropout_p=self.dropout if self.training else 0,
+        is_causal=True,
+    )</code></pre>
+
+                <p>From a learning perspective, we could also rewrite the <code>scaled_dot_product_attention</code> function. However, in practical applications, it's best to use PyTorch's built-in functions whenever possible.</p>
+                <pre><code>else:
+    # manual implementation of attention
+    att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(k.size(-1)))
+    att = att.masked_fill(self.bias[:, :, :T, :T] == 0, float("-inf"))
+    att = torch.nn.functional.softmax(att, dim=-1)
+    att = self.attn_dropout(att)
+    y = att @ v  # (B, nh, T, T) x (B, nh, T, hs) -> (B, nh, T, hs)</code></pre>
 
                 <h5>GPT Struct</h5>
 
