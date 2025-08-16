@@ -12,6 +12,7 @@ temp/
 # Distribution / packaging
 .Python
 build/
+out/
 develop-eggs/
 dist/
 downloads/

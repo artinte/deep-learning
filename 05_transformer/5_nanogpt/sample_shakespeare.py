@@ -13,7 +13,7 @@ temperature = 0.8 # 1.0 = no change, < 1.0 = less random, > 1.0 = more random, i
 top_k = 200 # retain only the top_k most likely tokens, clamp others to have 0 probability
 seed = 1337
 device = 'cuda' # examples: 'cpu', 'cuda', 'cuda:0', 'cuda:1', etc.
-dtype = 'bfloat16' if torch.cuda.is_available() and torch.cuda.is_bf16_supported() else 'float16'
+dtype = 'bfloat16'
 
 
 torch.manual_seed(seed)
@@ -21,8 +21,7 @@ torch.cuda.manual_seed(seed)
 torch.backends.cuda.matmul.allow_tf32 = True # allow tf32 on matmul
 torch.backends.cudnn.allow_tf32 = True # allow tf32 on cudnn
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
-dtype = 'bfloat16'
-ctx = contextlib.nullcontext() if device == 'cpu' else torch.amp.autocast(device_type=device, dtype=dtype)
+ctx = contextlib.nullcontext() if device == 'cpu' else torch.amp.autocast(device_type=device, dtype=torch.bfloat16)
 
 
 # init from a model saved in a specific directory.
@@ -52,3 +51,5 @@ with torch.no_grad():
     with ctx:
         for k in range(num_samples):
             y = model.generate(x, max_new_tokens, temperature=temperature, top_k=top_k)
+            print(decode(y[0].tolist()))
+            print('---------------')

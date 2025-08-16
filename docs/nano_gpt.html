@@ -534,6 +534,52 @@ return y</code></pre>
                 <p>It's time to training character GPT, to reduce complexity, parameters are not read from the command line. First, execute the <span class="highlight">shakespeare_char.py</span> file, then executing the <span class="highlight">train.py</span> file will start the training process.</p>
                 <p>The implementation in file <a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/5_nanogpt/train.py">train.py</a> </p>
 
+                <pre><code>def get_batch(split="train"):
+    if split == "train":
+        data = numpy.memmap(
+            os.path.join(data_dir, "train.bin"), dtype=numpy.uint16, mode="r"
+        )
+    else:
+        data = numpy.memmap(
+            os.path.join(data_dir, "val.bin"), dtype=numpy.uint16, mode="r"
+        )
+
+    ix = torch.randint(len(data) - block_size, (batch_size,))
+    x = torch.stack(
+        [torch.from_numpy((data[i : i + block_size]).astype(numpy.int64)) for i in ix]
+    )
+    y = torch.stack(
+        [
+            torch.from_numpy((data[i + 1 : i + 1 + block_size]).astype(numpy.int64))
+            for i in ix
+        ]
+    )
+
+    if device == "cuda":
+        # pin arrays x,y, which allows us to move them to GPU asynchronously (non_blocking=True)
+        x, y = x.pin_memory().to(device, non_blocking=True), y.pin_memory().to(
+            device, non_blocking=True
+        )
+    else:
+        x, y = x.to(device), y.to(device)
+    return x, y</code></pre>
+
+                <pre><code># helps estimate an arbitrarily accurate loss over either split using many batches
+@torch.no_grad()
+def estimate_loss(batch=200):
+    out = {}
+    model.eval()
+    for split in ["train", "val"]:
+        losses = torch.zeros(batch)
+        for k in range(batch):
+            X, Y = get_batch(split)
+            with ctx:
+                logits, loss = model(X, Y)
+            losses[k] = loss.item()
+        out[split] = losses.mean()
+    model.train()
+    return out</code></pre>
+
                 <h4>5.5.1.4 Inference</h4>
 
                 <p><a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/5_nanogpt/sample.py">sample.py</a></p>
