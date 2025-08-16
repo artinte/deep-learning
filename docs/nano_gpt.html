@@ -389,12 +389,12 @@ q = q.view(batch_size, seq_length, n_head, n_embed // n_head).transpose(1, 2)
 k = k.view(batch_size, seq_length, n_head, n_embed // n_head).transpose(1, 2)
 v = v.view(batch_size, seq_length, n_head, n_embed // n_head).transpose(1, 2)
 print('Query divided shape:', q.shape)
-print('Key divided shape', k.shape)
-print('Value divied shape', v.shape)</code></pre>
+print('Key divided shape:', k.shape)
+print('Value divied shape:', v.shape)</code></pre>
 
                 <pre><samp>Query divided shape: torch.Size([2, 2, 3, 2])
-Key divided shape torch.Size([2, 2, 3, 2])
-Value divied shape torch.Size([2, 2, 3, 2])</samp></pre>
+Key divided shape: torch.Size([2, 2, 3, 2])
+Value divied shape: torch.Size([2, 2, 3, 2])</samp></pre>
 
                 <p>Function <code>torch.nn.functional.scaled_dot_product_attention</code> calculate the scaled dot product attention, remember we should set <code>is_causal = True</code> :</p>
                 <pre><code># causal self-attention; Self-attend: (B, nh, T, hs) x (B, nh, hs, T) -> (B, nh, T, T)
@@ -417,6 +417,20 @@ if self.flash:
     att = torch.nn.functional.softmax(att, dim=-1)
     att = self.attn_dropout(att)
     y = att @ v  # (B, nh, T, T) x (B, nh, T, hs) -> (B, nh, T, hs)</code></pre>
+
+                <p>Transforming the output back to the input's shape:</p>
+                <p># re-assemble all head outputs side by side
+y = y.transpose(1, 2).contiguous().view(B, T, C)</p>
+
+                <p>During the entire attention mechanism process, from the input <code>x</code> to the final output <code>z</code> , you can see that their dimensions do not change. The core reason we use multi-head attention is to help lower the model's loss rate. There's a Chinese proverb that says, "Three humble cobblers are better than one master strategist," which roughly captures the same idea. It means that combining multiple, simpler perspectives can lead to a smarter, more robust solution than relying on a single, complex one.</p>
+                <pre><code>y = torch.nn.functional.scaled_dot_product_attention(q, k, v, attn_mask=None, is_causal=True)
+z = y.transpose(1, 2).contiguous().view(batch_size, seq_length, n_embed)
+print('Result of scaled_dot_product_attention:', y.shape)
+print('Re-assemble of result:', z.shape)</code></pre>
+                <pre><samp>Result of scaled_dot_product_attention: torch.Size([2, 2, 3, 2])
+Re-assemble of result: torch.Size([2, 3, 4])</samp></pre>
+
+                
 
                 <h5>GPT Struct</h5>
 
