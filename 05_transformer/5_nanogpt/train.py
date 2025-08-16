@@ -8,35 +8,15 @@ import numpy
 import torch
 import model
 
-
-"""
-This training script can be run both on a single gpu in debug mode,
-and also in a larger training run with distributed data parallel (ddp).
-
-To run on a single GPU, example:
-$ python train.py --batch_size=32
-
-"""
-
-# default config values designed to train a gpt2 (124M) on OpenWebText
-# I/O
+data_dir = "data/"
 out_dir = "out"
-eval_interval = 2000
-log_interval = 1
-eval_iters = 200
-eval_only = False  # if True, script exits right after the first eval
-always_save_checkpoint = True  # if True, always save a checkpoint after each eval
-init_from = "scratch"  # 'scratch' or 'resume' or 'gpt2*'
+max_iters = 500  # total number of training iterations
+eval_interval = 50  # for save checkpoint
+iter_num = 0
+best_val_loss = 1e9
 
-# wandb logging
-wandb_log = False  # disabled by default
-wandb_project = "owt"
-wandb_run_name = "gpt2"  # 'run' + str(time.time())
-
-# data
-dataset = "openwebtext"
 gradient_accumulation_steps = 5 * 8  # used to simulate larger batch sizes
-batch_size = 12  # if gradient_accumulation_steps > 1, this is the micro-batch size
+batch_size = 16  # if gradient_accumulation_steps > 1, this is the micro-batch size
 block_size = 1024
 
 # model parameters
@@ -48,48 +28,51 @@ bias = False  # do we use bias inside LayerNorm and Linear layers?
 
 # adamw optimizer
 learning_rate = 6e-4  # max learning rate
-max_iters = 600000  # total number of training iterations
 weight_decay = 1e-1
 beta1 = 0.9
 beta2 = 0.95
 grad_clip = 1.0  # clip gradients at this value, or disable if == 0.0
 # learning rate decay settings
 decay_lr = True  # whether to decay the learning rate
-warmup_iters = 2000  # how many steps to warm up for
-lr_decay_iters = 600000  # should be ~= max_iters per Chinchilla
+warmup_iters = 20  # how many steps to warm up for
+lr_decay_iters = 500  # should be ~= max_iters per Chinchilla
 min_lr = 6e-5  # minimum learning rate, should be ~= learning_rate/10 per Chinchilla
 
-# DDP settings
-backend = "nccl"
 
-# DDP settings
-backend = "nccl"  # 'nccl', 'gloo', etc.
-
-# system
-device = (
-    "cuda"  # examples: 'cpu', 'cuda', 'cuda:0', 'cuda:1' etc., or try 'mps' on macbooks
-)
-# 'float32', 'bfloat16', or 'float16', the latter will auto implement a GradScaler
-dtype = (
-    "bfloat16"
-    if torch.cuda.is_available() and torch.cuda.is_bf16_supported()
-    else "float16"
-)
-compile = False  # use PyTorch 2.0 to compile the model to be faster
-
-device_type = "cuda" if "cuda" in device else "cpu"
-ptdtype = {
-    "float32": torch.float32,
-    "bfloat16": torch.bfloat16,
-    "float16": torch.float16,
-}[dtype]
+dtype = "bfloat16"
+device = "cuda" if torch.cuda.is_available() else "cpu"
 ctx = (
     contextlib.nullcontext()
-    if device_type == "cpu"
-    else torch.amp.autocast(device_type=device_type, dtype=ptdtype)
+    if device == "cpu"
+    else torch.amp.autocast(device_type=device, dtype=torch.bfloat16)
 )
 
-data_dir = "data/"
+# model init
+model_args = dict(
+    n_layer=n_layer,
+    n_head=n_head,
+    n_embd=n_embd,
+    block_size=block_size,
+    bias=bias,
+    vocab_size=None,
+    dropout=dropout,
+)
+
+# attempt to derive vocab_size from the dataset
+meta_path = os.path.join(data_dir, "meta.pkl")
+meta_vocab_size = None
+if os.path.exists(meta_path):
+    with open(meta_path, "rb") as f:
+        meta = pickle.load(f)
+    meta_vocab_size = meta["vocab_size"]
+    print(f"found vocab_size = {meta_vocab_size} (inside {meta_path})")
+
+# init a new model from scratch
+print("Initializing a new model from scratch")
+# determine the vocab size we'll use for from-scratch training
+if meta_vocab_size is None:
+    print("defaulting to vocab_size of GPT-2 to 50304")
+model_args["vocab_size"] = meta_vocab_size if meta_vocab_size is not None else 50304
 
 
 def get_batch(split="train"):
@@ -113,7 +96,7 @@ def get_batch(split="train"):
         ]
     )
 
-    if device_type == "cuda":
+    if device == "cuda":
         # pin arrays x,y, which allows us to move them to GPU asynchronously (non_blocking=True)
         x, y = x.pin_memory().to(device, non_blocking=True), y.pin_memory().to(
             device, non_blocking=True
@@ -125,12 +108,12 @@ def get_batch(split="train"):
 
 # helps estimate an arbitrarily accurate loss over either split using many batches
 @torch.no_grad()
-def estimate_loss():
+def estimate_loss(batch=200):
     out = {}
     model.eval()
     for split in ["train", "val"]:
-        losses = torch.zeros(eval_iters)
-        for k in range(eval_iters):
+        losses = torch.zeros(batch)
+        for k in range(batch):
             X, Y = get_batch(split)
             with ctx:
                 logits, loss = model(X, Y)
@@ -154,69 +137,19 @@ def get_lr(it):
     coeff = 0.5 * (1.0 + math.cos(math.pi * decay_ratio))  # coeff ranges 0..1
     return min_lr + coeff * (learning_rate - min_lr)
 
-
-iter_num = 0
-best_val_loss = 1e9
-
-# attempt to derive vocab_size from the dataset
-meta_path = os.path.join(data_dir, "meta.pkl")
-meta_vocab_size = None
-if os.path.exists(meta_path):
-    with open(meta_path, "rb") as f:
-        meta = pickle.load(f)
-    meta_vocab_size = meta["vocab_size"]
-    print(f"found vocab_size = {meta_vocab_size} (inside {meta_path})")
-
-
-# model init
-model_args = dict(
-    n_layer=n_layer,
-    n_head=n_head,
-    n_embd=n_embd,
-    block_size=block_size,
-    bias=bias,
-    vocab_size=None,
-    dropout=dropout,
-)
-
-
-if init_from == "scratch":
-    # init a new model from scratch
-    print("Initializing a new model from scratch")
-    # determine the vocab size we'll use for from-scratch training
-    if meta_vocab_size is None:
-        print(
-            "defaulting to vocab_size of GPT-2 to 50304 (50257 rounded up for efficiency)"
-        )
-    model_args["vocab_size"] = meta_vocab_size if meta_vocab_size is not None else 50304
-    gptconf = model.GPTConfig(**model_args)
-    model = model.GPT(gptconf)
-
+gptconf = model.GPTConfig(**model_args)
+model = model.GPT(gptconf)
 model.to(device)
-
-# initialize a GradScaler. If enabled=False scaler is a no-op
-scaler = torch.cuda.amp.GradScaler(enabled=(dtype == "float16"))
 
 # optimizer
 optimizer = model.configure_optimizers(
-    weight_decay, learning_rate, (beta1, beta2), device_type
+    weight_decay, learning_rate, (beta1, beta2), device
 )
-
-# compile the model
-if compile:
-    print("compiling the model... (takes a ~minute)")
-    unoptimized_model = model
-    model = torch.compile(model)  # requires PyTorch 2.0
-
 
 # training loop
 X, Y = get_batch("train")  # fetch the very first batch
 t0 = time.time()
-local_iter_num = 0  # number of iterations in the lifetime of this process
 
-master_process = True
-raw_model = model
-running_mfu = -1.0
 while True:
     # determine and set the learning rate for this iteration
     lr = get_lr(iter_num) if decay_lr else learning_rate
@@ -224,17 +157,17 @@ while True:
         param_group["lr"] = lr
 
     # evaluate the loss on train/val sets and write checkpoints
-    if iter_num % eval_interval == 0 and master_process:
+    if iter_num % eval_interval == 0:
         losses = estimate_loss()
         print(
             f"step {iter_num}: train loss {losses['train']:.4f}, val loss {losses['val']:.4f}"
         )
 
-        if losses["val"] < best_val_loss or always_save_checkpoint:
+        if losses["val"] < best_val_loss:
             best_val_loss = losses["val"]
             if iter_num > 0:
                 checkpoint = {
-                    "model": raw_model.state_dict(),
+                    "model": model.state_dict(),
                     "optimizer": optimizer.state_dict(),
                     "model_args": model_args,
                     "iter_num": iter_num,
@@ -243,29 +176,20 @@ while True:
                 print(f"saving checkpoint to {out_dir}")
                 torch.save(checkpoint, os.path.join(out_dir, "ckpt.pt"))
 
-    if iter_num == 0 and eval_only:
-        break
-
     # forward backward update, with optional gradient accumulation to simulate larger batch size
-    # and using the GradScaler if data type is float16
     for micro_step in range(gradient_accumulation_steps):
         with ctx:
             logits, loss = model(X, Y)
-            loss = (
-                loss / gradient_accumulation_steps
-            )  # scale the loss to account for gradient accumulation
+            # scale the loss to account for gradient accumulation
+            loss = (loss / gradient_accumulation_steps)  
         # immediately async prefetch next batch while model is doing the forward pass on the GPU
         X, Y = get_batch("train")
-        # backward pass, with gradient scaling if training in fp16
-        scaler.scale(loss).backward()
+        loss.backward()
 
     # clip the gradient
     if grad_clip != 0.0:
-        scaler.unscale_(optimizer)
         torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
-    # step the optimizer and scaler if training in fp16
-    scaler.step(optimizer)
-    scaler.update()
+    optimizer.step()
     # flush the gradients as soon as we can, no need for this memory anymore
     optimizer.zero_grad(set_to_none=True)
 
@@ -273,18 +197,12 @@ while True:
     t1 = time.time()
     dt = t1 - t0
     t0 = t1
-    if iter_num % log_interval == 0 and master_process:
-        # get loss as float. note: this is a CPU-GPU sync point
-        # scale up to undo the division above, approximating the true total loss (exact would have been a sum)
-        lossf = loss.item() * gradient_accumulation_steps
-        if local_iter_num >= 5:  # let the training loop settle a bit
-            mfu = raw_model.estimate_mfu(batch_size * gradient_accumulation_steps, dt)
-            running_mfu = mfu if running_mfu == -1.0 else 0.9 * running_mfu + 0.1 * mfu
-        print(
-            f"iter {iter_num}: loss {lossf:.4f}, time {dt*1000:.2f}ms, mfu {running_mfu*100:.2f}%"
-        )
+
+    # get loss as float. note: this is a CPU-GPU sync point
+    # scale up to undo the division above, approximating the true total loss (exact would have been a sum)
+    lossf = loss.item() * gradient_accumulation_steps
+    print(f"iter {iter_num}: loss {lossf:.4f}, time {dt*1000:.2f}ms")
     iter_num += 1
-    local_iter_num += 1
 
     # termination conditions
     if iter_num > max_iters:

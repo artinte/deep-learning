@@ -528,12 +528,11 @@ return y</code></pre>
                 <p>In training phase, <code>logits.view(-1, logits.size(-1))</code> reshapes the model's output. The logits tensor initially has a shape of (batch_size, sequence_length, vocab_size). However, the cross_entropy function expects its input to be a 2D tensor, where each row corresponds to a single sample and each column is a class score.</p>
                 <p>The targets tensor starts with a shape of <code>(batch_size, sequence_length)</code> , holding the true token ID for each position. <code>targets.view(-1)</code> prepares the ground truth labels to match the reshaped logits.</p>
                 <p>The nanGPT codebase uses a target value of -1 for any token that should be ignored during loss calculation. This typically includes padding tokens at the end of sequences and the very first token, as there's no preceding token to predict it from.</p>
-
-                
+                <p>For more information, we can look at the <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.cross_entropy.html">torch.nn.functional.cross_entropy</a> documentation.</p>
 
                 <h4 id="training">5.5.1.3 Training</h4>
-
-                <p><a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/5_nanogpt/train.py">train.py</a> </p>
+                <p>It's time to training character GPT, to reduce complexity, parameters are not read from the command line. First, execute the <span class="highlight">shakespeare_char.py</span> file, then executing the <span class="highlight">train.py</span> file will start the training process.</p>
+                <p>The implementation in file <a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/5_nanogpt/train.py">train.py</a> </p>
 
                 <h4>5.5.1.4 Inference</h4>
 
