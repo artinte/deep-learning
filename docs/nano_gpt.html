@@ -372,7 +372,7 @@ Query shape: torch.Size([2, 3, 4])
 Key shape: torch.Size([2, 3, 4])
 Value shape: torch.Size([2, 3, 4])</samp></pre>
 
-                <p>The q, k and v varialbe is the same shape of x , because we use multi-head, so q, k and v need divide <code>self.n_head</code> parts:</p>
+                <p>The q, k and v variables is the same shape of x , because we use multi-head, so q, k and v need divide <code>self.n_head</code> parts:</p>
                 <pre><code># (B, nh, T, hs)
 k = k.view(B, T, self.n_head, C // self.n_head).transpose(1, 2)
 # (B, nh, T, hs)
@@ -381,9 +381,6 @@ q = q.view(B, T, self.n_head, C // self.n_head).transpose(1, 2)
 v = v.view(B, T, self.n_head, C // self.n_head).transpose(1, 2)</code></pre>
 
                 <p>After being divided, the <code>transpose</code> operation will swap the <code>n_head</code> and <code>seq_len</code> dimensions, like the demo shown:</p>
-                <p>Query divided shape: torch.Size([2, 2, 3, 2])
-Key divided shape torch.Size([2, 2, 3, 2])
-Value divied shape torch.Size([2, 2, 3, 2])</p>
                 <pre><code>n_head = 2
 q = q.view(batch_size, seq_length, n_head, n_embed // n_head).transpose(1, 2)
 k = k.view(batch_size, seq_length, n_head, n_embed // n_head).transpose(1, 2)
@@ -419,10 +416,10 @@ if self.flash:
     y = att @ v  # (B, nh, T, T) x (B, nh, T, hs) -> (B, nh, T, hs)</code></pre>
 
                 <p>Transforming the output back to the input's shape:</p>
-                <p># re-assemble all head outputs side by side
-y = y.transpose(1, 2).contiguous().view(B, T, C)</p>
+                <pre><code># re-assemble all head outputs side by side
+y = y.transpose(1, 2).contiguous().view(B, T, C)</code></pre>
 
-                <p>During the entire attention mechanism process, from the input <code>x</code> to the final output <code>z</code> , you can see that their dimensions do not change. The core reason we use multi-head attention is to help lower the model's loss rate. There's a Chinese proverb that says, "Three humble cobblers are better than one master strategist," which roughly captures the same idea. It means that combining multiple, simpler perspectives can lead to a smarter, more robust solution than relying on a single, complex one.</p>
+                <p>During the entire attention mechanism process, from the input <code>x</code> to the final output <code>z</code> , we can see that their dimensions do not change. The core reason we use multi-head attention is to help lower the model's loss rate. There's a Chinese proverb that says, "Three humble cobblers are better than one master strategist," which roughly captures the same idea. It means that combining multiple, simpler perspectives can lead to a smarter, more robust solution than relying on a single, complex one.</p>
                 <pre><code>y = torch.nn.functional.scaled_dot_product_attention(q, k, v, attn_mask=None, is_causal=True)
 z = y.transpose(1, 2).contiguous().view(batch_size, seq_length, n_embed)
 print('Result of scaled_dot_product_attention:', y.shape)
@@ -430,7 +427,12 @@ print('Re-assemble of result:', z.shape)</code></pre>
                 <pre><samp>Result of scaled_dot_product_attention: torch.Size([2, 2, 3, 2])
 Re-assemble of result: torch.Size([2, 3, 4])</samp></pre>
 
-                
+                <p>The c_proj linear layer acts as an output projection for the multi-head attention mechanism. Its primary role is to integrate the different perspectives learned by each of the separate attention heads.</p>
+                <p>Even though the layer's input and output dimensions are the same, it performs a crucial, learnable linear transformation that fuses all the information from the heads into a single, cohesive representation. This step is essential for creating a meaningful output that is then ready to be used in the subsequent residual connection.</p>
+                <pre><code># output projection
+y = self.resid_dropout(self.c_proj(y))
+return y</code></pre>
+
 
                 <h5>GPT Struct</h5>
 
