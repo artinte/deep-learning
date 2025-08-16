@@ -306,14 +306,14 @@ class GPTConfig:
         return y</code></pre>
 
                 <p>We can understand the code by reading it line by line.</p>
-                <p>Define a <code>CausalSelfAttention</code> , which is subclass of <code>torch.nn.Module</code> , <code>assert</code> ensure the embedding dimension (n_embd) is divisible by the number of attention heads (n_head) :</p>
+                <p>Define a <code>CausalSelfAttention</code> , which is subclass of <code>torch.nn.Module</code> , statement <code>assert</code> ensure the embedding dimension (n_embd) is divisible by the number of attention heads (n_head) :</p>
                 <pre><code>class CausalSelfAttention(torch.nn.Module):
     def __init__(self, config):
         super().__init__()
         assert config.n_embd % config.n_head == 0</code></pre>
                 
                 <p>Define two <code>torch.nn.Linear</code> and <code>torch.nn.Dropout</code> layer.</p>
-                <p>The first linear layer that performs the combined projection for query (Q), key (K) and value (v) vectors. Instead of having three separate linear layers for Q, K, and V, this one layer takes the input embedding (config.n_embd) and projects it to a size that's three times larger (3 * config.n_embd).</p>
+                <p>The first linear layer that performs the combined projection for query (Q), key (K) and value (v) vectors. Instead of having three separate linear layers for Q, K, and V, this one layer takes the input embedding <code>(config.n_embd)</code> and projects it to a size that's three times larger <code>(3 * config.n_embd)</code> .</p>
                 <p>The second linear layer takes the concatenated output from all attention heads (config.n_embd) and projects it back to the original embedding dimension.</p>
                 <pre><code># key, query, value projections for all heads, but in a batch
 self.c_attn = torch.nn.Linear(config.n_embd, 3 * config.n_embd, bias=config.bias)
@@ -341,8 +341,36 @@ if not self.flash:
         ),
     )</code></pre>
                 
-                
+                <p>The <code>forward</code> function receives an input parameter <code>x</code> , which is a small batch of text. And then unpacks the dimensions of the input tensor x. B is the batch size, T is the sequence length, and C is the embedding dimension <code>(n_embd)</code> :</p>
+                <pre><code>def forward(self, x):
+    # batch size, sequence length, embedding dimensionality (n_embd)
+    B, T, C = x.size()</code></pre>
 
+                <p>This is where the magic of the combined projection happens. The input x is passed through the c_attn linear layer, and the resulting tensor is split into three equal parts along the last dimension, giving us the query, key, and value tensors.</p>
+                <pre><code># calculate query, key, values for all heads in batch and move head forward to be the batch dim
+q, k, v = self.c_attn(x).split(self.n_embd, dim=2)</code></pre>
+                <p>We can write a simple demo to understand above process:</p>
+
+                <pre><code>batch_size = 2
+seq_length = 3
+n_embed = 4
+
+x = torch.randn((batch_size, seq_length, n_embed))
+print('Input tensor shape:', x.shape)
+
+c_attn = torch.nn.Linear(n_embed, 3 * n_embed)
+result = c_attn(x)
+print('Result shape:', result.shape)
+q, k, v = result.split(n_embed, dim=2)
+print('Query shape:', q.shape)
+print('Key shape:', k.shape)
+print('Value shape:', v.shape)</code></pre>
+
+                <pre><samp>Input tensor shape: torch.Size([2, 3, 4])
+Result shape: torch.Size([2, 3, 12])
+Query shape: torch.Size([2, 3, 4])
+Key shape: torch.Size([2, 3, 4])
+Value shape: torch.Size([2, 3, 4])</samp></pre>
 
                 <h5>GPT Struct</h5>
 
