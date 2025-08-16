@@ -489,7 +489,49 @@ return y</code></pre>
         elif isinstance(module, torch.nn.Embedding):
             torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)</code></pre>
 
-                <h4>5.5.1.3 Training</h4>
+                <p class="comment">Instead of using a sine and cosine function for positional encoding, the GPT model uses a learnable <code>torch.nn.Embedding</code> layer because it offers greater expressive power. The <code>wpe = torch.nn.Embedding(config.block_size, config.n_embd)</code> layer creates a lookup table where the model can learn the best vector representation for each position in the sequence, up to <code>block_size</code> .</p>
+
+                <p>Just like other deep learning programs, the data is processed by the GPT model to generate a result. This result is then compared with the expected value, and a loss function is used to calculate the difference between the two. In the next section <a href="nano_gpt.html#training">Training</a> , an optimizer will use this loss to update the model's parameters.</p>
+                
+                <pre><code>def forward(self, idx, targets=None):
+    device = idx.device
+    b, t = idx.size()
+    assert (
+        t &lt;= self.config.block_size
+    ), f"Cannot forward sequence of length {t}, block size is only {self.config.block_size}"
+    pos = torch.arange(0, t, dtype=torch.long, device=device)  # shape (t)
+
+    # forward the GPT model itself
+    tok_emb = self.transformer.wte(idx)  # token embeddings of shape (b, t, n_embd)
+    pos_emb = self.transformer.wpe(pos)  # position embeddings of shape (t, n_embd)
+    x = self.transformer.drop(tok_emb + pos_emb)
+    for block in self.transformer.h:
+        x = block(x)
+    x = self.transformer.ln_f(x)
+
+    if targets is not None:
+        # if we are given some desired targets also calculate the loss
+        logits = self.lm_head(x)
+        loss = torch.nn.functional.cross_entropy(
+            logits.view(-1, logits.size(-1)), targets.view(-1), ignore_index=-1
+        )
+    else:
+        # inference-time mini-optimization: only forward the lm_head on the very last position
+        logits = self.lm_head(
+            x[:, [-1], :]
+        )  # note: using list [-1] to preserve the time dim
+        loss = None
+
+    return logits, loss</code></pre>
+
+                <p>If we pass <code>targets</code> , we are training the model; otherwise, we are predicting (or performing inference). Let's take a detailed look at the loss calculation process in nanGPT.</p>
+                <p>In training phase, <code>logits.view(-1, logits.size(-1))</code> reshapes the model's output. The logits tensor initially has a shape of (batch_size, sequence_length, vocab_size). However, the cross_entropy function expects its input to be a 2D tensor, where each row corresponds to a single sample and each column is a class score.</p>
+                <p>The targets tensor starts with a shape of <code>(batch_size, sequence_length)</code> , holding the true token ID for each position. <code>targets.view(-1)</code> prepares the ground truth labels to match the reshaped logits.</p>
+                <p>The nanGPT codebase uses a target value of -1 for any token that should be ignored during loss calculation. This typically includes padding tokens at the end of sequences and the very first token, as there's no preceding token to predict it from.</p>
+
+                
+
+                <h4 id="training">5.5.1.3 Training</h4>
 
                 <p><a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/5_nanogpt/train.py">train.py</a> </p>
 
