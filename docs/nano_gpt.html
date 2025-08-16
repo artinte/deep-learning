@@ -61,7 +61,7 @@ First, you know Caius Marcius is chief enemy to the people.
 All:
 We know't, we know't.</samp></pre>
                 
-                <p>Download the <a href="https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt">input.txt</a> to local <span class="highlight">data/</span> directory, and read it in code:</p>
+                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/5_nanogpt/shakespeare_char.py">shakespeare_char.py</a> download the <a href="https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt">input.txt</a> to local <span class="highlight">data/</span> directory, and read it in code:</p>
                 <pre><code>data_dir = os.path.join(os.path.dirname(__file__), "data")
 os.makedirs(data_dir, exist_ok=True)
 input_file_path = os.path.join(data_dir, "input.txt")
@@ -172,6 +172,7 @@ with open(os.path.join(data_dir, "meta.pkl"), "wb") as f:
 
                 <p><a href="word_embed.html">Embedding</a> , <a href="activation_function.html">softmax</a> , <a href="network_scratch.html">linear layer</a> and <a href="res_net.html">Residual network</a> as mentioned in the previous tutorial, the attention module will be covered in the next section. File <a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/5_nanogpt/train.py">train.py</a> implements the architecture, let's break this down into a few parts.</p>
                 
+                <p>Here is a every common multilayer perceptron (MLP) , it's composed mainly of two symmetric <code>torch.nn.Linear</code>:</p>
                 <pre><code>class MLP(torch.nn.Module):
     def __init__(self, config):
         super().__init__()
@@ -189,6 +190,7 @@ with open(os.path.join(data_dir, "meta.pkl"), "wb") as f:
         x = self.dropout(x)
         return x</code></pre>
 
+                <p>The <code>Block</code> is the core of GPT , mainly include a <code>CausalSelfAttention</code> and a MLP. Additionally, it includes two residual networks and <code>torch.nn.LayerNorm</code> :</p>
                 <pre><code>class Block(torch.nn.Module):
     def __init__(self, config):
         super().__init__()
@@ -202,12 +204,28 @@ with open(os.path.join(data_dir, "meta.pkl"), "wb") as f:
         x = x + self.mlp(self.ln_2(x))
         return x</code></pre>
 
-                
-                <h5>Causal Self Attention</h5>
+                <h5>Parameters</h5>
+                <p></p>
+                <pre><code>@dataclass
+class GPTConfig:
+    block_size: int = 1024
+    # GPT-2 vocab_size of 50257, padded up to nearest multiple of 64 (50304) for efficiency.
+    # For our simple character GPT, 128 enough.
+    vocab_size: int = (128)
+    n_layer: int = 12
+    n_head: int = 12
+    n_embd: int = 768
+    dropout: float = 0.0
+    # True: bias in Linears and LayerNorms, like GPT-2. False: a bit better and faster
+    bias: bool = (True)</code></pre>
 
+                <h5>Causal Self Attention</h5>
+                <p>Causal self-attention is a specific type of self-attention mechanism used in transformer models, particularly for tasks like text generation. Unlike standard self-attention, which allows a token to attend to all other tokens in a sequence, causal self-attention enforces a crucial constraint: a token can only attend to the tokens that come before it in the sequence, and not to the tokens that come after.</p>
                 <img src="res/05/casual_self_attention.webp" alt="Casual Self Attention" width="550">
                 <p style="text-align: center; color: #555555;">Figure 4 - Casual Self Attention</p>
 
+                <p>This "causal" or "masked" approach is essential for autoregressive models like those used in large language models (LLMs) that predict the next word in a sequence. By preventing a model from "cheating" and looking ahead at future words, it ensures that the prediction for each position is based solely on the preceding context.</p>
+                <p>This is typically implemented by applying a mask to the attention weights, which effectively sets the attention scores for future tokens to negative infinity before applying the softmax function, making their contribution zero.</p>
                 <pre><code>class CausalSelfAttention(torch.nn.Module):
     def __init__(self, config):
         super().__init__()
@@ -277,20 +295,11 @@ with open(os.path.join(data_dir, "meta.pkl"), "wb") as f:
         y = self.resid_dropout(self.c_proj(y))
         return y</code></pre>
 
-                <h5>Parameters</h5>
+                <p>We can understand the code by reading it line by line.</p>
 
-                <pre><code>@dataclass
-class GPTConfig:
-    block_size: int = 1024
-    # GPT-2 vocab_size of 50257, padded up to nearest multiple of 64 (50304) for efficiency.
-    # For our simple character GPT, 128 enough.
-    vocab_size: int = (128)
-    n_layer: int = 12
-    n_head: int = 12
-    n_embd: int = 768
-    dropout: float = 0.0
-    # True: bias in Linears and LayerNorms, like GPT-2. False: a bit better and faster
-    bias: bool = (True)</code></pre>
+                
+
+                
 
 
                 <h5>GPT Struct</h5>
