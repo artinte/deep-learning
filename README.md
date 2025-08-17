@@ -69,7 +69,7 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 - [x] 8.1 [Speech Feature Extraction](https://artinte.github.io/deep-learning/speech_feature.html)
 - [ ] 8.2 [Automatic Speech Recognition](https://artinte.github.io/deep-learning/speech_recognition.html)
 - [ ] 8.3 [Text-to-Speech](https://artinte.github.io/deep-learning/text_to_speech.html)
-- [ ] 8.4 [Music Transcription](https://artinte.github.io/deep-learning/music_transcription.html)
+- [x] 8.4 [Music Transcription](https://artinte.github.io/deep-learning/music_transcription.html)
 - [x] 8.5 [Music Synthesis](https://artinte.github.io/deep-learning/music_synthesis.html)
 
 ### 09 Image and Video

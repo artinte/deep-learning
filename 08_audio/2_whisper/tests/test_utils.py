@@ -1,7 +1,10 @@
-from whisper.utils import str2bool
+from whisper import utils
+
+def test_exact_div():
+    utils.exact_div(4, 2)
 
 def test_str2bool():
-    result = str2bool("True")
+    result = utils.str2bool("True")
     assert result == True
-    result = str2bool("False")
+    result = utils.str2bool("False")
     assert result == False
