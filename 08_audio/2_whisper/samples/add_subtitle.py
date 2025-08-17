@@ -6,6 +6,7 @@ from transformers import MarianMTModel, MarianTokenizer
 
 """
 Add subtitle to a video
+python src_video.mp4 out_video.mp4
 """
 
 def format_time(seconds):
