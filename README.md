@@ -44,8 +44,8 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 - [x] 5.3 [Transformer from Stratch](https://artinte.github.io/deep-learning/transformer_stratch.html)
 - [x] 5.4 [nn.Transformer](https://artinte.github.io/deep-learning/nn_transformer.html)
 - [ ] 5.5 [nanoGPT](https://artinte.github.io/deep-learning/nano_gpt.html)
-- [ ] 5.6 [BERT](https://artinte.github.io/deep-learning/bert.html)
-- [ ] 5.7 [Vision Transformer](https://artinte.github.io/deep-learning/vision_transformer.html)
+- [x] 5.6 [BERT](https://artinte.github.io/deep-learning/bert.html)
+- [x] 5.7 [Vision Transformer](https://artinte.github.io/deep-learning/vision_transformer.html)
 
 ### 06 Diffusion Model
 
@@ -66,11 +66,11 @@ This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the e
 
 ### 08 Audio
 
-- [ ] 8.1 [Speech Feature Extraction](https://artinte.github.io/deep-learning/speech_feature.html)
+- [x] 8.1 [Speech Feature Extraction](https://artinte.github.io/deep-learning/speech_feature.html)
 - [ ] 8.2 [Automatic Speech Recognition](https://artinte.github.io/deep-learning/speech_recognition.html)
 - [ ] 8.3 [Text-to-Speech](https://artinte.github.io/deep-learning/text_to_speech.html)
 - [ ] 8.4 [Music Transcription](https://artinte.github.io/deep-learning/music_transcription.html)
-- [ ] 8.5 [Music Synthesis](https://artinte.github.io/deep-learning/music_synthesis.html)
+- [x] 8.5 [Music Synthesis](https://artinte.github.io/deep-learning/music_synthesis.html)
 
 ### 09 Image and Video
 

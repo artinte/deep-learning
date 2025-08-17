@@ -2,4 +2,6 @@ from whisper.utils import str2bool
 
 def test_str2bool():
     result = str2bool("True")
-    assert result
+    assert result == True
+    result = str2bool("False")
+    assert result == False
