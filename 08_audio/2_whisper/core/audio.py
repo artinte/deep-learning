@@ -2,7 +2,7 @@ import numpy
 import subprocess
 import os
 import torch
-import utils
+from core import utils
 import typing
 from functools import lru_cache
 
@@ -91,7 +91,7 @@ def pad_or_trim(array, length: int = N_SAMPLES, *, axis: int = -1):
     return array
 
 
-@lru_cache(max_size=None)
+@lru_cache(maxsize=None)
 def mel_filters(device, n_mels: int) -> torch.Tensor:
     """
     load the mel filterbank matrix for projecting STFT into a Mel spectrogram.
