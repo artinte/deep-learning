@@ -4,6 +4,9 @@ import os
 import subprocess
 from transformers import MarianMTModel, MarianTokenizer
 
+"""
+Add subtitle to a video
+"""
 
 def format_time(seconds):
     hours = int(seconds // 3600)
@@ -32,6 +35,7 @@ def add_subtitle(video_path, srt_path, output):
 
 
 if __name__ == "__main__":
+    print('Add subtitle to video...')
     parser = argparse.ArgumentParser(description="Add subtitles to a video.")
     parser.add_argument(
         "video_file", type=str, help="Path to the video file to be transcribed"
@@ -41,8 +45,12 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    audio_path = "temp.aac"
-    srt_path = "temp.srt"
+    temp_dir = "temp"
+    os.makedirs(temp_dir, exist_ok=True)
+    base_name = os.path.basename(args.output)
+    filename_without_ext = os.path.splitext(base_name)[0]
+    audio_path = os.path.join(temp_dir, filename_without_ext + ".aac")
+    srt_path = os.path.join(temp_dir, filename_without_ext + ".srt")
     for file_path in [audio_path, srt_path, args.output]:
         if os.path.exists(file_path):
             os.remove(file_path)
