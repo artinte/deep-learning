@@ -1,7 +1,10 @@
 import numpy
 import subprocess
+import os
 import torch
 import utils
+import typing
+from functools import lru_cache
 
 
 # hard-coded audio hyperparameters
@@ -19,6 +22,7 @@ N_SAMPLES_PER_TOKEN = HOP_LENGTH * 2
 FRAMES_PER_SECOND = utils.exact_div(SAMPLE_RATE, HOP_LENGTH)
 # 20ms per audio token
 TOKENS_PER_SECOND = utils.exact_div(SAMPLE_RATE, N_SAMPLES_PER_TOKEN)
+
 
 def load_audio(file: str, sr: int = SAMPLE_RATE):
     """
@@ -56,11 +60,11 @@ def load_audio(file: str, sr: int = SAMPLE_RATE):
         out = subprocess.run(cmd, capture_output=True, check=True).stdout
     except subprocess.CalledProcessError as e:
         raise RuntimeError(f"Failed to load audio: {e.stderr.decode()}") from e
-    
+
     return numpy.frombuffer(out, numpy.int16).flatten().astype(numpy.float32) / 32768.0
 
 
-def pad_or_trim(array, length: int = N_SAMPLES, *, axis: int=-1):
+def pad_or_trim(array, length: int = N_SAMPLES, *, axis: int = -1):
     """
     Pad or trim the audio array to N_SAMPLES, as expected by the encoder.
     """
@@ -72,15 +76,86 @@ def pad_or_trim(array, length: int = N_SAMPLES, *, axis: int=-1):
         if array.shape[axis] < length:
             pad_widths = [(0, 0)] * array.ndim
             pad_widths[axis] = (0, length - array.shape[axis])
-            array = torch.nn.functional.pad(array, [pad for sizes in pad_widths[::-1] for pad in sizes])
+            array = torch.nn.functional.pad(
+                array, [pad for sizes in pad_widths[::-1] for pad in sizes]
+            )
     else:
         if array.shape[axis] > length:
             array = array.take(indices=range(length), axis=axis)
-        
+
         if array.shape[axis] < length:
             pad_widths = [(0, 0)] * array.ndim
             pad_widths[axis] = (0, length - array.shape[axis])
             array = numpy.pad(array, pad_widths)
-    
+
     return array
 
+
+@lru_cache(max_size=None)
+def mel_filters(device, n_mels: int) -> torch.Tensor:
+    """
+    load the mel filterbank matrix for projecting STFT into a Mel spectrogram.
+    Allows decoupling librosa dependency; saved using:
+
+        np.savez_compressed(
+            "mel_filters.npz",
+            mel_80=librosa.filters.mel(sr=16000, n_fft=400, n_mels=80),
+            mel_128=librosa.filters.mel(sr=16000, n_fft=400, n_mels=128),
+        )
+    """
+    assert n_mels in {80, 128}, f"Unsupported n_mels: {n_mels}"
+
+    filters_path = os.path.join(os.path.dirname(__file__), "assets", "mel_filters.npz")
+    with numpy.load(filters_path, allow_pickle=False) as f:
+        return torch.from_numpy(f[f"mel_{n_mels}"]).to(device)
+
+
+def log_mel_spectrogram(
+    audio: typing.Union[str, numpy.ndarray, torch.Tensor],
+    n_mels: int = 80,
+    padding: int = 0,
+    device: typing.Optional[typing.Union[str, torch.device]] = None,
+):
+    """
+    Compute the log-Mel spectrogram of
+
+    Parameters
+    ----------
+    audio: Union[str, np.ndarray, torch.Tensor], shape = (*)
+        The path to audio or either a NumPy array or Tensor containing the audio waveform in 16 kHz
+
+    n_mels: int
+        The number of Mel-frequency filters, only 80 and 128 are supported
+
+    padding: int
+        Number of zero samples to pad to the right
+
+    device: Optional[Union[str, torch.device]]
+        If given, the audio tensor is moved to this device before STFT
+
+    Returns
+    -------
+    torch.Tensor, shape = (n_mels, n_frames)
+        A Tensor that contains the Mel spectrogram
+    """
+    if not torch.is_tensor(audio):
+        if isinstance(audio, str):
+            audio = load_audio(audio)
+        audio = torch.from_numpy(audio)
+
+    if device is not None:
+        audio = audio.to(device)
+    if padding > 0:
+        audio = torch.nn.functional.pad(audio, (0, padding))
+
+    window = torch.hann_window(N_FFT).to(audio.device)
+    stft = torch.stft(audio, N_FFT, HOP_LENGTH, window=window, return_complex=True)
+    magnitudes = stft[..., :-1].abs() ** 2
+
+    filters = mel_filters(audio.device, n_mels)
+    mel_spec = filters @ magnitudes
+
+    log_spec = torch.clamp(mel_spec, min=1e-10).log10()
+    log_spec = torch.maximum(log_spec, log_spec.max() - 8.0)
+    log_spec = (log_spec + 4.0) / 4.0
+    return log_spec
