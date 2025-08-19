@@ -117,6 +117,15 @@ print("Gradients:", gradients)</code></pre>
                     \(S(x_i) = \frac{e^{x_i}}{\sum_{j=1}^{n} e^{x_j}}\)
                 </div>
                 <p><a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Softmax.html">torch.nn.Softmax</a></p>
+
+
+                <h3>2.4.5 Gaussian Error Linear Unit</h3>
+                <p>The GELU (Gaussian Error Linear Unit) activation function is a smooth, differentiable alternative to the ReLU (Rectified Linear Unit) activation function, widely used in deep learning, particularly in transformer models like BERT. It addresses some of ReLU's limitations, such as the "dying ReLU" problem and its non-differentiability at zero. </p>
+                <p>The GELU function is defined as:</p>
+                <div class="highlight-math" style="text-align: center; overflow-x: auto;">
+                    \(GELU(x) = x \times \Phi(x)\)
+                </div>
+                <p>where \Phi(x) is the cumulative distribution function of the standard normal distribution.</p>
                 
                 <div class="navigation">
                     <a href="pytorch_basics.html">Prev: 2.3 PyTorch Basics</a>
