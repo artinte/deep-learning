@@ -1,6 +1,6 @@
 import math
 import torch
-from util import masked_softmax, show_heatmaps
+from utils import masked_softmax, show_heatmaps
 
 
 class DotProductAttention(torch.nn.Module):

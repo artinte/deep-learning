@@ -1,6 +1,7 @@
 from matplotlib import pyplot
 import torch
 
+
 def masked_softmax(X, valid_lens):
     """Perform softmax operation by masking elements on the last axis."""
     # X: 3D tensor, valid_lens: 1D or 2D tensor
@@ -44,6 +45,7 @@ def show_heatmaps(matrices, xlabel, ylabel, titles=None, figsize=(5, 5), cmap='v
             fig.colorbar(im, ax=ax)
     pyplot.tight_layout()
     pyplot.show()
+
 
 if __name__ == '__main__':
     print(masked_softmax(torch.rand(2, 2, 4), torch.tensor([2, 3])))

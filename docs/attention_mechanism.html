@@ -290,7 +290,7 @@ plot(x_train, y_train, x_val, y_val, kernels, names)</code></pre>
 Learn to    code    &lt;blank&gt;
 Hello world &lt;blank&gt; &lt;blank&gt;</samp></pre>
                 <p>Since we do not want blanks in our attention model we simply need to limit \(\sum_{i=1}^n \alpha(\mathbf{q}, \mathbf{k}_i) \mathbf{v}_i\) to \(\sum_{i=1}^l \alpha(\mathbf{q}, \mathbf{k}_i) \mathbf{v}_i\) for however long, \(l \leq n\), the actual sentence is. Since it is such a common problem, it has a name: the masked softmax operation.</p>
-                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/1_attention/util.py">util.py</a> implement it. Actually, the implementation cheats ever so slightly by setting the values of \(\mathbf{v}_i\), for \(i > l\), to zero. Moreover, it sets the attention weights to a large negative number, such as \(-10^{6}\), in order to make their contribution to gradients and values vanish in practice.</p>
+                <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/1_attention/utils.py">utils.py</a> implement it. Actually, the implementation cheats ever so slightly by setting the values of \(\mathbf{v}_i\), for \(i > l\), to zero. Moreover, it sets the attention weights to a large negative number, such as \(-10^{6}\), in order to make their contribution to gradients and values vanish in practice.</p>
                 
                 <p>This is done since linear algebra kernels and operators are heavily optimized for GPUs and it is faster to be slightly wasteful in computation rather than to have code with conditional (if then else) statements.</p>
 
@@ -358,7 +358,7 @@ assert torch.bmm(Q, K).shape == (2, 3, 6)</code></pre>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(\mathrm{softmax}\left(\frac{\mathbf Q \mathbf K^\top }{\sqrt{d}}\right) \mathbf V \in \mathbb{R}^{n\times v}\)
                 </div>
-                <p>Note that when applying this to a minibatch, we need the batch matrix multiplication. In the following implementation of the scaled dot product attention, we use dropout for model regularization.</p>
+                <p>Note that when applying this to a minibatch, we need the batch matrix multiplication. In the following implementation of the scaled dot product attention, we use dropout for model regularization:</p>
 
                 <pre><code>class DotProductAttention(torch.nn.Module):
     """Scaled dot product attention."""
@@ -378,7 +378,7 @@ assert torch.bmm(Q, K).shape == (2, 3, 6)</code></pre>
         self.attention_weights = masked_softmax(scores, valid_lens)
         return torch.bmm(self.dropout(self.attention_weights), values)</code></pre>
 
-                <p>To illustrate how the DotProductAttention class works, File <a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/1_attention/dot_prod_attention.py">dot_prod_attention.py</a> use the same keys, values, and valid lengths from the earlier toy example for additive attention. For the purpose of our example we assume that we have a minibatch size of 2, a total of 10 keys and values, and that the dimensionality of the values is 4. Lastly, we assume that the valid length per observation is 2 and 6 respectively. Given that, we expect the output to be a \(2 \times 1 \times 4\) tensor, i.e., one row per example of the minibatch.</p>
+                <p>To illustrate how the <code>DotProductAttention</code> class works, File <a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/1_attention/dot_prod_attention.py">dot_prod_attention.py</a> use the same keys, values, and valid lengths from the earlier toy example for additive attention. For the purpose of our example we assume that we have a minibatch size of 2, a total of 10 keys and values, and that the dimensionality of the values is 4. Lastly, we assume that the valid length per observation is 2 and 6 respectively. Given that, we expect the output to be a \(2 \times 1 \times 4\) tensor, i.e., one row per example of the minibatch.</p>
 
                 <pre><code>queries = torch.normal(0, 1, (2, 1, 2))
 keys = torch.normal(0, 1, (2, 10, 2))

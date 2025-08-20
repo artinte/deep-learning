@@ -1,6 +1,6 @@
 import torch
 
-from util import masked_softmax, show_heatmaps
+from utils import masked_softmax, show_heatmaps
 
 
 class AdditiveAttention(torch.nn.Module):
