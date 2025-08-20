@@ -6,12 +6,6 @@ def func(x):
     return 2 * numpy.sin(x) + x**0.8
 
 
-n_train = 50
-rng = numpy.random.default_rng(0)
-keys = numpy.sort(rng.random(n_train) * 5)
-values = func(keys) + rng.normal(0.0, 0.5, (n_train,))
-
-
 def compute_attention_weights(query, keys, sigma):
     # Compute distance-based weights
     dist = (query - keys) ** 2
@@ -30,8 +24,17 @@ def simple_attention(x, sigma=1.0):
     return result, attention_history
 
 
+n_train = 50
+rng = numpy.random.default_rng(0)
+keys = numpy.sort(rng.random(n_train) * 5)
+values = func(keys) + rng.normal(0.0, 0.5, (n_train,))
+
 queries = numpy.arange(0, 5, 0.05)
 result, attn_matrix = simple_attention(queries, sigma=0.5)
+
+print('Input queries shape:', queries.shape)
+print('Result shape:', result.shape)
+print('Attention shape:', numpy.array(attn_matrix).shape)
 
 pyplot.plot(keys, values, "o", alpha=0.5)
 pyplot.plot(queries, result)
