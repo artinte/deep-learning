@@ -20,7 +20,7 @@
 
             <main class="col-md-8 content">
                 <h2 class="custom-title">5.1 Attention Mechanism</h2>
-                <p class="title-subtext">An <strong>attention mechanism</strong> is a machine learning technique that directs deep learning models to prioritize (or attend to) the most relevant parts of input data. Innovation in attention mechanisms enabled the transformer architecture that yielded the modern <strong>large language models (LLMs)</strong> that power popular applications like <a href="https://chatgpt.com/">ChatGPT</a>.</p>
+                <p class="title-subtext">An <a href="https://d2l.ai/chapter_attention-mechanisms-and-transformers/index.html">attention mechanism</a> is a machine learning technique that directs deep learning models to prioritize (or attend to) the most relevant parts of input data. Innovation in attention mechanisms enabled the transformer architecture that yielded the modern <strong>large language models (LLMs)</strong> that power popular applications like <a href="https://chatgpt.com/">ChatGPT</a>.</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-05-19</p>
 
                 <p>As their name suggests, <strong>attention mechanisms</strong> are inspired by the ability of humans (and other animals) to selectively pay more attention to salient details and ignore details that are less important in the moment. Having access to all information but focusing on only the most relevant information helps to ensure that no meaningful details are lost while enabling efficient use of limited memory and time.</p>
@@ -50,13 +50,13 @@
                     <li><p>There is no need to compress or simplify the database to make the operations effective.</p></li>
                 </ul>
                 <p>Clearly we would not have introduced a simple database here if it wasn't for the purpose of explaining deep learning. Indeed, this leads to one of the most exciting concepts introduced in deep learning in the past decade: the <strong>attention mechanism</strong>.</p>
-                <p>We will cover the specifics of its application to machine translation later. For now, simply consider the following: denote by \(\mathcal{D} = {(k_1, v_1), \cdots, (k_m, v_m)}\) a database of \(m\) tuples of keys and values. Moreover, denote by \(q\) a query. Then we can define the attention over \(\mathcal{D}\) as:</p>
+                <p>We will cover the specifics of its application to machine translation later. For now, simply consider the following: denote by \(\mathcal{D} \stackrel{\textrm{def}}{=} \{(\mathbf{k}_1, \mathbf{v}_1), \ldots (\mathbf{k}_m, \mathbf{v}_m)\}\) a database of \(m\) tuples of keys and values. Moreover, denote by \(q\) a query. Then we can define the attention over \(\mathcal{D}\) as:</p>
 
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;" id="attention-pooling">
-                    \(Attention(q, D) = \sum_{i=1}^{m} \alpha(q, k_i) v_i\)
+                    \(\textrm{Attention}(\mathbf{q}, \mathcal{D}) \stackrel{\textrm{def}}{=} \sum_{i=1}^m \alpha(\mathbf{q}, \mathbf{k}_i) \mathbf{v}_i\)
                 </div>
 
-                <p>where \(\alpha(q, k_i) \in \mathbb{R} (i = 1, \cdots , m)\) are scalar attention weights. The operation itself is typically referred to as <strong>attention pooling</strong>. The name attention derives from the fact that the operation pays particular attention to the terms for which the weight \(\alpha\) is significant (i.e., large).</p>
+                <p>where \(\alpha(\mathbf{q}, \mathbf{k}_i) \in \mathbb{R}\) are scalar attention weights. The operation itself is typically referred to as <strong>attention pooling</strong>. The name attention derives from the fact that the operation pays particular attention to the terms for which the weight \(\alpha\) is significant (i.e., large).</p>
                 <p>As such, the attention over \(\mathcal{D}\) generates a linear combination of values contained in the database. In fact, this contains the above example as a special case where all but one weight is zero. We have a number of special cases:</p>
                 <ul class="with-bullets">
                     <li><p>The weights \(\alpha(q, k_i)\) are nonnegative. In this case the output of the attention mechanism is contained in the convex cone spanned by the values \(v_i\) .</p></li>
@@ -66,9 +66,9 @@
                 </ul>
                 <p>A common strategy for ensuring that the weights sum up to 1 is to normalize them via:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
-                    \(\alpha(q, k_i) = \frac{\alpha(q, k_i)}{\sum_j \alpha(q, k_j)}\)
+                    \(\alpha(\mathbf{q}, \mathbf{k}_i) = \frac{\exp(a(\mathbf{q}, \mathbf{k}_i))}{\sum_j \exp(a(\mathbf{q}, \mathbf{k}_j))}\)
                 </div>
-                <p>In particular, to ensure that the weights are also nonnegative, one can resort to exponentiation. This means that we can now pick any function \(\alpha(q, k)\) and then apply the softmax operation used for multinomial models to it via:</p>
+                <p>In particular, to ensure that the weights are also nonnegative, one can resort to exponentiation. This means that we can now pick any function \(a(\mathbf{q}, \mathbf{k})\) and then apply the softmax operation used for multinomial models to it via:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \(\alpha(q, k_i) = \frac{exp(\alpha(q, k_i))}{\sum_j exp(\alpha(q, k_j))}\)
                 </div>
@@ -77,16 +77,17 @@
                 <img src="res/05/query_kv.png" alt="Query - (Keys, Values)" width="600">
                 <p style="text-align: center; color: #555555;">Figure 3 - Query - (Keys, Values)</p>
 
+                <h5>Simple Examples</h5>
                 <p>For simplicity, consider the following regression problem, given a dataset of input-output pairs:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \({(x_1, y_1), \cdots , (x_n, y_n)}\)
                 </div>
-                <p>how can we learn a function \(f\) to predict the output \(\hat{y} = f(x)\) for any new input \(x\).</p>
+                <p>How can we learn a function \(f\) to predict the output \(\hat{y} = f(x)\) for any new input \(x\) ?</p>
                 <p>Generate a synthetic dataset based on the following nonlinear function:</p>
                 <div class="highlight-math" style="text-align: center;  overflow-x: auto;">
                     \(y_i = 2sin(x_i) + x_i^{0.8} + \xi\)
                 </div>
-                <p>Here, \(\xi\) is the added noise term, which follows a normal distribution with mean 0 and standard deviation 0.5 .In this example, 50 training samples are generated. For better visualization, the training samples are sorted. The code is in the file <a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/1_attention/simple_attention.py">random_point_dataset.py</a> .</p>
+                <p>Here, \(\xi\) is the added noise term, which follows a normal distribution with mean 0 and standard deviation 0.5 . In this example, 50 training samples are generated. For better visualization, the training samples are sorted. The code is in the file <a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/1_attention/simple_attention.py">simple_attention.py</a> .</p>
                 <pre><code>def func(x):
     return 2 * numpy.sin(x) + x**0.8
 
@@ -94,7 +95,8 @@ rng = numpy.random.default_rng(0)
 n_train = 50
 keys = numpy.sort(rng.random(n_train) * 5)
 values = func(keys) + rng.normal(0.0, 0.5, (n_train,))</code></pre>
-                <p>The \(\alpha(q, k)\) function calculates how much attention a query should pay to each key based on how close they are. Instead of using the standard dot-product method like in Transformers, it uses a distance-based approach. It measures the squared distance between the query and each key, then applies a Gaussian function to turn these distances into similarity scores. Finally, it normalizes the scores so they add up to one. This method gives higher attention to keys that are closer to the query, making it useful for tasks where local similarity matters.</p>
+
+                <p>The \(\alpha(\mathbf{q}, \mathbf{k})\) function calculates how much attention a query should pay to each key based on how close they are. Instead of using the standard dot-product method like in Transformers, it uses a distance-based approach. It measures the squared distance between the query and each key, then applies a Gaussian function to turn these distances into similarity scores. Finally, it normalizes the scores so they add up to one. This method gives higher attention to keys that are closer to the query, making it useful for tasks where local similarity matters.</p>
                 <pre><code>def compute_attention_weights(query, keys, sigma):
     # Compute distance-based weights
     dist = (query - keys) ** 2

@@ -5,8 +5,9 @@ from matplotlib import pyplot
 def func(x):
     return 2 * numpy.sin(x) + x**0.8
 
-rng = numpy.random.default_rng(0)
+
 n_train = 50
+rng = numpy.random.default_rng(0)
 keys = numpy.sort(rng.random(n_train) * 5)
 values = func(keys) + rng.normal(0.0, 0.5, (n_train,))
 
@@ -38,9 +39,13 @@ pyplot.grid(True)
 pyplot.subplots_adjust(left=0.08, right=0.92, top=0.96, bottom=0.06)
 pyplot.show()
 
-pyplot.imshow(attn_matrix, aspect="auto", origin="lower",
-              extent=[keys[0], keys[-1], queries[0], queries[-1]],
-              cmap="viridis")
+pyplot.imshow(
+    attn_matrix,
+    aspect="auto",
+    origin="lower",
+    extent=[keys[0], keys[-1], queries[0], queries[-1]],
+    cmap="viridis",
+)
 pyplot.colorbar(label="Attention Weight")
 pyplot.xlabel("Key (x position)")
 pyplot.ylabel("Query (x position)")
