@@ -201,7 +201,7 @@
                         <p>Learning machine learning is difficult, especially if you are entering from other majors. I saw the trend of artificial intelligence about six years ago (2019) and wanted to switch to the artificial intelligence industry, but I didn't have a good entry point.</p>
                         <p>Since 2024, I have been preparing to learn deep learning systematically. At first, I wrote in Google Docs, then wrote a <a href="https://github.com/artinte/machine-learning-series">Machine Learning Series</a>, and now <em>Deep Learning  with PyTorch</em>. Along the way, I think the most important thing is the goal and persistence, and you will gradually find the fun of learning.</p>
                         
-                        <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: center; margin-bottom: 1em;">
                             <iframe width="560" height="315" src="https://www.youtube.com/embed/Yi4CQqzYr3Q?si=Q3HsE0m2gJXuNwSZ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
                         </div>
 
@@ -435,14 +435,18 @@
                     <section id="section5" class="content-section">
                         <h2>05 Transformer</h2>
                         <p>The <strong>transformer</strong> is a deep learning architecture that was developed by researchers at Google and is based on the <strong>multi-head attention mechanism</strong> , which was proposed in the 2017 paper <a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a> .</p>
-                        <img src="res/00/transformer_arch.png" alt="Transformer Architecture" width="400">
+        
+                        <img src="res/00/transformer_arch.png" alt="Transformer Architecture" width="400" style="margin-bottom: 1em;">
 
                         <p>This chapter is the most important one in this tutorial, We will start by learning what the attention mechanism is, and then read paper "Attention Is All You Need", and provide some practical examples. Finally, BERT and ViT are variants of the Transformer.</p>
-
+                        <p>Transformer is a relatively large deep learning architecture with extensive applications. There are numerous optimizations related to it, and it is difficult to explain thoroughly in a single article. Learning this architecture requires patience, and hands-on practice is extremely helpful for understanding the process of data computation.</p>
+        
                         <h3 id="section5-sub1">
                             <a href="attention_mechanism.html" style="color: inherit;">5.1 Attention Mechanism</a>
                         </h3>
-                        <p>Mathematically speaking, an attention mechanism computes attention weights that reflect the relative importance of each part of an input sequence to the task at hand.</p>
+                        <p>Mathematically speaking, an attention mechanism computes <strong>attention weights</strong> that reflect the relative importance of each part of an input sequence to the task at hand.</p>
+                        <p>We will learn what the attention mechanism is, understand how to compute it using query, key, and value, and look into how PyTorch implements it—laying a solid foundation for the subsequent learning of Transformer.</p>
+        
                         <p><a href="https://www.ibm.com/think/topics/attention-mechanism">What is an attention mechanism?</a></p>
                         <p><a href="https://d2l.ai/chapter_attention-mechanisms-and-transformers/index.html">Attention Mechanisms and Transformers</a></p>
 
@@ -450,12 +454,14 @@
                             <a href="transformer_paper.html" style="color: inherit;">5.2 Attention Is All You Need</a>
                         </h3>
                         <p>We propose a new simple network architecture, the <strong>Transformer</strong> , based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train.</p>
+                        <p>Regardless of whether you fully understand it or not, go through the paper first to get a general impression. Later, when you work on specific example implementations and look back at this paper, you will gain more insights.</p>
+
                         <p><a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a></p>
 
                         <h3 id="section5-sub3">
                             <a href="transformer_stratch.html" style="color: inherit;">5.3 Transformer from Stratch</a>
                         </h3>
-                        <p>The Transformer from “Attention is All You Need” has been on a lot of people’s minds over the last year. Besides producing major improvements in translation quality, it provides a new architecture for many other NLP tasks. The paper itself is very clearly written, but the conventional wisdom has been that it is quite difficult to implement correctly.</p>
+                        <p>The Transformer from "Attention is All You Need" has been on a lot of people’s minds over the last year. Besides producing major improvements in translation quality, it provides a new architecture for many other NLP tasks. The paper itself is very clearly written, but the conventional wisdom has been that it is quite difficult to implement correctly.</p>
                         <p><a href="https://nlp.seas.harvard.edu/annotated-transformer/">The Annotated Transformer</a></p>
 
                         <h3 id="section5-sub4">
