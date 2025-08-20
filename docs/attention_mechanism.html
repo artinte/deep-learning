@@ -126,22 +126,22 @@ result, attn_matrix = simple_attention(queries, sigma=0.5)</code></pre>
                 <p style="text-align: center; color: #555555;">Figure 5 - Attention Weights Over Distance</p>
 
                 <h3>5.1.2 Attention Pooling</h3>
-                <p>Now that we have introduced the primary components of the attention mechanism, let’s use them in a rather classical setting, namely regression and classification via kernel density estimation.</p>
-                <p>This detour simply provides additional background: it is entirely optional and can be skipped if needed. At their core, Nadaraya–Watson estimators rely on some similarity kernel \(\alpha(q, k)\) relating queries \(q\) to keys \(k\). Some common kernels are:</p>
+                <p>Now that we have introduced the primary components of the attention mechanism, let's use them in a rather classical setting, namely regression and classification via kernel density estimation.</p>
+                <p>This detour simply provides additional background: it is entirely optional and can be skipped if needed. At their core, Nadaraya–Watson estimators rely on some similarity kernel \(\alpha(\mathbf{q}, \mathbf{k})\) relating queries \(\mathbf{q}\) to keys \(\mathbf{k}\). Some common kernels are:</p>
                 <p class="highlight-math" style="text-align: center; overflow-x: auto;">
-                    \(\alpha(q, k) = exp(-\frac{1}{2} {\left| q - k \right|}^2)\)
+                    \(\alpha(\mathbf{q}, \mathbf{k}) = \exp\left(-\frac{1}{2} \|\mathbf{q} - \mathbf{k}\|^2 \right)\)
                 </p>
                 <p class="highlight-math" style="text-align: center; overflow-x: auto;">
-                    \(\alpha(q, k) = 1 \quad if \quad \left| q - k \right| \le 1\)
+                    \(\alpha(\mathbf{q}, \mathbf{k}) = 1 \textrm{ if } \|\mathbf{q} - \mathbf{k}\| \leq 1\)
                 </p>
                 <p class="highlight-math" style="text-align: center; overflow-x: auto;">
-                    \(\alpha(q, k) = max(0, 1 - \left| q - k \right|)\)
+                    \(\alpha(\mathbf{q}, \mathbf{k}) = \mathop{\mathrm{max}}\left(0, 1 - \|\mathbf{q} - \mathbf{k}\|\right)\)
                 </p>
                 <p>There are many more choices that we could pick. All of the kernels are heuristic and can be tuned. For instance, we can adjust the width, not only on a global basis but even on a per-coordinate basis. Regardless, all of them lead to the following equation for regression and classification alike:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
-                    \(f(q) = \sum_i v_i \frac{\alpha(q, k_i)}{\sum_j \alpha(q, k_j)}\)
+                    \(f(\mathbf{q}) = \sum_i \mathbf{v}_i \frac{\alpha(\mathbf{q}, \mathbf{k}_i)}{\sum_j \alpha(\mathbf{q}, \mathbf{k}_j)}\)
                 </div>
-                <p>In the case of a (scalar) regression with observations \((x_i, y_i)\) for features and labels respectively, \(v_i = y_i\) are scalars, \(k_i = x_i\) are vectors, and the query \(q\) denotes the new location where \(f\) should be evaluated. In the case of (multiclass) classification, we use one-hot-encoding of \(y_i\) to obtain \(v_i\). One of the convenient properties of this estimator is that it requires no training.</p>
+                <p>In the case of a (scalar) regression with observations \((x_i, y_i)\) for features and labels respectively, \(v_i = y_i\) are scalars, \(k_i = x_i\) are vectors, and the query \(\mathbf{q}\) denotes the new location where \(f\) should be evaluated. In the case of (multiclass) classification, we use one-hot-encoding of \(y_i\) to obtain \(v_i\). One of the convenient properties of this estimator is that it requires no training.</p>
                 
                 <h4>5.1.2.1 Kernels and Data</h4>
                 
