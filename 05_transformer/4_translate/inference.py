@@ -1,7 +1,7 @@
 import torch
 
 
-def translate_one_batch(model, iterator, SRC, TRG):
+def translate_one_batch(model, iterator, src_field, trg_field):
     model.eval()
     translations = []
 
@@ -14,13 +14,13 @@ def translate_one_batch(model, iterator, SRC, TRG):
         output = output.argmax(dim=-1)
 
         for i in range(src.size(0)):
-            src_tokens = [SRC.vocab.itos[idx] for idx in src[i]]
+            src_tokens = [src_field.vocab.itos[idx] for idx in src[i]]
             hyp_tokens = []
             for idx in output[i]:
-                if idx == TRG.vocab.stoi[TRG.eos_token]:
+                if idx == trg_field.vocab.stoi[trg_field.eos_token]:
                     break
-                if idx != TRG.vocab.stoi[TRG.pad_token]:
-                    hyp_tokens.append(TRG.vocab.itos[idx])
+                if idx != trg_field.vocab.stoi[trg_field.pad_token]:
+                    hyp_tokens.append(trg_field.vocab.itos[idx])
 
             translations.append(
                 {
@@ -28,9 +28,9 @@ def translate_one_batch(model, iterator, SRC, TRG):
                     "hyp": " ".join(hyp_tokens),
                     "trg": " ".join(
                         [
-                            TRG.vocab.itos[idx]
+                            trg_field.vocab.itos[idx]
                             for idx in trg[i][1:].cpu().numpy()
-                            if idx != TRG.vocab.stoi[TRG.pad_token]
+                            if idx != trg_field.vocab.stoi[trg_field.pad_token]
                         ]
                     ),
                 }
