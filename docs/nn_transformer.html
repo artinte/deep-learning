@@ -23,12 +23,12 @@
                 <p class="title-subtext"></p>
                 <p style="color: #a0a0a0;">Created Date: 2025-07-02</p>
 
-                <p>In <a href="transformer_stratch.html">section 5.3</a> we write a simple transformer demo, copy input to output. In this tutorial, we will use the <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Transformer.html">torch.nn.Transformer</a> interface to quickly translate German to English and complete the framework of the translation project. Then we will use the handwritten multi-head attention, encoder, decoder, and forward propagation layers to replace the <code>torch.nn.Transformer</code> interface.</p>
+                <p>In <a href="transformer_stratch.html">previous section</a> we write a simple transformer demo, copy input to output. In this tutorial, we will use the <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Transformer.html">torch.nn.Transformer</a> interface to quickly translate German to English and complete the framework of the translation project. Then we will use the handwritten multi-head attention, encoder, decoder, and forward propagation layers to replace the <code>torch.nn.Transformer</code> interface.</p>
 
                 <h3 id="multi30k">5.4.1 Dataset of Multi30k</h3>
 
-                <p>This dataset contains the "multi30k" dataset, which is the "task 1" dataset from <a href="https://www.statmt.org/wmt16/multimodal-task.html">here</a> .</p>
-                <p>Each example consists of an "en" and a "de" feature. "en" is an English sentence, and "de" is the German translation of the English sentence. The Multi30k dataset has 3 splits: train, validation, and test.</p>
+                <p>For ease of use, we'll use the WMT16 Machine Translation dataset. This dataset contains the "multi30k" dataset, which is the "task 1" dataset from <a href="https://www.statmt.org/wmt16/multimodal-task.html">here</a> .</p>
+                <p>Each example consists of an "en" and a "de" feature. "en" is an English sentence, and "de" is the German translation of the English sentence. The Multi30k dataset has 3 splits: train, validation, and test. Use <code>datasets</code> from HuggingFace:</p>
 
                 <pre><code>nltk.download('punkt')
 nltk.download('punkt_tab')
@@ -112,7 +112,7 @@ Target vocabulary size: 5920
 ['<unk>', '<pad>', '<sos>', '<eos>', '.', 'ein', 'einem', 'in', 'eine', ',']
 ['<unk>', '<pad>', '<sos>', '<eos>', 'a', '.', 'in', 'the', 'on', 'man']</samp></pre>
 
-                <p>BucketIterator efficiently groups similar-length sentences into batches for training, validation, and testing. The loop demonstrates accessing these batched source (src) and target (trg) tensors and printing their shapes.</p>
+                <p><code>BucketIterator</code> efficiently groups similar-length sentences into batches for training, validation, and testing. The loop demonstrates accessing these batched source (src) and target (trg) tensors and printing their shapes.</p>
 
                 <pre><code>BATCH_SIZE = 32
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -219,9 +219,7 @@ CLIP = 1.0  # Gradient clipping</code></pre>
         
         # Gradient clipping to avoid exploding gradients
         torch.nn.utils.clip_grad_norm_(model.parameters(), clip)
-        
         optimizer.step()
-        
         epoch_loss += loss.item()
     
     return epoch_loss / len(iterator)</code></pre>

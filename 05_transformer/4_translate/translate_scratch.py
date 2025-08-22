@@ -6,6 +6,7 @@ import math
 import datasets
 from torchtext.data import Field, Example, Dataset, BucketIterator
 from nltk.tokenize import word_tokenize
+from positional_encoding import PositionalEncoding
 
 
 nltk.download("punkt")
@@ -79,17 +80,6 @@ train_iterator, valid_iterator, test_iterator = BucketIterator.splits(
 )
 
 
-BATCH_SIZE = 32
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-train_iterator, valid_iterator, test_iterator = BucketIterator.splits(
-    (train_dataset, valid_dataset, test_dataset),
-    batch_size=BATCH_SIZE,
-    device=device,
-    sort_within_batch=True,
-    sort_key=lambda x: len(x.src),
-)
-
 for batch in train_iterator:
     src = batch.src
     trg = batch.trg
@@ -120,11 +110,11 @@ class MultiHeadAttention(torch.nn.Module):
         d_k = self.d_k
 
         # (B, H, T_q, d_k)
-        q = (self.q_linear(query).view(B, T_q, H, d_k).transpose(1, 2))
+        q = self.q_linear(query).view(B, T_q, H, d_k).transpose(1, 2)
         # (B, H, T_k, d_k)
         k = self.k_linear(key).view(B, T_k, H, d_k).transpose(1, 2)
         # (B, H, T_v, d_k)
-        v = (self.v_linear(value).view(B, T_v, H, d_k).transpose(1, 2))
+        v = self.v_linear(value).view(B, T_v, H, d_k).transpose(1, 2)
         # (B, H, T_q, T_k)
         attn_scores = (q @ k.transpose(-2, -1)) / math.sqrt(d_k)
 
@@ -235,6 +225,7 @@ class TransformerModel(torch.nn.Module):
 
         self.src_emb = torch.nn.Embedding(src_vocab_size, emb_size)
         self.trg_emb = torch.nn.Embedding(trg_vocab_size, emb_size)
+        self.position_encoding = PositionalEncoding(emb_size)
 
         self.encoder = Encoder(EncoderLayer(emb_size, nhead, nhid, dropout), nlayers)
         self.decoder = Decoder(DecoderLayer(emb_size, nhead, nhid, dropout), nlayers)
@@ -243,12 +234,17 @@ class TransformerModel(torch.nn.Module):
 
     def forward(self, src, tgt, src_mask=None):
         src_emb = self.src_emb(src)
-        tgt_emb = self.trg_emb(tgt)
+        trg_emb = self.trg_emb(tgt)
 
-        memory = self.encoder(src_emb, src_mask)
-        tgt_mask = self.generate_square_subsequent_mask(tgt_emb.size(1), tgt.device)
+        src_emb_with_pos = self.position_encoding(src_emb)
+        trg_emb_with_pos = self.position_encoding(trg_emb)
 
-        output = self.decoder(tgt_emb, memory, tgt_mask, src_mask)
+        memory = self.encoder(src_emb_with_pos, src_mask)
+        tgt_mask = self.generate_square_subsequent_mask(
+            trg_emb_with_pos.size(1), tgt.device
+        )
+
+        output = self.decoder(trg_emb_with_pos, memory, tgt_mask, src_mask)
         return self.fc_out(output)
 
     def generate_square_subsequent_mask(self, sz, device):
