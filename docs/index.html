@@ -462,6 +462,9 @@
                             <a href="transformer_stratch.html" style="color: inherit;">5.3 Transformer from Stratch</a>
                         </h3>
                         <p>The Transformer from "Attention is All You Need" has been on a lot of people’s minds over the last year. Besides producing major improvements in translation quality, it provides a new architecture for many other NLP tasks. The paper itself is very clearly written, but the conventional wisdom has been that it is quite difficult to implement correctly.</p>
+                        <p>This chapter will implement the Transformer architecture from scratch, module by module, to give you a clear look at the model's details. To avoid any data-related distractions, we'll only use numbers. Our goal is for the model to perform a copy task: if we input the sequence 0, 1, 2, ..., 9, we expect the model to output the exact same sequence. This may seem strange, as a simple function could do this with no effort. However, the remarkable part is that we can achieve this operation after passing the data through a massive and complex network. Isn't that incredible?</p>
+                        <p>The main implementation is based on the article below. The article is very well-written, but it's quite long and may be difficult to understand. This guide will take a more accessible approach, with each module's output explained in detail to clarify its inner workings.</p>
+
                         <p><a href="https://nlp.seas.harvard.edu/annotated-transformer/">The Annotated Transformer</a></p>
 
                         <h3 id="section5-sub4">
