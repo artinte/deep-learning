@@ -145,7 +145,7 @@ result, attn_matrix = simple_attention(queries, sigma=0.5)</code></pre>
                 
                 <h4>5.1.2.1 Kernels and Data</h4>
                 
-                <p>All the kernels \(\alpha (k, q)\) defined in this section are translation and rotation invariant; that is, if we shift and rotate \(k\) and \(q\) in the same manner, the value of \(\alpha\) remains unchanged. For simplicity we thus pick scalar arguments \(k, q \in \mathbb{R}\) and pick the key \(k = 0\) as the origin. File <a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/1_attention/kernel_func.py">kernel_func.py</a> yields:</p>
+                <p>All the kernels \(\alpha (\mathbf{k}, \mathbf{q})\) defined in this section are translation and rotation invariant; that is, if we shift and rotate \(\mathbf{k}\) and \(\mathbf{q}\) in the same manner, the value of \(\alpha\) remains unchanged. For simplicity we thus pick scalar arguments \(k, q \in \mathbb{R}\) and pick the key \(k = 0\) as the origin. File <a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/1_attention/kernel_func.py">kernel_func.py</a> yields:</p>
 
                 <pre><code>def gaussian(x):
     return torch.exp(-x**2 / 2)
@@ -195,7 +195,7 @@ y_val = f(x_val)</code></pre>
                 <p>Now that we have data and kernels, all we need is a function that computes the kernel regression estimates. Note that we also want to obtain the relative kernel weights in order to perform some minor diagnostics.</p>
                 <p>Hence we first compute the kernel between all training features (covariates) <code>x_train</code> and all validation features <code>x_val</code>. This yields a matrix, which we subsequently normalize. When multiplied with the training labels <code>y_train</code> we obtain the estimates.</p>
 
-                <p>Recall <a href="#attention-pooling">attention pooling formula</a> , Let each validation feature be a query, and each training feature–label pair be a key–value pair. As a result, the normalized relative kernel weights (<code>attention_w</code> below) are the attention weights.</p>
+                <p>Recall <a href="#attention-pooling">attention pooling</a> formula, let each validation feature be a query, and each training feature–label pair be a key–value pair. As a result, the normalized relative kernel weights (<code>attention_w</code> below) are the attention weights.</p>
                 <pre><code>def nadaraya_watson(x_train, y_train, x_val, kernel):
     dists = x_train.reshape((-1, 1)) - x_val.reshape((1, -1))
     # Each column/row corresponds to each query/key
@@ -257,7 +257,7 @@ plot(x_train, y_train, x_val, y_val, kernels, names)</code></pre>
                 <p>Nadaraya–Watson kernel regression is an early precursor of the current attention mechanisms. It can be used directly with little to no training or tuning, either for classification or regression. The attention weight is assigned according to the similarity (or distance) between query and key, and according to how many similar observations are available.</p>
 
                 <h3>5.1.3 Scoring Functions</h3>
-                <p>We used a number of different distance-based kernels, including a Gaussian kernel to model interactions between queries and keys. As it turns out, distance functions are slightly more expensive to compute than dot products. As such, with the softmax operation to ensure nonnegative attention weights, much of the work has gone into attention scoring functions \(a\) in Figure 11 .</p>
+                <p>We used a number of different distance-based kernels, including a Gaussian kernel to model interactions between queries and keys. As it turns out, distance functions are slightly more expensive to compute than dot products. As such, with the softmax operation to ensure nonnegative attention weights, much of the work has gone into attention scoring functions \(a\) in Figure 11:</p>
 
                 <img src="res/05/attention_output.png" alt="Attention Output" width="600">
                 <p style="text-align: center; color: #555555;">Figure 11 - Weights are computed with \(\alpha\) and the softmax function</p>
@@ -445,6 +445,32 @@ show_heatmaps(attention.attention_weights.reshape((1, 1, 2, 10)),
                 <p style="text-align: center; color: #555555;">Figure 13 - Heatmap of Additive Attention Weights</p>
 
                 <h3>5.1.4 PyTorch Implementation</h3>
+
+                <p>We can see <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html">torch.nn.functional.scaled_dot_product_attention</a> for detail.</p>
+                <p>Computes scaled dot product attention on query, key and value tensors, using an optional attention mask if passed, and applying dropout if a probability greater than 0.0 is specified. </p>
+
+                <pre><code>batch_size = 2
+num_heads = 4
+seq_len = 10
+embed_dim = 16
+
+query = torch.randn(batch_size, num_heads, seq_len, embed_dim)
+key = torch.randn(batch_size, num_heads, seq_len, embed_dim)
+value = torch.randn(batch_size, num_heads, seq_len, embed_dim)
+
+output = torch.nn.functional.scaled_dot_product_attention(query, key, value)
+print(f'Shape of the output tensor: {output.shape}')
+
+# specify a mask
+attn_mask = torch.ones(batch_size, 1, seq_len, seq_len, dtype=torch.bool)
+output_with_mask = torch.nn.functional.scaled_dot_product_attention(query, key, value, attn_mask=attn_mask)
+print(f'Shape of the output tensor with mask: {output_with_mask.shape}')
+</code></pre>
+
+                <pre><samp>Shape of the output tensor: torch.Size([2, 4, 10, 16])
+Shape of the output tensor with mask: torch.Size([2, 4, 10, 16])</samp></pre>
+
+                <p>Here's a handwritten scaled dot-product attention; it's extremely important:</p>
                 <pre><code># Efficient implementation equivalent to the following:
 def scaled_dot_product_attention(query, key, value, attn_mask=None, dropout_p=0.0,
         is_causal=False, scale=None, enable_gqa=False) -> torch.Tensor:

@@ -28,3 +28,21 @@ def scaled_dot_product_attention(query, key, value, attn_mask=None, dropout_p=0.
     attn_weight = torch.softmax(attn_weight, dim=-1)
     attn_weight = torch.dropout(attn_weight, dropout_p, train=True)
     return attn_weight @ value
+
+
+batch_size = 2
+num_heads = 4
+seq_len = 10
+embed_dim = 16
+
+query = torch.randn(batch_size, num_heads, seq_len, embed_dim)
+key = torch.randn(batch_size, num_heads, seq_len, embed_dim)
+value = torch.randn(batch_size, num_heads, seq_len, embed_dim)
+
+output = torch.nn.functional.scaled_dot_product_attention(query, key, value)
+print(f'Shape of the output tensor: {output.shape}')
+
+# specify a mask
+attn_mask = torch.ones(batch_size, 1, seq_len, seq_len, dtype=torch.bool)
+output_with_mask = torch.nn.functional.scaled_dot_product_attention(query, key, value, attn_mask=attn_mask)
+print(f'Shape of the output tensor with mask: {output_with_mask.shape}')
