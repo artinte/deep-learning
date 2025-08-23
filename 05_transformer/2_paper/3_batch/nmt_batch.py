@@ -12,8 +12,9 @@ tokenizer = transformers.AutoTokenizer.from_pretrained(model_name)
 
 model.eval()
 
-en_sentences = [dataset[i]["en"] for i in range(32)]
-de_references = [dataset[i]["de"] for i in range(32)]
+batchs = 32
+en_sentences = [dataset[i]["en"] for i in range(batchs)]
+de_references = [dataset[i]["de"] for i in range(batchs)]
 
 inputs = tokenizer(en_sentences, return_tensors="pt", padding=True, truncation=True)
 
@@ -35,7 +36,7 @@ with torch.no_grad():
 print(translated_tokens)
 de_predictions = tokenizer.batch_decode(translated_tokens, skip_special_tokens=True)
 
-for i in range(32):
+for i in range(batchs):
     print("-" * 50)
     print(f"Source: {en_sentences[i]}")
     print(f"Prediction: {de_predictions[i]}")
