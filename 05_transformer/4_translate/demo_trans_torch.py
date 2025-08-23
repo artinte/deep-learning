@@ -23,13 +23,18 @@ if __name__ == "__main__":
 
     src_field, trg_field, train_iter, valid_iter, test_iter = preprocess(device)
 
-    model = TransformerModel(len(src_field.vocab), len(trg_field.vocab)).to(device)
+    model = TransformerModel(
+        len(src_field.vocab),
+        len(trg_field.vocab),
+        src_field.vocab.stoi[src_field.pad_token],
+        trg_field.vocab.stoi[trg_field.pad_token],
+    ).to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=0.01)
     criterion = torch.nn.CrossEntropyLoss(
         ignore_index=trg_field.vocab.stoi[trg_field.pad_token]
     ).to(device)
 
-    for epoch in range(15):
+    for epoch in range(20):
         train_loss = train(model, train_iter, optimizer, criterion)
         valid_loss = evaluate(model, valid_iter, criterion)
         print(
