@@ -15,7 +15,6 @@ for i in range(32):
     de_reference = dataset[i]["de"]
 
     inputs = tokenizer(en_sentence, return_tensors="pt", padding=True, truncation=True)
-
     with torch.no_grad():
         translated_tokens = model.generate(
             input_ids=inputs["input_ids"],
