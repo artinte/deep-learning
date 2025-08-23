@@ -3,12 +3,13 @@ import transformers
 
 dataset = datasets.load_dataset("bentrevett/multi30k", split="test")
 
-translator = transformers.pipeline('translation_en_to_de',
-                                   model="Helsinki-NLP/opus-mt-en-de")
+translator = transformers.pipeline(
+    task="translation_en_to_de", model="Helsinki-NLP/opus-mt-en-de", framework="pt"
+)
 
 for i in range(32):
-    en_sentence = datasets[i]['en']
-    de_reference = datasets[i]['de']
+    en_sentence = dataset[i]["en"]
+    de_reference = dataset[i]["de"]
     de_pred = translator(en_sentence)[0]["translation_text"]
 
     print("-" * 50)
