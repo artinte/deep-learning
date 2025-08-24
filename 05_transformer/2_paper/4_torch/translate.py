@@ -13,7 +13,7 @@ def translate(model, sentence, tokenizer, max_len=512):
         bos_token_id = tokenizer.pad_token_id
         tgt_tokens = [bos_token_id]
 
-        for i in range(max_len):
+        for _ in range(max_len):
             tgt_tensor = torch.LongTensor(tgt_tokens).unsqueeze(0).to(model.device)
             logits = model.decode(tgt_tensor, memory)
             next_token_id = logits.argmax(dim=-1)[0, -1].item()
