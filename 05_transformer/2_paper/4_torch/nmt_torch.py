@@ -58,16 +58,16 @@ def collate_fn(batch):
     return src_tokens["input_ids"], tgt_tokens["input_ids"]
 
 
-batchs = 16
+BATCH_SIZE = 16
 
 train_dataloader = torch.utils.data.DataLoader(
-    train_dataset, batch_size=batchs, shuffle=True, collate_fn=collate_fn
+    train_dataset, batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate_fn
 )
 valid_dataloader = torch.utils.data.DataLoader(
-    valid_dataset, batch_size=batchs, shuffle=False, collate_fn=collate_fn
+    valid_dataset, batch_size=BATCH_SIZE, shuffle=False, collate_fn=collate_fn
 )
 test_dataloader = torch.utils.data.DataLoader(
-    test_dataset, batch_size=batchs, shuffle=False, collate_fn=collate_fn
+    test_dataset, batch_size=BATCH_SIZE, shuffle=False, collate_fn=collate_fn
 )
 
 test_src_sample, test_tgt_sample = next(iter(test_dataloader))
@@ -80,7 +80,6 @@ print(f"First batch test tgt token: {test_tgt_sample}")
 class PositionalEncoding(torch.nn.Module):
     """
     Injects positional information into the embeddings.
-    Since we are using batch_first=True, we transpose the tensor at the end.
     """
 
     def __init__(self, d_model, dropout=0.1, max_len=8192):
@@ -176,7 +175,6 @@ class Seq2SeqTransformer(torch.nn.Module):
 
 # --- Helper Functions for Masks and Training ---
 
-
 def generate_square_subsequent_mask(sz):
     """
     Generates a causal mask. The mask needs to be square for batch_first.
@@ -220,7 +218,6 @@ def train_epoch(model, optimizer, criterion):
             src, tgt_input
         )
 
-        # Forward pass
         logits = model(
             src,
             tgt_input,
@@ -281,7 +278,6 @@ def evaluate(model, criterion):
     return total_loss / len(valid_dataloader)
 
 
-# Hyperparameters
 SRC_VOCAB_SIZE = tokenizer.vocab_size
 TGT_VOCAB_SIZE = tokenizer.vocab_size
 D_MODEL = 512
@@ -290,7 +286,7 @@ NUM_ENCODER_LAYERS = 6
 NUM_DECODER_LAYERS = 6
 DIM_FEEDFORWARD = 2048
 DROPOUT = 0.3
-NUM_EPOCHS = 50
+NUM_EPOCHS = 15
 
 model = Seq2SeqTransformer(
     num_encoder_layers=NUM_ENCODER_LAYERS,
@@ -323,14 +319,10 @@ def translate(model, sentence, max_len=tokenizer.model_max_length):
         )
         src_tensor = src_tokens["input_ids"].to(device)
 
-        src_mask = torch.zeros(
-            (src_tensor.shape[1], src_tensor.shape[1]), dtype=torch.bool
-        ).to(device)
+        src_mask = None
         src_padding_mask = src_tensor == tokenizer.pad_token_id
 
         memory = model.encode(src_tensor, src_mask, src_padding_mask)
-
-        # Start the target sequence with the EOS token, as it serves as the start token.
         tgt_tokens = [tokenizer.eos_token_id]
 
         for i in range(max_len):
@@ -338,6 +330,7 @@ def translate(model, sentence, max_len=tokenizer.model_max_length):
 
             tgt_mask = (generate_square_subsequent_mask(tgt_tensor.shape[1])).to(device)
 
+            # The `decode` function needs the causal mask, the memory (encoder output), and the memory padding mask.
             logits = model.decode(tgt_tensor, memory, tgt_mask, None, src_padding_mask)
 
             next_token_id = logits.argmax(dim=-1)[0, -1].item()
@@ -350,6 +343,7 @@ def translate(model, sentence, max_len=tokenizer.model_max_length):
     return translation
 
 
+print("Testing Translation on First 32 Samples")
 for i in range(32):
     en_sentence = data_test[i]["en"]
     de_reference = data_test[i]["de"]
