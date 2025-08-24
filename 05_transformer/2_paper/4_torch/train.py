@@ -1,16 +1,33 @@
 import torch
 
 def train(model, train_dataloader, optimizer, criterion):
+    """
+    Trains the Seq2SeqTransformer model.
+    Args:
+        model (torch.nn.Module): The Seq2SeqTransformer model.
+        train_dataloader (torch.utils.data.DataLoader): The training data loader.
+        optimizer (torch.optim.Optimizer): The optimizer for training.
+        criterion (torch.nn.modules.loss._Loss): The loss function.
+    """
     model.train()
     total_loss = 0
-    for src, tgt in train_dataloader:
+    for src, tgt, src_key_padding_mask, tgt_key_padding_mask in train_dataloader:
+        # Move tensors to the correct device
         src = src.to(model.device)
         tgt = tgt.to(model.device)
+        src_key_padding_mask = src_key_padding_mask.to(model.device)
+        tgt_key_padding_mask = tgt_key_padding_mask.to(model.device)
         
-        # The target input is the target sequence without the EOS token
+        # The target input is the target sequence without the EOS token.
+        # This is what the decoder receives as input.
         tgt_input = tgt[:, :-1]
+        tgt_key_padding_mask = tgt_key_padding_mask[:, :-1]
+        
+        src_key_padding_mask = src_key_padding_mask == 0
+        tgt_key_padding_mask = tgt_key_padding_mask == 0
+        
         # [batch_size, tgt_seq_len, vocab_size]
-        logits = model.forward(src, tgt_input)
+        logits = model.forward(src, tgt_input, src_key_padding_mask, tgt_key_padding_mask)
         output = logits.reshape(-1, logits.shape[-1])
 
         # [batch, seq_len] -> [batch x seq_len]

@@ -1,5 +1,4 @@
 import datasets
-import transformers
 import torch
 
 
@@ -24,7 +23,7 @@ def preprocess(tokenizer):
     print(f"Validation dataset length: {len(data_valid)}")
     print(f"Test dataset length: {len(data_test)}")
     print(f"First train sample: {data_train[0]}")
-    
+
     first_sample_eng_token = tokenizer(
         data_train[0]["en"],
         max_length=tokenizer.model_max_length,
@@ -42,7 +41,6 @@ def preprocess(tokenizer):
     )
     print(f"First sample token IDs (Destination): {first_sample_de_token['input_ids']}")
 
-
     def collate_fn(batch):
         en_sentences = [item[0] for item in batch]
         de_sentences = [item[1] for item in batch]
@@ -53,12 +51,22 @@ def preprocess(tokenizer):
         tgt_tokens = tokenizer(
             de_sentences, truncation=True, padding=True, return_tensors="pt"
         )
-        bos_token_id = tokenizer.pad_token_id
-        bos = torch.full((tgt_tokens["input_ids"].size(0), 1), bos_token_id, dtype=torch.long)
+        bos_token_id = tokenizer.eos_token_id
+        bos = torch.full(
+            (tgt_tokens["input_ids"].size(0), 1), bos_token_id, dtype=torch.long
+        )
+        bos_mask = torch.ones(
+            (tgt_tokens["attention_mask"].size(0), 1), dtype=torch.long
+        )
 
         # The tokenizer now returns a dictionary with 'input_ids' and 'attention_mask'
         # We only need the input IDs for this model.
-        return src_tokens["input_ids"], torch.cat([bos, tgt_tokens["input_ids"]], dim=1)
+        return (
+            src_tokens["input_ids"],
+            torch.cat([bos, tgt_tokens["input_ids"]], dim=1),
+            src_tokens["attention_mask"],
+            torch.cat([bos_mask, tgt_tokens["attention_mask"]], dim=1),
+        )
 
     BATCH_SIZE = 16
 
@@ -75,10 +83,14 @@ def preprocess(tokenizer):
         test_dataset, batch_size=BATCH_SIZE, shuffle=False, collate_fn=collate_fn
     )
 
-    test_src_sample, test_tgt_sample = next(iter(test_dataloader))
+    test_src_sample, test_tgt_sample, test_src_mask, test_tgt_mask = next(iter(test_dataloader))
     print(f"Shape of test src sample: {test_src_sample.shape}")
     print(f"First batch test src token: {test_src_sample}")
     print(f"Shape of test tgt sample: {test_tgt_sample.shape}")
     print(f"First batch test tgt token: {test_tgt_sample}")
+    print(f"Shape of test src mask: {test_src_mask.shape}")
+    print(f"First batch test src mask: {test_src_mask}")
+    print(f"Shape of test tgt mask: {test_tgt_mask.shape}")
+    print(f"First batch test tgt mask: {test_tgt_mask}")
 
-    return train_dataloader, valid_dataloader, test_dataloader
+    return train_dataloader, valid_dataloader, test_dataloader, data_test

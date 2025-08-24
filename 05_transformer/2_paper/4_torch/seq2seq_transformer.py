@@ -13,9 +13,10 @@ class Seq2SeqTransformer(torch.nn.Module):
         num_decoder_layers,
         dim_feedforward,
         dropout,
+        device,
     ):
         super(Seq2SeqTransformer, self).__init__()
-
+        self.device=device
         self.src_embedding = torch.nn.Embedding(src_vocab_size, d_model)
         self.tgt_embedding = torch.nn.Embedding(tgt_vocab_size, d_model)
         self.positional_encoding = PositionalEncoding(d_model, dropout)
@@ -62,7 +63,7 @@ class Seq2SeqTransformer(torch.nn.Module):
             src=src_emb, src_key_padding_mask=src_key_padding_mask
         )
 
-    def decode(self, tgt, memory, tgt_key_padding_mask):
+    def decode(self, tgt, memory, memory_key_padding_mask):
         tgt_emb = self.positional_encoding(self.tgt_embedding(tgt))
 
         tgt_mask = torch.nn.Transformer.generate_square_subsequent_mask(tgt.size(1)).to(
@@ -72,7 +73,7 @@ class Seq2SeqTransformer(torch.nn.Module):
         out = self.transformer.decoder(
             tgt=tgt_emb,
             memory=memory,
+            memory_key_padding_mask=memory_key_padding_mask,
             tgt_mask=tgt_mask,
-            tgt_key_padding_mask=tgt_key_padding_mask,
         )
         return self.generator(out)
