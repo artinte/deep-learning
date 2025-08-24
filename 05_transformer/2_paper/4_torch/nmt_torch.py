@@ -50,12 +50,16 @@ def collate_fn(batch):
         en_sentences, truncation=True, padding=True, return_tensors="pt"
     )
     tgt_tokens = tokenizer(
-        de_sentences, truncation=True, padding=True, return_tensors="pt"
+        de_sentences, truncation=True, padding=True, return_tensors="pt",
     )
 
     # The tokenizer now returns a dictionary with 'input_ids' and 'attention_mask'
     # We only need the input IDs for this model.
-    return src_tokens["input_ids"], tgt_tokens["input_ids"]
+    sos_tensor = torch.full((tgt_tokens["input_ids"].shape[0], 1),
+                            tokenizer.eos_token_id,
+                            dtype=tgt_tokens["input_ids"].dtype,
+                            device=tgt_tokens["input_ids"].device)
+    return src_tokens["input_ids"], torch.cat([sos_tensor, tgt_tokens["input_ids"]], dim=1)
 
 
 BATCH_SIZE = 16
