@@ -3,7 +3,7 @@ from preprocess import preprocess
 from tokenizer import get_tokenizer
 from train import train
 from evaluate import evaluate
-from translate import translate
+from translate import greedy_translate
 from seq2seq_transformer import Seq2SeqTransformer
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -36,7 +36,9 @@ model = Seq2SeqTransformer(
 ).to(device)
 
 
-criterion = torch.nn.CrossEntropyLoss(ignore_index=tokenizer.pad_token_id)
+criterion = torch.nn.CrossEntropyLoss(
+    ignore_index=tokenizer.pad_token_id, label_smoothing=0.1
+)
 optimizer = torch.optim.Adam(model.parameters(), lr=0.0001, betas=(0.9, 0.98), eps=1e-9)
 
 print("Starting model training...")
@@ -53,7 +55,7 @@ for i in range(32):
     en_sentence = data_test[i]["en"]
     de_reference = data_test[i]["de"]
 
-    translated = translate(model, en_sentence, tokenizer)
+    translated = greedy_translate(model, en_sentence, tokenizer)
 
     print("-" * 50)
     print(f"Source: {en_sentence}")

@@ -51,7 +51,7 @@ def preprocess(tokenizer):
         tgt_tokens = tokenizer(
             de_sentences, truncation=True, padding=True, return_tensors="pt"
         )
-        bos_token_id = tokenizer.eos_token_id
+        bos_token_id = tokenizer.bos_token_id or tokenizer.eos_token_id
         bos = torch.full(
             (tgt_tokens["input_ids"].size(0), 1), bos_token_id, dtype=torch.long
         )
