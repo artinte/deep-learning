@@ -1,4 +1,5 @@
 import torch
+import datasets
 from preprocess import preprocess
 from tokenizer import get_tokenizer
 from train import train
@@ -23,7 +24,14 @@ dim_feedforward = 2048
 dropout = 0.2
 num_epochs = 10
 
-model = Seq2SeqTransformer()
+model = Seq2SeqTransformer(src_vocab_size,
+                           tgt_vocab_size,
+                           d_model,
+                           n_head,
+                           num_encoder_layers,
+                           num_decoder_layers,
+                           dim_feedforward,
+                           dropout)
 
 
 criterion = torch.nn.CrossEntropyLoss(ignore_index=tokenizer.pad_token_id)
@@ -36,3 +44,17 @@ for epoch in range(num_epochs):
     print(
         f"Epoch: {epoch+1:02} | Train Loss: {train_loss:.3f} | Valid Loss: {valid_loss:.3f}"
     )
+
+
+print("Testing Translation on First 32 Samples")
+for i in range(32):
+    data_test = datasets.load_dataset("bentrevett/multi30k", split="test")
+    en_sentence = data_test[i]["en"]
+    de_reference = data_test[i]["de"]
+
+    translated = translate(model, en_sentence)
+
+    print("-" * 50)
+    print(f"Source: {en_sentence}")
+    print(f"Prediction: {translated}")
+    print(f"Reference: {de_reference}")

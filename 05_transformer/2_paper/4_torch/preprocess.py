@@ -53,10 +53,12 @@ def preprocess(tokenizer):
         tgt_tokens = tokenizer(
             de_sentences, truncation=True, padding=True, return_tensors="pt"
         )
+        bos_token_id = tokenizer.pad_token_id
+        bos = torch.full((tgt_tokens["input_ids"].size(0), 1), bos_token_id, dtype=torch.long)
 
         # The tokenizer now returns a dictionary with 'input_ids' and 'attention_mask'
         # We only need the input IDs for this model.
-        return src_tokens["input_ids"], tgt_tokens["input_ids"]
+        return src_tokens["input_ids"], torch.cat([bos, tgt_tokens["input_ids"]], dim=1)
 
     BATCH_SIZE = 16
 
