@@ -60,19 +60,41 @@ def preprocess(device, batch_size=32):
         sort_key=lambda x: len(x.src),
     )
 
-    valid_iterator, test_iterator = torchtext.data.BucketIterator.splits(
-        (valid_dataset, test_dataset),
+    valid_iterator = torchtext.data.BucketIterator(
+        valid_dataset,
         batch_size=batch_size,
         device=device,
-        sort_within_batch=False
+        sort_within_batch=False,
+    )
+    
+    test_iterator = torchtext.data.BucketIterator(
+        test_dataset,
+        batch_size=batch_size,
+        device=device,
+        sort_within_batch=False,
     )
 
     for batch in train_iterator:
         src = batch.src
         tgt = batch.tgt
 
-        print(src.shape)
-        print(tgt.shape)
+        print(f"First src train sample shape: {src.shape}")
+        print(f"First tgt train sample shape: {tgt.shape}")
+        break
+
+    for batch in test_iterator:
+        test_src_sample = batch.src
+        test_tgt_sample = batch.tgt
+        test_src_mask = test_src_sample != 0
+        test_tgt_mask = test_tgt_sample != 0
+        print(f"Shape of test src sample: {test_src_sample.shape}")
+        print(f"First batch test src token: {test_src_sample}")
+        print(f"Shape of test tgt sample: {test_tgt_sample.shape}")
+        print(f"First batch test tgt token: {test_tgt_sample}")
+        print(f"Shape of test src mask: {test_src_mask.shape}")
+        print(f"First batch test src mask: {test_src_mask}")
+        print(f"Shape of test tgt mask: {test_tgt_mask.shape}")
+        print(f"First batch test tgt mask: {test_tgt_mask}")
         break
 
     return src_field, tgt_field, train_iterator, valid_iterator, test_iterator

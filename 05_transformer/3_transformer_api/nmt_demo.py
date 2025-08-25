@@ -6,6 +6,7 @@ from evaluate import evaluate
 from inference import greedy_translate
 from seq2seq_transformer import Seq2SeqTransformer
 
+torch.set_printoptions(profile="full")
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
