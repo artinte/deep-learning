@@ -39,7 +39,8 @@ model = Seq2SeqTransformer(
 criterion = torch.nn.CrossEntropyLoss(
     ignore_index=tokenizer.pad_token_id, label_smoothing=0.1
 )
-optimizer = torch.optim.Adam(model.parameters(), lr=0.0001, betas=(0.9, 0.98), eps=1e-9)
+# optimizer = torch.optim.Adam(model.parameters(), lr=0.0001, betas=(0.9, 0.98), eps=1e-9)
+optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=0.01)
 
 print("Starting model training...")
 for epoch in range(num_epochs):

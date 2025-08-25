@@ -63,8 +63,8 @@
                             <ul id="chapter5" class="child-chapters" style="display: none;">
                                 <li><a class="nav-link" href="attention_mechanism.html">5.1 Attention Mechanism</a></li>
                                 <li><a class="nav-link" href="transformer_paper.html">5.2 Attention Is All You Need</a></li>
-                                <li><a class="nav-link" href="transformer_stratch.html">5.3 Transformer from Stratch</a></li>
-                                <li><a class="nav-link" href="nn_transformer.html">5.4 nn.Transformer</a></li>
+                                <li><a class="nav-link" href="nn_transformer.html">5.3 nn.Transformer</a></li>
+                                <li><a class="nav-link" href="transformer_stratch.html">5.4 Transformer from Stratch</a></li>
                                 <li><a class="nav-link" href="nano_gpt.html">5.5 nanoGPT</a></li>
                                 <li><a class="nav-link" href="bert.html">5.6 BERT</a></li>
                                 <li><a class="nav-link" href="vision_transformer.html">5.7 Vision Transformer</a></li>
@@ -459,20 +459,24 @@
                         <p><a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a></p>
 
                         <h3 id="section5-sub3">
-                            <a href="transformer_stratch.html" style="color: inherit;">5.3 Transformer from Stratch</a>
+                            <a href="nn_transformer.html" style="color: inherit;">5.3 nn.Transformer</a>
+                        </h3>
+                        <p>The code is very concise and easy to understand. For example, when studying the Transformer chapter, you'll read the paper "Attention Is All You Need," which provides an example of English-to-German translation that can be implemented on a single computer.</p>
+                        <p>For a beginner, completing such an example is not easy, even with the help of AI. During my experiments, I discovered that the Tokenizer lacked a start marker, and that the torch.nn.Transformer had too many parameters to pass. The model was reading too much code, and it was a bit confused.</p>
+                        <p>After repeated analysis, I split a relatively large example into several files, each focusing on its own task. Once these modules were divided, the code became very concise and easy to understand.</p>
+
+                        <p><a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a></p>
+                        <p><a href="https://d2l.ai/chapter_attention-mechanisms-and-transformers/index.html">Attention Mechanisms and Transformers</a></p>
+                        <p><a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Transformer.html">torch.nn.Transformer - PyTorch</a></p>
+
+                        <h3 id="section5-sub4">
+                            <a href="transformer_stratch.html" style="color: inherit;">5.4 Transformer from Stratch</a>
                         </h3>
                         <p>The Transformer from "Attention is All You Need" has been on a lot of people’s minds over the last year. Besides producing major improvements in translation quality, it provides a new architecture for many other NLP tasks. The paper itself is very clearly written, but the conventional wisdom has been that it is quite difficult to implement correctly.</p>
                         <p>This chapter will implement the Transformer architecture from scratch, module by module, to give you a clear look at the model's details. To avoid any data-related distractions, we'll only use numbers. Our goal is for the model to perform a copy task: if we input the sequence 0, 1, 2, ..., 9, we expect the model to output the exact same sequence. This may seem strange, as a simple function could do this with no effort. However, the remarkable part is that we can achieve this operation after passing the data through a massive and complex network. Isn't that incredible?</p>
                         <p>The main implementation is based on the article below. The article is very well-written, but it's quite long and may be difficult to understand. This guide will take a more accessible approach, with each module's output explained in detail to clarify its inner workings.</p>
 
                         <p><a href="https://nlp.seas.harvard.edu/annotated-transformer/">The Annotated Transformer</a></p>
-
-                        <h3 id="section5-sub4">
-                            <a href="nn_transformer.html" style="color: inherit;">5.4 nn.Transformer</a>
-                        </h3>
-                        <p><a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a></p>
-                        <p><a href="https://d2l.ai/chapter_attention-mechanisms-and-transformers/index.html">Attention Mechanisms and Transformers</a></p>
-                        <p><a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Transformer.html">torch.nn.Transformer - PyTorch</a></p>
 
                         <h3 id="section5-sub5">
                             <a href="nano_gpt.html" style="color: inherit;">5.5 nanoGPT</a>

@@ -19,13 +19,13 @@
             </nav>
 
             <main class="col-md-8 content">
-                <h2 class="custom-title">5.4 nn.Transformer</h2>
+                <h2 class="custom-title">5.3 nn.Transformer</h2>
                 <p class="title-subtext"></p>
                 <p style="color: #a0a0a0;">Created Date: 2025-07-02</p>
 
-                <p>In <a href="transformer_stratch.html">previous section</a> we write a simple transformer demo, copy input to output. In this tutorial, we will use the <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Transformer.html">torch.nn.Transformer</a> interface to quickly translate German to English and complete the framework of the translation project. Then we will use the handwritten multi-head attention, encoder, decoder, and forward propagation layers to replace the <code>torch.nn.Transformer</code> interface.</p>
+                <p>In this tutorial, we will use the <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Transformer.html">torch.nn.Transformer</a> interface to quickly translate German to English and complete the framework of the translation project. Then we will use the handwritten multi-head attention, encoder, decoder, and forward propagation layers to replace the <code>torch.nn.Transformer</code> interface.</p>
 
-                <h3 id="multi30k">5.4.1 Dataset of Multi30k</h3>
+                <h3 id="multi30k">5.3.1 Dataset of Multi30k</h3>
 
                 <p>For ease of use, we'll use the WMT16 Machine Translation dataset. This dataset contains the "multi30k" dataset, which is the "task 1" dataset from <a href="https://www.statmt.org/wmt16/multimodal-task.html">here</a> .</p>
                 <p>Each example consists of an "en" and a "de" feature. "en" is an English sentence, and "de" is the German translation of the English sentence. The Multi30k dataset has 3 splits: train, validation, and test. Use <code>datasets</code> from HuggingFace:</p>
@@ -136,11 +136,11 @@ for batch in train_iterator:
                 <pre><samp>torch.Size([32, 19])
 torch.Size([32, 26])</samp></pre>
 
-                <h3>5.4.2 nn.Transformer API</h3>
+                <h3>5.3.2 nn.Transformer API</h3>
 
                 <p>This section builds a Transformer model using PyTorch's nn.Transformer for sequence-to-sequence tasks. It defines embeddings, encoder-decoder layers, and output projection. Training employs teacher forcing, loss masking, and gradient clipping. Finally, inference generates translations by feeding target sequences and decoding predictions from model outputs.</p>
 
-                <h4>5.4.2.1 Make Transformer Model</h4>
+                <h4>5.3.2.1 Make Transformer Model</h4>
                 <p>This TransformerModel class defines a standard sequence-to-sequence Transformer architecture using PyTorch's nn.Transformer module. It initializes with:</p>
                 <ul class="with-bullets">
                     <li><p>src_emb and trg_emb: Embedding layers to convert input source and target token IDs into dense vector representations (emb_size).</p></li>
@@ -191,7 +191,7 @@ criterion.to(device)
 EPOCHS = 40
 CLIP = 1.0  # Gradient clipping</code></pre>
 
-                <h4>5.4.2.2 Training nn.Transformer</h4>
+                <h4>5.3.2.2 Training nn.Transformer</h4>
                 
                 <pre><code>def train(model, iterator, optimizer, criterion, clip):
     model.train()
@@ -291,7 +291,7 @@ Epoch 38 | Train Loss: 0.356 | Validation Loss: 1.560
 Epoch 39 | Train Loss: 0.350 | Validation Loss: 1.573
 Epoch 40 | Train Loss: 0.343 | Validation Loss: 1.563</samp></pre>
 
-                <h4>5.4.2.3 Translation Inference</h4>
+                <h4>5.3.2.3 Translation Inference</h4>
 
                 <pre><code>def translate_one_batch(model, iterator, SRC, TRG):
     model.eval()
@@ -461,7 +461,7 @@ Prediction: three men are walking up walking .
 Reference: three men are walking up hill . &lt;eos&gt;
 --------------------------------------------------</samp></pre>
 
-                <h3>5.4.3 Transformer from Scratch</h3>
+                <h3>5.3.3 Transformer from Scratch</h3>
 
                 <p>File <a href="https://github.com/artinte/deep-learning/blob/develop/05_transformer/4_translate/translate_scratch.py">translate_scratch.py</a></p>
 
@@ -506,14 +506,14 @@ Epoch 38 | Train Loss: 0.370 | Validation Loss: 2.603
 Epoch 39 | Train Loss: 0.353 | Validation Loss: 2.652
 Epoch 40 | Train Loss: 0.338 | Validation Loss: 2.678</samp></pre>
 
-                <h3>5.4.4 Optimization</h3>
+                <h3>5.3.4 Optimization</h3>
 
 
-                <h3>5.4.5 Conclusion</h3>
+                <h3>5.3.5 Conclusion</h3>
 
                 <div class="navigation">
-                    <a href="transformer_stratch.html">Prev: 5.3 Transformer from Stratch</a>
-                    <a href="nano_gpt.html">Next: 5.5 nanoGPT</a>
+                    <a href="transformer_paper.html">Prev: 5.2 Attention Is All You Need</a>
+                    <a href="transformer_stratch.html">Next: 5.4 Transformer from Stratch</a>
                 </div>
             </main>
 

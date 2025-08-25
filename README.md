@@ -2,11 +2,11 @@
 
 This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the explanation of theoretical knowledge, but also pays more attention to engineering practice. By combining a large number of practical cases, especially how to train, optimize and deploy models, readers will be able to master how to use [PyTorch](https://pytorch.org/) to complete various deep learning tasks.
 
-The code is highly practical. For example, in the [Transformer](transformer) chapter, four methods are used to implement the English-German translation task described in the paper:
+The code is highly practical. For example, in the Transformer chapter, four methods are used to implement the English-German translation task described in the [paper](https://arxiv.org/abs/1706.03762) :
 
-* directly use the pre-trained models from transformers;
-* Use torch.nn.Transformer API;
-* Use torch.nn.functional.scaled_dot_product_attention function;
+* Directly use the pre-trained models from transformers;
+* Use [torch.nn.Transformer](https://docs.pytorch.org/docs/stable/generated/torch.nn.Transformer.html) API;
+* Use [torch.nn.functional.scaled_dot_product_attention](https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html) function;
 * Implement from scratch.
 
 These four methods are progressive in hierarchy and serve as excellent learning materials. The following is the table of contents of the book:
@@ -50,8 +50,8 @@ These four methods are progressive in hierarchy and serve as excellent learning 
 
 - [x] 5.1 [Attention Mechanism](https://artinte.github.io/deep-learning/attention_mechanism.html)
 - [x] 5.2 [Attention Is All You Need](https://artinte.github.io/deep-learning/transformer_paper.html)
-- [x] 5.3 [Transformer from Stratch](https://artinte.github.io/deep-learning/transformer_stratch.html)
-- [x] 5.4 [nn.Transformer](https://artinte.github.io/deep-learning/nn_transformer.html)
+- [x] 5.3 [nn.Transformer](https://artinte.github.io/deep-learning/nn_transformer.html)
+- [x] 5.4 [Transformer from Stratch](https://artinte.github.io/deep-learning/transformer_stratch.html)
 - [ ] 5.5 [nanoGPT](https://artinte.github.io/deep-learning/nano_gpt.html)
 - [x] 5.6 [BERT](https://artinte.github.io/deep-learning/bert.html)
 - [x] 5.7 [Vision Transformer](https://artinte.github.io/deep-learning/vision_transformer.html)
