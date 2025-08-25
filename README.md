@@ -52,7 +52,7 @@ These four methods are progressive in hierarchy and serve as excellent learning 
 - [x] 5.2 [Attention Is All You Need](https://artinte.github.io/deep-learning/transformer_paper.html)
 - [x] 5.3 [nn.Transformer](https://artinte.github.io/deep-learning/nn_transformer.html)
 - [x] 5.4 [Transformer from Stratch](https://artinte.github.io/deep-learning/transformer_stratch.html)
-- [ ] 5.5 [nanoGPT](https://artinte.github.io/deep-learning/nano_gpt.html)
+- [x] 5.5 [nanoGPT](https://artinte.github.io/deep-learning/nano_gpt.html)
 - [x] 5.6 [BERT](https://artinte.github.io/deep-learning/bert.html)
 - [x] 5.7 [Vision Transformer](https://artinte.github.io/deep-learning/vision_transformer.html)
 
@@ -61,7 +61,7 @@ These four methods are progressive in hierarchy and serve as excellent learning 
 - [x] 6.1 [Probability Theory](https://artinte.github.io/deep-learning/prob_theory.html)
 - [x] 6.2 [Gaussian Processes](https://artinte.github.io/deep-learning/gaussian_process.html)
 - [x] 6.3 [Mathematical Foundation](https://artinte.github.io/deep-learning/diffusion_math.html)
-- [ ] 6.4 [Diffusion from Scratch](https://artinte.github.io/deep-learning/diffusion_scratch.html)
+- [x] 6.4 [Diffusion from Scratch](https://artinte.github.io/deep-learning/diffusion_scratch.html)
 - [x] 6.5 [Estimating Gradients](https://artinte.github.io/deep-learning/estimate_gradients.html)
 - [x] 6.6 [Diffusion Probability Model](https://artinte.github.io/deep-learning/dd_prob_model.html)
 - [x] 6.7 [Latent Diffusion](https://artinte.github.io/deep-learning/latent_diffusion.html)
@@ -76,8 +76,8 @@ These four methods are progressive in hierarchy and serve as excellent learning 
 ### 08 Audio
 
 - [x] 8.1 [Speech Feature Extraction](https://artinte.github.io/deep-learning/speech_feature.html)
-- [ ] 8.2 [Automatic Speech Recognition](https://artinte.github.io/deep-learning/speech_recognition.html)
-- [ ] 8.3 [Text-to-Speech](https://artinte.github.io/deep-learning/text_to_speech.html)
+- [x] 8.2 [Automatic Speech Recognition](https://artinte.github.io/deep-learning/speech_recognition.html)
+- [x] 8.3 [Text-to-Speech](https://artinte.github.io/deep-learning/text_to_speech.html)
 - [x] 8.4 [Music Transcription](https://artinte.github.io/deep-learning/music_transcription.html)
 - [x] 8.5 [Music Synthesis](https://artinte.github.io/deep-learning/music_synthesis.html)
 
