@@ -8,16 +8,16 @@ def evaluate(model, iterator, criterion):
     with torch.no_grad():
         for _, batch in enumerate(iterator):
             src = batch.src
-            trg = batch.trg
+            tgt = batch.tgt
 
-            output = model(src, trg[:, :-1])
+            output = model(src, tgt[:, :-1])
 
             output_dim = output.shape[-1]
 
             output = output.view(-1, output_dim)
-            trg = trg[:, 1:].contiguous().view(-1)
+            tgt = tgt[:, 1:].contiguous().view(-1)
 
-            loss = criterion(output, trg)
+            loss = criterion(output, tgt)
             epoch_loss += loss.item()
 
     return epoch_loss / len(iterator)

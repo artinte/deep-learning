@@ -3,7 +3,7 @@ from preprocess import preprocess
 from tokenizer import get_tokenizer
 from train import train
 from evaluate import evaluate
-from translate import greedy_translate
+from inference import greedy_translate
 from seq2seq_transformer import Seq2SeqTransformer
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

@@ -23,7 +23,7 @@ def preprocess(device):
         lower=True,
         batch_first=True,
     )
-    trg_field = torchtext.data.Field(
+    tgt_field = torchtext.data.Field(
         tokenize=nltk.tokenize.word_tokenize,
         init_token="<sos>",
         eos_token="<eos>",
@@ -34,41 +34,41 @@ def preprocess(device):
 
     train_examples = [
         torchtext.data.Example.fromlist(
-            [src, trg], fields=[("src", src_field), ("trg", trg_field)]
+            [src, tgt], fields=[("src", src_field), ("tgt", tgt_field)]
         )
-        for src, trg in train_data
+        for src, tgt in train_data
     ]
     valid_examples = [
         torchtext.data.Example.fromlist(
-            [src, trg], fields=[("src", src_field), ("trg", trg_field)]
+            [src, tgt], fields=[("src", src_field), ("tgt", tgt_field)]
         )
-        for src, trg in valid_data
+        for src, tgt in valid_data
     ]
     test_examples = [
         torchtext.data.Example.fromlist(
-            [src, trg], fields=[("src", src_field), ("trg", trg_field)]
+            [src, tgt], fields=[("src", src_field), ("tgt", tgt_field)]
         )
-        for src, trg in test_data
+        for src, tgt in test_data
     ]
 
     train_dataset = torchtext.data.Dataset(
-        examples=train_examples, fields=[("src", src_field), ("trg", trg_field)]
+        examples=train_examples, fields=[("src", src_field), ("tgt", tgt_field)]
     )
     valid_dataset = torchtext.data.Dataset(
-        examples=valid_examples, fields=[("src", src_field), ("trg", trg_field)]
+        examples=valid_examples, fields=[("src", src_field), ("tgt", tgt_field)]
     )
     test_dataset = torchtext.data.Dataset(
-        examples=test_examples, fields=[("src", src_field), ("trg", trg_field)]
+        examples=test_examples, fields=[("src", src_field), ("tgt", tgt_field)]
     )
 
     src_field.build_vocab(train_dataset, min_freq=2)
-    trg_field.build_vocab(train_dataset, min_freq=2)
+    tgt_field.build_vocab(train_dataset, min_freq=2)
 
     print("Source vocabulary size: " + str(len(src_field.vocab)))
-    print("Target vocabulary size: " + str(len(trg_field.vocab)))
+    print("Target vocabulary size: " + str(len(tgt_field.vocab)))
 
-    print([word for word, _ in list(src_field.vocab.stoi.items())[:10]])
-    print([word for word, _ in list(trg_field.vocab.stoi.items())[:10]])
+    print([word for word, _ in list(src_field.vocab.stoi.items())[:20]])
+    print([word for word, _ in list(tgt_field.vocab.stoi.items())[:20]])
     
     train_iterator, valid_iterator, test_iterator = (
         torchtext.data.BucketIterator.splits(
@@ -82,10 +82,10 @@ def preprocess(device):
 
     for batch in train_iterator:
         src = batch.src
-        trg = batch.trg
+        tgt = batch.tgt
 
         print(src.shape)
-        print(trg.shape)
+        print(tgt.shape)
         break
 
-    return src_field, trg_field, train_iterator, valid_iterator, test_iterator
+    return src_field, tgt_field, train_iterator, valid_iterator, test_iterator

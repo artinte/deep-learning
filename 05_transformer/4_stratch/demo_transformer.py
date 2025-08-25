@@ -11,27 +11,29 @@ def print_translations(translations):
         print("-" * 50)
         print(f"Source: {tran['src']}")
         print(f"Prediction: {tran['hyp']}")
-        print(f"Reference: {tran['trg']}")
+        print(f"Reference: {tran['tgt']}")
 
 
 if __name__ == "__main__":
-    device = torch.device(
-        "cuda"
-        if torch.cuda.is_available()
-        else "mps" if torch.backends.mps.is_available() else "cpu"
-    )
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    src_field, trg_field, train_iter, valid_iter, test_iter = preprocess(device)
+    src_field, tgt_field, train_iter, valid_iter, test_iter = preprocess(device)
+    src_vocab_size = len(src_field.vocab)
+    tgt_vocab_size = len(tgt_field.vocab)
+    print(f"Src vocab size: {src_vocab_size}")
+    print(f"Tgt vocab size: {tgt_vocab_size}")
 
+    src_pad_token = src_field.vocab.stoi[src_field.pad_token]
+    tgt_pad_token = tgt_field.vocab.stoi[tgt_field.pad_token]
     model = TransformerModel(
-        len(src_field.vocab),
-        len(trg_field.vocab),
-        src_field.vocab.stoi[src_field.pad_token],
-        trg_field.vocab.stoi[trg_field.pad_token],
+        src_vocab_size,
+        tgt_vocab_size,
+        src_pad_token,
+        tgt_pad_token,
     ).to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=0.01)
     criterion = torch.nn.CrossEntropyLoss(
-        ignore_index=trg_field.vocab.stoi[trg_field.pad_token]
+        ignore_index=tgt_field.vocab.stoi[tgt_field.pad_token]
     ).to(device)
 
     for epoch in range(20):
@@ -41,5 +43,5 @@ if __name__ == "__main__":
             f"Epoch {epoch+1} | Train loss: {train_loss:.3f} | Val loss: {valid_loss:.3f}"
         )
 
-    translations = translate_one_batch(model, test_iter, src_field, trg_field)
+    translations = translate_one_batch(model, test_iter, src_field, tgt_field)
     print_translations(translations)
