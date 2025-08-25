@@ -7,13 +7,14 @@ class TransformerModel(torch.nn.Module):
         self,
         src_vocab_size,
         tgt_vocab_size,
+        d_model,
+        n_head,
+        dim_feedforward,
+        num_encoder_layers,
+        num_decoder_layers,
+        dropout,
         src_pad_idx,
         tgt_pad_idx,
-        d_model=256,
-        nhead=8,
-        n_ff=1024,
-        nlayers=6,
-        dropout=0.1,
     ):
         super(TransformerModel, self).__init__()
         self.src_pad_idx = src_pad_idx
@@ -24,10 +25,10 @@ class TransformerModel(torch.nn.Module):
 
         self.transformer = torch.nn.Transformer(
             d_model=d_model,
-            nhead=nhead,
-            num_encoder_layers=nlayers,
-            num_decoder_layers=nlayers,
-            dim_feedforward=n_ff,
+            nhead=n_head,
+            num_encoder_layers=num_encoder_layers,
+            num_decoder_layers=num_decoder_layers,
+            dim_feedforward=dim_feedforward,
             batch_first=True,
             dropout=dropout,
         )

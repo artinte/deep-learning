@@ -15,7 +15,7 @@ class TranslationDataset(torch.utils.data.Dataset):
         return en_text, de_text
 
 
-def preprocess(tokenizer):
+def preprocess(tokenizer, batch_size=16):
     data_train, data_valid, data_test = datasets.load_dataset(
         "bentrevett/multi30k", split=["train", "validation", "test"]
     )
@@ -68,19 +68,17 @@ def preprocess(tokenizer):
             torch.cat([bos_mask, tgt_tokens["attention_mask"]], dim=1),
         )
 
-    BATCH_SIZE = 16
-
     train_dataset = TranslationDataset(data_train)
     valid_dataset = TranslationDataset(data_valid)
     test_dataset = TranslationDataset(data_test)
     train_dataloader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=BATCH_SIZE, shuffle=True, collate_fn=collate_fn
+        train_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn
     )
     valid_dataloader = torch.utils.data.DataLoader(
-        valid_dataset, batch_size=BATCH_SIZE, shuffle=False, collate_fn=collate_fn
+        valid_dataset, batch_size=batch_size, shuffle=False, collate_fn=collate_fn
     )
     test_dataloader = torch.utils.data.DataLoader(
-        test_dataset, batch_size=BATCH_SIZE, shuffle=False, collate_fn=collate_fn
+        test_dataset, batch_size=batch_size, shuffle=False, collate_fn=collate_fn
     )
 
     test_src_sample, test_tgt_sample, test_src_mask, test_tgt_mask = next(iter(test_dataloader))
