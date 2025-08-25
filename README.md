@@ -2,6 +2,15 @@
 
 This [eBook](https://artinte.github.io/deep-learning/) not only focuses on the explanation of theoretical knowledge, but also pays more attention to engineering practice. By combining a large number of practical cases, especially how to train, optimize and deploy models, readers will be able to master how to use [PyTorch](https://pytorch.org/) to complete various deep learning tasks.
 
+The code is highly practical. For example, in the [Transformer](transformer) chapter, four methods are used to implement the English-German translation task described in the paper:
+
+* directly use the pre-trained models from transformers;
+* Use torch.nn.Transformer API;
+* Use torch.nn.functional.scaled_dot_product_attention function;
+* Implement from scratch.
+
+These four methods are progressive in hierarchy and serve as excellent learning materials. The following is the table of contents of the book:
+
 ### 01 Tensor and Gradient Basics
 - [x] 1.1 [Install PyTorch](https://artinte.github.io/deep-learning/pytorch_install.html)
 - [x] 1.2 [Introduction to Tensors](https://artinte.github.io/deep-learning/tensor_intro.html)
