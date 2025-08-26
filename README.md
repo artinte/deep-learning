@@ -40,7 +40,7 @@ These four methods are progressive in hierarchy and serve as excellent learning 
 ### 04 Recurrent Network
 
 - [x] 4.1 [RNN from Scratch](https://artinte.github.io/deep-learning/rnn_classify_scratch.html)
-- [x] 4.2 [Word Embeddings](https://artinte.github.io/deep-learning/word_embed.html)
+- [x] 4.2 [Text Preprocessing](https://artinte.github.io/deep-learning/word_embed.html)
 - [x] 4.3 [Word2Vec](https://artinte.github.io/deep-learning/word2vec.html)
 - [x] 4.4 [Text Generation with RNN](https://artinte.github.io/deep-learning/text_generate_rnn.html)
 - [x] 4.5 [Neural Machine Translation](https://artinte.github.io/deep-learning/nmt_align.html)
@@ -50,9 +50,12 @@ These four methods are progressive in hierarchy and serve as excellent learning 
 
 - [x] 5.1 [Attention Mechanism](https://artinte.github.io/deep-learning/attention_mechanism.html)
 - [x] 5.2 [Attention Is All You Need](https://artinte.github.io/deep-learning/transformer_paper.html)
+      The original paper "Attention Is All You Need"
 - [x] 5.3 [nn.Transformer](https://artinte.github.io/deep-learning/nn_transformer.html)
+      Use the torch.nn.Transformer interface for the German-to-English translation task.
 - [x] 5.4 [Transformer from Stratch](https://artinte.github.io/deep-learning/transformer_stratch.html)
 - [x] 5.5 [nanoGPT](https://artinte.github.io/deep-learning/nano_gpt.html)
+      The simplest, fastest repository for training/finetuning medium-sized GPTs.
 - [x] 5.6 [BERT](https://artinte.github.io/deep-learning/bert.html)
 - [x] 5.7 [Vision Transformer](https://artinte.github.io/deep-learning/vision_transformer.html)
 
