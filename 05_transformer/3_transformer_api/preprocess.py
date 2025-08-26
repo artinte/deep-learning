@@ -15,10 +15,17 @@ class TranslationDataset(torch.utils.data.Dataset):
         return en_text, de_text
 
 
-def preprocess(tokenizer, device, batch_size=16):
-    data_train, data_valid, data_test = datasets.load_dataset(
-        "bentrevett/multi30k", split=["train", "validation", "test"]
-    )
+def preprocess(tokenizer, device, batch_size=16, dataset=None):
+    if dataset:
+        data_train, data_valid, data_test = (
+            dataset["train"],
+            dataset["validation"],
+            dataset["test"],
+        )
+    else:
+        data_train, data_valid, data_test = datasets.load_dataset(
+            "bentrevett/multi30k", split=["train", "validation", "test"]
+        )
     print(f"Training dataset length: {len(data_train)}")
     print(f"Validation dataset length: {len(data_valid)}")
     print(f"Test dataset length: {len(data_test)}")
@@ -81,7 +88,9 @@ def preprocess(tokenizer, device, batch_size=16):
         test_dataset, batch_size=batch_size, shuffle=False, collate_fn=collate_fn
     )
 
-    test_src_sample, test_tgt_sample, test_src_mask, test_tgt_mask = next(iter(test_dataloader))
+    test_src_sample, test_tgt_sample, test_src_mask, test_tgt_mask = next(
+        iter(test_dataloader)
+    )
     print(f"Shape of test src sample: {test_src_sample.shape}")
     print(f"First batch test src token: {test_src_sample}")
     print(f"Shape of test tgt sample: {test_tgt_sample.shape}")

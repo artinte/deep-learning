@@ -46,6 +46,15 @@ def preprocess(device, batch_size=32):
     src_field.build_vocab(train_dataset, min_freq=2)
     tgt_field.build_vocab(train_dataset, min_freq=2)
 
+    print(f"Source <sos> index: {src_field.vocab.stoi[src_field.init_token]}")
+    print(f"Source <eos> index: {src_field.vocab.stoi[src_field.eos_token]}")
+    print(f"Source <pad> index: {src_field.vocab.stoi[src_field.pad_token]}")
+    print(f"Source <unk> index: {src_field.vocab.stoi[src_field.unk_token]}")
+    print(f"Target <sos> index: {tgt_field.vocab.stoi[tgt_field.init_token]}")
+    print(f"Target <eos> index: {tgt_field.vocab.stoi[tgt_field.eos_token]}")
+    print(f"Target <pad> index: {tgt_field.vocab.stoi[tgt_field.pad_token]}")
+    print(f"Target <unk> index: {tgt_field.vocab.stoi[tgt_field.unk_token]}")
+
     print("Source vocabulary size: " + str(len(src_field.vocab)))
     print("Target vocabulary size: " + str(len(tgt_field.vocab)))
 
@@ -85,8 +94,8 @@ def preprocess(device, batch_size=32):
     for batch in test_iterator:
         test_src_sample = batch.src
         test_tgt_sample = batch.tgt
-        test_src_mask = test_src_sample != 0
-        test_tgt_mask = test_tgt_sample != 0
+        test_src_mask = test_src_sample != src_field.vocab.stoi[src_field.pad_token]
+        test_tgt_mask = test_tgt_sample != tgt_field.vocab.stoi[tgt_field.pad_token]
         print(f"Shape of test src sample: {test_src_sample.shape}")
         print(f"First batch test src token: {test_src_sample}")
         print(f"Shape of test tgt sample: {test_tgt_sample.shape}")
