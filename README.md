@@ -49,12 +49,12 @@ These four methods are progressive in hierarchy and serve as excellent learning 
 ### 05 Transformer
 
 - [x] 5.1 [Attention Mechanism](https://artinte.github.io/deep-learning/attention_mechanism.html)
-- [x] 5.2 [Attention Is All You Need](https://artinte.github.io/deep-learning/transformer_paper.html)
+- [x] 5.2 [Attention Is All You Need](https://artinte.github.io/deep-learning/transformer_paper.html)  
       The original paper "Attention Is All You Need"
-- [x] 5.3 [nn.Transformer](https://artinte.github.io/deep-learning/nn_transformer.html)
-      Use the torch.nn.Transformer interface for the German-to-English translation task.
+- [x] 5.3 [nn.Transformer](https://artinte.github.io/deep-learning/nn_transformer.html)  
+      Use the [torch.nn.Transformer](https://docs.pytorch.org/docs/stable/generated/torch.nn.Transformer.html) interface for the German-to-English translation task.
 - [x] 5.4 [Transformer from Stratch](https://artinte.github.io/deep-learning/transformer_stratch.html)
-- [x] 5.5 [nanoGPT](https://artinte.github.io/deep-learning/nano_gpt.html)
+- [x] 5.5 [nanoGPT](https://artinte.github.io/deep-learning/nano_gpt.html)  
       The simplest, fastest repository for training/finetuning medium-sized GPTs.
 - [x] 5.6 [BERT](https://artinte.github.io/deep-learning/bert.html)
 - [x] 5.7 [Vision Transformer](https://artinte.github.io/deep-learning/vision_transformer.html)

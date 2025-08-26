@@ -29,8 +29,8 @@ def greedy_translate(model, sentence, tokenizer, max_len=512):
         src_tokens = tokenizer(
             sentence, truncation=True, padding=False, return_tensors="pt"
         )
-        src = src_tokens["input_ids"].to(model.device)
-        src_key_padding_mask = (src_tokens["attention_mask"] == 0).to(model.device)
+        src = src_tokens["input_ids"]
+        src_key_padding_mask = (src_tokens["attention_mask"] == 0)
         memory = model.encode(src, src_key_padding_mask)
 
         bos_token_id = tokenizer.eos_token_id
@@ -102,8 +102,8 @@ def translate_beam_search(model, sentence, tokenizer, max_len=512, num_beams=5):
         src_tokens = tokenizer(
             sentence, truncation=True, padding=False, return_tensors="pt"
         )
-        src = src_tokens["input_ids"].to(model.device)
-        src_key_padding_mask = (src_tokens["attention_mask"] == 0).to(model.device)
+        src = src_tokens["input_ids"]
+        src_key_padding_mask = (src_tokens["attention_mask"] == 0)
         memory = model.encode(src, src_key_padding_mask)
 
         bos_token_id = tokenizer.bos_token_id or tokenizer.eos_token_id

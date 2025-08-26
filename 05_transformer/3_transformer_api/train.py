@@ -3,9 +3,9 @@ import torch
 
 def train(model, train_dataloader, optimizer, criterion):
     """
-    Trains the Seq2SeqTransformer model.
+    Trains the Transformer model.
     Args:
-        model (torch.nn.Module): The Seq2SeqTransformer model.
+        model (torch.nn.Module): The Transformer model.
         train_dataloader (torch.utils.data.DataLoader): The training data loader.
         optimizer (torch.optim.Optimizer): The optimizer for training.
         criterion (torch.nn.modules.loss._Loss): The loss function.
@@ -13,12 +13,6 @@ def train(model, train_dataloader, optimizer, criterion):
     model.train()
     total_loss = 0
     for src, tgt, src_key_padding_mask, tgt_key_padding_mask in train_dataloader:
-        # Move tensors to the correct device
-        src = src.to(model.device)
-        tgt = tgt.to(model.device)
-        src_key_padding_mask = src_key_padding_mask.to(model.device)
-        tgt_key_padding_mask = tgt_key_padding_mask.to(model.device)
-
         # The target input is the target sequence without the EOS token.
         # This is what the decoder receives as input.
         tgt_input = tgt[:, :-1]

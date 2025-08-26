@@ -6,11 +6,6 @@ def evaluate(model, valid_dataloader, criterion):
     total_loss = 0
     with torch.no_grad():
         for src, tgt, src_key_padding_mask, tgt_key_padding_mask in valid_dataloader:
-            src = src.to(model.device)
-            tgt = tgt.to(model.device)
-            src_key_padding_mask = src_key_padding_mask.to(model.device)
-            tgt_key_padding_mask = tgt_key_padding_mask.to(model.device)
-
             # The target input is the target sequence without the EOS token
             tgt_input = tgt[:, :-1]
             tgt_key_padding_mask = tgt_key_padding_mask[:, :-1]

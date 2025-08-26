@@ -15,7 +15,7 @@ class TranslationDataset(torch.utils.data.Dataset):
         return en_text, de_text
 
 
-def preprocess(tokenizer, batch_size=16):
+def preprocess(tokenizer, device, batch_size=16):
     data_train, data_valid, data_test = datasets.load_dataset(
         "bentrevett/multi30k", split=["train", "validation", "test"]
     )
@@ -47,17 +47,17 @@ def preprocess(tokenizer, batch_size=16):
 
         src_tokens = tokenizer(
             en_sentences, truncation=True, padding=True, return_tensors="pt"
-        )
+        ).to(device)
         tgt_tokens = tokenizer(
             de_sentences, truncation=True, padding=True, return_tensors="pt"
-        )
+        ).to(device)
         bos_token_id = tokenizer.bos_token_id or tokenizer.eos_token_id
         bos = torch.full(
             (tgt_tokens["input_ids"].size(0), 1), bos_token_id, dtype=torch.long
-        )
+        ).to(device)
         bos_mask = torch.ones(
             (tgt_tokens["attention_mask"].size(0), 1), dtype=torch.long
-        )
+        ).to(device)
 
         # The tokenizer now returns a dictionary with 'input_ids' and 'attention_mask'
         # We only need the input IDs for this model.

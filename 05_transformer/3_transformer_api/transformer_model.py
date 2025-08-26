@@ -2,7 +2,7 @@ import torch
 from positional_encoding import PositionalEncoding
 
 
-class Seq2SeqTransformer(torch.nn.Module):
+class TransformerModel(torch.nn.Module):
     def __init__(
         self,
         src_vocab_size,
@@ -16,7 +16,7 @@ class Seq2SeqTransformer(torch.nn.Module):
         device,
     ):
         """
-        Initializes the Seq2SeqTransformer model components.
+        Initializes the Transformer model components.
 
         Args:
             src_vocab_size (int): Size of the source language vocabulary.
@@ -29,7 +29,7 @@ class Seq2SeqTransformer(torch.nn.Module):
             dropout (float): The dropout value.
             device (torch.device): The device (e.g., 'cpu' or 'cuda') to run the model on.
         """
-        super(Seq2SeqTransformer, self).__init__()
+        super(TransformerModel, self).__init__()
         self.device = device
         self.src_embedding = torch.nn.Embedding(src_vocab_size, d_model)
         self.tgt_embedding = torch.nn.Embedding(tgt_vocab_size, d_model)

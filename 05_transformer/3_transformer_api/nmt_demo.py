@@ -3,8 +3,8 @@ from preprocess import preprocess
 from tokenizer import get_tokenizer
 from train import train
 from evaluate import evaluate
-from inference import greedy_translate
-from seq2seq_transformer import Seq2SeqTransformer
+from inference import greedy_translate, translate_beam_search
+from transformer_model import TransformerModel
 
 torch.set_printoptions(profile="full")
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -12,7 +12,7 @@ print(f"Using device: {device}")
 
 tokenizer = get_tokenizer()
 
-train_dataloader, valid_dataloader, test_dataloader, data_test = preprocess(tokenizer)
+train_dataloader, valid_dataloader, test_dataloader, data_test = preprocess(tokenizer, device)
 
 src_vocab_size = tokenizer.vocab_size
 tgt_vocab_size = tokenizer.vocab_size
@@ -22,9 +22,9 @@ num_encoder_layers = 6
 num_decoder_layers = 6
 dim_feedforward = 2048
 dropout = 0.2
-num_epochs = 30
+num_epochs = 20
 
-model = Seq2SeqTransformer(
+model = TransformerModel(
     src_vocab_size,
     tgt_vocab_size,
     d_model,
@@ -57,8 +57,8 @@ for i in range(32):
     en_sentence = data_test[i]["en"]
     de_reference = data_test[i]["de"]
 
-    translated = greedy_translate(model, en_sentence, tokenizer)
-
+    # translated = greedy_translate(model, en_sentence, tokenizer)
+    translated = translate_beam_search(model, en_sentence, tokenizer)
     print("-" * 50)
     print(f"Source: {en_sentence}")
     print(f"Prediction: {translated}")
