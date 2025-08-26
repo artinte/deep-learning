@@ -1,4 +1,5 @@
 import torch
+from torchmetrics.text import BLEUScore
 from preprocess import preprocess
 from tokenizer import get_tokenizer
 from train import train
@@ -12,7 +13,7 @@ print(f"Using device: {device}")
 
 tokenizer = get_tokenizer()
 
-train_dataloader, valid_dataloader, test_dataloader, data_test = preprocess(tokenizer, device)
+train_dataloader, valid_dataloader, _, data_test = preprocess(tokenizer, device)
 
 src_vocab_size = tokenizer.vocab_size
 tgt_vocab_size = tokenizer.vocab_size
@@ -51,7 +52,6 @@ for epoch in range(num_epochs):
         f"Epoch: {epoch+1:02} | Train Loss: {train_loss:.3f} | Valid Loss: {valid_loss:.3f}"
     )
 
-
 print("Testing Translation on First 32 Samples")
 for i in range(32):
     en_sentence = data_test[i]["en"]
@@ -63,3 +63,19 @@ for i in range(32):
     print(f"Source: {en_sentence}")
     print(f"Prediction: {translated}")
     print(f"Reference: {de_reference}")
+
+print("-" * 50)
+print("Calculating Corpus BLEU Score...")
+all_predictions = []
+all_references = []
+for sample in data_test:
+    en_sentence = sample["en"]
+    de_reference = sample["de"]
+
+    translated = translate_beam_search(model, en_sentence, tokenizer)
+    all_predictions.append(translated)
+    all_references.append([de_reference])
+
+bleu_metric = BLEUScore()
+bleu_score = bleu_metric(all_predictions, all_references)
+print(f"Corpus BLEU Score: {bleu_score.item():.4f}")
