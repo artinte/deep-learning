@@ -106,4 +106,4 @@ def preprocess(device, batch_size=32):
         print(f"First batch test tgt mask: {test_tgt_mask}")
         break
 
-    return src_field, tgt_field, train_iterator, valid_iterator, test_iterator
+    return src_field, tgt_field, train_iterator, valid_iterator, test_iterator, test_data

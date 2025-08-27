@@ -3,13 +3,14 @@ from transformer_model import TransformerModel
 from preprocess import preprocess
 from train import train
 from evaluate import evaluate
-from inference import translate_one_batch
+from inference import greedy_translate
+from torchmetrics.text import BLEUScore
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
-src_field, tgt_field, train_iter, valid_iter, test_iter = preprocess(device)
+src_field, tgt_field, train_iter, valid_iter, test_iter, test_data = preprocess(device)
 
 src_vocab_size = len(src_field.vocab)
 tgt_vocab_size = len(tgt_field.vocab)
@@ -43,15 +44,35 @@ optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=0.01)
 
 print("Starting model training...")
 for epoch in range(num_epochs):
-    train_loss = train(model, train_iter, optimizer, criterion)
-    valid_loss = evaluate(model, valid_iter, criterion)
+    train_loss = train(model, train_iter, src_field, tgt_field, optimizer, criterion)
+    valid_loss = evaluate(model, valid_iter, src_field, tgt_field, criterion)
     print(
         f"Epoch {epoch+1} | Train loss: {train_loss:.3f} | Val loss: {valid_loss:.3f}"
     )
 
-translations = translate_one_batch(model, test_iter, src_field, tgt_field)
-for tran in translations:
+print("Testing Translation on First 32 Samples")
+for i in range(32):
+    en_sentence = test_data[i]["en"]
+    de_reference = test_data[i]["de"]
+
+    translated = greedy_translate(model, en_sentence, src_field, tgt_field)
     print("-" * 50)
-    print(f"Source: {tran['src']}")
-    print(f"Prediction: {tran['hyp']}")
-    print(f"Reference: {tran['tgt']}")
+    print(f"Source: {en_sentence}")
+    print(f"Prediction: {translated}")
+    print(f"Reference: {de_reference}")
+
+print("-" * 50)
+print("Calculating Corpus BLEU Score...")
+all_predictions = []
+all_references = []
+for sample in test_data:
+    en_sentence = sample["en"]
+    de_reference = sample["de"]
+
+    translated = greedy_translate(model, en_sentence, src_field, tgt_field)
+    all_predictions.append(translated)
+    all_references.append([de_reference])
+
+bleu_metric = BLEUScore()
+bleu_score = bleu_metric(all_predictions, all_references)
+print(f"Corpus BLEU Score: {bleu_score.item():.4f}")

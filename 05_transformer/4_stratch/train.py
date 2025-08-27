@@ -1,20 +1,16 @@
 import torch
 
 
-def train(model, train_dataloader, optimizer, criterion):
-    """
-    Trains the Transformer model.
-    Args:
-        model (torch.nn.Module): The Transformer model.
-        train_dataloader (torch.utils.data.DataLoader): The training data loader.
-        optimizer (torch.optim.Optimizer): The optimizer for training.
-        criterion (torch.nn.modules.loss._Loss): The loss function.
-    """
+def train(model, train_iter, src_field, tgt_field, optimizer, criterion):
     model.train()
     total_loss = 0
-    for src, tgt, src_key_padding_mask, tgt_key_padding_mask in train_dataloader:
+    for data in train_iter:
         # The target input is the target sequence without the EOS token.
         # This is what the decoder receives as input.
+        src, tgt = data.src, data.tgt
+        src_key_padding_mask = src != src_field.vocab.stoi[src_field.pad_token]
+        tgt_key_padding_mask = tgt != tgt_field.vocab.stoi[tgt_field.pad_token]
+
         tgt_input = tgt[:, :-1]
         tgt_key_padding_mask = tgt_key_padding_mask[:, :-1]
 
@@ -39,4 +35,4 @@ def train(model, train_dataloader, optimizer, criterion):
 
         total_loss += loss.item()
 
-    return total_loss / len(train_dataloader)
+    return total_loss / len(train_iter)

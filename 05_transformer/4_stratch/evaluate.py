@@ -1,12 +1,16 @@
 import torch
 
 
-def evaluate(model, valid_dataloader, criterion):
+def evaluate(model, valid_iter, src_field, tgt_field, criterion):
     model.eval()
     total_loss = 0
     with torch.no_grad():
-        for src, tgt, src_key_padding_mask, tgt_key_padding_mask in valid_dataloader:
+        for data in valid_iter:
             # The target input is the target sequence without the EOS token
+            src = data.src
+            tgt = data.tgt
+            src_key_padding_mask = src != src_field.vocab.stoi[src_field.pad_token]
+            tgt_key_padding_mask = tgt != tgt_field.vocab.stoi[tgt_field.pad_token]
             tgt_input = tgt[:, :-1]
             tgt_key_padding_mask = tgt_key_padding_mask[:, :-1]
 
@@ -24,4 +28,4 @@ def evaluate(model, valid_dataloader, criterion):
             loss = criterion(output, tgt_out)
             total_loss += loss.item()
 
-    return total_loss / len(valid_dataloader)
+    return total_loss / len(valid_iter)
