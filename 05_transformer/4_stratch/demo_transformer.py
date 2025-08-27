@@ -1,3 +1,4 @@
+import time
 import torch
 from transformer_model import TransformerModel
 from preprocess import preprocess
@@ -33,8 +34,7 @@ model = TransformerModel(
     num_decoder_layers=num_decoder_layers,
     dim_feedforward=dim_feedforward,
     dropout=dropout,
-    src_pad_idx=src_pad_token,
-    tgt_pad_idx=tgt_pad_token,
+    device=device
 ).to(device)
 
 criterion = torch.nn.CrossEntropyLoss(
@@ -44,11 +44,14 @@ optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=0.01)
 
 print("Starting model training...")
 for epoch in range(num_epochs):
+    start_time = time.time()
     train_loss = train(model, train_iter, src_field, tgt_field, optimizer, criterion)
     valid_loss = evaluate(model, valid_iter, src_field, tgt_field, criterion)
-    print(
-        f"Epoch {epoch+1} | Train loss: {train_loss:.3f} | Val loss: {valid_loss:.3f}"
-    )
+    end_time = time.time()
+    epoch_mins = int((end_time - start_time) / 60)
+    epoch_secs = int((end_time - start_time) % 60)
+    print(f"Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s")
+    print(f"\tTrain Loss: {train_loss:.3f} | Valid Loss: {valid_loss:.3f}")
 
 print("Testing Translation on First 32 Samples")
 for i in range(32):

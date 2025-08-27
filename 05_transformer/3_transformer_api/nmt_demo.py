@@ -1,10 +1,11 @@
+import time
 import torch
 from torchmetrics.text import BLEUScore
 from preprocess import preprocess
 from tokenizer import get_tokenizer
 from train import train
 from evaluate import evaluate
-from inference import greedy_translate, translate_beam_search
+from inference import greedy_translate
 from transformer_model import TransformerModel
 
 torch.set_printoptions(profile="full")
@@ -41,16 +42,19 @@ model = TransformerModel(
 criterion = torch.nn.CrossEntropyLoss(
     ignore_index=tokenizer.pad_token_id, label_smoothing=0.1
 )
-# optimizer = torch.optim.Adam(model.parameters(), lr=0.0001, betas=(0.9, 0.98), eps=1e-9)
-optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=0.01)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.0001, betas=(0.9, 0.98), eps=1e-9)
+#optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=0.01)
 
 print("Starting model training...")
 for epoch in range(num_epochs):
+    start_time = time.time()
     train_loss = train(model, train_dataloader, optimizer, criterion)
     valid_loss = evaluate(model, valid_dataloader, criterion)
-    print(
-        f"Epoch: {epoch+1:02} | Train Loss: {train_loss:.3f} | Valid Loss: {valid_loss:.3f}"
-    )
+    end_time = time.time()
+    epoch_mins = int((end_time - start_time) / 60)
+    epoch_secs = int((end_time - start_time) % 60)
+    print(f"Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s")
+    print(f"\tTrain Loss: {train_loss:.3f} | Valid Loss: {valid_loss:.3f}")
 
 print("Testing Translation on First 32 Samples")
 for i in range(32):
@@ -58,7 +62,7 @@ for i in range(32):
     de_reference = data_test[i]["de"]
 
     # translated = greedy_translate(model, en_sentence, tokenizer)
-    translated = translate_beam_search(model, en_sentence, tokenizer)
+    translated = greedy_translate(model, en_sentence, tokenizer)
     print("-" * 50)
     print(f"Source: {en_sentence}")
     print(f"Prediction: {translated}")
@@ -72,7 +76,7 @@ for sample in data_test:
     en_sentence = sample["en"]
     de_reference = sample["de"]
 
-    translated = translate_beam_search(model, en_sentence, tokenizer)
+    translated = greedy_translate(model, en_sentence, tokenizer)
     all_predictions.append(translated)
     all_references.append([de_reference])
 
