@@ -2,6 +2,14 @@ import transformers
 import torch
 from preprocess import preprocess
 
+tokenizer = transformers.AutoTokenizer.from_pretrained("Helsinki-NLP/opus-mt-en-de")
+
+assert tokenizer.bos_token_id == None
+assert tokenizer.eos_token_id != None
+bos_token_id = tokenizer.bos_token_id or tokenizer.eos_token_id
+assert bos_token_id == tokenizer.eos_token_id
+
+
 mock_data = {
     "train": [
         {"en": "A small dog is playing.", "de": "Ein kleiner Hund spielt."},
@@ -15,7 +23,7 @@ mock_data = {
     ],
 }
 
-tokenizer = transformers.AutoTokenizer.from_pretrained("Helsinki-NLP/opus-mt-en-de")
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 train_dataloader, valid_dataloader, test_dataloader, data_test = preprocess(
