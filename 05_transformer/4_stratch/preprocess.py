@@ -75,7 +75,7 @@ def preprocess(device, batch_size=32):
         device=device,
         sort_within_batch=False,
     )
-    
+
     test_iterator = torchtext.data.BucketIterator(
         test_dataset,
         batch_size=batch_size,

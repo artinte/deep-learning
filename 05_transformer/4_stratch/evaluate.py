@@ -1,23 +1,27 @@
 import torch
 
 
-def evaluate(model, iterator, criterion):
+def evaluate(model, valid_dataloader, criterion):
     model.eval()
-    epoch_loss = 0
-
+    total_loss = 0
     with torch.no_grad():
-        for _, batch in enumerate(iterator):
-            src = batch.src
-            tgt = batch.tgt
+        for src, tgt, src_key_padding_mask, tgt_key_padding_mask in valid_dataloader:
+            # The target input is the target sequence without the EOS token
+            tgt_input = tgt[:, :-1]
+            tgt_key_padding_mask = tgt_key_padding_mask[:, :-1]
 
-            output = model(src, tgt[:, :-1])
+            src_key_padding_mask = src_key_padding_mask == 0
+            tgt_key_padding_mask = tgt_key_padding_mask == 0
 
-            output_dim = output.shape[-1]
+            # [batch_size, tgt_seq_len, vocab_size]
+            logits = model.forward(
+                src, tgt_input, src_key_padding_mask, tgt_key_padding_mask
+            )
+            output = logits.reshape(-1, logits.shape[-1])
+            # [batch, seq_len] -> [batch x seq_len]
+            tgt_out = tgt[:, 1:].reshape(-1)
 
-            output = output.view(-1, output_dim)
-            tgt = tgt[:, 1:].contiguous().view(-1)
+            loss = criterion(output, tgt_out)
+            total_loss += loss.item()
 
-            loss = criterion(output, tgt)
-            epoch_loss += loss.item()
-
-    return epoch_loss / len(iterator)
+    return total_loss / len(valid_dataloader)

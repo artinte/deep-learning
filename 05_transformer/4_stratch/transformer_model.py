@@ -9,19 +9,31 @@ class TransformerModel(torch.nn.Module):
         tgt_vocab_size,
         d_model,
         n_head,
-        dim_feedforward,
         num_encoder_layers,
         num_decoder_layers,
+        dim_feedforward,
         dropout,
-        src_pad_idx,
-        tgt_pad_idx,
+        device,
     ):
+        """
+        Initializes the Transformer model components.
+
+        Args:
+            src_vocab_size (int): Size of the source language vocabulary.
+            tgt_vocab_size (int): Size of the target language vocabulary.
+            d_model (int): The number of expected features in the encoder/decoder inputs (embedding dimension).
+            n_head (int): The number of heads in the multiheadattention models.
+            num_encoder_layers (int): The number of sub-encoder layers in the encoder.
+            num_decoder_layers (int): The number of sub-decoder layers in the decoder.
+            dim_feedforward (int): The dimension of the feedforward network model.
+            dropout (float): The dropout value.
+            device (torch.device): The device (e.g., 'cpu' or 'cuda') to run the model on.
+        """
         super(TransformerModel, self).__init__()
-        self.src_pad_idx = src_pad_idx
-        self.tgt_pad_idx = tgt_pad_idx
-        self.src_emb = torch.nn.Embedding(src_vocab_size, d_model)
-        self.tgt_emb = torch.nn.Embedding(tgt_vocab_size, d_model)
-        self.positional_encoding = PositionalEncoding(d_model)
+        self.device = device
+        self.src_embedding = torch.nn.Embedding(src_vocab_size, d_model)
+        self.tgt_embedding = torch.nn.Embedding(tgt_vocab_size, d_model)
+        self.positional_encoding = PositionalEncoding(d_model, dropout)
 
         self.transformer = torch.nn.Transformer(
             d_model=d_model,
@@ -29,62 +41,98 @@ class TransformerModel(torch.nn.Module):
             num_encoder_layers=num_encoder_layers,
             num_decoder_layers=num_decoder_layers,
             dim_feedforward=dim_feedforward,
-            batch_first=True,
             dropout=dropout,
+            batch_first=True,  # Set to True for batch-first tensors
         )
 
-        self.fc_out = torch.nn.Linear(d_model, tgt_vocab_size)
+        self.generator = torch.nn.Linear(d_model, tgt_vocab_size)
 
-    def make_src_mask(self, src):
-        # This creates a boolean mask that is passed to src_key_padding_mask
-        return src == self.src_pad_idx
+    def forward(self, src, tgt, src_key_padding_mask, tgt_key_padding_mask):
+        """
+        The forward pass for training the model.
 
-    def make_tgt_mask(self, tgt):
-        # Create the padding mask as a float tensor with a large negative value
-        tgt_pad_mask = (tgt == self.tgt_pad_idx).float() * -1e9
+        Args:
+            src (torch.Tensor): The source sequence tensor. Shape: [batch_size, src_seq_len]
+            tgt (torch.Tensor): The target seqeunce tensor. Shape: [batch_size, tgt_seq_len]
+            src_key_padding_mask (torch.Tensor): Boolean mask to prevent attention to padding tokens in the source.
+                Shape: [batch_size, src_seq_len]
+            tgt_key_padding_mask (torch.Tensor): Boolean mask to prevent attention to padding tokens in the target.
+                Shape: [batch_size, tgt_seq_len]
 
-        tgt_len = tgt.shape[1]
-        # The look-ahead mask is already a float tensor
-        tgt_sub_mask = self.transformer.generate_square_subsequent_mask(tgt_len).to(
-            tgt.device
+        Returns:
+            torch.Tensor: The final output logits for the target sequence. Shape: [batch_size, tgt_seq_len, tgt_vocab_size]
+        """
+        src_emb = self.positional_encoding(self.src_embedding(src))
+        tgt_emb = self.positional_encoding(self.tgt_embedding(tgt))
+
+        # Generate a boolean causal mask for the target sequence
+        tgt_mask = (
+            torch.triu(torch.ones(tgt.size(1), tgt.size(1)), diagonal=1)
+            .bool()
+            .to(self.device)
         )
 
-        # Return both masks separately
-        return tgt_pad_mask, tgt_sub_mask
+        out = self.transformer(
+            src=src_emb,
+            tgt=tgt_emb,
+            src_key_padding_mask=src_key_padding_mask,
+            tgt_key_padding_mask=tgt_key_padding_mask,
+            tgt_mask=tgt_mask,
+        )
+        # [batch_size, tgt_seq_len, vocab_size]
+        return self.generator(out)
 
-    def forward(self, src, tgt):
-        # generate masks
-        src_mask = self.make_src_mask(src)
-        tgt_pad_mask, tgt_sub_mask = self.make_tgt_mask(tgt)
+    def encode(self, src, src_key_padding_mask):
+        """
+        Encodes the source sequence into a memory tensor.
 
-        src_emb = self.src_emb(src)
-        tgt_emb = self.tgt_emb(tgt)
-        src_emb_with_pos = self.positional_encoding(src_emb)
-        tgt_emb_with_pos = self.positional_encoding(tgt_emb)
+        This method is typically used during inference (e.g., beam search)
+        when the entire source sequence is encoded once.
 
-        output = self.transformer(
-            src_emb_with_pos,
-            tgt_emb_with_pos,
-            src_key_padding_mask=src_mask,
-            tgt_key_padding_mask=tgt_pad_mask,
-            tgt_mask=tgt_sub_mask,
+        Args:
+            src (torch.Tensor): The source sequence tensor. Shape: [batch_size, src_seq_len]
+            src_key_padding_mask (torch.Tensor): Boolean mask to prevent attention to padding tokens in the source.
+                Shape: [batch_size, src_seq_len]
+
+        Returns:
+            torch.Tensor: The output memory tensor from the encoder. Shape: [batch_size, src_seq_len, d_model]
+        """
+        src_emb = self.positional_encoding(self.src_embedding(src))
+        return self.transformer.encoder(
+            src=src_emb, src_key_padding_mask=src_key_padding_mask
         )
 
-        return self.fc_out(output)
+    def decode(self, tgt, memory, memory_key_padding_mask):
+        """
+        Decodes the target sequence given the encoder's output memory.
 
-    def encode(self, src):
-        """Processes the source sequence through the encoder."""
-        src_mask = self.make_src_mask(src)
-        src_emb = self.positional_encoding(self.src_emb(src))
-        return self.transformer.encoder(src_emb, src_key_padding_mask=src_mask)
+        This method is typically used during inference for step-by-step
+        generation of the target sequence.
 
-    def decode(self, tgt, memory):
-        """Processes the target sequence through the decoder, given the encoder output."""
-        tgt_pad_mask, tgt_sub_mask = self.make_tgt_mask(tgt)
-        tgt_emb = self.positional_encoding(self.tgt_emb(tgt))
-        return self.transformer.decoder(
-            tgt_emb,
-            memory,
-            tgt_key_padding_mask=tgt_pad_mask,
-            tgt_mask=tgt_sub_mask,
+        Args:
+            tgt (torch.Tensor): The current target sequence tensor (may be a single token during decoding).
+                Shape: [batch_size, current_tgt_seq_len]
+            memory (torch.Tensor): The encoder's output tensor. Shape: [batch_size, src_seq_len, d_model]
+            memory_key_padding_mask (torch.Tensor): Boolean mask for the memory (source sequence padding).
+                Shape: [batch_size, src_seq_len]
+
+        Returns:
+            torch.Tensor: The final output logits for the current target step(s).
+                Shape: [batch_size, current_tgt_seq_len, tgt_vocab_size]
+        """
+        tgt_emb = self.positional_encoding(self.tgt_embedding(tgt))
+
+        # Generate a boolean causal mask for the target sequence
+        tgt_mask = (
+            torch.triu(torch.ones(tgt.size(1), tgt.size(1)), diagonal=1)
+            .bool()
+            .to(self.device)
         )
+
+        out = self.transformer.decoder(
+            tgt=tgt_emb,
+            memory=memory,
+            memory_key_padding_mask=memory_key_padding_mask,
+            tgt_mask=tgt_mask,
+        )
+        return self.generator(out)
