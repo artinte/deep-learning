@@ -1,10 +1,7 @@
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
 import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
-import matplotlib.pyplot as plt
 
 # Configuration
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -31,33 +28,33 @@ test_data = torchvision.datasets.MNIST(root='./data', train=False, transform=tra
 train_loader = DataLoader(train_data, batch_size=BATCH_SIZE, shuffle=True)
 test_loader = DataLoader(test_data, batch_size=BATCH_SIZE, shuffle=False)
 
-class PatchEmbedding(nn.Module):
+class PatchEmbedding(torch.nn.Module):
     def __init__(self, img_size, patch_size, in_channels=1, dim=64):
         super().__init__()
         self.patch_size = patch_size
         self.num_patches = (img_size // patch_size) ** 2
-        self.proj = nn.Conv2d(in_channels, dim, kernel_size=patch_size, stride=patch_size)
+        self.proj = torch.nn.Conv2d(in_channels, dim, kernel_size=patch_size, stride=patch_size)
 
     def forward(self, x):
         x = self.proj(x)  # [B, dim, H/patch, W/patch]
         x = x.flatten(2).transpose(1, 2)  # [B, N_patches, dim]
         return x
 
-class ViT(nn.Module):
+class ViT(torch.nn.Module):
     def __init__(self, img_size=28, patch_size=7, in_channels=1, num_classes=10, dim=64, depth=6, heads=8, mlp_dim=128):
         super().__init__()
         self.patch_embed = PatchEmbedding(img_size, patch_size, in_channels, dim)
         num_patches = self.patch_embed.num_patches
 
-        self.cls_token = nn.Parameter(torch.randn(1, 1, dim))
-        self.pos_embed = nn.Parameter(torch.randn(1, num_patches + 1, dim))
+        self.cls_token = torch.nn.Parameter(torch.randn(1, 1, dim))
+        self.pos_embed = torch.nn.Parameter(torch.randn(1, num_patches + 1, dim))
 
-        encoder_layer = nn.TransformerEncoderLayer(d_model=dim, nhead=heads, dim_feedforward=mlp_dim, batch_first=False) # Add batch_first=False for clarity (it's the default)
-        self.transformer = nn.TransformerEncoder(encoder_layer, num_layers=depth)
+        encoder_layer = torch.nn.TransformerEncoderLayer(d_model=dim, nhead=heads, dim_feedforward=mlp_dim, batch_first=False) # Add batch_first=False for clarity (it's the default)
+        self.transformer = torch.nn.TransformerEncoder(encoder_layer, num_layers=depth)
 
-        self.mlp_head = nn.Sequential(
-            nn.LayerNorm(dim),
-            nn.Linear(dim, num_classes)
+        self.mlp_head = torch.nn.Sequential(
+            torch.nn.LayerNorm(dim),
+            torch.nn.Linear(dim, num_classes)
         )
 
     def forward(self, x):
@@ -80,15 +77,15 @@ class ViT(nn.Module):
         return self.mlp_head(cls_out)
 
 def init_weights(m):
-    if isinstance(m, nn.Linear) or isinstance(m, nn.Conv2d):
-        nn.init.xavier_uniform_(m.weight)
+    if isinstance(m, torch.nn.Linear) or isinstance(m, torch.nn.Conv2d):
+        torch.nn.init.xavier_uniform_(m.weight)
         if m.bias is not None:
-            nn.init.constant_(m.bias, 0)
+            torch.nn.init.constant_(m.bias, 0)
 
 model = ViT().to(device)
 model.apply(init_weights)
 optimizer = torch.optim.Adam(model.parameters(), lr=LR)
-criterion = nn.CrossEntropyLoss()
+criterion = torch.nn.CrossEntropyLoss()
 
 # Training
 print("Starting Training...")

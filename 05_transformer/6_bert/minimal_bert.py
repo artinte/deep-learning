@@ -1,22 +1,20 @@
 import torch
-import torch.nn as nn
-import math
 import random
 
-class MiniBERT(nn.Module):
+class MiniBERT(torch.nn.Module):
     def __init__(self, vocab_size=30522, hidden=128, n_layers=2, n_heads=2, max_len=128):
         super().__init__()
-        self.token_embed = nn.Embedding(vocab_size, hidden)
-        self.pos_embed = nn.Embedding(max_len, hidden)
-        self.segment_embed = nn.Embedding(2, hidden)
+        self.token_embed = torch.nn.Embedding(vocab_size, hidden)
+        self.pos_embed = torch.nn.Embedding(max_len, hidden)
+        self.segment_embed = torch.nn.Embedding(2, hidden)
 
-        encoder_layer = nn.TransformerEncoderLayer(d_model=hidden, nhead=n_heads, dim_feedforward=512, dropout=0.1, activation='gelu')
-        self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=n_layers)
+        encoder_layer = torch.nn.TransformerEncoderLayer(d_model=hidden, nhead=n_heads, dim_feedforward=512, dropout=0.1, activation='gelu')
+        self.encoder = torch.nn.TransformerEncoder(encoder_layer, num_layers=n_layers)
 
-        self.norm = nn.LayerNorm(hidden)
+        self.norm = torch.nn.LayerNorm(hidden)
 
-        self.mlm_head = nn.Linear(hidden, vocab_size)
-        self.nsp_head = nn.Linear(hidden, 2)
+        self.mlm_head = torch.nn.Linear(hidden, vocab_size)
+        self.nsp_head = torch.nn.Linear(hidden, 2)
 
     def forward(self, input_ids, segment_ids):
         B, T = input_ids.size()
@@ -120,8 +118,8 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = MiniBERT(vocab_size=vocab_size, hidden=128, n_layers=2, n_heads=2, max_len=16).to(device)
 
 optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3)
-loss_fn_mlm = nn.CrossEntropyLoss(ignore_index=-100)
-loss_fn_nsp = nn.CrossEntropyLoss()
+loss_fn_mlm = torch.nn.CrossEntropyLoss(ignore_index=-100)
+loss_fn_nsp = torch.nn.CrossEntropyLoss()
 
 model.train()
 for epoch in range(30):

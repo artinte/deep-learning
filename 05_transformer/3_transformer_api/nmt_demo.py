@@ -16,6 +16,7 @@ tokenizer = get_tokenizer()
 
 train_dataloader, valid_dataloader, _, data_test = preprocess(tokenizer, device)
 
+# Smaller model parameters are less likely to cause overfitting.
 src_vocab_size = tokenizer.vocab_size
 tgt_vocab_size = tokenizer.vocab_size
 d_model = 512
