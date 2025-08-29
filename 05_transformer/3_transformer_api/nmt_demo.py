@@ -44,7 +44,7 @@ criterion = torch.nn.CrossEntropyLoss(
     ignore_index=tokenizer.pad_token_id, label_smoothing=0.1
 )
 optimizer = torch.optim.Adam(model.parameters(), lr=0.0001, betas=(0.9, 0.98), eps=1e-9)
-#optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=0.01)
+# optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=0.01)
 
 print("Starting model training...")
 for epoch in range(num_epochs):
@@ -54,8 +54,9 @@ for epoch in range(num_epochs):
     end_time = time.time()
     epoch_mins = int((end_time - start_time) / 60)
     epoch_secs = int((end_time - start_time) % 60)
-    print(f"Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s")
-    print(f"\tTrain Loss: {train_loss:.3f} | Valid Loss: {valid_loss:.3f}")
+    print(
+        f"Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s\tTrain Loss: {train_loss:.3f} | Valid Loss: {valid_loss:.3f}"
+    )
 
 print("Testing Translation on First 32 Samples")
 for i in range(32):

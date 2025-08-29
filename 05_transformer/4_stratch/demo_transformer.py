@@ -15,16 +15,14 @@ src_field, tgt_field, train_iter, valid_iter, test_iter, test_data = preprocess(
 
 src_vocab_size = len(src_field.vocab)
 tgt_vocab_size = len(tgt_field.vocab)
-d_model = 512
-n_head = 8
+d_model = 256
+n_head = 4
 num_encoder_layers = 6
 num_decoder_layers = 6
-dim_feedforward = 2048
+dim_feedforward = 1024
 dropout = 0.2
 num_epochs = 30
 
-src_pad_token = src_field.vocab.stoi[src_field.pad_token]
-tgt_pad_token = tgt_field.vocab.stoi[tgt_field.pad_token]
 model = TransformerModel(
     src_vocab_size=src_vocab_size,
     tgt_vocab_size=tgt_vocab_size,
@@ -34,7 +32,7 @@ model = TransformerModel(
     num_decoder_layers=num_decoder_layers,
     dim_feedforward=dim_feedforward,
     dropout=dropout,
-    device=device
+    device=device,
 ).to(device)
 
 criterion = torch.nn.CrossEntropyLoss(
@@ -50,8 +48,9 @@ for epoch in range(num_epochs):
     end_time = time.time()
     epoch_mins = int((end_time - start_time) / 60)
     epoch_secs = int((end_time - start_time) % 60)
-    print(f"Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s")
-    print(f"\tTrain Loss: {train_loss:.3f} | Valid Loss: {valid_loss:.3f}")
+    print(
+        f"Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s\tTrain Loss: {train_loss:.3f} | Valid Loss: {valid_loss:.3f}"
+    )
 
 print("Testing Translation on First 32 Samples")
 for i in range(32):

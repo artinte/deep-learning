@@ -7,9 +7,11 @@ class PositionalEncoding(torch.nn.Module):
     Injects positional information into the embeddings.
     """
 
-    def __init__(self, d_model, dropout=0.1, max_len=8192):
+    def __init__(self, d_model, dropout=0.1, max_len=8192, batch_first=True):
         super(PositionalEncoding, self).__init__()
         self.dropout = torch.nn.Dropout(p=dropout)
+        self.batch_first = batch_first
+
         pe = torch.zeros(max_len, d_model)
         position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
         div_term = torch.exp(
@@ -21,6 +23,10 @@ class PositionalEncoding(torch.nn.Module):
         self.register_buffer("pe", pe)
 
     def forward(self, x):
-        # x has shape [batch_size, seq_len, d_model]
-        x = x + self.pe[:, : x.size(1), :]
+        if self.batch_first:
+            # x has shape [batch_size, seq_len, d_model]
+            x = x + self.pe[:, : x.size(1), :]
+        else:
+            # x has shape [seq_len, batch_size, d_model]
+            x = x + self.pe[: x.size(0), :]
         return self.dropout(x)
