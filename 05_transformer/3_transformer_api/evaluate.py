@@ -13,12 +13,12 @@ def evaluate(model, valid_dataloader, criterion):
             src_key_padding_mask = src_key_padding_mask == 0
             tgt_key_padding_mask = tgt_key_padding_mask == 0
 
-            # [batch_size, tgt_seq_len, vocab_size]
+            # [batch_size, tgt_seq_len - 1, vocab_size]
             logits = model.forward(
                 src, tgt_input, src_key_padding_mask, tgt_key_padding_mask
             )
             output = logits.reshape(-1, logits.shape[-1])
-            # [batch, seq_len] -> [batch x seq_len]
+            # [batch_size, tgt_seq_len - 1] -> [batch x (tgt_seq_len - 1)]
             tgt_out = tgt[:, 1:].reshape(-1)
 
             loss = criterion(output, tgt_out)
