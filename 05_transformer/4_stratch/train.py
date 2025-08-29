@@ -8,14 +8,11 @@ def train(model, train_iter, src_field, tgt_field, optimizer, criterion):
         # The target input is the target sequence without the EOS token.
         # This is what the decoder receives as input.
         src, tgt = data.src, data.tgt
-        src_key_padding_mask = src != src_field.vocab.stoi[src_field.pad_token]
-        tgt_key_padding_mask = tgt != tgt_field.vocab.stoi[tgt_field.pad_token]
+        src_key_padding_mask = src == src_field.vocab.stoi[src_field.pad_token]
+        tgt_key_padding_mask = tgt == tgt_field.vocab.stoi[tgt_field.pad_token]
 
         tgt_input = tgt[:, :-1]
         tgt_key_padding_mask = tgt_key_padding_mask[:, :-1]
-
-        src_key_padding_mask = src_key_padding_mask == 0
-        tgt_key_padding_mask = tgt_key_padding_mask == 0
 
         # [batch_size, tgt_seq_len, vocab_size]
         logits = model.forward(

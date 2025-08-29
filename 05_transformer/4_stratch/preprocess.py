@@ -26,7 +26,6 @@ def preprocess(device, batch_size=32):
 
     src_field = torchtext.data.Field(
         tokenize=nltk.tokenize.word_tokenize,
-        init_token="<sos>",
         eos_token="<eos>",
         pad_token="<pad>",
         batch_first=True,
