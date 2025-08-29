@@ -28,7 +28,7 @@ def greedy_translate(model, sentence, tokenizer, max_len=512):
     with torch.no_grad():
         src_tokens = tokenizer(
             sentence, truncation=True, padding=False, return_tensors="pt"
-        )
+        ).to(model.device)
         src = src_tokens["input_ids"]
         src_key_padding_mask = (src_tokens["attention_mask"] == 0)
         memory = model.encode(src, src_key_padding_mask)

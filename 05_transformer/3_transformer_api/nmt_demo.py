@@ -7,6 +7,7 @@ from train import train
 from evaluate import evaluate
 from inference import greedy_translate
 from transformer_model import TransformerModel
+from custom_optimizer import CustomOptimizer
 
 torch.set_printoptions(profile="full")
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -24,8 +25,8 @@ n_head = 8
 num_encoder_layers = 6
 num_decoder_layers = 6
 dim_feedforward = 2048
-dropout = 0.2
-num_epochs = 30
+dropout = 0.3
+num_epochs = 1
 
 model = TransformerModel(
     src_vocab_size,
@@ -43,8 +44,10 @@ model = TransformerModel(
 criterion = torch.nn.CrossEntropyLoss(
     ignore_index=tokenizer.pad_token_id, label_smoothing=0.1
 )
-optimizer = torch.optim.Adam(model.parameters(), lr=0.0001, betas=(0.9, 0.98), eps=1e-9)
-# optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=0.01)
+
+base_optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, betas=(0.9, 0.98), eps=1e-9)
+warnup_steps = 4000
+optimizer = CustomOptimizer(base_optimizer, d_model, warnup_steps)
 
 print("Starting model training...")
 for epoch in range(num_epochs):
@@ -55,7 +58,7 @@ for epoch in range(num_epochs):
     epoch_mins = int((end_time - start_time) / 60)
     epoch_secs = int((end_time - start_time) % 60)
     print(
-        f"Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s\tTrain Loss: {train_loss:.3f} | Valid Loss: {valid_loss:.3f}"
+        f"Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s | Train Loss: {train_loss:.3f} | Valid Loss: {valid_loss:.3f}"
     )
 
 print("Testing Translation on First 32 Samples")

@@ -49,7 +49,7 @@ for epoch in range(num_epochs):
     epoch_mins = int((end_time - start_time) / 60)
     epoch_secs = int((end_time - start_time) % 60)
     print(
-        f"Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s\tTrain Loss: {train_loss:.3f} | Valid Loss: {valid_loss:.3f}"
+        f"Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s | Train Loss: {train_loss:.3f} | Valid Loss: {valid_loss:.3f}"
     )
 
 print("Testing Translation on First 32 Samples")

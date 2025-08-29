@@ -12,9 +12,10 @@ def create_torchtext_dataset(raw_data, field_src, field_tgt):
     return torchtext.data.Dataset(examples, fields)
 
 
-def preprocess(device, batch_size=32):
+def preprocess(device, batch_size=32, dataset=None):
     nltk.download("punkt")
-    dataset = datasets.load_dataset("bentrevett/multi30k")
+    if dataset == None:
+        dataset = datasets.load_dataset("bentrevett/multi30k")
     print(dataset)
     # {'en': 'Two young, White males are outside near many bushes.',
     # 'de': 'Zwei junge weiße Männer sind im Freien in der Nähe vieler Büsche.'}
@@ -45,7 +46,6 @@ def preprocess(device, batch_size=32):
     src_field.build_vocab(train_dataset, min_freq=2)
     tgt_field.build_vocab(train_dataset, min_freq=2)
 
-    print(f"Source <sos> index: {src_field.vocab.stoi[src_field.init_token]}")
     print(f"Source <eos> index: {src_field.vocab.stoi[src_field.eos_token]}")
     print(f"Source <pad> index: {src_field.vocab.stoi[src_field.pad_token]}")
     print(f"Source <unk> index: {src_field.vocab.stoi[src_field.unk_token]}")
@@ -93,8 +93,8 @@ def preprocess(device, batch_size=32):
     for batch in test_iterator:
         test_src_sample = batch.src
         test_tgt_sample = batch.tgt
-        test_src_mask = test_src_sample != src_field.vocab.stoi[src_field.pad_token]
-        test_tgt_mask = test_tgt_sample != tgt_field.vocab.stoi[tgt_field.pad_token]
+        test_src_mask = test_src_sample == src_field.vocab.stoi[src_field.pad_token]
+        test_tgt_mask = test_tgt_sample == tgt_field.vocab.stoi[tgt_field.pad_token]
         print(f"Shape of test src sample: {test_src_sample.shape}")
         print(f"First batch test src token: {test_src_sample}")
         print(f"Shape of test tgt sample: {test_tgt_sample.shape}")
@@ -105,4 +105,11 @@ def preprocess(device, batch_size=32):
         print(f"First batch test tgt mask: {test_tgt_mask}")
         break
 
-    return src_field, tgt_field, train_iterator, valid_iterator, test_iterator, test_data
+    return (
+        src_field,
+        tgt_field,
+        train_iterator,
+        valid_iterator,
+        test_iterator,
+        test_data,
+    )

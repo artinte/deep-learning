@@ -1,14 +1,5 @@
-import transformers
 import torch
 from preprocess import preprocess
-
-tokenizer = transformers.AutoTokenizer.from_pretrained("Helsinki-NLP/opus-mt-en-de")
-
-assert tokenizer.bos_token_id == None
-assert tokenizer.eos_token_id != None
-bos_token_id = tokenizer.bos_token_id or tokenizer.eos_token_id
-assert bos_token_id == tokenizer.eos_token_id
-
 
 mock_data = {
     "train": [
@@ -79,16 +70,20 @@ mock_data = {
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-train_dataloader, valid_dataloader, test_dataloader, data_test = preprocess(
-    tokenizer, device=device, batch_size=2, dataset=mock_data
+src_field, tgt_field, train_iterator, valid_iterator, test_iterator, test_data = (
+    preprocess(device=device, batch_size=2, dataset=mock_data)
 )
-assert len(train_dataloader) == 5
-assert len(valid_dataloader) == 3
-assert len(test_dataloader) == 3
+assert len(train_iterator) == 5
+assert len(valid_iterator) == 3
+assert len(test_iterator) == 3
 
-src, tgt, src_key_padding_mask, tgt_key_padding_mask = next(iter(valid_dataloader))
-bos_token_id = tokenizer.bos_token_id or tokenizer.eos_token_id
-eos_token_id = tokenizer.eos_token_id
+(src, tgt) = next(iter(valid_iterator))
+src_eos_token_id = src_field.vocab.stoi[src_field.eos_token]
+tgt_bos_token_id = tgt_field.vocab.stoi[tgt_field.init_token]
+tgt_eos_token_id = tgt_field.vocab.stoi[tgt_field.eos_token]
+src_key_padding_mask = src == src_field.vocab.stoi[src_field.pad_token]
+tgt_key_padding_mask = tgt == tgt_field.vocab.stoi[tgt_field.pad_token]
+
 
 print(src.shape)
 print(tgt.shape)
@@ -96,9 +91,9 @@ assert src.shape == (2, 8)
 assert tgt.shape == (2, 14)
 assert src_key_padding_mask.shape == (2, 8)
 assert tgt_key_padding_mask.shape == (2, 14)
-assert torch.equal(src[:, -1], torch.tensor([eos_token_id, eos_token_id]))
-assert torch.equal(tgt[:, 0], torch.tensor([bos_token_id, bos_token_id]))
-assert torch.equal(tgt[:, -1], torch.tensor([eos_token_id, eos_token_id]))
+assert torch.equal(src[:, -1], torch.tensor([src_eos_token_id, src_eos_token_id]))
+assert torch.equal(tgt[:, 0], torch.tensor([tgt_bos_token_id, tgt_bos_token_id]))
+assert torch.equal(tgt[:, -1], torch.tensor([tgt_eos_token_id, tgt_eos_token_id]))
 assert torch.equal(
     src_key_padding_mask,
     torch.tensor(
