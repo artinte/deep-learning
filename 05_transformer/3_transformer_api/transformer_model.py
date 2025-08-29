@@ -31,6 +31,7 @@ class TransformerModel(torch.nn.Module):
         """
         super(TransformerModel, self).__init__()
         self.device = device
+        self.d_model = d_model
         self.src_embedding = torch.nn.Embedding(src_vocab_size, d_model)
         self.tgt_embedding = torch.nn.Embedding(tgt_vocab_size, d_model)
         self.positional_encoding = PositionalEncoding(d_model, dropout)
@@ -62,15 +63,11 @@ class TransformerModel(torch.nn.Module):
         Returns:
             torch.Tensor: The final output logits for the target sequence. Shape: [batch_size, tgt_seq_len, tgt_vocab_size]
         """
-        src_emb = self.positional_encoding(self.src_embedding(src))
-        tgt_emb = self.positional_encoding(self.tgt_embedding(tgt))
+        src_emb = self.positional_encoding(self.src_embedding(src) * torch.sqrt(torch.tensor(self.d_model, device=self.device)))
+        tgt_emb = self.positional_encoding(self.tgt_embedding(tgt) * torch.sqrt(torch.tensor(self.d_model, device=self.device)))
 
         # Generate a boolean causal mask for the target sequence
-        tgt_mask = (
-            torch.triu(torch.ones(tgt.size(1), tgt.size(1)), diagonal=1)
-            .bool()
-            .to(self.device)
-        )
+        tgt_mask = torch.triu(torch.ones(tgt.size(1), tgt.size(1)), diagonal=1).bool().to(self.device)
 
         out = self.transformer(
             src=src_emb,
@@ -97,7 +94,7 @@ class TransformerModel(torch.nn.Module):
         Returns:
             torch.Tensor: The output memory tensor from the encoder. Shape: [batch_size, src_seq_len, d_model]
         """
-        src_emb = self.positional_encoding(self.src_embedding(src))
+        src_emb = self.positional_encoding(self.src_embedding(src) * torch.sqrt(torch.tensor(self.d_model, device=self.device)))
         return self.transformer.encoder(
             src=src_emb, src_key_padding_mask=src_key_padding_mask
         )
@@ -120,14 +117,10 @@ class TransformerModel(torch.nn.Module):
             torch.Tensor: The final output logits for the current target step(s).
                 Shape: [batch_size, current_tgt_seq_len, tgt_vocab_size]
         """
-        tgt_emb = self.positional_encoding(self.tgt_embedding(tgt))
+        tgt_emb = self.positional_encoding(self.tgt_embedding(tgt) * torch.sqrt(torch.tensor(self.d_model, device=self.device)))
 
         # Generate a boolean causal mask for the target sequence
-        tgt_mask = (
-            torch.triu(torch.ones(tgt.size(1), tgt.size(1)), diagonal=1)
-            .bool()
-            .to(self.device)
-        )
+        tgt_mask = torch.triu(torch.ones(tgt.size(1), tgt.size(1)), diagonal=1).bool().to(self.device)
 
         out = self.transformer.decoder(
             tgt=tgt_emb,
