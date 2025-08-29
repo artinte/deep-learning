@@ -26,6 +26,10 @@ def preprocess(tokenizer, device, batch_size=16, dataset=None):
         data_train, data_valid, data_test = datasets.load_dataset(
             "bentrevett/multi30k", split=["train", "validation", "test"]
         )
+        wmt_dataset = datasets.load_dataset("wmt14", "de-en", split="train[:3%]")
+        wmt_dataset = wmt_dataset.map(lambda x: {"de": x["translation"]["de"], "en": x["translation"]["en"]})
+        wmt_dataset = wmt_dataset.remove_columns("translation")
+        data_train = datasets.concatenate_datasets([data_train, wmt_dataset])
     print(f"Training dataset length: {len(data_train)}")
     print(f"Validation dataset length: {len(data_valid)}")
     print(f"Test dataset length: {len(data_test)}")

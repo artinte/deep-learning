@@ -5,7 +5,7 @@ def greedy_translate(model, sentence, src_field, tgt_field, max_len=512):
 
     model.eval()
     with torch.no_grad():
-        tokens = [token for token in src_field.tokenizer(sentence)]
+        tokens = [token for token in src_field.tokenize(sentence)]
         src_tokens = [src_field.vocab.stoi[token] for token in tokens]
         # [1, src_seq_len]
         src_tensor = torch.LongTensor(src_tokens).unsqueeze(0).to(model.device)
@@ -13,7 +13,7 @@ def greedy_translate(model, sentence, src_field, tgt_field, max_len=512):
 
         memory = model.encode(src_tensor, src_key_padding_mask)
 
-        bos_token_id = tgt_field.vocab.stoi[tgt_field.bos_token]
+        bos_token_id = tgt_field.vocab.stoi[tgt_field.init_token]
         tgt_tokens = [bos_token_id]
 
         for _ in range(max_len):

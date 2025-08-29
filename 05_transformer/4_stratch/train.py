@@ -4,7 +4,7 @@ import torch
 def train(model, train_iter, src_field, tgt_field, optimizer, criterion):
     model.train()
     total_loss = 0
-    for data in train_iter:
+    for i, data in enumerate(train_iter):
         # The target input is the target sequence without the EOS token.
         # This is what the decoder receives as input.
         src, tgt = data.src, data.tgt
@@ -31,5 +31,9 @@ def train(model, train_iter, src_field, tgt_field, optimizer, criterion):
         optimizer.step()
 
         total_loss += loss.item()
+
+        if (i + 1) % 100 == 0:
+            avg_loss_100 = total_loss / (i + 1)
+            print(f"  Step: {i+1} | Avg Train Loss: {avg_loss_100:.3f}")
 
     return total_loss / len(train_iter)

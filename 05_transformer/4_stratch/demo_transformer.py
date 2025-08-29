@@ -22,7 +22,7 @@ num_encoder_layers = 6
 num_decoder_layers = 6
 dim_feedforward = 1024
 dropout = 0.2
-num_epochs = 50
+num_epochs = 30
 
 model = TransformerModel(
     src_vocab_size=src_vocab_size,
@@ -57,8 +57,8 @@ for epoch in range(num_epochs):
 
 print("Testing Translation on First 32 Samples")
 for i in range(32):
-    en_sentence = test_data[i]["en"]
-    de_reference = test_data[i]["de"]
+    en_sentence = test_data[i][0]
+    de_reference = test_data[i][1]
 
     translated = greedy_translate(model, en_sentence, src_field, tgt_field)
     print("-" * 50)

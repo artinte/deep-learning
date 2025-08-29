@@ -14,7 +14,9 @@ def train(model, train_dataloader, optimizer, criterion):
     """
     model.train()
     total_loss = 0
-    for src, tgt, src_key_padding_mask, tgt_key_padding_mask in train_dataloader:
+    for i, (src, tgt, src_key_padding_mask, tgt_key_padding_mask) in enumerate(
+        train_dataloader
+    ):
         # The target input is the target sequence without the EOS token.
         # This is what the decoder receives as input.
         tgt_input = tgt[:, :-1]
@@ -40,5 +42,9 @@ def train(model, train_dataloader, optimizer, criterion):
         optimizer.step()
 
         total_loss += loss.item()
+
+        if (i + 1) % 100 == 0:
+            avg_loss_100 = total_loss / (i + 1)
+            print(f"  Step: {i+1} | Avg Train Loss: {avg_loss_100:.3f}")
 
     return total_loss / len(train_dataloader)
