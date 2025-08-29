@@ -1,11 +1,12 @@
 import time
 import torch
-from transformer_model import TransformerModel
 from preprocess import preprocess
 from train import train
 from evaluate import evaluate
 from inference import greedy_translate
 from torchmetrics.text import BLEUScore
+from custom_optimizer import CustomOptimizer
+from transformer_model import TransformerModel
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -21,7 +22,7 @@ num_encoder_layers = 6
 num_decoder_layers = 6
 dim_feedforward = 1024
 dropout = 0.2
-num_epochs = 30
+num_epochs = 50
 
 model = TransformerModel(
     src_vocab_size=src_vocab_size,
@@ -38,7 +39,9 @@ model = TransformerModel(
 criterion = torch.nn.CrossEntropyLoss(
     ignore_index=tgt_field.vocab.stoi[tgt_field.pad_token], label_smoothing=0.1
 )
-optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=0.01)
+base_optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, betas=(0.9, 0.98), eps=1e-9)
+warnup_steps = 4000
+optimizer = CustomOptimizer(base_optimizer, d_model, warnup_steps)
 
 print("Starting model training...")
 for epoch in range(num_epochs):
@@ -68,8 +71,8 @@ print("Calculating Corpus BLEU Score...")
 all_predictions = []
 all_references = []
 for sample in test_data:
-    en_sentence = sample["en"]
-    de_reference = sample["de"]
+    en_sentence = sample[0]
+    de_reference = sample[1]
 
     translated = greedy_translate(model, en_sentence, src_field, tgt_field)
     all_predictions.append(translated)

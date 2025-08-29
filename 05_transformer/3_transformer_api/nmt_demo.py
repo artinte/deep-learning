@@ -25,8 +25,8 @@ n_head = 8
 num_encoder_layers = 6
 num_decoder_layers = 6
 dim_feedforward = 2048
-dropout = 0.3
-num_epochs = 1
+dropout = 0.4
+num_epochs = 40
 
 model = TransformerModel(
     src_vocab_size,
