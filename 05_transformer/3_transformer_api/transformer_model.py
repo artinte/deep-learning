@@ -113,7 +113,7 @@ class TransformerModel(torch.nn.Module):
             src=src_emb, src_key_padding_mask=src_key_padding_mask
         )
 
-    def decode(self, tgt, memory, memory_key_padding_mask):
+    def decode(self, tgt, memory, memory_key_padding_mask, tgt_key_padding_mask):
         """
         Decodes the target sequence given the encoder's output memory.
 
@@ -149,6 +149,7 @@ class TransformerModel(torch.nn.Module):
             memory=memory,
             memory_key_padding_mask=memory_key_padding_mask,
             tgt_mask=tgt_mask,
+            tgt_key_padding_mask=tgt_key_padding_mask,
         )
         # (batch_size, tgt_seq_len, vocab_size)
         return self.generator(out)

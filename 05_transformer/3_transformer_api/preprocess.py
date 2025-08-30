@@ -2,18 +2,32 @@ import datasets
 import torch
 
 
-class TranslationDataset(torch.utils.data.Dataset):
-    def __init__(self, dataset):
-        self.dataset = dataset
+def collate_fn(batch, tokenizer, device):
+    en_sentences = [item["en"] for item in batch]
+    de_sentences = [item["de"] for item in batch]
 
-    def __len__(self):
-        return len(self.dataset)
+    src_tokens = tokenizer(
+        en_sentences, truncation=True, padding=True, return_tensors="pt"
+    ).to(device)
+    tgt_tokens = tokenizer(
+        de_sentences, truncation=True, padding=True, return_tensors="pt"
+    ).to(device)
+    bos_token_id = tokenizer.bos_token_id or tokenizer.eos_token_id
+    bos = torch.full(
+        (tgt_tokens["input_ids"].size(0), 1), bos_token_id, dtype=torch.long
+    ).to(device)
+    bos_mask = torch.ones(
+        (tgt_tokens["attention_mask"].size(0), 1), dtype=torch.long
+    ).to(device)
 
-    def __getitem__(self, index):
-        en_text = self.dataset[index]["en"]
-        de_text = self.dataset[index]["de"]
-        return en_text, de_text
-
+    # The tokenizer now returns a dictionary with 'input_ids' and 'attention_mask'
+    # We only need the input IDs for this model.
+    return (
+        src_tokens["input_ids"],
+        torch.cat([bos, tgt_tokens["input_ids"]], dim=1),
+        src_tokens["attention_mask"],
+        torch.cat([bos_mask, tgt_tokens["attention_mask"]], dim=1),
+    )
 
 def preprocess(tokenizer, device, batch_size=16, dataset=None):
     if dataset:
@@ -54,44 +68,17 @@ def preprocess(tokenizer, device, batch_size=16, dataset=None):
     )
     print(f"First sample token IDs (Destination): {first_sample_de_token['input_ids']}")
 
-    def collate_fn(batch):
-        en_sentences = [item[0] for item in batch]
-        de_sentences = [item[1] for item in batch]
-
-        src_tokens = tokenizer(
-            en_sentences, truncation=True, padding=True, return_tensors="pt"
-        ).to(device)
-        tgt_tokens = tokenizer(
-            de_sentences, truncation=True, padding=True, return_tensors="pt"
-        ).to(device)
-        bos_token_id = tokenizer.bos_token_id or tokenizer.eos_token_id
-        bos = torch.full(
-            (tgt_tokens["input_ids"].size(0), 1), bos_token_id, dtype=torch.long
-        ).to(device)
-        bos_mask = torch.ones(
-            (tgt_tokens["attention_mask"].size(0), 1), dtype=torch.long
-        ).to(device)
-
-        # The tokenizer now returns a dictionary with 'input_ids' and 'attention_mask'
-        # We only need the input IDs for this model.
-        return (
-            src_tokens["input_ids"],
-            torch.cat([bos, tgt_tokens["input_ids"]], dim=1),
-            src_tokens["attention_mask"],
-            torch.cat([bos_mask, tgt_tokens["attention_mask"]], dim=1),
-        )
-
-    train_dataset = TranslationDataset(data_train)
-    valid_dataset = TranslationDataset(data_valid)
-    test_dataset = TranslationDataset(data_test)
     train_dataloader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn
+        data_train, batch_size=batch_size, shuffle=True,
+        collate_fn=lambda x: collate_fn(x, tokenizer, device)
     )
     valid_dataloader = torch.utils.data.DataLoader(
-        valid_dataset, batch_size=batch_size, shuffle=False, collate_fn=collate_fn
+        data_valid, batch_size=batch_size, shuffle=False,
+        collate_fn=lambda x: collate_fn(x, tokenizer, device)
     )
     test_dataloader = torch.utils.data.DataLoader(
-        test_dataset, batch_size=batch_size, shuffle=False, collate_fn=collate_fn
+        data_test, batch_size=batch_size, shuffle=False,
+        collate_fn=lambda x: collate_fn(x, tokenizer, device)
     )
 
     test_src_sample, test_tgt_sample, test_src_mask, test_tgt_mask = next(
