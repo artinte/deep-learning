@@ -1,15 +1,87 @@
 import datasets
-import torchtext
 import nltk
+import torch
+from collections import Counter
+from functools import partial
+
+unknown_token = "<unk>"
+pad_token = "<pad>"
+sos_token = "<sos>"
+eos_token = "<eos>"
 
 
-def create_torchtext_dataset(raw_data, field_src, field_tgt):
-    fields = [("src", field_src), ("tgt", field_tgt)]
-    examples = [
-        torchtext.data.Example.fromlist([src, tgt], fields=fields)
-        for src, tgt in raw_data
-    ]
-    return torchtext.data.Dataset(examples, fields)
+class Vocabulary:
+    def __init__(self, specials, min_freq=1):
+        self.specials = specials
+        self.min_freq = min_freq
+        self.stoi = {token: i for i, token in enumerate(specials)}
+        self.itos = {i: token for i, token in enumerate(specials)}
+        self.unk_idx = self.stoi[unknown_token]
+
+    def build_vocab(self, tokens_list):
+        counter = Counter(tokens_list)
+        # Sort by frequency and then alphabetically for consistent ordering
+        sorted_tokens = sorted(counter.items(), key=lambda x: (-x[1], x[0]))
+
+        for token, freq in sorted_tokens:
+            if freq >= self.min_freq and token not in self.stoi:
+                self.stoi[token] = len(self.stoi)
+
+        self.itos = {i: token for token, i in self.stoi.items()}
+
+    def __len__(self):
+        return len(self.stoi)
+
+    def numericalize(self, tokens):
+        return [self.stoi.get(token, self.unk_idx) for token in tokens]
+
+
+class TranslationDataset(torch.utils.data.Dataset):
+    def __init__(self, data, src_vocab, tgt_vocab, max_len=None):
+        self.data = data
+        self.src_vocab = src_vocab
+        self.tgt_vocab = tgt_vocab
+        self.max_len = max_len
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        src_text, tgt_text = self.data[idx]
+
+        # Tokenize using nltk
+        src_tokens = nltk.tokenize.word_tokenize(src_text) + [eos_token]
+        tgt_tokens = [sos_token] + nltk.tokenize.word_tokenize(tgt_text) + [eos_token]
+
+        # Numericalize tokens
+        src_numerical = self.src_vocab.numericalize(src_tokens)
+        tgt_numerical = self.tgt_vocab.numericalize(tgt_tokens)
+
+        return {"src": src_numerical, "tgt": tgt_numerical}
+
+
+# Custom collate function for DataLoader to handle padding
+def collate_fn_with_vocab(batch, src_vocab, tgt_vocab):
+    src_list = [item["src"] for item in batch]
+    tgt_list = [item["tgt"] for item in batch]
+
+    # Pad sequences to the length of the longest in the batch
+    src_padded = torch.nn.utils.rnn.pad_sequence(
+        [torch.tensor(s) for s in src_list],
+        batch_first=True,
+        padding_value=src_vocab.stoi[pad_token],
+    )
+    tgt_padded = torch.nn.utils.rnn.pad_sequence(
+        [torch.tensor(t) for t in tgt_list],
+        batch_first=True,
+        padding_value=tgt_vocab.stoi[pad_token],
+    )
+
+    # Create key padding masks
+    src_mask = src_padded == src_vocab.stoi[pad_token]
+    tgt_mask = tgt_padded == tgt_vocab.stoi[pad_token]
+
+    return src_padded, tgt_padded, src_mask, tgt_mask
 
 
 def preprocess(device, batch_size=32, dataset=None):
@@ -25,91 +97,56 @@ def preprocess(device, batch_size=32, dataset=None):
     valid_data = [(example["de"], example["en"]) for example in dataset["validation"]]
     test_data = [(example["de"], example["en"]) for example in dataset["test"]]
 
-    src_field = torchtext.data.Field(
-        tokenize=nltk.tokenize.word_tokenize,
-        eos_token="<eos>",
-        pad_token="<pad>",
-        batch_first=True,
-    )
-    tgt_field = torchtext.data.Field(
-        tokenize=nltk.tokenize.word_tokenize,
-        init_token="<sos>",
-        eos_token="<eos>",
-        pad_token="<pad>",
-        batch_first=True,
+    # Create vocabulary instances
+    src_vocab = Vocabulary(specials=[unknown_token, pad_token, eos_token], min_freq=2)
+    tgt_vocab = Vocabulary(
+        specials=[unknown_token, pad_token, sos_token, eos_token], min_freq=2
     )
 
-    train_dataset = create_torchtext_dataset(train_data, src_field, tgt_field)
-    valid_dataset = create_torchtext_dataset(valid_data, src_field, tgt_field)
-    test_dataset = create_torchtext_dataset(test_data, src_field, tgt_field)
-
-    src_field.build_vocab(train_dataset, min_freq=2)
-    tgt_field.build_vocab(train_dataset, min_freq=2)
-
-    print(f"Source <eos> index: {src_field.vocab.stoi[src_field.eos_token]}")
-    print(f"Source <pad> index: {src_field.vocab.stoi[src_field.pad_token]}")
-    print(f"Source <unk> index: {src_field.vocab.stoi[src_field.unk_token]}")
-    print(f"Target <sos> index: {tgt_field.vocab.stoi[tgt_field.init_token]}")
-    print(f"Target <eos> index: {tgt_field.vocab.stoi[tgt_field.eos_token]}")
-    print(f"Target <pad> index: {tgt_field.vocab.stoi[tgt_field.pad_token]}")
-    print(f"Target <unk> index: {tgt_field.vocab.stoi[tgt_field.unk_token]}")
-
-    print("Source vocabulary size: " + str(len(src_field.vocab)))
-    print("Target vocabulary size: " + str(len(tgt_field.vocab)))
-
-    print(f"Source vocab examples: {list(src_field.vocab.stoi.keys())[:20]}")
-    print(f"Target vocab examples: {list(tgt_field.vocab.stoi.keys())[:20]}")
-
-    train_iterator = torchtext.data.BucketIterator(
-        train_dataset,
-        batch_size=batch_size,
-        device=device,
-        sort_within_batch=True,
-        sort_key=lambda x: len(x.src),
+    collate_fn = partial(
+        collate_fn_with_vocab, src_vocab=src_vocab, tgt_vocab=tgt_vocab
     )
 
-    valid_iterator = torchtext.data.BucketIterator(
-        valid_dataset,
-        batch_size=batch_size,
-        device=device,
-        sort_within_batch=False,
+    train_dataloader = torch.utils.data.DataLoader(
+        train_data, batch_size=batch_size, shuffle=True, collate_fn=collate_fn
+    )
+    valid_dataloader = torch.utils.data.DataLoader(
+        valid_data, batch_size=batch_size, shuffle=False, collate_fn=collate_fn
+    )
+    test_dataloader = torch.utils.data.DataLoader(
+        test_data, batch_size=batch_size, shuffle=False, collate_fn=collate_fn
     )
 
-    test_iterator = torchtext.data.BucketIterator(
-        test_dataset,
-        batch_size=batch_size,
-        device=device,
-        sort_within_batch=False,
-    )
+    print(f"Source <eos> index: {src_vocab.stoi[eos_token]}")
+    print(f"Source <pad> index: {src_vocab.stoi[pad_token]}")
+    print(f"Source <unk> index: {src_vocab.stoi[unknown_token]}")
+    print(f"Target <sos> index: {tgt_vocab.stoi[sos_token]}")
+    print(f"Target <eos> index: {tgt_vocab.stoi[eos_token]}")
+    print(f"Target <pad> index: {tgt_vocab.stoi[pad_token]}")
+    print(f"Target <unk> index: {tgt_vocab.stoi[unknown_token]}")
 
-    for batch in train_iterator:
-        src = batch.src
-        tgt = batch.tgt
+    print("Source vocabulary size: " + str(len(src_vocab)))
+    print("Target vocabulary size: " + str(len(tgt_vocab)))
 
+    print(f"Source vocab examples: {list(src_vocab)[:20]}")
+    print(f"Target vocab examples: {list(tgt_vocab)[:20]}")
+
+    for src, tgt, src_mask, tgt_mask in test_dataloader:
         print(f"First src train sample shape: {src.shape}")
         print(f"First tgt train sample shape: {tgt.shape}")
-        break
-
-    for batch in test_iterator:
-        test_src_sample = batch.src
-        test_tgt_sample = batch.tgt
-        test_src_mask = test_src_sample == src_field.vocab.stoi[src_field.pad_token]
-        test_tgt_mask = test_tgt_sample == tgt_field.vocab.stoi[tgt_field.pad_token]
-        print(f"Shape of test src sample: {test_src_sample.shape}")
-        print(f"First batch test src token: {test_src_sample}")
-        print(f"Shape of test tgt sample: {test_tgt_sample.shape}")
-        print(f"First batch test tgt token: {test_tgt_sample}")
-        print(f"Shape of test src mask: {test_src_mask.shape}")
-        print(f"First batch test src mask: {test_src_mask}")
-        print(f"Shape of test tgt mask: {test_tgt_mask.shape}")
-        print(f"First batch test tgt mask: {test_tgt_mask}")
+        print(f"First src train sample: {src}")
+        print(f"First tgt train sample: {tgt}")
+        print(f"First src train mask shape: {src_mask.shape}")
+        print(f"First tgt train mask shape: {tgt_mask.shape}")
+        print(f"First src train mask: {src_mask}")
+        print(f"First tgt train mask: {tgt_mask}")
         break
 
     return (
-        src_field,
-        tgt_field,
-        train_iterator,
-        valid_iterator,
-        test_iterator,
+        src_vocab,
+        tgt_vocab,
+        train_dataloader,
+        valid_dataloader,
+        test_dataloader,
         test_data,
     )
