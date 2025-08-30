@@ -79,6 +79,7 @@ class TransformerModel(torch.nn.Module):
             .to(self.device)
         )
 
+        # (batch_size, tgt_seq_len, d_model)
         out = self.transformer(
             src=src_emb,
             tgt=tgt_emb,
@@ -86,7 +87,7 @@ class TransformerModel(torch.nn.Module):
             tgt_key_padding_mask=tgt_key_padding_mask,
             tgt_mask=tgt_mask,
         )
-        # [batch_size, tgt_seq_len, vocab_size]
+        # (batch_size, tgt_seq_len, vocab_size)
         return self.generator(out)
 
     def encode(self, src, src_key_padding_mask):
@@ -142,10 +143,12 @@ class TransformerModel(torch.nn.Module):
             .to(self.device)
         )
 
+        # (batch_size, tgt_seq_len, d_model)
         out = self.transformer.decoder(
             tgt=tgt_emb,
             memory=memory,
             memory_key_padding_mask=memory_key_padding_mask,
             tgt_mask=tgt_mask,
         )
+        # (batch_size, tgt_seq_len, vocab_size)
         return self.generator(out)
