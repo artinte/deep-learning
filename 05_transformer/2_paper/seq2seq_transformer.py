@@ -293,7 +293,7 @@ transformer = Seq2SeqTransformer(
     FFN_HID_DIM,
 ).to(device)
 
-loss_fn = torch.nn.CrossEntropyLoss(ignore_index=PAD_IDX, label_smoothing=0.1)
+loss_fn = torch.nn.CrossEntropyLoss(ignore_index=PAD_IDX)
 optimizer = optim.Adam(transformer.parameters(), lr=0.0005)
 
 NUM_EPOCHS = 30
@@ -341,8 +341,54 @@ def greedy_decode(model, src_sentence, max_len=50):
     return ys.flatten()
 
 
-def translate(model, src_sentence):
-    tgt_tokens = greedy_decode(model, src_sentence).cpu().numpy()
+def topk_decode(model, src_sentence, max_len=50, k=5):
+    """
+    Decodes a source sentence using top-k sampling.
+    """
+    model.eval()
+    src = text_transform[SRC_LANGUAGE](src_sentence).to(device).unsqueeze(1)
+    src_padding_mask = (src == PAD_IDX).transpose(0, 1)
+
+    with torch.no_grad():
+        memory = model.encode(src, src_padding_mask)
+
+    ys = torch.ones(1, 1).fill_(BOS_IDX).type(torch.long).to(device)
+
+    for _ in range(max_len - 1):
+        with torch.no_grad():
+            tgt_mask = nn.Transformer.generate_square_subsequent_mask(ys.size(0)).to(
+                device
+            )
+            tgt_padding_mask = (ys == PAD_IDX).transpose(0, 1)
+            out = model.decode(
+                ys,
+                memory,
+                tgt_mask=tgt_mask,
+                tgt_key_padding_mask=tgt_padding_mask,
+            )
+
+        prob = model.generator(out[-1, :, :])
+
+        # Get the top-k probabilities and indices
+        topk_probs, topk_indices = torch.topk(prob, k, dim=1)
+
+        # Sample one from the top-k indices
+        next_word_idx = topk_indices.gather(
+            1, torch.multinomial(topk_probs, num_samples=1)
+        ).item()
+
+        ys = torch.cat(
+            [ys, torch.ones(1, 1).type_as(src.data).fill_(next_word_idx)], dim=0
+        )
+
+        if next_word_idx == EOS_IDX:
+            break
+
+    return ys.flatten()
+
+
+def translate(model, src_sentence, decode_fn=greedy_decode):
+    tgt_tokens = decode_fn(model, src_sentence).cpu().numpy()
 
     def lookup_tokens(indices):
         return [tgt_rev_vocab.get(i, "<unk>") for i in indices]
