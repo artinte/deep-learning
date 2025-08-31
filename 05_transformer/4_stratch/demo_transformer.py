@@ -7,6 +7,7 @@ import spacy
 from collections import defaultdict
 from torch.utils.data import DataLoader
 from torchmetrics.text.bleu import BLEUScore
+from positional_encoding import PositionalEncoding
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -143,25 +144,6 @@ valid_dataloader = DataLoader(
 )
 
 
-class PositionalEncoding(nn.Module):
-    def __init__(self, d_model, dropout=0.1, maxlen=4096):
-        super(PositionalEncoding, self).__init__()
-        den = torch.exp(-torch.arange(0, d_model, 2) * math.log(10000) / d_model)
-        pos = torch.arange(0, maxlen).reshape(maxlen, 1)
-        pos_embedding = torch.zeros((maxlen, d_model))
-        pos_embedding[:, 0::2] = torch.sin(pos * den)
-        pos_embedding[:, 1::2] = torch.cos(pos * den)
-        pos_embedding = pos_embedding.unsqueeze(1)
-        self.dropout = nn.Dropout(dropout)
-        self.register_buffer("pos_embedding", pos_embedding)
-
-    def forward(self, token_embedding):
-        return self.dropout(
-            token_embedding
-            + self.pos_embedding[: token_embedding.size(0), :].requires_grad_(False)
-        )
-
-
 class Seq2SeqTransformer(nn.Module):
     def __init__(
         self,
@@ -188,7 +170,7 @@ class Seq2SeqTransformer(nn.Module):
         self.generator = nn.Linear(d_model, tgt_vocab_size)
         self.src_tok_emb = nn.Embedding(src_vocab_size, d_model)
         self.tgt_tok_emb = nn.Embedding(tgt_vocab_size, d_model)
-        self.positional_encoding = PositionalEncoding(d_model, dropout)
+        self.positional_encoding = PositionalEncoding(d_model, dropout, batch_first=False)
 
     def forward(self, src, tgt, src_mask, tgt_mask, src_padding_mask, tgt_padding_mask):
         src_emb = self.positional_encoding(self.src_tok_emb(src))

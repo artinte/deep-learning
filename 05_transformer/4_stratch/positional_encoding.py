@@ -11,16 +11,19 @@ class PositionalEncoding(torch.nn.Module):
         super(PositionalEncoding, self).__init__()
         self.dropout = torch.nn.Dropout(p=dropout)
         self.batch_first = batch_first
-
+        # shape [max_len, d_model]
         pe = torch.zeros(max_len, d_model)
+        # shape [max_len, 1]
         position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
         # equation term: 10000**(-2i/d_model)
         div_term = torch.exp(
             torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model)
         )
         # PE(pos, 2i) = sin(pos / (10000^(2i/d_model)))
+        # position * div_term shape: [max_len, d_model/2]
         pe[:, 0::2] = torch.sin(position * div_term)
         # PE(pos, 2i+1) = cos(pos / (10000^(2i/d_model)))
+        # positional * div_term shape: [max_len, d_model/2]
         pe[:, 1::2] = torch.cos(position * div_term)
         if self.batch_first:
             # Shape: [1, max_len, d_model]

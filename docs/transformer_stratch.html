@@ -421,7 +421,7 @@ pyplot.show()</code></pre>
         x = x + self.pe[:, : x.size(1)].requires_grad_(False)
         return self.dropout(x)</code></pre>
 
-                <p>The PyTorch code <code>div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))</code> is a direct implementation of the \(10000**(-2i/d_model)\) term from the Transformer's positional encoding formula. The div_term array is a sequence of values that determines the oscillation frequencies of the sine and cosine waves.</p>
+                <p>The PyTorch code <code>div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))</code> is a direct implementation of the \(10000^(-2i/d_{model})\) term from the Transformer's positional encoding formula. The div_term array is a sequence of values that determines the oscillation frequencies of the sine and cosine waves.</p>
 
                 <p>The term \(10000^{-2i/d_{model}}\) is equal to \({(e^{ln 10000})}^{-2i/d_{model}}\), this simplifies to \(e^{ln 10000 \cdot (-2i/d_{model})}\).</p>
 
