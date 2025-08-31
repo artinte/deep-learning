@@ -5,9 +5,6 @@ def evaluate(model, dataloader, loss_fn, pad_token_id, device):
     model.eval()
     losses = 0
     for src, tgt in dataloader:
-        src = src.to(device)
-        tgt = tgt.to(device)
-
         tgt_input = tgt[:-1, :]
 
         src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(

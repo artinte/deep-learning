@@ -134,7 +134,7 @@ def collate_fn(batch):
         tgt_batch, padding_value=pad_token_id, batch_first=False
     )
 
-    return src_batch, tgt_batch
+    return src_batch.to(device), tgt_batch.to(device)
 
 
 train_dataloader = DataLoader(

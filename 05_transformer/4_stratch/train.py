@@ -6,8 +6,6 @@ def train(model, optimizer, dataloader, loss_fn, pad_token_id, device):
     model.train()
     losses = 0
     for src, tgt in dataloader:
-        src = src.to(device)
-        tgt = tgt.to(device)
 
         tgt_input = tgt[:-1, :]
 
