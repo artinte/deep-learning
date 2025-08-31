@@ -22,7 +22,7 @@
                 <h2 class="custom-title">5.4 Transformer from Stratch</h2>
                 <p class="title-subtext">An annotated, line-by-line implementation of the Transformer model is detailed, covering its architecture, attention mechanisms, and a basic training example.</p>
                 <p style="color: #a0a0a0;">Created Date: 2025-06-29</p>
-                <p>The <strong>Transformer</strong> has been on a lot of people’s minds over the past few years. This post presents an annotated version of the paper in the form of a line-by-line implementation. It reorders and deletes some sections from the original paper and adds comments throughout.</p>
+                <p>The <strong>Transformer</strong> has been on a lot of people's minds over the past few years. This post presents an annotated version of the paper in the form of a line-by-line implementation. It reorders and deletes some sections from the original paper and adds comments throughout.</p>
 
                 <h3>5.4.1 Background</h3>
                 <p>The goal of reducing sequential computation also forms the foundation of the Extended Neural GPU, ByteNet and ConvS2S, all of which use convolutional neural networks as basic building block, computing hidden representations in parallel for all input and output positions. In these models, the number of operations required to relate signals from two arbitrary input or output positions grows in the distance between positions, linearly for ConvS2S and logarithmically for ByteNet. This makes it more difficult to learn dependencies between distant positions.</p>
@@ -383,7 +383,8 @@ pyplot.show()</code></pre>
 
                 <h3>5.4.6 Positional Encoding</h3>
 
-                <p>Since our model contains no recurrence and no convolution, in order for the model to make use of the order of the sequence, we must inject some information about the relative or absolute position of the tokens in the sequence. To this end, we add “positional encodings” to the input embeddings at the bottoms of the encoder and decoder stacks. The positional encodings have the same dimension \(d_{model}\) as the embeddings, so that the two can be summed. There are many choices of positional encodings, learned and fixed.</p>
+                <p>Since our model contains no recurrence and no convolution, in order for the model to make use of the order of the sequence, we must inject some information about the relative or absolute position of the tokens in the sequence. To this end, we add "positional encodings" to the input embeddings at the bottoms of the encoder and decoder stacks. The positional encodings have the same dimension \(d_{model}\) as the embeddings, so that the two can be summed. There are many choices of positional encodings, learned and fixed.</p>
+
                 <p>In this work, we use sine and cosine functions of different frequencies:</p>
                 <div class="highlight-math" style="text-align: center; overflow-x: auto;">
                     \[
@@ -420,7 +421,12 @@ pyplot.show()</code></pre>
         x = x + self.pe[:, : x.size(1)].requires_grad_(False)
         return self.dropout(x)</code></pre>
 
+                <p>The PyTorch code <code>div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))</code> is a direct implementation of the \(10000**(-2i/d_model)\) term from the Transformer's positional encoding formula. The div_term array is a sequence of values that determines the oscillation frequencies of the sine and cosine waves.</p>
+
+                <p>The term \(10000^{-2i/d_{model}}\) is equal to \({(e^{ln 10000})}^{-2i/d_{model}}\), this simplifies to \(e^{ln 10000 \cdot (-2i/d_{model})}\).</p>
+
                 <p>We also experimented with using learned positional embeddings instead, and found that the two versions produced nearly identical results. We chose the sinusoidal version because it may allow the model to extrapolate to sequence lengths longer than the ones encountered during training.</p>
+
 
                 <h3>5.4.7 Full Model</h3>
                 <p>Here we define a function from hyperparameters to a full model.</p>

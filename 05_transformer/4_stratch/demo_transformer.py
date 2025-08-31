@@ -97,7 +97,11 @@ def sequential_transforms(*transforms):
 
 def tensor_transform(token_ids):
     return torch.cat(
-        (torch.tensor([bos_token_id]), torch.tensor(token_ids), torch.tensor([eos_token_id]))
+        (
+            torch.tensor([bos_token_id]),
+            torch.tensor(token_ids),
+            torch.tensor([eos_token_id]),
+        )
     )
 
 
@@ -153,7 +157,8 @@ class PositionalEncoding(nn.Module):
 
     def forward(self, token_embedding):
         return self.dropout(
-            token_embedding + self.pos_embedding[: token_embedding.size(0), :]
+            token_embedding
+            + self.pos_embedding[: token_embedding.size(0), :].requires_grad_(False)
         )
 
 
@@ -205,7 +210,9 @@ class Seq2SeqTransformer(nn.Module):
             src_key_padding_mask=src_key_padding_mask,
         )
 
-    def decode(self, tgt, memory, memory_key_padding_mask, tgt_mask, tgt_key_padding_mask):
+    def decode(
+        self, tgt, memory, memory_key_padding_mask, tgt_mask, tgt_key_padding_mask
+    ):
         tgt_emb = self.positional_encoding(self.tgt_tok_emb(tgt))
         return self.transformer.decoder(
             tgt_emb,
@@ -300,7 +307,7 @@ transformer = Seq2SeqTransformer(
     len(src_vocab),
     len(tgt_vocab),
     dim_feedforward,
-    dropout
+    dropout,
 ).to(device)
 
 loss_fn = torch.nn.CrossEntropyLoss(ignore_index=pad_token_id)
