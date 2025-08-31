@@ -24,6 +24,23 @@
                 <p style="color: #a0a0a0;">Created Date: 2025-06-29</p>
                 <p>The <strong>Transformer</strong> has been on a lot of people's minds over the past few years. This post presents an annotated version of the paper in the form of a line-by-line implementation. It reorders and deletes some sections from the original paper and adds comments throughout.</p>
 
+                <pre><samp>Epoch: 1, Train loss: 4.3663, Validation loss: 3.3677
+Epoch: 2, Train loss: 3.1504, Validation loss: 2.7708
+Epoch: 3, Train loss: 2.6564, Validation loss: 2.4176
+Epoch: 4, Train loss: 2.3202, Validation loss: 2.1805
+Epoch: 5, Train loss: 2.0730, Validation loss: 2.0143
+Epoch: 6, Train loss: 1.8753, Validation loss: 1.8929
+Epoch: 7, Train loss: 1.7048, Validation loss: 1.8100
+Epoch: 8, Train loss: 1.5627, Validation loss: 1.7444
+Epoch: 9, Train loss: 1.4419, Validation loss: 1.6899
+Epoch: 10, Train loss: 1.3397, Validation loss: 1.6611
+Epoch: 11, Train loss: 1.2527, Validation loss: 1.6388
+Epoch: 12, Train loss: 1.1787, Validation loss: 1.6026
+Epoch: 13, Train loss: 1.1139, Validation loss: 1.5776
+Epoch: 14, Train loss: 1.0554, Validation loss: 1.5837
+Epoch: 15, Train loss: 1.0070, Validation loss: 1.5639
+Epoch: 16, Train loss: 0.9601, Validation loss: 1.5599</samp></pre>
+
                 <h3>5.4.1 Background</h3>
                 <p>The goal of reducing sequential computation also forms the foundation of the Extended Neural GPU, ByteNet and ConvS2S, all of which use convolutional neural networks as basic building block, computing hidden representations in parallel for all input and output positions. In these models, the number of operations required to relate signals from two arbitrary input or output positions grows in the distance between positions, linearly for ConvS2S and logarithmically for ByteNet. This makes it more difficult to learn dependencies between distant positions.</p>
                 <p>In the Transformer this is reduced to a constant number of operations, albeit at the cost of reduced effective resolution due to averaging attention-weighted positions, an effect we counteract with <strong>Multi-Head Attention</strong>.</p>

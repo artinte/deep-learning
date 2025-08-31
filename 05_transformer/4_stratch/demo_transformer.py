@@ -7,8 +7,7 @@ import spacy
 from collections import defaultdict
 from torch.utils.data import DataLoader
 from torchmetrics.text.bleu import BLEUScore
-from positional_encoding import PositionalEncoding
-
+from transformer_model import TransformerModel
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
@@ -144,67 +143,6 @@ valid_dataloader = DataLoader(
 )
 
 
-class Seq2SeqTransformer(nn.Module):
-    def __init__(
-        self,
-        num_encoder_layers,
-        num_decoder_layers,
-        d_model,
-        nhead,
-        src_vocab_size,
-        tgt_vocab_size,
-        dim_feedforward,
-        dropout,
-    ):
-        super(Seq2SeqTransformer, self).__init__()
-        self.transformer = nn.Transformer(
-            d_model=d_model,
-            nhead=nhead,
-            num_encoder_layers=num_encoder_layers,
-            num_decoder_layers=num_decoder_layers,
-            dim_feedforward=dim_feedforward,
-            dropout=dropout,
-            batch_first=False,
-        )
-        self.d_model = d_model
-        self.generator = nn.Linear(d_model, tgt_vocab_size)
-        self.src_tok_emb = nn.Embedding(src_vocab_size, d_model)
-        self.tgt_tok_emb = nn.Embedding(tgt_vocab_size, d_model)
-        self.positional_encoding = PositionalEncoding(d_model, dropout, batch_first=False)
-
-    def forward(self, src, tgt, src_mask, tgt_mask, src_padding_mask, tgt_padding_mask):
-        src_emb = self.positional_encoding(self.src_tok_emb(src))
-        tgt_emb = self.positional_encoding(self.tgt_tok_emb(tgt))
-        outs = self.transformer(
-            src_emb,
-            tgt_emb,
-            src_mask,
-            tgt_mask,
-            src_key_padding_mask=src_padding_mask,
-            tgt_key_padding_mask=tgt_padding_mask,
-        )
-        return self.generator(outs)
-
-    def encode(self, src, src_key_padding_mask):
-        src_emb = self.positional_encoding(self.src_tok_emb(src))
-        return self.transformer.encoder(
-            src=src_emb,
-            src_key_padding_mask=src_key_padding_mask,
-        )
-
-    def decode(
-        self, tgt, memory, memory_key_padding_mask, tgt_mask, tgt_key_padding_mask
-    ):
-        tgt_emb = self.positional_encoding(self.tgt_tok_emb(tgt))
-        return self.transformer.decoder(
-            tgt_emb,
-            memory=memory,
-            memory_key_padding_mask=memory_key_padding_mask,
-            tgt_mask=tgt_mask,
-            tgt_key_padding_mask=tgt_key_padding_mask,
-        )
-
-
 def create_mask(src, tgt):
     src_seq_len = src.shape[0]
     tgt_seq_len = tgt.shape[0]
@@ -281,7 +219,7 @@ def evaluate(model, dataloader, loss_fn):
 
 
 torch.manual_seed(0)
-transformer = Seq2SeqTransformer(
+transformer = TransformerModel(
     num_encoder_layers,
     num_decoder_layers,
     d_model,
