@@ -8,10 +8,10 @@ from collections import defaultdict
 from torch.utils.data import DataLoader
 
 
-DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-BATCH_SIZE = 128
-EMB_SIZE = 512
-NHEAD = 8
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+batch_size = 128
+d_model = 512
+num_head = 8
 FFN_HID_DIM = 512
 NUM_ENCODER_LAYERS = 3
 NUM_DECODER_LAYERS = 3
@@ -126,10 +126,10 @@ def collate_fn(batch):
 
 
 train_dataloader = DataLoader(
-    train_dataset, batch_size=BATCH_SIZE, collate_fn=collate_fn
+    train_dataset, batch_size=batch_size, collate_fn=collate_fn
 )
 valid_dataloader = DataLoader(
-    dataset["validation"], batch_size=BATCH_SIZE, collate_fn=collate_fn
+    dataset["validation"], batch_size=batch_size, collate_fn=collate_fn
 )
 
 
@@ -173,10 +173,11 @@ class Seq2SeqTransformer(nn.Module):
             dropout=dropout,
             batch_first=False,
         )
+        self.d_model = d_model
         self.generator = nn.Linear(emb_size, tgt_vocab_size)
         self.src_tok_emb = nn.Embedding(src_vocab_size, emb_size)
         self.tgt_tok_emb = nn.Embedding(tgt_vocab_size, emb_size)
-        self.positional_encoding = PositionalEncoding(emb_size, dropout=dropout)
+        self.positional_encoding = PositionalEncoding(emb_size, dropout=0.1)
 
     def forward(self, src, tgt, src_mask, tgt_mask, src_padding_mask, tgt_padding_mask):
         src_emb = self.positional_encoding(self.src_tok_emb(src))
@@ -210,8 +211,8 @@ def create_mask(src, tgt):
     src_seq_len = src.shape[0]
     tgt_seq_len = tgt.shape[0]
 
-    tgt_mask = nn.Transformer.generate_square_subsequent_mask(tgt_seq_len).to(DEVICE)
-    src_mask = torch.zeros((src_seq_len, src_seq_len), device=DEVICE).type(torch.bool)
+    tgt_mask = nn.Transformer.generate_square_subsequent_mask(tgt_seq_len).to(device)
+    src_mask = torch.zeros((src_seq_len, src_seq_len), device=device).type(torch.bool)
 
     src_padding_mask = (src == PAD_IDX).transpose(0, 1)
     tgt_padding_mask = (tgt == PAD_IDX).transpose(0, 1)
@@ -223,8 +224,8 @@ def train_epoch(model, optimizer, dataloader, loss_fn):
     model.train()
     losses = 0
     for src, tgt in dataloader:
-        src = src.to(DEVICE)
-        tgt = tgt.to(DEVICE)
+        src = src.to(device)
+        tgt = tgt.to(device)
 
         tgt_input = tgt[:-1, :]
 
@@ -245,6 +246,8 @@ def train_epoch(model, optimizer, dataloader, loss_fn):
         tgt_out = tgt[1:, :]
         loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
         loss.backward()
+        # Add the gradient clipping for stable training
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0, norm_type=2)
         optimizer.step()
         losses += loss.item()
     return losses / len(dataloader)
@@ -254,8 +257,8 @@ def evaluate(model, dataloader, loss_fn):
     model.eval()
     losses = 0
     for src, tgt in dataloader:
-        src = src.to(DEVICE)
-        tgt = tgt.to(DEVICE)
+        src = src.to(device)
+        tgt = tgt.to(device)
 
         tgt_input = tgt[:-1, :]
 
@@ -283,17 +286,17 @@ torch.manual_seed(0)
 transformer = Seq2SeqTransformer(
     NUM_ENCODER_LAYERS,
     NUM_DECODER_LAYERS,
-    EMB_SIZE,
-    NHEAD,
+    d_model,
+    num_head,
     len(src_vocab),
     len(tgt_vocab),
     FFN_HID_DIM,
-).to(DEVICE)
+).to(device)
 
-loss_fn = torch.nn.CrossEntropyLoss(ignore_index=PAD_IDX)
+loss_fn = torch.nn.CrossEntropyLoss(ignore_index=PAD_IDX, label_smoothing=0.1)
 optimizer = optim.Adam(transformer.parameters(), lr=0.0005)
 
-NUM_EPOCHS = 20
+NUM_EPOCHS = 30
 for epoch in range(1, NUM_EPOCHS + 1):
     train_loss = train_epoch(transformer, optimizer, train_dataloader, loss_fn)
     valid_loss = evaluate(transformer, valid_dataloader, loss_fn)
@@ -304,18 +307,18 @@ for epoch in range(1, NUM_EPOCHS + 1):
 
 def greedy_decode(model, src_sentence, max_len=50):
     model.eval()
-    src = text_transform[SRC_LANGUAGE](src_sentence).to(DEVICE).unsqueeze(1)
+    src = text_transform[SRC_LANGUAGE](src_sentence).to(device).unsqueeze(1)
     src_padding_mask = (src == PAD_IDX).transpose(0, 1)
 
     with torch.no_grad():
         memory = model.encode(src, src_padding_mask)
 
-    ys = torch.ones(1, 1).fill_(BOS_IDX).type(torch.long).to(DEVICE)
+    ys = torch.ones(1, 1).fill_(BOS_IDX).type(torch.long).to(device)
 
-    for i in range(max_len - 1):
+    for _ in range(max_len - 1):
         with torch.no_grad():
             tgt_mask = nn.Transformer.generate_square_subsequent_mask(ys.size(0)).to(
-                DEVICE
+                device
             )
             tgt_padding_mask = (ys == PAD_IDX).transpose(0, 1)
             out = model.decode(
