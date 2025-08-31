@@ -8,6 +8,7 @@ from collections import defaultdict
 from torch.utils.data import DataLoader
 from torchmetrics.text.bleu import BLEUScore
 from transformer_model import TransformerModel
+from utils import create_mask
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
@@ -143,19 +144,6 @@ valid_dataloader = DataLoader(
 )
 
 
-def create_mask(src, tgt):
-    src_seq_len = src.shape[0]
-    tgt_seq_len = tgt.shape[0]
-
-    tgt_mask = nn.Transformer.generate_square_subsequent_mask(tgt_seq_len).to(device)
-    src_mask = torch.zeros((src_seq_len, src_seq_len), device=device).type(torch.bool)
-
-    src_padding_mask = (src == pad_token_id).transpose(0, 1)
-    tgt_padding_mask = (tgt == pad_token_id).transpose(0, 1)
-
-    return src_mask, tgt_mask, src_padding_mask, tgt_padding_mask
-
-
 def train_epoch(model, optimizer, dataloader, loss_fn):
     model.train()
     losses = 0
@@ -166,7 +154,7 @@ def train_epoch(model, optimizer, dataloader, loss_fn):
         tgt_input = tgt[:-1, :]
 
         src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(
-            src, tgt_input
+            src, tgt_input, pad_token_id, device
         )
 
         logits = model(
@@ -199,7 +187,7 @@ def evaluate(model, dataloader, loss_fn):
         tgt_input = tgt[:-1, :]
 
         src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(
-            src, tgt_input
+            src, tgt_input, pad_token_id, device
         )
 
         with torch.no_grad():
