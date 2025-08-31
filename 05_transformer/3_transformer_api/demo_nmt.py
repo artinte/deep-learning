@@ -18,15 +18,15 @@ tokenizer = get_tokenizer()
 train_dataloader, valid_dataloader, _, data_test = preprocess(tokenizer, device)
 
 # Smaller model parameters are less likely to cause overfitting.
-src_vocab_size = tokenizer.vocab_size
-tgt_vocab_size = tokenizer.vocab_size
+src_vocab_size = len(tokenizer)
+tgt_vocab_size = len(tokenizer)
 d_model = 512
 n_head = 8
 num_encoder_layers = 6
 num_decoder_layers = 6
 dim_feedforward = 2048
 dropout = 0.2
-num_epochs = 50
+num_epochs = 30
 
 model = TransformerModel(
     src_vocab_size,

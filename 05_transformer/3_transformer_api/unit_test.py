@@ -1,13 +1,14 @@
 import transformers
 import torch
+from tokenizer import get_tokenizer
 from preprocess import preprocess
 
-tokenizer = transformers.AutoTokenizer.from_pretrained("Helsinki-NLP/opus-mt-en-de")
+tokenizer = get_tokenizer()
 
-assert tokenizer.bos_token_id == None
+assert tokenizer.bos_token_id != None
 assert tokenizer.eos_token_id != None
 bos_token_id = tokenizer.bos_token_id or tokenizer.eos_token_id
-assert bos_token_id == tokenizer.eos_token_id
+assert bos_token_id != tokenizer.eos_token_id
 
 
 mock_data = {
@@ -89,6 +90,7 @@ assert len(test_dataloader) == 3
 src, tgt, src_key_padding_mask, tgt_key_padding_mask = next(iter(valid_dataloader))
 bos_token_id = tokenizer.bos_token_id or tokenizer.eos_token_id
 eos_token_id = tokenizer.eos_token_id
+pad_token_id = tokenizer.pad_token_id
 
 print(src.shape)
 print(tgt.shape)
@@ -96,13 +98,27 @@ assert src.shape == (2, 8)
 assert tgt.shape == (2, 14)
 assert src_key_padding_mask.shape == (2, 8)
 assert tgt_key_padding_mask.shape == (2, 14)
-assert torch.equal(src[:, -1], torch.tensor([eos_token_id, eos_token_id]))
-assert torch.equal(tgt[:, 0], torch.tensor([bos_token_id, bos_token_id]))
-assert torch.equal(tgt[:, -1], torch.tensor([eos_token_id, eos_token_id]))
+assert torch.equal(src[:, -1], torch.tensor([pad_token_id, eos_token_id]).to(device))
+assert torch.equal(tgt[:, 0], torch.tensor([bos_token_id, bos_token_id]).to(device))
+assert torch.equal(tgt[:, -1], torch.tensor([pad_token_id, eos_token_id]).to(device))
 assert torch.equal(
     src_key_padding_mask,
     torch.tensor(
-        [[1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]],
+        [[1, 1, 1, 1, 1, 1, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1]],
         device=device,
     ),
 )
+
+attention_mask = torch.tensor([[1, 1, 1, 0, 0],
+                               [1, 1, 1, 1, 0]])
+sliced_attention_mask = attention_mask[:,:-1]
+print(sliced_attention_mask)
+final_mask = (sliced_attention_mask == 0)
+print(final_mask)
+
+attention_mask = torch.tensor([[1, 1, 1, 0, 0],
+                               [1, 1, 1, 1, 0]])
+boolean_mask = (attention_mask == 0)
+print(boolean_mask)
+sliced_boolean_mask = boolean_mask[:,:-1]
+print(sliced_boolean_mask)

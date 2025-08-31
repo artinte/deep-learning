@@ -8,10 +8,9 @@ def evaluate(model, valid_dataloader, criterion):
         for src, tgt, src_key_padding_mask, tgt_key_padding_mask in valid_dataloader:
             # The target input is the target sequence without the EOS token
             tgt_input = tgt[:, :-1]
-            tgt_key_padding_mask = tgt_key_padding_mask[:, :-1]
+            tgt_key_padding_mask = (tgt_key_padding_mask == 0)[:, :-1]
 
             src_key_padding_mask = src_key_padding_mask == 0
-            tgt_key_padding_mask = tgt_key_padding_mask == 0
 
             # [batch_size, tgt_seq_len - 1, vocab_size]
             logits = model.forward(
