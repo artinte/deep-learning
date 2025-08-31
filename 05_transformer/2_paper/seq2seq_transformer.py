@@ -6,11 +6,12 @@ import torch.optim as optim
 import spacy
 from collections import defaultdict
 from torch.utils.data import DataLoader
+from torchmetrics.text.bleu import BLEUScore
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 batch_size = 128
-d_model = 512
+d_model = 256
 num_head = 8
 FFN_HID_DIM = 512
 NUM_ENCODER_LAYERS = 3
@@ -69,8 +70,9 @@ def build_vocab(data_iter, language, min_freq=2, specials=None):
     return str_to_idx, idx_to_str, lookup_token
 
 
-dataset = datasets.load_dataset("bentrevett/multi30k", "default")
-train_dataset = dataset["train"]
+train_dataset, valid_dataset, test_dataset = datasets.load_dataset(
+    "bentrevett/multi30k", split=["train", "validation", "test"]
+)
 
 src_vocab, src_rev_vocab, src_lookup = build_vocab(
     train_dataset, SRC_LANGUAGE, min_freq=2, specials=SPECIAL_TOKENS
@@ -129,7 +131,7 @@ train_dataloader = DataLoader(
     train_dataset, batch_size=batch_size, collate_fn=collate_fn
 )
 valid_dataloader = DataLoader(
-    dataset["validation"], batch_size=batch_size, collate_fn=collate_fn
+    valid_dataset, batch_size=batch_size, collate_fn=collate_fn
 )
 
 
@@ -401,18 +403,30 @@ def translate(model, src_sentence, decode_fn=greedy_decode):
     )
 
 
-test_sentences = [
-    "A man is playing guitar.",
-    "Two dogs are running in the park.",
-    "The child is eating an apple.",
-    "A man in an orange hat starring at something.",
-    "A Boston Terrier is running on lush green grass in front of a white fence.",
-    "A girl in karate uniform breaking a stick with a front kick.",
-    "Five people wearing winter jackets and helmets stand in the snow, with snowmobiles in the background.",
-    "People are fixing the roof of a house.",
-]
+print("Testing Translation on First 32 Samples")
+for i in range(32):
+    en_sentence = train_dataset[i]["en"]
+    de_reference = train_dataset[i]["de"]
 
-for s in test_sentences:
-    print(f"{SRC_LANGUAGE} : {s}")
-    print(f"{TGT_LANGUAGE} : {translate(transformer, s)}")
-    print("-" * 40)
+    translated = translate(transformer, en_sentence)
+    print("-" * 50)
+    print(f"Source: {en_sentence}")
+    print(f"Prediction: {translated}")
+    print(f"Reference: {de_reference}")
+
+
+print("-" * 50)
+print("Calculating Corpus BLEU Score...")
+all_predictions = []
+all_references = []
+for sample in train_dataset.take(100):
+    en_sentence = sample["en"]
+    de_reference = sample["de"]
+
+    translated = translate(transformer, en_sentence)
+    all_predictions.append(translated)
+    all_references.append([de_reference])
+
+bleu_metric = BLEUScore()
+bleu_score = bleu_metric(all_predictions, all_references)
+print(f"Corpus BLEU Score: {bleu_score.item():.4f}")
