@@ -1,28 +1,30 @@
 import torch
+from utils import create_mask
 
-
-def evaluate(model, valid_iter, src_field, tgt_field, criterion):
+def evaluate(model, dataloader, loss_fn, pad_token_id, device):
     model.eval()
-    total_loss = 0
-    with torch.no_grad():
-        for data in valid_iter:
-            # The target input is the target sequence without the EOS token
-            src = data.src
-            tgt = data.tgt
-            src_key_padding_mask = src == src_field.vocab.stoi[src_field.pad_token]
-            tgt_key_padding_mask = tgt == tgt_field.vocab.stoi[tgt_field.pad_token]
-            tgt_input = tgt[:, :-1]
-            tgt_key_padding_mask = tgt_key_padding_mask[:, :-1]
+    losses = 0
+    for src, tgt in dataloader:
+        src = src.to(device)
+        tgt = tgt.to(device)
 
-            # [batch_size, tgt_seq_len, vocab_size]
-            logits = model.forward(
-                src, tgt_input, src_key_padding_mask, tgt_key_padding_mask
+        tgt_input = tgt[:-1, :]
+
+        src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(
+            src, tgt_input, pad_token_id, device
+        )
+
+        with torch.no_grad():
+            logits = model(
+                src,
+                tgt_input,
+                src_mask,
+                tgt_mask,
+                src_padding_mask,
+                tgt_padding_mask,
             )
-            output = logits.reshape(-1, logits.shape[-1])
-            # [batch, seq_len] -> [batch x seq_len]
-            tgt_out = tgt[:, 1:].reshape(-1)
 
-            loss = criterion(output, tgt_out)
-            total_loss += loss.item()
-
-    return total_loss / len(valid_iter)
+        tgt_out = tgt[1:, :]
+        loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
+        losses += loss.item()
+    return losses / len(dataloader)

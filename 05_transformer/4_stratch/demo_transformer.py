@@ -8,7 +8,8 @@ from collections import defaultdict
 from torch.utils.data import DataLoader
 from torchmetrics.text.bleu import BLEUScore
 from transformer_model import TransformerModel
-from utils import create_mask
+from train import train
+from evaluate import evaluate
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
@@ -144,70 +145,8 @@ valid_dataloader = DataLoader(
 )
 
 
-def train_epoch(model, optimizer, dataloader, loss_fn):
-    model.train()
-    losses = 0
-    for src, tgt in dataloader:
-        src = src.to(device)
-        tgt = tgt.to(device)
-
-        tgt_input = tgt[:-1, :]
-
-        src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(
-            src, tgt_input, pad_token_id, device
-        )
-
-        logits = model(
-            src,
-            tgt_input,
-            src_mask,
-            tgt_mask,
-            src_padding_mask,
-            tgt_padding_mask,
-        )
-
-        optimizer.zero_grad()
-        tgt_out = tgt[1:, :]
-        loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
-        loss.backward()
-        # Add the gradient clipping for stable training
-        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0, norm_type=2)
-        optimizer.step()
-        losses += loss.item()
-    return losses / len(dataloader)
-
-
-def evaluate(model, dataloader, loss_fn):
-    model.eval()
-    losses = 0
-    for src, tgt in dataloader:
-        src = src.to(device)
-        tgt = tgt.to(device)
-
-        tgt_input = tgt[:-1, :]
-
-        src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(
-            src, tgt_input, pad_token_id, device
-        )
-
-        with torch.no_grad():
-            logits = model(
-                src,
-                tgt_input,
-                src_mask,
-                tgt_mask,
-                src_padding_mask,
-                tgt_padding_mask,
-            )
-
-        tgt_out = tgt[1:, :]
-        loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
-        losses += loss.item()
-    return losses / len(dataloader)
-
-
 torch.manual_seed(0)
-transformer = TransformerModel(
+model = TransformerModel(
     num_encoder_layers,
     num_decoder_layers,
     d_model,
@@ -219,11 +158,13 @@ transformer = TransformerModel(
 ).to(device)
 
 loss_fn = torch.nn.CrossEntropyLoss(ignore_index=pad_token_id)
-optimizer = optim.Adam(transformer.parameters(), lr=0.0005)
+optimizer = optim.Adam(model.parameters(), lr=0.0005)
 
 for epoch in range(1, num_epochs + 1):
-    train_loss = train_epoch(transformer, optimizer, train_dataloader, loss_fn)
-    valid_loss = evaluate(transformer, valid_dataloader, loss_fn)
+    train_loss = train(
+        model, optimizer, train_dataloader, loss_fn, pad_token_id, device
+    )
+    valid_loss = evaluate(model, valid_dataloader, loss_fn, pad_token_id, device)
     print(
         f"Epoch: {epoch}, Train loss: {train_loss:.4f}, Validation loss: {valid_loss:.4f}"
     )
@@ -332,7 +273,7 @@ for i in range(32):
     en_sentence = train_dataset[i]["en"]
     de_reference = train_dataset[i]["de"]
 
-    translated = translate(transformer, en_sentence)
+    translated = translate(model, en_sentence)
     print("-" * 50)
     print(f"Source: {en_sentence}")
     print(f"Prediction: {translated}")
@@ -347,7 +288,7 @@ for sample in train_dataset.take(100):
     en_sentence = sample["en"]
     de_reference = sample["de"]
 
-    translated = translate(transformer, en_sentence)
+    translated = translate(model, en_sentence)
 
     all_predictions.append(translated)
     all_references.append([de_reference.lower()])

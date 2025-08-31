@@ -1,39 +1,35 @@
 import torch
+from utils import create_mask
 
 
-def train(model, train_iter, src_field, tgt_field, optimizer, criterion):
+def train(model, optimizer, dataloader, loss_fn, pad_token_id, device):
     model.train()
-    total_loss = 0
-    for i, data in enumerate(train_iter):
-        # The target input is the target sequence without the EOS token.
-        # This is what the decoder receives as input.
-        src, tgt = data.src, data.tgt
-        src_key_padding_mask = src == src_field.vocab.stoi[src_field.pad_token]
-        tgt_key_padding_mask = tgt == tgt_field.vocab.stoi[tgt_field.pad_token]
+    losses = 0
+    for src, tgt in dataloader:
+        src = src.to(device)
+        tgt = tgt.to(device)
 
-        tgt_input = tgt[:, :-1]
-        tgt_key_padding_mask = tgt_key_padding_mask[:, :-1]
+        tgt_input = tgt[:-1, :]
 
-        # [batch_size, tgt_seq_len, vocab_size]
-        logits = model.forward(
-            src, tgt_input, src_key_padding_mask, tgt_key_padding_mask
+        src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(
+            src, tgt_input, pad_token_id, device
         )
-        output = logits.reshape(-1, logits.shape[-1])
 
-        # [batch, seq_len] -> [batch x seq_len]
-        tgt_out = tgt[:, 1:].reshape(-1)
+        logits = model(
+            src,
+            tgt_input,
+            src_mask,
+            tgt_mask,
+            src_padding_mask,
+            tgt_padding_mask,
+        )
 
-        # backpropagation
         optimizer.zero_grad()
-        loss = criterion(output, tgt_out)
+        tgt_out = tgt[1:, :]
+        loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
         loss.backward()
-        torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+        # Add the gradient clipping for stable training
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0, norm_type=2)
         optimizer.step()
-
-        total_loss += loss.item()
-
-        if (i + 1) % 100 == 0:
-            avg_loss_100 = total_loss / (i + 1)
-            print(f"  Step: {i+1} | Avg Train Loss: {avg_loss_100:.3f}")
-
-    return total_loss / len(train_iter)
+        losses += loss.item()
+    return losses / len(dataloader)
