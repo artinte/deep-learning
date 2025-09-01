@@ -8,10 +8,10 @@ src_language = "en"
 tgt_language = "de"
 
 special_tokens = {
-    "<unk>": 1,
-    "<pad>": 2,
-    "<bos>": 3,
-    "<eos>": 4,
+    "<unk>": 0,
+    "<pad>": 1,
+    "<bos>": 2,
+    "<eos>": 3,
 }
 
 try:

@@ -4,19 +4,14 @@ from transformer_model import TransformerModel
 from train import train
 from evaluate import evaluate
 from inference import translate
-from preprocess import (
-    special_tokens,
-    preprocess,
-    src_vocab,
-    tgt_vocab,
-)
+from preprocess import special_tokens, preprocess, src_vocab, tgt_vocab
 
 torch.manual_seed(0)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
 
-num_epochs = 20
+num_epochs = 40
 batch_size = 128
 d_model = 256
 num_head = 8
@@ -70,7 +65,7 @@ for sample in test_dataset.take(100):
     en_sentence = sample["en"]
     de_reference = sample["de"]
 
-    translated = translate(model, en_sentence)
+    translated = translate(model, en_sentence, device)
 
     all_predictions.append(translated)
     all_references.append([de_reference.lower()])

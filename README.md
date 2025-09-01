@@ -51,7 +51,13 @@ These four methods are progressive in hierarchy and serve as excellent learning 
 - [x] 5.1 [Attention Mechanism](https://artinte.github.io/deep-learning/attention_mechanism.html)
 - [x] 5.2 [Attention Is All You Need](https://artinte.github.io/deep-learning/transformer_paper.html)
 - [x] 5.3 [nn.Transformer](https://artinte.github.io/deep-learning/nn_transformer.html)
-- [x] 5.4 [Transformer from Stratch](https://artinte.github.io/deep-learning/transformer_stratch.html)
+
+5.4 [Transformer from Stratch](https://artinte.github.io/deep-learning/transformer_stratch.html)
+
+`demo_transformer.py` demonstrates building a machine translation system using PyTorch’s [torch.nn.Transformer](https://docs.pytorch.org/docs/stable/generated/torch.nn.Transformer.html) , a flexible implementation of the Transformer architecture. The API provides encoder–decoder layers with multi-head self-attention and feedforward networks, making it well-suited for sequence-to-sequence tasks such as translation.
+
+`demo_stratch.py` 
+
 - [x] 5.5 [nanoGPT](https://artinte.github.io/deep-learning/nano_gpt.html)
 - [x] 5.6 [BERT](https://artinte.github.io/deep-learning/bert.html)
 - [x] 5.7 [Vision Transformer](https://artinte.github.io/deep-learning/vision_transformer.html)
