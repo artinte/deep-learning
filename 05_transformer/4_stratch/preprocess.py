@@ -1,152 +1,133 @@
+from collections import defaultdict
 import datasets
-import nltk
+import spacy
 import torch
-from collections import Counter
-from functools import partial
 
-unknown_token = "<unk>"
-pad_token = "<pad>"
-sos_token = "<sos>"
-eos_token = "<eos>"
+src_language = "en"
+tgt_language = "de"
 
+special_tokens = {
+    "<unk>": 1,
+    "<pad>": 2,
+    "<bos>": 3,
+    "<eos>": 4,
+}
 
-class Vocabulary:
-    def __init__(self, specials, min_freq=1):
-        self.specials = specials
-        self.min_freq = min_freq
-        self.stoi = {token: i for i, token in enumerate(specials)}
-        self.itos = {i: token for i, token in enumerate(specials)}
-        self.unk_idx = self.stoi[unknown_token]
+try:
+    spacy_en = spacy.load("en_core_web_sm")
+    spacy_de = spacy.load("de_core_news_sm")
+except IOError:
+    print("Spacy models not found. Downloading...")
+    from spacy.cli import download
 
-    def build_vocab(self, tokens_list):
-        counter = Counter(tokens_list)
-        # Sort by frequency and then alphabetically for consistent ordering
-        sorted_tokens = sorted(counter.items(), key=lambda x: (-x[1], x[0]))
+    download("en_core_web_sm")
+    download("de_core_news_sm")
+    spacy_en = spacy.load("en_core_web_sm")
+    spacy_de = spacy.load("de_core_news_sm")
 
-        for token, freq in sorted_tokens:
-            if freq >= self.min_freq and token not in self.stoi:
-                self.stoi[token] = len(self.stoi)
-
-        self.itos = {i: token for token, i in self.stoi.items()}
-
-    def __len__(self):
-        return len(self.stoi)
-
-    def numericalize(self, tokens):
-        return [self.stoi.get(token, self.unk_idx) for token in tokens]
+token_transform = {
+    src_language: lambda text: [
+        token.text.lower() for token in spacy_en.tokenizer(text)
+    ],
+    tgt_language: lambda text: [
+        token.text.lower() for token in spacy_de.tokenizer(text)
+    ],
+}
 
 
-class TranslationDataset(torch.utils.data.Dataset):
-    def __init__(self, data, src_vocab, tgt_vocab, max_len=None):
-        self.data = data
-        self.src_vocab = src_vocab
-        self.tgt_vocab = tgt_vocab
-        self.max_len = max_len
+def build_vocab(data_iter, language, min_freq=2, specials=None):
+    if specials is None:
+        specials = []
 
-    def __len__(self):
-        return len(self.data)
+    counts = defaultdict(int)
+    for example in data_iter:
+        tokens = token_transform[language](example[language])
+        for token in tokens:
+            counts[token] += 1
 
-    def __getitem__(self, idx):
-        src_text, tgt_text = self.data[idx]
+    str_to_idx = {token: i for i, token in enumerate(specials)}
+    current_idx = len(specials)
 
-        # Tokenize using nltk
-        src_tokens = nltk.tokenize.word_tokenize(src_text) + [eos_token]
-        tgt_tokens = [sos_token] + nltk.tokenize.word_tokenize(tgt_text) + [eos_token]
+    for token, count in sorted(counts.items(), key=lambda item: item[1], reverse=True):
+        if count >= min_freq:
+            str_to_idx[token] = current_idx
+            current_idx += 1
 
-        # Numericalize tokens
-        src_numerical = self.src_vocab.numericalize(src_tokens)
-        tgt_numerical = self.tgt_vocab.numericalize(tgt_tokens)
+    idx_to_str = {idx: token for token, idx in str_to_idx.items()}
 
-        return {"src": src_numerical, "tgt": tgt_numerical}
+    def lookup_token(token):
+        return str_to_idx.get(token, special_tokens["<unk>"])
 
-
-# Custom collate function for DataLoader to handle padding
-def collate_fn_with_vocab(batch, src_vocab, tgt_vocab):
-    src_list = [item["src"] for item in batch]
-    tgt_list = [item["tgt"] for item in batch]
-
-    # Pad sequences to the length of the longest in the batch
-    src_padded = torch.nn.utils.rnn.pad_sequence(
-        [torch.tensor(s) for s in src_list],
-        batch_first=True,
-        padding_value=src_vocab.stoi[pad_token],
-    )
-    tgt_padded = torch.nn.utils.rnn.pad_sequence(
-        [torch.tensor(t) for t in tgt_list],
-        batch_first=True,
-        padding_value=tgt_vocab.stoi[pad_token],
-    )
-
-    # Create key padding masks
-    src_mask = src_padded == src_vocab.stoi[pad_token]
-    tgt_mask = tgt_padded == tgt_vocab.stoi[pad_token]
-
-    return src_padded, tgt_padded, src_mask, tgt_mask
+    return str_to_idx, idx_to_str, lookup_token
 
 
-def preprocess(device, batch_size=32, dataset=None):
-    nltk.download("punkt")
-    if dataset == None:
-        dataset = datasets.load_dataset("bentrevett/multi30k")
-    print(dataset)
-    # {'en': 'Two young, White males are outside near many bushes.',
-    # 'de': 'Zwei junge weiße Männer sind im Freien in der Nähe vieler Büsche.'}
-    print(f"First train sample: {dataset["train"][0]}")
+train_dataset, valid_dataset, test_dataset = datasets.load_dataset(
+    "bentrevett/multi30k", split=["train", "validation", "test"]
+)
 
-    train_data = [(example["de"], example["en"]) for example in dataset["train"]]
-    valid_data = [(example["de"], example["en"]) for example in dataset["validation"]]
-    test_data = [(example["de"], example["en"]) for example in dataset["test"]]
+src_vocab, src_rev_vocab, src_lookup = build_vocab(
+    train_dataset, src_language, min_freq=2, specials=special_tokens.keys()
+)
+tgt_vocab, tgt_rev_vocab, tgt_lookup = build_vocab(
+    train_dataset, tgt_language, min_freq=2, specials=special_tokens.keys()
+)
 
-    # Create vocabulary instances
-    src_vocab = Vocabulary(specials=[unknown_token, pad_token, eos_token], min_freq=2)
-    tgt_vocab = Vocabulary(
-        specials=[unknown_token, pad_token, sos_token, eos_token], min_freq=2
+
+def sequential_transforms(*transforms):
+    def func(txt_input):
+        for transform in transforms:
+            txt_input = transform(txt_input)
+        return txt_input
+
+    return func
+
+
+def tensor_transform(token_ids):
+    return torch.cat(
+        (
+            torch.tensor([special_tokens["<bos>"]]),
+            torch.tensor(token_ids),
+            torch.tensor([special_tokens["<eos>"]]),
+        )
     )
 
-    collate_fn = partial(
-        collate_fn_with_vocab, src_vocab=src_vocab, tgt_vocab=tgt_vocab
+
+text_transform = {
+    src_language: sequential_transforms(
+        token_transform[src_language],
+        lambda tokens: [src_lookup(token) for token in tokens],
+        tensor_transform,
+    ),
+    tgt_language: sequential_transforms(
+        token_transform[tgt_language],
+        lambda tokens: [tgt_lookup(token) for token in tokens],
+        tensor_transform,
+    ),
+}
+
+
+def collate_fn(batch, device):
+    src_batch, tgt_batch = [], []
+    for item in batch:
+        src_batch.append(text_transform[src_language](item[src_language]))
+        tgt_batch.append(text_transform[tgt_language](item[tgt_language]))
+
+    src_batch = torch.nn.utils.rnn.pad_sequence(
+        src_batch, padding_value=special_tokens["<pad>"], batch_first=False
+    )
+    tgt_batch = torch.nn.utils.rnn.pad_sequence(
+        tgt_batch, padding_value=special_tokens["<pad>"], batch_first=False
     )
 
+    return src_batch.to(device), tgt_batch.to(device)
+
+
+def preprocess(batch_size):
     train_dataloader = torch.utils.data.DataLoader(
-        train_data, batch_size=batch_size, shuffle=True, collate_fn=collate_fn
+        train_dataset, batch_size=batch_size, collate_fn=collate_fn
     )
     valid_dataloader = torch.utils.data.DataLoader(
-        valid_data, batch_size=batch_size, shuffle=False, collate_fn=collate_fn
-    )
-    test_dataloader = torch.utils.data.DataLoader(
-        test_data, batch_size=batch_size, shuffle=False, collate_fn=collate_fn
+        valid_dataset, batch_size=batch_size, collate_fn=collate_fn
     )
 
-    print(f"Source <eos> index: {src_vocab.stoi[eos_token]}")
-    print(f"Source <pad> index: {src_vocab.stoi[pad_token]}")
-    print(f"Source <unk> index: {src_vocab.stoi[unknown_token]}")
-    print(f"Target <sos> index: {tgt_vocab.stoi[sos_token]}")
-    print(f"Target <eos> index: {tgt_vocab.stoi[eos_token]}")
-    print(f"Target <pad> index: {tgt_vocab.stoi[pad_token]}")
-    print(f"Target <unk> index: {tgt_vocab.stoi[unknown_token]}")
-
-    print("Source vocabulary size: " + str(len(src_vocab)))
-    print("Target vocabulary size: " + str(len(tgt_vocab)))
-
-    print(f"Source vocab examples: {list(src_vocab)[:20]}")
-    print(f"Target vocab examples: {list(tgt_vocab)[:20]}")
-
-    for src, tgt, src_mask, tgt_mask in test_dataloader:
-        print(f"First src train sample shape: {src.shape}")
-        print(f"First tgt train sample shape: {tgt.shape}")
-        print(f"First src train sample: {src}")
-        print(f"First tgt train sample: {tgt}")
-        print(f"First src train mask shape: {src_mask.shape}")
-        print(f"First tgt train mask shape: {tgt_mask.shape}")
-        print(f"First src train mask: {src_mask}")
-        print(f"First tgt train mask: {tgt_mask}")
-        break
-
-    return (
-        src_vocab,
-        tgt_vocab,
-        train_dataloader,
-        valid_dataloader,
-        test_dataloader,
-        test_data,
-    )
+    return train_dataloader, valid_dataloader
