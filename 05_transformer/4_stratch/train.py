@@ -1,8 +1,9 @@
 import torch
 from utils import create_mask
+from preprocess import special_tokens
 
 
-def train(model, optimizer, dataloader, loss_fn, pad_token_id, device):
+def train(model, optimizer, dataloader, loss_fn, device):
     model.train()
     losses = 0
     for src, tgt in dataloader:
@@ -10,7 +11,7 @@ def train(model, optimizer, dataloader, loss_fn, pad_token_id, device):
         tgt_input = tgt[:-1, :]
 
         src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(
-            src, tgt_input, pad_token_id, device
+            src, tgt_input, special_tokens["<pad>"], device
         )
 
         logits = model(

@@ -1,14 +1,16 @@
 import torch
+from preprocess import special_tokens
 from utils import create_mask
 
-def evaluate(model, dataloader, loss_fn, pad_token_id, device):
+
+def evaluate(model, dataloader, loss_fn, device):
     model.eval()
     losses = 0
     for src, tgt in dataloader:
         tgt_input = tgt[:-1, :]
 
         src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(
-            src, tgt_input, pad_token_id, device
+            src, tgt_input, special_tokens["<pad>"], device
         )
 
         with torch.no_grad():

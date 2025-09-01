@@ -1,4 +1,5 @@
 from collections import defaultdict
+from functools import partial
 import datasets
 import spacy
 import torch
@@ -122,12 +123,13 @@ def collate_fn(batch, device):
     return src_batch.to(device), tgt_batch.to(device)
 
 
-def preprocess(batch_size):
+def preprocess(batch_size, device):
+    collate = partial(collate_fn, device=device)
     train_dataloader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=batch_size, collate_fn=collate_fn
+        train_dataset, batch_size=batch_size, collate_fn=collate
     )
     valid_dataloader = torch.utils.data.DataLoader(
-        valid_dataset, batch_size=batch_size, collate_fn=collate_fn
+        valid_dataset, batch_size=batch_size, collate_fn=collate
     )
 
-    return train_dataloader, valid_dataloader
+    return train_dataloader, valid_dataloader, test_dataset

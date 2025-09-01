@@ -1,37 +1,107 @@
 import torch
+from preprocess import (
+    text_transform,
+    src_language,
+    tgt_language,
+    tgt_rev_vocab,
+    special_tokens,
+)
+from utils import create_mask
 
 
-def greedy_translate(model, sentence, src_field, tgt_field, max_len=512):
-
+def greedy_decode(model, src_sentence, device, max_len=50):
     model.eval()
+    src = text_transform[src_language](src_sentence).to(device).unsqueeze(1)
+    src_padding_mask = (src == special_tokens["<pad>"]).transpose(0, 1)
+
     with torch.no_grad():
-        tokens = [token for token in src_field.tokenize(sentence)]
-        src_tokens = [src_field.vocab.stoi[token] for token in tokens]
-        # [1, src_seq_len]
-        src_tensor = torch.LongTensor(src_tokens).unsqueeze(0).to(model.device)
-        src_key_padding_mask = src_tensor == src_field.vocab.stoi[src_field.pad_token]
+        memory = model.encode(src, src_padding_mask)
 
-        memory = model.encode(src_tensor, src_key_padding_mask)
+    ys = torch.ones(1, 1).fill_(special_tokens["<bos>"]).type(torch.long).to(device)
 
-        bos_token_id = tgt_field.vocab.stoi[tgt_field.init_token]
-        tgt_tokens = [bos_token_id]
+    for _ in range(max_len - 1):
+        with torch.no_grad():
+            tgt_mask = torch.nn.Transformer.generate_square_subsequent_mask(
+                ys.size(0)
+            ).to(device)
+            tgt_padding_mask = (ys == special_tokens["<pad>"]).transpose(0, 1)
+            out = model.decode(
+                ys,
+                memory,
+                memory_key_padding_mask=src_padding_mask,
+                tgt_mask=tgt_mask,
+                tgt_key_padding_mask=tgt_padding_mask,
+            )
 
-        for _ in range(max_len):
-            tgt_tensor = torch.LongTensor(tgt_tokens).unsqueeze(0).to(model.device)
-            # The decoder's memory padding mask is the source padding mask.
-            logits = model.decode(tgt_tensor, memory, src_key_padding_mask)
-            # Greedily select the next token.
-            next_token_id = logits.argmax(dim=-1)[0, -1].item()
-            tgt_tokens.append(next_token_id)
+        prob = model.generator(out[-1, :, :])
+        next_word_idx = torch.argmax(prob, dim=1).item()
 
-            if next_token_id == tgt_field.vocab.stoi[tgt_field.eos_token]:
-                break
+        ys = torch.cat(
+            [ys, torch.ones(1, 1).type_as(src.data).fill_(next_word_idx)], dim=0
+        )
 
-    translation = " ".join(
-        [
-            tgt_field.vocab.itos[token]
-            for token in tgt_tokens
-            if token not in [bos_token_id, tgt_field.vocab.stoi[tgt_field.eos_token]]
-        ]
+        if next_word_idx == special_tokens["<eos>"]:
+            break
+
+    return ys.flatten()
+
+
+def topk_decode(model, src_sentence, device, max_len=50, k=5):
+    """
+    Decodes a source sentence using top-k sampling.
+    """
+    model.eval()
+    src = text_transform[src_language](src_sentence).to(device).unsqueeze(1)
+    src_padding_mask = (src == special_tokens["<pad>"]).transpose(0, 1)
+
+    with torch.no_grad():
+        memory = model.encode(src, src_padding_mask)
+
+    ys = torch.ones(1, 1).fill_(special_tokens["<bos>"]).type(torch.long).to(device)
+
+    for _ in range(max_len - 1):
+        with torch.no_grad():
+            tgt_mask = torch.nn.Transformer.generate_square_subsequent_mask(
+                ys.size(0)
+            ).to(device)
+            tgt_padding_mask = (ys == special_tokens["<pad>"]).transpose(0, 1)
+            out = model.decode(
+                ys,
+                memory,
+                memory_key_padding_mask=src_padding_mask,
+                tgt_mask=tgt_mask,
+                tgt_key_padding_mask=tgt_padding_mask,
+            )
+
+        prob = model.generator(out[-1, :, :])
+
+        # Get the top-k probabilities and indices
+        topk_probs, topk_indices = torch.topk(prob, k, dim=1)
+
+        # Sample one from the top-k indices
+        next_word_idx = topk_indices.gather(
+            1, torch.multinomial(topk_probs, num_samples=1)
+        ).item()
+
+        ys = torch.cat(
+            [ys, torch.ones(1, 1).type_as(src.data).fill_(next_word_idx)], dim=0
+        )
+
+        if next_word_idx == special_tokens["<eos>"]:
+            break
+
+    return ys.flatten()
+
+
+def translate(model, src_sentence, device, decode_fn=greedy_decode):
+    tgt_tokens = decode_fn(model, src_sentence, device).cpu().numpy()
+
+    def lookup_tokens(indices):
+        return [tgt_rev_vocab.get(i, "<unk>") for i in indices]
+
+    return (
+        " ".join(lookup_tokens(list(tgt_tokens)))
+        .replace("<bos>", "")
+        .replace("<eos>", "")
+        .strip()
     )
-    return translation
