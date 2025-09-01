@@ -24,9 +24,13 @@ num_decoder_layers = 3
 dropout = 0.1
 src_language = "en"
 tgt_language = "de"
-special_tokens = ["<unk>", "<pad>", "<bos>", "<eos>"]
-unk_token_id, pad_token_id, bos_token_id, eos_token_id = 0, 1, 2, 3
 
+special_tokens = {
+    "<unk>": 1,
+    "<pad>": 2,
+    "<bos>": 3,
+    "<eos>": 4,
+}
 
 try:
     spacy_en = spacy.load("en_core_web_sm")
@@ -71,7 +75,7 @@ def build_vocab(data_iter, language, min_freq=2, specials=None):
     idx_to_str = {idx: token for token, idx in str_to_idx.items()}
 
     def lookup_token(token):
-        return str_to_idx.get(token, unk_token_id)
+        return str_to_idx.get(token, special_tokens["<unk>"])
 
     return str_to_idx, idx_to_str, lookup_token
 
@@ -81,10 +85,10 @@ train_dataset, valid_dataset, test_dataset = datasets.load_dataset(
 )
 
 src_vocab, src_rev_vocab, src_lookup = build_vocab(
-    train_dataset, src_language, min_freq=2, specials=special_tokens
+    train_dataset, src_language, min_freq=2, specials=special_tokens.keys()
 )
 tgt_vocab, tgt_rev_vocab, tgt_lookup = build_vocab(
-    train_dataset, tgt_language, min_freq=2, specials=special_tokens
+    train_dataset, tgt_language, min_freq=2, specials=special_tokens.keys()
 )
 
 
@@ -100,9 +104,9 @@ def sequential_transforms(*transforms):
 def tensor_transform(token_ids):
     return torch.cat(
         (
-            torch.tensor([bos_token_id]),
+            torch.tensor([special_tokens["<bos>"]]),
             torch.tensor(token_ids),
-            torch.tensor([eos_token_id]),
+            torch.tensor([special_tokens["<eos>"]]),
         )
     )
 
@@ -128,10 +132,10 @@ def collate_fn(batch):
         tgt_batch.append(text_transform[tgt_language](item[tgt_language]))
 
     src_batch = nn.utils.rnn.pad_sequence(
-        src_batch, padding_value=pad_token_id, batch_first=False
+        src_batch, padding_value=special_tokens["<pad>"], batch_first=False
     )
     tgt_batch = nn.utils.rnn.pad_sequence(
-        tgt_batch, padding_value=pad_token_id, batch_first=False
+        tgt_batch, padding_value=special_tokens["<pad>"], batch_first=False
     )
 
     return src_batch.to(device), tgt_batch.to(device)
@@ -157,14 +161,14 @@ model = TransformerModel(
     dropout,
 ).to(device)
 
-loss_fn = torch.nn.CrossEntropyLoss(ignore_index=pad_token_id)
+loss_fn = torch.nn.CrossEntropyLoss(ignore_index=special_tokens["<pad>"])
 optimizer = optim.Adam(model.parameters(), lr=0.0005)
 
 for epoch in range(1, num_epochs + 1):
     train_loss = train(
-        model, optimizer, train_dataloader, loss_fn, pad_token_id, device
+        model, optimizer, train_dataloader, loss_fn, special_tokens["<pad>"], device
     )
-    valid_loss = evaluate(model, valid_dataloader, loss_fn, pad_token_id, device)
+    valid_loss = evaluate(model, valid_dataloader, loss_fn, special_tokens["<pad>"], device)
     print(
         f"Epoch: {epoch}, Train loss: {train_loss:.4f}, Validation loss: {valid_loss:.4f}"
     )
@@ -173,19 +177,19 @@ for epoch in range(1, num_epochs + 1):
 def greedy_decode(model, src_sentence, max_len=50):
     model.eval()
     src = text_transform[src_language](src_sentence).to(device).unsqueeze(1)
-    src_padding_mask = (src == pad_token_id).transpose(0, 1)
+    src_padding_mask = (src == special_tokens["<pad>"]).transpose(0, 1)
 
     with torch.no_grad():
         memory = model.encode(src, src_padding_mask)
 
-    ys = torch.ones(1, 1).fill_(bos_token_id).type(torch.long).to(device)
+    ys = torch.ones(1, 1).fill_(special_tokens["<bos>"]).type(torch.long).to(device)
 
     for _ in range(max_len - 1):
         with torch.no_grad():
             tgt_mask = nn.Transformer.generate_square_subsequent_mask(ys.size(0)).to(
                 device
             )
-            tgt_padding_mask = (ys == pad_token_id).transpose(0, 1)
+            tgt_padding_mask = (ys == special_tokens["<pad>"]).transpose(0, 1)
             out = model.decode(
                 ys,
                 memory,
@@ -201,7 +205,7 @@ def greedy_decode(model, src_sentence, max_len=50):
             [ys, torch.ones(1, 1).type_as(src.data).fill_(next_word_idx)], dim=0
         )
 
-        if next_word_idx == eos_token_id:
+        if next_word_idx == special_tokens["<eos>"]:
             break
 
     return ys.flatten()
@@ -213,19 +217,19 @@ def topk_decode(model, src_sentence, max_len=50, k=5):
     """
     model.eval()
     src = text_transform[src_language](src_sentence).to(device).unsqueeze(1)
-    src_padding_mask = (src == pad_token_id).transpose(0, 1)
+    src_padding_mask = (src == special_tokens["<pad>"]).transpose(0, 1)
 
     with torch.no_grad():
         memory = model.encode(src, src_padding_mask)
 
-    ys = torch.ones(1, 1).fill_(bos_token_id).type(torch.long).to(device)
+    ys = torch.ones(1, 1).fill_(special_tokens["<bos>"]).type(torch.long).to(device)
 
     for _ in range(max_len - 1):
         with torch.no_grad():
             tgt_mask = nn.Transformer.generate_square_subsequent_mask(ys.size(0)).to(
                 device
             )
-            tgt_padding_mask = (ys == pad_token_id).transpose(0, 1)
+            tgt_padding_mask = (ys == special_tokens["<pad>"]).transpose(0, 1)
             out = model.decode(
                 ys,
                 memory,
@@ -248,7 +252,7 @@ def topk_decode(model, src_sentence, max_len=50, k=5):
             [ys, torch.ones(1, 1).type_as(src.data).fill_(next_word_idx)], dim=0
         )
 
-        if next_word_idx == eos_token_id:
+        if next_word_idx == special_tokens["<eos>"]:
             break
 
     return ys.flatten()
