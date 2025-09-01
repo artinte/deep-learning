@@ -46,7 +46,7 @@ def build_vocab(data_iter, language, min_freq=2, specials=None):
         for token in tokens:
             counts[token] += 1
 
-    str_to_idx = {token: i for i, token in enumerate(specials)}
+    str_to_idx = {token: idx for token, idx in specials.items()}
     current_idx = len(specials)
 
     for token, count in sorted(counts.items(), key=lambda item: item[1], reverse=True):
@@ -67,10 +67,10 @@ train_dataset, valid_dataset, test_dataset = datasets.load_dataset(
 )
 
 src_vocab, src_rev_vocab, src_lookup = build_vocab(
-    train_dataset, src_language, min_freq=2, specials=special_tokens.keys()
+    train_dataset, src_language, min_freq=2, specials=special_tokens
 )
 tgt_vocab, tgt_rev_vocab, tgt_lookup = build_vocab(
-    train_dataset, tgt_language, min_freq=2, specials=special_tokens.keys()
+    train_dataset, tgt_language, min_freq=2, specials=special_tokens
 )
 
 
