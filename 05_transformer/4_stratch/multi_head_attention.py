@@ -1,73 +1,72 @@
 import torch
-import math
 
-
+# Custom Multi-Head Attention layer using F.scaled_dot_product_attention
 class MultiHeadAttention(torch.nn.Module):
-    def __init__(self, d_model, n_heads, dropout=0.1):
-        super(MultiHeadAttention, self).__init__()
-        assert d_model % n_heads == 0, "d_model must be divisible by n_heads"
-        # head dimension
-        self.d_k = d_model // n_heads
-        # head number
-        self.n_heads = n_heads
+    def __init__(
+        self, d_model: int, nhead: int, dropout: float = 0.1, batch_first: bool = True
+    ):
+        super().__init__()
+        self.d_model = d_model
+        self.nhead = nhead
+        self.head_dim = d_model // nhead
+        self.batch_first = batch_first
 
-        # Linear projections for Query, Key, and Value
-        self.q_linear = torch.nn.Linear(d_model, d_model)
-        self.k_linear = torch.nn.Linear(d_model, d_model)
-        self.v_linear = torch.nn.Linear(d_model, d_model)
+        # Linear layers for projecting query, key, and value
+        self.q_proj = torch.nn.Linear(d_model, d_model)
+        self.k_proj = torch.nn.Linear(d_model, d_model)
+        self.v_proj = torch.nn.Linear(d_model, d_model)
+        self.out_proj = torch.nn.Linear(d_model, d_model)
 
-        # Final linear layer after concatenating heads
-        self.out_linear = torch.nn.Linear(d_model, d_model)
-        self.dropout_rate = dropout
+        self.dropout_p = dropout
 
-    def forward(self, query, key, value, attn_mask=None, is_causal=False):
-        """
-        Args:
-            query, key, value (Tensor): Tensors of shape (batch_size, seq_len, d_model).
-            attn_mask (Tensor): A boolean mask of shape (batch_size, 1, 1, seq_len) or (batch_size, seq_len, seq_len)
-                                or (1, 1, seq_len, seq_len), where True indicates positions to be masked.
-            is_causal (bool): If True, a causal mask is automatically applied.
-        """
-        batch_size = query.size(0)
+    def forward(
+        self,
+        query: torch.Tensor,
+        key: torch.Tensor,
+        value: torch.Tensor,
+        attn_mask: torch.Tensor = None,
+        is_causal: bool = False,
+    ):
 
-        # Linear projections and reshaping for multi-head attention
-        # Shape: (batch_size, n_heads, seq_len, d_k)
-        query = (
-            self.q_linear(query)
-            .view(batch_size, -1, self.n_heads, self.d_k)
-            .transpose(1, 2)
-        )
-        key = (
-            self.k_linear(key)
-            .view(batch_size, -1, self.n_heads, self.d_k)
-            .transpose(1, 2)
-        )
-        value = (
-            self.v_linear(value)
-            .view(batch_size, -1, self.n_heads, self.d_k)
-            .transpose(1, 2)
-        )
+        # Project Q, K, V
+        q = self.q_proj(query)
+        k = self.k_proj(key)
+        v = self.v_proj(value)
 
-        # Call the highly optimized scaled_dot_product_attention function
-        # This single function replaces the manual implementation of scaling, softmax, and dropout
-        # The attn_mask parameter should be passed in a way that aligns with PyTorch's
-        # internal conventions for the function.
+        # Reshape for multi-head attention.
+        if self.batch_first:
+            q = q.view(-1, q.size(1), self.nhead, self.head_dim).transpose(1, 2)
+            k = k.view(-1, k.size(1), self.nhead, self.head_dim).transpose(1, 2)
+            v = v.view(-1, v.size(1), self.nhead, self.head_dim).transpose(1, 2)
+        else:
+            q = q.view(q.size(0), -1, self.nhead, self.head_dim).transpose(1, 2)
+            k = k.view(k.size(0), -1, self.nhead, self.head_dim).transpose(1, 2)
+            v = v.view(v.size(0), -1, self.nhead, self.head_dim).transpose(1, 2)
+
+        # Pass the masks to scaled_dot_product_attention.
+        # F.scaled_dot_product_attention automatically handles key_padding_mask.
         attn_output = torch.nn.functional.scaled_dot_product_attention(
-            query,
-            key,
-            value,
+            q,
+            k,
+            v,
             attn_mask=attn_mask,
-            dropout_p=self.dropout_rate if self.training else 0.0,
+            dropout_p=self.dropout_p if self.training else 0.0,
             is_causal=is_causal,
         )
 
-        # Reshape and pass through final linear layer
-        # Shape: (batch_size, seq_len, d_model)
-        attn_output = (
-            attn_output.transpose(1, 2)
-            .contiguous()
-            .view(batch_size, -1, self.n_heads * self.d_k)
-        )
-        output = self.out_linear(attn_output)
+        # Reshape back to the original d_model dimension
+        if self.batch_first:
+            attn_output = (
+                attn_output.transpose(1, 2)
+                .contiguous()
+                .view(-1, query.size(1), self.d_model)
+            )
+        else:
+            attn_output = (
+                attn_output.transpose(1, 2)
+                .contiguous()
+                .view(query.size(0), -1, self.d_model)
+            )
 
-        return output
+        output = self.out_proj(attn_output)
+        return output, None

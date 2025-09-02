@@ -1,6 +1,8 @@
 import torch
 from torchmetrics.text.bleu import BLEUScore
-from transformer_model import TransformerModel
+from transformer_sdpa_model import TransformerSdpaModel
+from custom_decoder import CustomDecoder, CustomDecoderLayer
+from custom_encoder import CustomEncoder, CustomEncoderLayer
 from train import train
 from evaluate import evaluate
 from inference import translate, greedy_decode
@@ -11,7 +13,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
 
-num_epochs = 40
+num_epochs = 20
 batch_size = 128
 d_model = 256
 nhead = 8
@@ -25,15 +27,45 @@ train_dataloader, valid_dataloader, test_dataset = preprocess(
     batch_size, device, batch_first
 )
 
-model = TransformerModel(
-    num_encoder_layers,
-    num_decoder_layers,
+# custom_encoder = torch.nn.TransformerEncoder(
+#     torch.nn.TransformerEncoderLayer(
+custom_encoder = CustomEncoder(
+    CustomEncoderLayer(
+        d_model=d_model,
+        nhead=nhead,
+        dim_feedforward=dim_feedforward,
+        dropout=dropout,
+        activation="relu",
+        batch_first=batch_first,
+    ),
+    num_layers=num_encoder_layers,
+)
+
+# custom_decoder = torch.nn.TransformerDecoder(
+#     torch.nn.TransformerDecoderLayer(
+custom_decoder = CustomDecoder(
+    CustomDecoderLayer(
+        d_model=d_model,
+        nhead=nhead,
+        dim_feedforward=dim_feedforward,
+        dropout=dropout,
+        activation="relu",
+        batch_first=batch_first,
+    ),
+    num_layers=num_decoder_layers,
+)
+
+model = TransformerSdpaModel(
     d_model,
     nhead,
-    len(src_vocab),
-    len(tgt_vocab),
+    num_encoder_layers,
+    num_decoder_layers,
     dim_feedforward,
     dropout,
+    custom_encoder,
+    custom_decoder,
+    len(src_vocab),
+    len(tgt_vocab),
     batch_first=batch_first,
 ).to(device)
 
@@ -46,7 +78,6 @@ for epoch in range(1, num_epochs + 1):
     print(
         f"Epoch: {epoch}, Train loss: {train_loss:.4f}, Validation loss: {valid_loss:.4f}"
     )
-
 
 print("Testing Translation on First 32 Samples")
 for i in range(32):
