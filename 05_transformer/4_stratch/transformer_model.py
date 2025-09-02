@@ -13,6 +13,7 @@ class TransformerModel(torch.nn.Module):
         tgt_vocab_size,
         dim_feedforward,
         dropout,
+        batch_first,
     ):
         super(TransformerModel, self).__init__()
         self.transformer = torch.nn.Transformer(
@@ -22,14 +23,14 @@ class TransformerModel(torch.nn.Module):
             num_decoder_layers=num_decoder_layers,
             dim_feedforward=dim_feedforward,
             dropout=dropout,
-            batch_first=False,
+            batch_first=batch_first,
         )
         self.d_model = d_model
         self.generator = torch.nn.Linear(d_model, tgt_vocab_size)
         self.src_tok_emb = torch.nn.Embedding(src_vocab_size, d_model)
         self.tgt_tok_emb = torch.nn.Embedding(tgt_vocab_size, d_model)
         self.positional_encoding = PositionalEncoding(
-            d_model, dropout, batch_first=False
+            d_model, dropout, batch_first=batch_first
         )
 
     def forward(self, src, tgt, src_mask, tgt_mask, src_padding_mask, tgt_padding_mask):

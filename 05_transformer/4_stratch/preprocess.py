@@ -107,24 +107,24 @@ text_transform = {
 }
 
 
-def collate_fn(batch, device):
+def collate_fn(batch, device, batch_first):
     src_batch, tgt_batch = [], []
     for item in batch:
         src_batch.append(text_transform[src_language](item[src_language]))
         tgt_batch.append(text_transform[tgt_language](item[tgt_language]))
 
     src_batch = torch.nn.utils.rnn.pad_sequence(
-        src_batch, padding_value=special_tokens["<pad>"], batch_first=False
+        src_batch, padding_value=special_tokens["<pad>"], batch_first=batch_first
     )
     tgt_batch = torch.nn.utils.rnn.pad_sequence(
-        tgt_batch, padding_value=special_tokens["<pad>"], batch_first=False
+        tgt_batch, padding_value=special_tokens["<pad>"], batch_first=batch_first
     )
 
     return src_batch.to(device), tgt_batch.to(device)
 
 
-def preprocess(batch_size, device):
-    collate = partial(collate_fn, device=device)
+def preprocess(batch_size, device, batch_first=False):
+    collate = partial(collate_fn, device=device, batch_first=batch_first)
     train_dataloader = torch.utils.data.DataLoader(
         train_dataset, batch_size=batch_size, collate_fn=collate
     )

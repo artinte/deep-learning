@@ -3,15 +3,19 @@ from utils import create_mask
 from preprocess import special_tokens
 
 
-def train(model, optimizer, dataloader, loss_fn, device):
+def train(model, optimizer, dataloader, loss_fn, device, batch_first):
     model.train()
     losses = 0
     for src, tgt in dataloader:
-
-        tgt_input = tgt[:-1, :]
+        if batch_first:
+            tgt_input = tgt[:, :-1]
+            tgt_out = tgt[:, 1:]
+        else:
+            tgt_input = tgt[:-1, :]
+            tgt_out = tgt[1:, :]
 
         src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(
-            src, tgt_input, special_tokens["<pad>"], device
+            src, tgt_input, special_tokens["<pad>"], device, batch_first
         )
 
         logits = model(
@@ -24,7 +28,7 @@ def train(model, optimizer, dataloader, loss_fn, device):
         )
 
         optimizer.zero_grad()
-        tgt_out = tgt[1:, :]
+        
         loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
         loss.backward()
         # Add the gradient clipping for stable training
