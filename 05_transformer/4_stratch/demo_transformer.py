@@ -19,8 +19,9 @@ dim_feedforward = 512
 num_encoder_layers = 3
 num_decoder_layers = 3
 dropout = 0.1
+batch_first = False
 
-train_dataloader, valid_dataloader, test_dataset = preprocess(batch_size, device)
+train_dataloader, valid_dataloader, test_dataset = preprocess(batch_size, device, batch_first)
 
 
 model = TransformerModel(
@@ -32,14 +33,15 @@ model = TransformerModel(
     len(tgt_vocab),
     dim_feedforward,
     dropout,
+    batch_first=True,
 ).to(device)
 
 loss_fn = torch.nn.CrossEntropyLoss(ignore_index=special_tokens["<pad>"])
 optimizer = torch.optim.Adam(model.parameters(), lr=0.0005)
 
 for epoch in range(1, num_epochs + 1):
-    train_loss = train(model, optimizer, train_dataloader, loss_fn, device)
-    valid_loss = evaluate(model, valid_dataloader, loss_fn, device)
+    train_loss = train(model, optimizer, train_dataloader, loss_fn, device, batch_first)
+    valid_loss = evaluate(model, valid_dataloader, loss_fn, device, batch_first)
     print(
         f"Epoch: {epoch}, Train loss: {train_loss:.4f}, Validation loss: {valid_loss:.4f}"
     )
@@ -50,7 +52,7 @@ for i in range(32):
     en_sentence = test_dataset[i]["en"]
     de_reference = test_dataset[i]["de"]
 
-    translated = translate(model, en_sentence, device)
+    translated = translate(model, en_sentence, device, batch_first)
     print("-" * 50)
     print(f"Source: {en_sentence}")
     print(f"Prediction: {translated}")
@@ -65,7 +67,7 @@ for sample in test_dataset.take(100):
     en_sentence = sample["en"]
     de_reference = sample["de"]
 
-    translated = translate(model, en_sentence, device)
+    translated = translate(model, en_sentence, device, batch_first)
 
     all_predictions.append(translated)
     all_references.append([de_reference.lower()])
