@@ -1,5 +1,4 @@
 from typing import Optional
-from torch.nn.init import xavier_uniform_
 import torch
 
 class MultiheadAttention(torch.nn.Module):
@@ -64,11 +63,11 @@ class MultiheadAttention(torch.nn.Module):
 
     def _reset_parameters(self) -> None:
         if self._qkv_same_embed_dim:
-            xavier_uniform_(self.in_proj_weight)
+            torch.nn.init.xavier_uniform_(self.in_proj_weight)
         else:
-            xavier_uniform_(self.q_proj_weight)
-            xavier_uniform_(self.k_proj_weight)
-            xavier_uniform_(self.v_proj_weight)
+            torch.nn.init.xavier_uniform_(self.q_proj_weight)
+            torch.nn.init.xavier_uniform_(self.k_proj_weight)
+            torch.nn.init.xavier_uniform_(self.v_proj_weight)
 
     def forward(
         self,
