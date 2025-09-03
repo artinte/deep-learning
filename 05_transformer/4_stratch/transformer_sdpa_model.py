@@ -37,7 +37,8 @@ class TransformerSdpaModel(torch.nn.Module):
             d_model, dropout, batch_first=batch_first
         )
 
-    def forward(self, src, tgt, src_mask, tgt_mask, src_padding_mask, tgt_padding_mask):
+    def forward(self, src, tgt, src_mask, tgt_mask, src_key_padding_mask, tgt_key_padding_mask,
+                src_is_causal=False, tgt_is_causal=True):
         src_emb = self.positional_encoding(self.src_tok_emb(src))
         tgt_emb = self.positional_encoding(self.tgt_tok_emb(tgt))
         outs = self.transformer(
@@ -45,8 +46,10 @@ class TransformerSdpaModel(torch.nn.Module):
             tgt_emb,
             src_mask,
             tgt_mask,
-            src_key_padding_mask=src_padding_mask,
-            tgt_key_padding_mask=tgt_padding_mask,
+            src_key_padding_mask=src_key_padding_mask,
+            tgt_key_padding_mask=tgt_key_padding_mask,
+            src_is_causal=src_is_causal,
+            tgt_is_causal=tgt_is_causal,
         )
         return self.generator(outs)
 

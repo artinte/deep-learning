@@ -41,10 +41,10 @@ custom_encoder = CustomEncoder(
     num_layers=num_encoder_layers,
 )
 
-custom_decoder = torch.nn.TransformerDecoder(
-    torch.nn.TransformerDecoderLayer(
-# custom_decoder = CustomDecoder(
-#     CustomDecoderLayer(
+# custom_decoder = torch.nn.TransformerDecoder(
+#     torch.nn.TransformerDecoderLayer(
+custom_decoder = CustomDecoder(
+    CustomDecoderLayer(
         d_model=d_model,
         nhead=nhead,
         dim_feedforward=dim_feedforward,
@@ -79,7 +79,7 @@ for epoch in range(1, num_epochs + 1):
         f"Epoch: {epoch}, Train loss: {train_loss:.4f}, Validation loss: {valid_loss:.4f}"
     )
 
-print("Testing Translation on First 32 Samples")
+print("\nTesting Translation on First 32 Samples")
 for i in range(32):
     en_sentence = test_dataset[i]["en"]
     de_reference = test_dataset[i]["de"]

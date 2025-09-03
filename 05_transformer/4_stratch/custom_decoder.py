@@ -15,9 +15,11 @@ class CustomDecoderLayer(torch.nn.Module):
     ):
         super().__init__()
         self.self_attn = torch.nn.MultiheadAttention(
+        # self.self_attn = MultiHeadAttention(
             d_model, nhead, dropout=dropout, batch_first=batch_first
         )
         self.cross_attn = torch.nn.MultiheadAttention(
+        # self.cross_attn = MultiHeadAttention(
             d_model, nhead, dropout=dropout, batch_first=batch_first
         )
 
@@ -45,6 +47,8 @@ class CustomDecoderLayer(torch.nn.Module):
         memory_mask=None,
         tgt_key_padding_mask=None,
         memory_key_padding_mask=None,
+        tgt_is_causal=True,
+        memory_is_casual=False,
     ):
         # Self-attention block with is_causal=True
         x = tgt
@@ -54,7 +58,8 @@ class CustomDecoderLayer(torch.nn.Module):
                 x,
                 x,
                 attn_mask=tgt_mask,
-                is_causal=True,
+                key_padding_mask=tgt_key_padding_mask,
+                is_causal=tgt_is_causal,
             )[0]
         )
         x = self.norm1(x)
@@ -66,7 +71,8 @@ class CustomDecoderLayer(torch.nn.Module):
                 memory,
                 memory,
                 attn_mask=memory_mask,
-                is_causal=False,
+                key_padding_mask=memory_key_padding_mask,
+                is_causal=memory_is_casual,
             )[0]
         )
         x = self.norm2(x)
@@ -94,7 +100,7 @@ class CustomDecoder(torch.nn.Module):
         memory_mask=None,
         tgt_key_padding_mask=None,
         memory_key_padding_mask=None,
-        tgt_is_causal=False,
+        tgt_is_causal=True,
         memory_is_causal=False,
     ):
         output = tgt
@@ -106,5 +112,7 @@ class CustomDecoder(torch.nn.Module):
                 memory_mask=memory_mask,
                 tgt_key_padding_mask=tgt_key_padding_mask,
                 memory_key_padding_mask=memory_key_padding_mask,
+                tgt_is_causal=tgt_is_causal,
+                memory_is_casual=memory_is_causal,
             )
         return output

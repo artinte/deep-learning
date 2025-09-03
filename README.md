@@ -58,7 +58,7 @@ These four methods are progressive in hierarchy and serve as excellent learning 
 
 `demo_sdpa.py` implements the same functionality as `demo_transformer.py` , but it rewrites the `torch.nn.Transformer` features—including the core modules like the encoder, decoder, and multi-head attention—using PyTorch's native APIs, such as [torch.nn.functional.scaled_dot_product_attention](https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html) .
 
-`demo_stratch.py` 
+`demo_scratch.py` further decompose the Transformer structure by implementing key components like residual networks and layer normalization to achieve a thorough mastery of the architecture.
 
 - [x] 5.5 [nanoGPT](https://artinte.github.io/deep-learning/nano_gpt.html)
 - [x] 5.6 [BERT](https://artinte.github.io/deep-learning/bert.html)
