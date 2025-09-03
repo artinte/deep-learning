@@ -14,10 +14,10 @@ class CustomDecoderLayer(torch.nn.Module):
         batch_first=True,
     ):
         super().__init__()
-        self.self_attn = MultiHeadAttention(
+        self.self_attn = torch.nn.MultiheadAttention(
             d_model, nhead, dropout=dropout, batch_first=batch_first
         )
-        self.cross_attn = MultiHeadAttention(
+        self.cross_attn = torch.nn.MultiheadAttention(
             d_model, nhead, dropout=dropout, batch_first=batch_first
         )
 

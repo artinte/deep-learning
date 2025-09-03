@@ -14,7 +14,7 @@ class CustomEncoderLayer(torch.nn.Module):
         batch_first=True,
     ):
         super().__init__()
-        self.self_attn = MultiHeadAttention(
+        self.self_attn = torch.nn.MultiheadAttention(
             d_model, nhead, dropout=dropout, batch_first=batch_first
         )
 
@@ -32,7 +32,7 @@ class CustomEncoderLayer(torch.nn.Module):
         elif activation == "gelu":
             self.activation = torch.nn.functional.gelu
 
-    def forward(self, src, src_mask=None, src_key_padding_mask=None):
+    def forward(self, src, src_mask=None, src_key_padding_mask=None, is_causal=False):
         # Self-attention block with is_causal=False
         x = src
         x = x + self.dropout1(
@@ -40,8 +40,9 @@ class CustomEncoderLayer(torch.nn.Module):
                 x,
                 x,
                 x,
+                key_padding_mask=src_key_padding_mask,
                 attn_mask=src_mask,
-                is_causal=False,
+                is_causal=is_causal,
             )[0]
         )
         x = self.norm1(x)
@@ -65,6 +66,9 @@ class CustomEncoder(torch.nn.Module):
         output = src
         for layer in self.layers:
             output = layer(
-                output, src_mask=mask, src_key_padding_mask=src_key_padding_mask
+                output,
+                src_mask=mask,
+                src_key_padding_mask=src_key_padding_mask,
+                is_causal=is_causal,
             )
         return output

@@ -41,10 +41,10 @@ custom_encoder = CustomEncoder(
     num_layers=num_encoder_layers,
 )
 
-# custom_decoder = torch.nn.TransformerDecoder(
-#     torch.nn.TransformerDecoderLayer(
-custom_decoder = CustomDecoder(
-    CustomDecoderLayer(
+custom_decoder = torch.nn.TransformerDecoder(
+    torch.nn.TransformerDecoderLayer(
+# custom_decoder = CustomDecoder(
+#     CustomDecoderLayer(
         d_model=d_model,
         nhead=nhead,
         dim_feedforward=dim_feedforward,
