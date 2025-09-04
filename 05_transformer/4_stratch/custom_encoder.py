@@ -1,6 +1,6 @@
 import torch
 from multihead_attention import MultiheadAttention
-
+from multihead_attention_scratch import MultiheadAttentionScratch
 
 # Custom Transformer Encoder Layer using the new attention mechanism
 class CustomEncoderLayer(torch.nn.Module):
@@ -16,6 +16,7 @@ class CustomEncoderLayer(torch.nn.Module):
         super().__init__()
         # self.self_attn = torch.nn.MultiheadAttention(
         self.self_attn = MultiheadAttention(
+        # self.self_attn = MultiheadAttentionScratch(
             d_model, nhead, dropout=dropout, batch_first=batch_first
         )
 

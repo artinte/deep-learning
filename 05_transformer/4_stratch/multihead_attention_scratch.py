@@ -40,6 +40,19 @@ def scaled_dot_product_attention(
 
 
 class MultiheadAttentionScratch(torch.nn.Module):
+    """
+    A scratch implementation of the Multi-Head Attention mechanism.
+
+    This module performs the following steps:
+    1. Projects the input tensors (query, key, value) into different subspaces.
+    2. Splits these projections into multiple 'heads'.
+    3. Computes and combines attention and padding masks.
+    4. For each head, it computes scaled dot-product attention using the
+       optimized torch.nn.functional.scaled_dot_product_attention.
+    5. Concatenates the outputs from all heads.
+    6. Applies a final linear projection to get the final output.
+    """
+
     def __init__(self, d_model, num_heads, dropout=0.0, batch_first=False):
         super(MultiheadAttentionScratch, self).__init__()
         self.d_model = d_model
@@ -59,16 +72,16 @@ class MultiheadAttentionScratch(torch.nn.Module):
         self, query, key, value, key_padding_mask=None, attn_mask=None, is_causal=False
     ):
         if self.batch_first:
-            batch_size, seq_len, d_model = query.size()
+            batch_size, seq_len, _ = query.size()
         else:
-            seq_len, batch_size, d_model = query.size()
+            seq_len, batch_size, _ = query.size()
 
         q_proj = self.q_proj(query)
         k_proj = self.k_proj(key)
         v_proj = self.v_proj(value)
 
         if self.batch_first:
-            # (batch_size, seq_len, d_model) -> (batch_size, seq_len, num_heads, head_dim)
+            # (batch_size, seq_len, d_model) -> (batch_size, num_heads, seq_len, head_dim)
             q_proj = q_proj.view(
                 batch_size, -1, self.num_heads, self.head_dim
             ).transpose(1, 2)
@@ -80,28 +93,34 @@ class MultiheadAttentionScratch(torch.nn.Module):
             ).transpose(1, 2)
         else:
             # (batch_size, num_heads, seq_len, head_dim)
-            q_proj = q_proj.view(
-                seq_len, batch_size, self.num_heads, self.head_dim
-            ).transpose(1, 2)
-            k_proj = k_proj.view(
-                seq_len, batch_size, self.num_heads, self.head_dim
-            ).transpose(1, 2)
-            v_proj = v_proj.view(
-                seq_len, batch_size, self.num_heads, self.head_dim
-            ).transpose(1, 2)
-            
+            q_proj = (
+                q_proj.transpose(0, 1)
+                .view(batch_size, -1, self.num_heads, self.head_dim)
+                .transpose(1, 2)
+            )
+            k_proj = (
+                k_proj.transpose(0, 1)
+                .view(batch_size, -1, self.num_heads, self.head_dim)
+                .transpose(1, 2)
+            )
+            v_proj = (
+                v_proj.transpose(0, 1)
+                .view(batch_size, -1, self.num_heads, self.head_dim)
+                .transpose(1, 2)
+            )
+
         if key_padding_mask is not None:
             if attn_mask is None:
                 attn_mask = key_padding_mask.unsqueeze(1).unsqueeze(2)
             else:
-                attn_mask = attn_mask.logical_or(key_padding_mask.unsqueeze(1).unsqueeze(1))
+                attn_mask = attn_mask.logical_or(
+                    key_padding_mask.unsqueeze(1).unsqueeze(1)
+                )
 
         context = torch.nn.functional.scaled_dot_product_attention(
             q_proj,
             k_proj,
             v_proj,
-            attn_mask=attn_mask,
-            dropout_p=self.dropout,
             attn_mask=attn_mask,
             dropout_p=self.dropout if self.training else 0.0,
             is_causal=is_causal,
@@ -115,4 +134,4 @@ class MultiheadAttentionScratch(torch.nn.Module):
         else:
             output = output.view(batch_size, seq_len, self.d_model).transpose(0, 1)
 
-        return self.out_proj(output)
+        return self.dropout_layer(self.out_proj(output))
