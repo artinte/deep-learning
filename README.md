@@ -48,9 +48,15 @@ These four methods are progressive in hierarchy and serve as excellent learning 
 
 ### 05 Transformer
 
-- [x] 5.1 [Attention Mechanism](https://artinte.github.io/deep-learning/attention_mechanism.html)
-- [x] 5.2 [Attention Is All You Need](https://artinte.github.io/deep-learning/transformer_paper.html)
-- [x] 5.3 [nn.Transformer](https://artinte.github.io/deep-learning/nn_transformer.html)
+5.1 [Attention Mechanism](https://artinte.github.io/deep-learning/attention_mechanism.html)
+
+5.2 [Attention Is All You Need](https://artinte.github.io/deep-learning/transformer_paper.html)
+
+`demo_transformers.py`
+
+5.3 [nn.Transformer](https://artinte.github.io/deep-learning/nn_transformer.html)
+
+`project_en_de_translate.py`
 
 5.4 [Transformer from Stratch](https://artinte.github.io/deep-learning/transformer_stratch.html)
 
@@ -60,9 +66,11 @@ These four methods are progressive in hierarchy and serve as excellent learning 
 
 `demo_scratch.py` further decompose the Transformer structure by implementing key components like residual networks and layer normalization to achieve a thorough mastery of the architecture.
 
-- [x] 5.5 [nanoGPT](https://artinte.github.io/deep-learning/nano_gpt.html)
-- [x] 5.6 [BERT](https://artinte.github.io/deep-learning/bert.html)
-- [x] 5.7 [Vision Transformer](https://artinte.github.io/deep-learning/vision_transformer.html)
+5.5 [nanoGPT](https://artinte.github.io/deep-learning/nano_gpt.html)
+
+5.6 [BERT](https://artinte.github.io/deep-learning/bert.html)
+
+5.7 [Vision Transformer](https://artinte.github.io/deep-learning/vision_transformer.html)
 
 ### 06 Diffusion Model
 
@@ -80,6 +88,7 @@ These four methods are progressive in hierarchy and serve as excellent learning 
 - [x] 7.2 [Easy OCR](https://artinte.github.io/deep-learning/easy_ocr.html)
 - [x] 7.3 [Language Modeling](https://artinte.github.io/deep-learning/language_model.html)
 - [x] 7.4 [Chatbots](https://artinte.github.io/deep-learning/chatbots.html)
+- [x] 7.5 [MIDI Prediction]()
 
 ### 08 Audio
 
