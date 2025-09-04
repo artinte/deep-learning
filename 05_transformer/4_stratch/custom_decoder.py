@@ -1,5 +1,5 @@
 import torch
-from multi_head_attention import MultiheadAttention
+from multihead_attention import MultiheadAttention
 
 
 # Custom Transformer Decoder Layer using the new attention mechanism

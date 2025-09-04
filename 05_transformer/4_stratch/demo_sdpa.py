@@ -21,7 +21,7 @@ dim_feedforward = 512
 num_encoder_layers = 3
 num_decoder_layers = 3
 dropout = 0.1
-batch_first = True
+batch_first = False
 
 train_dataloader, valid_dataloader, test_dataset = preprocess(
     batch_size, device, batch_first
