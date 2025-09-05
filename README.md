@@ -50,6 +50,8 @@ These four methods are progressive in hierarchy and serve as excellent learning 
 
 5.1 [Attention Mechanism](https://artinte.github.io/deep-learning/attention_mechanism.html)
 
+`demo_scale_dot_product_attention.py`
+
 5.2 [Attention Is All You Need](https://artinte.github.io/deep-learning/transformer_paper.html)
 
 `demo_transformers.py`
@@ -84,11 +86,17 @@ These four methods are progressive in hierarchy and serve as excellent learning 
 
 ### 07 Text
 
-- [x] 7.1 [Translate with Transformer](https://artinte.github.io/deep-learning/trans_transformer.html)
-- [x] 7.2 [Easy OCR](https://artinte.github.io/deep-learning/easy_ocr.html)
-- [x] 7.3 [Language Modeling](https://artinte.github.io/deep-learning/language_model.html)
-- [x] 7.4 [Chatbots](https://artinte.github.io/deep-learning/chatbots.html)
-- [x] 7.5 [MIDI Prediction]()
+7.1 [Translate with Transformer](https://artinte.github.io/deep-learning/trans_transformer.html)
+
+7.2 [Easy OCR](https://artinte.github.io/deep-learning/easy_ocr.html)
+
+7.3 [Language Modeling](https://artinte.github.io/deep-learning/language_model.html)
+
+7.4 [Chatbots](https://artinte.github.io/deep-learning/chatbots.html)
+
+7.5 [MIDI Prediction]()
+
+`project_midi_prediction.py`
 
 ### 08 Audio
 
