@@ -39,12 +39,17 @@ These four methods are progressive in hierarchy and serve as excellent learning 
 
 ### 04 Recurrent Network
 
-- [x] 4.1 [RNN from Scratch](https://artinte.github.io/deep-learning/rnn_classify_scratch.html)
-- [x] 4.2 [Text Preprocessing](https://artinte.github.io/deep-learning/word_embed.html)
-- [x] 4.3 [Word2Vec](https://artinte.github.io/deep-learning/word2vec.html)
-- [x] 4.4 [Text Generation with RNN](https://artinte.github.io/deep-learning/text_generate_rnn.html)
-- [x] 4.5 [Neural Machine Translation](https://artinte.github.io/deep-learning/nmt_align.html)
-- [x] 4.6 [Attention-based NMT](https://artinte.github.io/deep-learning/attention_nmt.html)
+4.1 [RNN from Scratch](https://artinte.github.io/deep-learning/rnn_classify_scratch.html)
+
+4.2 [Text Preprocessing](https://artinte.github.io/deep-learning/word_embed.html)
+
+4.3 [Word2Vec](https://artinte.github.io/deep-learning/word2vec.html)
+
+4.4 [Text Generation with RNN](https://artinte.github.io/deep-learning/text_generate_rnn.html)
+
+4.5 [Neural Machine Translation](https://artinte.github.io/deep-learning/nmt_align.html)
+
+4.6 [Attention-based NMT](https://artinte.github.io/deep-learning/attention_nmt.html)
 
 ### 05 Transformer
 
@@ -76,27 +81,39 @@ These four methods are progressive in hierarchy and serve as excellent learning 
 
 ### 06 Diffusion Model
 
-- [x] 6.1 [Probability Theory](https://artinte.github.io/deep-learning/prob_theory.html)
-- [x] 6.2 [Gaussian Processes](https://artinte.github.io/deep-learning/gaussian_process.html)
-- [x] 6.3 [Mathematical Foundation](https://artinte.github.io/deep-learning/diffusion_math.html)
-- [x] 6.4 [Diffusion from Scratch](https://artinte.github.io/deep-learning/diffusion_scratch.html)
-- [x] 6.5 [Estimating Gradients](https://artinte.github.io/deep-learning/estimate_gradients.html)
-- [x] 6.6 [Diffusion Probability Model](https://artinte.github.io/deep-learning/dd_prob_model.html)
-- [x] 6.7 [Latent Diffusion](https://artinte.github.io/deep-learning/latent_diffusion.html)
+6.1 [Probability Theory](https://artinte.github.io/deep-learning/prob_theory.html)
+
+6.2 [Gaussian Processes](https://artinte.github.io/deep-learning/gaussian_process.html)
+
+6.3 [Mathematical Foundation](https://artinte.github.io/deep-learning/diffusion_math.html)
+
+6.4 [Diffusion from Scratch](https://artinte.github.io/deep-learning/diffusion_scratch.html)
+
+6.5 [Estimating Gradients](https://artinte.github.io/deep-learning/estimate_gradients.html)
+
+6.6 [Diffusion Probability Model](https://artinte.github.io/deep-learning/dd_prob_model.html)
+
+6.7 [Latent Diffusion](https://artinte.github.io/deep-learning/latent_diffusion.html)
 
 ### 07 Text
 
-7.1 [Translate with Transformer](https://artinte.github.io/deep-learning/trans_transformer.html)
+7.1 [MIDI Prediction](https://artinte.github.io/deep-learning/trans_transformer.html)
+
+`project_midi_prediction.py` uses a Transformer Decoder to predict MIDI music. It preprocesses MIDI into event sequences, trains the model on these sequences, and generates complete MIDI files autoregressively via greedy search.
 
 7.2 [Easy OCR](https://artinte.github.io/deep-learning/easy_ocr.html)
 
+`project_auto_deal.py` take screenshots of the phone screen using Android ADB, and perform text recognition with the EasyOCR library.
+
 7.3 [Language Modeling](https://artinte.github.io/deep-learning/language_model.html)
+
+`project_gamma_finetune.py`
 
 7.4 [Chatbots](https://artinte.github.io/deep-learning/chatbots.html)
 
-7.5 [MIDI Prediction]()
+`project_chatbots.py`
 
-`project_midi_prediction.py`
+
 
 ### 08 Audio
 
