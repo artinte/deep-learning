@@ -59,6 +59,8 @@ These four methods are progressive in hierarchy and serve as excellent learning 
 
 5.2 [Attention Is All You Need](https://artinte.github.io/deep-learning/transformer_paper.html)
 
+The original paper [Attention Is All You Need](https://arxiv.org/abs/1706.03762), and some code snippets to help understand the paper's content. The Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.
+
 `demo_transformers.py`
 
 5.3 [nn.Transformer](https://artinte.github.io/deep-learning/nn_transformer.html)
@@ -76,6 +78,8 @@ These four methods are progressive in hierarchy and serve as excellent learning 
 5.5 [nanoGPT](https://artinte.github.io/deep-learning/nano_gpt.html)
 
 5.6 [BERT](https://artinte.github.io/deep-learning/bert.html)
+
+The `project_bert.py` code references the [google-research/bert](https://github.com/google-research/bert) project, but is implemented using PyTorch. BERT, which stands for Bidirectional Encoder Representations from Transformers, is designed to pre-train deep bidirectional representations from unlabeled text by jointly conditioning on both left and right context in all layers.
 
 5.7 [Vision Transformer](https://artinte.github.io/deep-learning/vision_transformer.html)
 
