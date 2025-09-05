@@ -1,88 +1,77 @@
-import time
 import torch
-from torchmetrics.text import BLEUScore
-from preprocess import preprocess
-from tokenizer import get_tokenizer
+from torchmetrics.text.bleu import BLEUScore
+from transformer_model import TransformerModel
 from train import train
 from evaluate import evaluate
-from inference import greedy_translate
-from transformer_model import TransformerModel
-from custom_optimizer import CustomOptimizer
+from inference import translate, greedy_decode
+from preprocess import special_tokens, preprocess, src_vocab, tgt_vocab, train_dataset
 
-torch.set_printoptions(profile="full")
+torch.manual_seed(0)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
-tokenizer = get_tokenizer()
 
-train_dataloader, valid_dataloader, _, data_test = preprocess(tokenizer, device)
+num_epochs = 20
+batch_size = 128
+d_model = 256
+nhead = 8
+dim_feedforward = 512
+num_encoder_layers = 3
+num_decoder_layers = 3
+dropout = 0.1
+batch_first = True
 
-# Smaller model parameters are less likely to cause overfitting.
-src_vocab_size = len(tokenizer)
-tgt_vocab_size = len(tokenizer)
-d_model = 512
-n_head = 8
-num_encoder_layers = 6
-num_decoder_layers = 6
-dim_feedforward = 2048
-dropout = 0.2
-num_epochs = 30
-
-model = TransformerModel(
-    src_vocab_size,
-    tgt_vocab_size,
-    d_model,
-    n_head,
-    num_encoder_layers,
-    num_decoder_layers,
-    dim_feedforward,
-    dropout,
-    device,
-).to(device)
-
-criterion = torch.nn.CrossEntropyLoss(
-    ignore_index=tokenizer.pad_token_id, label_smoothing=0.1
+train_dataloader, valid_dataloader, test_dataset = preprocess(
+    batch_size, device, batch_first
 )
 
-base_optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, betas=(0.9, 0.98), eps=1e-9)
-warnup_steps = 4000
-optimizer = CustomOptimizer(base_optimizer, d_model, warnup_steps)
+model = TransformerModel(
+    num_encoder_layers,
+    num_decoder_layers,
+    d_model,
+    nhead,
+    len(src_vocab),
+    len(tgt_vocab),
+    dim_feedforward,
+    dropout,
+    batch_first=batch_first,
+).to(device)
 
-print("Starting model training...")
-for epoch in range(num_epochs):
-    start_time = time.time()
-    train_loss = train(model, train_dataloader, optimizer, criterion)
-    valid_loss = evaluate(model, valid_dataloader, criterion)
-    end_time = time.time()
-    epoch_mins = int((end_time - start_time) / 60)
-    epoch_secs = int((end_time - start_time) % 60)
+loss_fn = torch.nn.CrossEntropyLoss(ignore_index=special_tokens["<pad>"])
+optimizer = torch.optim.Adam(model.parameters(), lr=0.0005)
+
+for epoch in range(1, num_epochs + 1):
+    train_loss = train(model, optimizer, train_dataloader, loss_fn, device, batch_first)
+    valid_loss = evaluate(model, valid_dataloader, loss_fn, device, batch_first)
     print(
-        f"Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s | Train Loss: {train_loss:.3f} | Valid Loss: {valid_loss:.3f}"
+        f"Epoch: {epoch}, Train loss: {train_loss:.4f}, Validation loss: {valid_loss:.4f}"
     )
+
 
 print("Testing Translation on First 32 Samples")
 for i in range(32):
-    en_sentence = data_test[i]["en"]
-    de_reference = data_test[i]["de"]
+    en_sentence = test_dataset[i]["en"]
+    de_reference = test_dataset[i]["de"]
 
-    # translated = greedy_translate(model, en_sentence, tokenizer)
-    translated = greedy_translate(model, en_sentence, tokenizer)
+    translated = translate(model, en_sentence, device, greedy_decode, batch_first)
     print("-" * 50)
     print(f"Source: {en_sentence}")
     print(f"Prediction: {translated}")
     print(f"Reference: {de_reference}")
 
+
 print("-" * 50)
 print("Calculating Corpus BLEU Score...")
 all_predictions = []
 all_references = []
-for sample in data_test:
+for sample in train_dataset.take(100):
     en_sentence = sample["en"]
     de_reference = sample["de"]
 
-    translated = greedy_translate(model, en_sentence, tokenizer)
+    translated = translate(model, en_sentence, device, greedy_decode, batch_first)
+
     all_predictions.append(translated)
-    all_references.append([de_reference])
+    all_references.append([de_reference.lower()])
 
 bleu_metric = BLEUScore()
 bleu_score = bleu_metric(all_predictions, all_references)

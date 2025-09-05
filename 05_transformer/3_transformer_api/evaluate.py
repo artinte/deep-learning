@@ -1,26 +1,33 @@
 import torch
+from preprocess import special_tokens
+from utils import create_mask
 
 
-def evaluate(model, valid_dataloader, criterion):
+def evaluate(model, dataloader, loss_fn, device, batch_first):
     model.eval()
-    total_loss = 0
-    with torch.no_grad():
-        for src, tgt, src_key_padding_mask, tgt_key_padding_mask in valid_dataloader:
-            # The target input is the target sequence without the EOS token
+    losses = 0
+    for src, tgt in dataloader:
+        if batch_first:
             tgt_input = tgt[:, :-1]
-            tgt_key_padding_mask = (tgt_key_padding_mask == 0)[:, :-1]
+            tgt_out = tgt[:, 1:]
+        else:
+            tgt_input = tgt[:-1, :]
+            tgt_out = tgt[1:, :]
 
-            src_key_padding_mask = src_key_padding_mask == 0
+        src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(
+            src, tgt_input, special_tokens["<pad>"], device, batch_first
+        )
 
-            # [batch_size, tgt_seq_len - 1, vocab_size]
-            logits = model.forward(
-                src, tgt_input, src_key_padding_mask, tgt_key_padding_mask
+        with torch.no_grad():
+            logits = model(
+                src,
+                tgt_input,
+                src_mask,
+                tgt_mask,
+                src_padding_mask,
+                tgt_padding_mask,
             )
-            output = logits.reshape(-1, logits.shape[-1])
-            # [batch_size, tgt_seq_len - 1] -> [batch x (tgt_seq_len - 1)]
-            tgt_out = tgt[:, 1:].reshape(-1)
 
-            loss = criterion(output, tgt_out)
-            total_loss += loss.item()
-
-    return total_loss / len(valid_dataloader)
+        loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
+        losses += loss.item()
+    return losses / len(dataloader)

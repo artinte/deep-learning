@@ -1,96 +1,135 @@
+from collections import defaultdict
+from functools import partial
 import datasets
+import spacy
 import torch
 
+src_language = "en"
+tgt_language = "de"
 
-def collate_fn(batch, tokenizer, device):
-    en_sentences = [item["en"] for item in batch]
-    de_sentences = [item["de"] for item in batch]
+special_tokens = {
+    "<unk>": 0,
+    "<pad>": 1,
+    "<bos>": 2,
+    "<eos>": 3,
+}
 
-    src_tokens = tokenizer(
-        en_sentences, truncation=True, padding=True, return_tensors="pt"
-    ).to(device)
-    tgt_tokens = tokenizer(
-        de_sentences, truncation=True, padding=True, return_tensors="pt"
-    ).to(device)
-    bos_token_id = tokenizer.bos_token_id or tokenizer.eos_token_id
-    bos = torch.full(
-        (tgt_tokens["input_ids"].size(0), 1), bos_token_id, dtype=torch.long
-    ).to(device)
-    bos_mask = torch.ones(
-        (tgt_tokens["attention_mask"].size(0), 1), dtype=torch.long
-    ).to(device)
+try:
+    spacy_en = spacy.load("en_core_web_sm")
+    spacy_de = spacy.load("de_core_news_sm")
+except IOError:
+    print("Spacy models not found. Downloading...")
+    from spacy.cli import download
 
-    # The tokenizer now returns a dictionary with 'input_ids' and 'attention_mask'
-    # We only need the input IDs for this model.
-    return (
-        src_tokens["input_ids"],
-        torch.cat([bos, tgt_tokens["input_ids"]], dim=1),
-        src_tokens["attention_mask"],
-        torch.cat([bos_mask, tgt_tokens["attention_mask"]], dim=1),
-    )
+    download("en_core_web_sm")
+    download("de_core_news_sm")
+    spacy_en = spacy.load("en_core_web_sm")
+    spacy_de = spacy.load("de_core_news_sm")
 
-def preprocess(tokenizer, device, batch_size=16, dataset=None):
-    if dataset:
-        data_train, data_valid, data_test = (
-            dataset["train"],
-            dataset["validation"],
-            dataset["test"],
+token_transform = {
+    src_language: lambda text: [
+        token.text.lower() for token in spacy_en.tokenizer(text)
+    ],
+    tgt_language: lambda text: [
+        token.text.lower() for token in spacy_de.tokenizer(text)
+    ],
+}
+
+
+def build_vocab(data_iter, language, min_freq=2, specials=None):
+    if specials is None:
+        specials = []
+
+    counts = defaultdict(int)
+    for example in data_iter:
+        tokens = token_transform[language](example[language])
+        for token in tokens:
+            counts[token] += 1
+
+    str_to_idx = {token: idx for token, idx in specials.items()}
+    current_idx = len(specials)
+
+    for token, count in sorted(counts.items(), key=lambda item: item[1], reverse=True):
+        if count >= min_freq:
+            str_to_idx[token] = current_idx
+            current_idx += 1
+
+    idx_to_str = {idx: token for token, idx in str_to_idx.items()}
+
+    def lookup_token(token):
+        return str_to_idx.get(token, special_tokens["<unk>"])
+
+    return str_to_idx, idx_to_str, lookup_token
+
+
+train_dataset, valid_dataset, test_dataset = datasets.load_dataset(
+    "bentrevett/multi30k", split=["train", "validation", "test"]
+)
+
+src_vocab, src_rev_vocab, src_lookup = build_vocab(
+    train_dataset, src_language, min_freq=2, specials=special_tokens
+)
+tgt_vocab, tgt_rev_vocab, tgt_lookup = build_vocab(
+    train_dataset, tgt_language, min_freq=2, specials=special_tokens
+)
+
+
+def sequential_transforms(*transforms):
+    def func(txt_input):
+        for transform in transforms:
+            txt_input = transform(txt_input)
+        return txt_input
+
+    return func
+
+
+def tensor_transform(token_ids):
+    return torch.cat(
+        (
+            torch.tensor([special_tokens["<bos>"]]),
+            torch.tensor(token_ids),
+            torch.tensor([special_tokens["<eos>"]]),
         )
-    else:
-        # For quick testing, we use a smaller dataset.
-        # You can replace this with a larger dataset like WMT.
-        # wmt_dataset = datasets.load_dataset("wmt14", "de-en", split="train[:3%]")
-        # wmt_dataset = wmt_dataset.map(lambda x: {"de": x["translation"]["de"], "en": x["translation"]["en"]})
-        # wmt_dataset = wmt_dataset.remove_columns("translation")
-        data_train, data_valid, data_test = datasets.load_dataset(
-            "bentrevett/multi30k", split=["train", "validation", "test"]
-        )
-        
-    print(f"Training dataset length: {len(data_train)}")
-    print(f"Validation dataset length: {len(data_valid)}")
-    print(f"Test dataset length: {len(data_test)}")
-    print(f"First train sample: {data_train[0]}")
-
-    first_sample_eng_token = tokenizer(
-        data_train[0]["en"],
-        max_length=tokenizer.model_max_length,
-        truncation=True,
-        padding=True,
-        return_tensors="pt",
     )
-    print(f"First sample token IDs (Source): {first_sample_eng_token['input_ids']}")
-    first_sample_de_token = tokenizer(
-        data_train[0]["de"],
-        max_length=tokenizer.model_max_length,
-        truncation=True,
-        padding=True,
-        return_tensors="pt",
-    )
-    print(f"First sample token IDs (Destination): {first_sample_de_token['input_ids']}")
 
+
+text_transform = {
+    src_language: sequential_transforms(
+        token_transform[src_language],
+        lambda tokens: [src_lookup(token) for token in tokens],
+        tensor_transform,
+    ),
+    tgt_language: sequential_transforms(
+        token_transform[tgt_language],
+        lambda tokens: [tgt_lookup(token) for token in tokens],
+        tensor_transform,
+    ),
+}
+
+
+def collate_fn(batch, device, batch_first):
+    src_batch, tgt_batch = [], []
+    for item in batch:
+        src_batch.append(text_transform[src_language](item[src_language]))
+        tgt_batch.append(text_transform[tgt_language](item[tgt_language]))
+
+    src_batch = torch.nn.utils.rnn.pad_sequence(
+        src_batch, padding_value=special_tokens["<pad>"], batch_first=batch_first
+    )
+    tgt_batch = torch.nn.utils.rnn.pad_sequence(
+        tgt_batch, padding_value=special_tokens["<pad>"], batch_first=batch_first
+    )
+
+    return src_batch.to(device), tgt_batch.to(device)
+
+
+def preprocess(batch_size, device, batch_first=False):
+    collate = partial(collate_fn, device=device, batch_first=batch_first)
     train_dataloader = torch.utils.data.DataLoader(
-        data_train, batch_size=batch_size, shuffle=True,
-        collate_fn=lambda x: collate_fn(x, tokenizer, device)
+        train_dataset, batch_size=batch_size, collate_fn=collate
     )
     valid_dataloader = torch.utils.data.DataLoader(
-        data_valid, batch_size=batch_size, shuffle=False,
-        collate_fn=lambda x: collate_fn(x, tokenizer, device)
-    )
-    test_dataloader = torch.utils.data.DataLoader(
-        data_test, batch_size=batch_size, shuffle=False,
-        collate_fn=lambda x: collate_fn(x, tokenizer, device)
+        valid_dataset, batch_size=batch_size, collate_fn=collate
     )
 
-    test_src_sample, test_tgt_sample, test_src_mask, test_tgt_mask = next(
-        iter(test_dataloader)
-    )
-    print(f"Shape of test src sample: {test_src_sample.shape}")
-    print(f"First batch test src token: {test_src_sample}")
-    print(f"Shape of test tgt sample: {test_tgt_sample.shape}")
-    print(f"First batch test tgt token: {test_tgt_sample}")
-    print(f"Shape of test src mask: {test_src_mask.shape}")
-    print(f"First batch test src mask: {test_src_mask}")
-    print(f"Shape of test tgt mask: {test_tgt_mask.shape}")
-    print(f"First batch test tgt mask: {test_tgt_mask}")
-
-    return train_dataloader, valid_dataloader, test_dataloader, data_test
+    return train_dataloader, valid_dataloader, test_dataset

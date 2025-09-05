@@ -1,49 +1,38 @@
 import torch
+from utils import create_mask
+from preprocess import special_tokens
 
 
-def train(model, train_dataloader, optimizer, criterion):
-    """
-    Trains the Transformer model.
-    Args:
-        model (torch.nn.Module): The Transformer model.
-        train_dataloader (torch.utils.data.DataLoader): The training data loader.
-            Outputs (src, tgt, src_key_padding_mask, tgt_key_padding_mask),
-            where 0 in masks represents padding tokens, and all tensors are already on the target device.
-        optimizer (torch.optim.Optimizer): The optimizer for training.
-        criterion (torch.nn.modules.loss._Loss): The loss function.
-    """
+def train(model, optimizer, dataloader, loss_fn, device, batch_first):
     model.train()
-    total_loss = 0
-    for i, (src, tgt, src_key_padding_mask, tgt_key_padding_mask) in enumerate(
-        train_dataloader
-    ):
-        # The target input is the target sequence without the EOS token.
-        # This is what the decoder receives as input.
-        tgt_input = tgt[:, :-1]
+    losses = 0
+    for src, tgt in dataloader:
+        if batch_first:
+            tgt_input = tgt[:, :-1]
+            tgt_out = tgt[:, 1:]
+        else:
+            tgt_input = tgt[:-1, :]
+            tgt_out = tgt[1:, :]
 
-        src_key_padding_mask = src_key_padding_mask == 0
-        tgt_key_padding_mask = (tgt_key_padding_mask == 0)[:, :-1]
-
-        # [batch_size, tgt_seq_len - 1, tgt_vocab_size]
-        logits = model.forward(
-            src, tgt_input, src_key_padding_mask, tgt_key_padding_mask
+        src_mask, tgt_mask, src_padding_mask, tgt_padding_mask = create_mask(
+            src, tgt_input, special_tokens["<pad>"], device, batch_first
         )
-        output = logits.reshape(-1, logits.shape[-1])
 
-        # [batch_size, tgt_seq_len - 1] -> [batch_size x (tgt_seq_len - 1)]
-        tgt_out = tgt[:, 1:].reshape(-1)
+        logits = model(
+            src,
+            tgt_input,
+            src_mask,
+            tgt_mask,
+            src_padding_mask,
+            tgt_padding_mask,
+        )
 
-        # backpropagation
         optimizer.zero_grad()
-        loss = criterion(output, tgt_out)
+        
+        loss = loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
         loss.backward()
+        # Add the gradient clipping for stable training
         torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0, norm_type=2)
         optimizer.step()
-
-        total_loss += loss.item()
-
-        if (i + 1) % 100 == 0:
-            avg_loss_100 = total_loss / (i + 1)
-            print(f"  Step: {i+1} | Avg Train Loss: {avg_loss_100:.3f}")
-
-    return total_loss / len(train_dataloader)
+        losses += loss.item()
+    return losses / len(dataloader)
