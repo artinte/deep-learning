@@ -26,11 +26,18 @@ pip3 install torch torchvision torchaudio
 
 1.4 [Principles of Deep Learning](https://artinte.github.io/deep-learning/principle_learn.html)
 
+We will explore the fundamental principles of deep learning, including the concepts of machine learning, rules and representations, neural networks, and optimization techniques such as gradient descent.
+
+![Training Process of Deep Learning](docs/res/01/train_process_640.png)
+
 1.5 [Calculus](https://artinte.github.io/deep-learning/calculus.html)
 
 1.6 [Gradient Descent](https://artinte.github.io/deep-learning/gradient_descent.html)
 
 1.7 [Neural Network from Scratch](https://artinte.github.io/deep-learning/network_scratch.html)
+
+`demo_simple_network_numpy.py` trains a small neural network from scratch using NumPy to classify a simple dataset of people's heights and weights as either male or female.
+
 
 ### 02 Fully Connected Network
 
