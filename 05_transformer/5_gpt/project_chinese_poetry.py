@@ -1,10 +1,22 @@
 import torch
+from preprocess_chinese_poetry import proprocess, special_tokens
+
+
+class PoetryDataset(torch.utils.data.Dataset):
+    def __init__(self, encoded_poems):
+        self.data = encoded_poems
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        return torch.tensor(self.data[idx], dtype=torch.long)
 
 
 class Config:
     batch_size = 64  # How many independent sequences will we process in parallel.
-    block_size = 2  # What is the maxium context length for predictions
-    max_iters = 5000  # How many training iterations
+    block_size = 128  # What is the maxium context length for predictions
+    epochs = 5000  # How many training iterations
     eval_interval = 500  # How often to evaluate the model
     learning_rate = 3e-4  # Learning rate for the optimizer
     device = "cuda" if torch.cuda.is_available() else "cpu"  # Use GPU if available
@@ -15,48 +27,14 @@ class Config:
     dropout = 0.0  # Dropout rate for regularization
 
 
-torch.manual_seed(1337)
-
-text = """
-床前明月光，疑是地上霜。
-举头望明月，低头思故乡。
-"""
-
-chars = sorted(list(set(text)))
-vocab_size = len(chars)
-print("Vocab size:", vocab_size)
-
-stoi = {ch: i for i, ch in enumerate(chars)}
-itos = {i: ch for i, ch in enumerate(chars)}
-
-encode = lambda s: [stoi[c] for c in s]
-decode = lambda l: "".join([itos[i] for i in l])
-
-data = torch.tensor(encode(text), dtype=torch.long)
-n = int(0.9 * len(data))
-train_data = data[:n]
-val_data = data[n:]
-
-
-def get_batch(split):
-    data = train_data if split == 'train' else val_data
-    ix = torch.randint(len(data) - Config.block_size, (Config.batch_size,))
-    x = torch.stack([data[i:i+Config.block_size] for i in ix])
-    y = torch.stack([data[i+1:i+Config.block_size+1] for i in ix])
-    x, y = x.to(Config.device), y.to(Config.device)
-    return x, y
-
-
 # The main GPT language model
 class GPTLanguageModel(torch.nn.Module):
-    def __init__(self):
+    def __init__(self, vocab_size):
         super().__init__()
         self.token_embedding_table = torch.nn.Embedding(vocab_size, Config.n_embd)
         self.position_embedding_table = torch.nn.Embedding(
             Config.block_size, Config.n_embd
         )
-
-        # Use a single TransformerEncoderLayer to define the block
         encoder_layer = torch.nn.TransformerEncoderLayer(
             d_model=Config.n_embd,
             nhead=Config.n_head,
@@ -64,16 +42,12 @@ class GPTLanguageModel(torch.nn.Module):
             dropout=Config.dropout,
             batch_first=True,
         )
-
-        # Stack multiple layers using TransformerEncoder
         self.transformer_encoder = torch.nn.TransformerEncoder(
             encoder_layer, num_layers=Config.n_layer
         )
-
         self.ln_f = torch.nn.LayerNorm(Config.n_embd)
         self.lm_head = torch.nn.Linear(Config.n_embd, vocab_size)
 
-        # We pre-compute the causal mask for efficiency.
         self.register_buffer(
             "causal_mask",
             torch.triu(
@@ -84,22 +58,13 @@ class GPTLanguageModel(torch.nn.Module):
 
     def forward(self, idx, targets=None):
         B, T = idx.shape
-
-        # idx and targets are both (B, T) tensors of integers
-        tok_emb = self.token_embedding_table(idx)  # (B, T, C)
-        pos_emb = self.position_embedding_table(
-            torch.arange(T, device=Config.device)
-        )  # (T, C)
-        x = tok_emb + pos_emb  # (B, T, C) - Add token and positional embeddings
-
-        # The attention mask needs to be the same size as the block_size
+        tok_emb = self.token_embedding_table(idx)
+        pos_emb = self.position_embedding_table(torch.arange(T, device=Config.device))
+        x = tok_emb + pos_emb
         attn_mask = self.causal_mask[:T, :T]
-
-        # The TransformerEncoder expects a mask with shape (T, T)
         x = self.transformer_encoder(x, mask=attn_mask)
-
         x = self.ln_f(x)
-        logits = self.lm_head(x)  # (B, T, vocab_size)
+        logits = self.lm_head(x)
 
         if targets is None:
             loss = None
@@ -112,62 +77,112 @@ class GPTLanguageModel(torch.nn.Module):
         return logits, loss
 
     def generate(self, idx, max_new_tokens):
-        # idx is a (B, T) array of indices in the current context
         for _ in range(max_new_tokens):
-            # Crop idx to the last block_size tokens
             idx_cond = idx[:, -Config.block_size :]
-            # Get predictions
-            logits, loss = self(idx_cond)
-            # Focus only on the last time step
-            logits = logits[:, -1, :]  # becomes (B, C)
-            # Apply softmax to get probabilities
-            probs = torch.nn.functional.softmax(logits, dim=-1)  # (B, C)
-            # Sample from the distribution
-            idx_next = torch.multinomial(probs, num_samples=1)  # (B, 1)
-            # Append sampled index to the running sequence
-            idx = torch.cat((idx, idx_next), dim=1)  # (B, T+1)
+            logits, _ = self(idx_cond)
+            logits = logits[:, -1, :]
+            probs = torch.nn.functional.softmax(logits, dim=-1)
+            idx_next = torch.multinomial(probs, num_samples=1)
+            idx = torch.cat((idx, idx_next), dim=1)
+            # Add the stopping condition.
+            if idx_next.item() == special_tokens["<eos>"]:
+                break
         return idx
+    
+def collate_fn(batch):
+    padded_batch = torch.nn.utils.rnn.pad_sequence(batch, batch_first=True, padding_value=special_tokens["<pad>"])
+    x = padded_batch[:, :-1]
+    y = padded_batch[:, 1:]
+    return x, y
 
 
-# --- Training and Inference ---
+torch.manual_seed(1337)  # for reproducibility
+encoded_poems, vocab, idx_to_word = proprocess(file_path="data/chinese_poetry.csv")
+
+vocab_size = len(vocab)
+print(f"Vocab size: {vocab_size}")
+
+n = int(0.98 * len(encoded_poems))
+print(f"Train/val split: {n}/{len(encoded_poems)-n}")
+train_data = encoded_poems[:n]
+val_data = encoded_poems[n:]
+train_dataset = PoetryDataset(train_data)
+val_dataset = PoetryDataset(val_data)
+train_loader = torch.utils.data.DataLoader(
+    train_dataset, batch_size=Config.batch_size, shuffle=True, collate_fn=collate_fn
+)
+val_loader = torch.utils.data.DataLoader(
+    val_dataset, batch_size=Config.batch_size, shuffle=False, collate_fn=collate_fn
+)
+
+
+def get_batch(split_loader):
+    xb, yb = next(split_loader)
+    xb, yb = xb.to(Config.device), yb.to(Config.device)
+    return xb, yb
+
+
 @torch.no_grad()
-def estimate_loss(model):
+def estimate_loss(model, train_loader, val_loader):
     out = {}
     model.eval()
+    
+    # Create fresh iterators for evaluation
+    train_iter = iter(train_loader)
+    val_iter = iter(val_loader)
+    
     for split in ["train", "val"]:
         losses = torch.zeros(Config.eval_iters)
+        current_iter = train_iter if split == "train" else val_iter
         for k in range(Config.eval_iters):
-            X, Y = get_batch(split)
+            try:
+                X, Y = get_batch(current_iter)
+            except StopIteration:
+                # If an iterator runs out of data during evaluation,
+                # just break the loop. This can happen with small datasets.
+                break
             logits, loss = model(X, Y)
             losses[k] = loss.item()
+        
+        # Calculate mean loss for the batches that were processed
         out[split] = losses.mean()
+        
     model.train()
     return out
 
 
-model = GPTLanguageModel().to(Config.device)
-print(sum(p.numel() for p in model.parameters()) / 1e6, "Model Parameters")
-
+model = GPTLanguageModel(vocab_size).to(Config.device)
+print(f"Model Parameters: {sum(p.numel() for p in model.parameters()) / 1e6:.2f}M")
 optimizer = torch.optim.AdamW(model.parameters(), lr=Config.learning_rate)
-for iter in range(Config.max_iters):
-    if iter % Config.eval_interval == 0:
-        losses = estimate_loss(model)
+
+train_iter = iter(train_loader)
+val_iter = iter(val_loader)
+
+for iter_num in range(Config.epochs):
+    if iter_num % len(train_loader) == 0:
+        train_iter = iter(train_loader)
+
+    if iter_num % Config.eval_interval == 0:
+        losses = estimate_loss(model, train_loader, val_loader)
         print(
-            f"step {iter}: train loss {losses['train']:.4f}, val loss {losses['val']:.4f}"
+            f"step {iter_num}: train loss {losses['train']:.4f}, val loss {losses['val']:.4f}"
         )
 
-    # sample a batch of data
-    xb, yb = get_batch("train")
-
-    # evaluate the loss
+    # Get a batch from the current training iterator
+    xb, yb = get_batch(train_iter)
     logits, loss = model(xb, yb)
     optimizer.zero_grad(set_to_none=True)
     loss.backward()
     optimizer.step()
 
-start_seed = "床前明月光"
-context = torch.tensor(
-    encode(start_seed), dtype=torch.long, device=Config.device
-).unsqueeze(0)
-generated_text = model.generate(context, max_new_tokens=500)[0]
-print(decode(generated_text.tolist()))
+# Inference/Generation
+print("-" * 50)
+start_seed = "白日依山尽，"
+encoded_seed = [vocab.get(char, special_tokens["<unk>"]) for char in start_seed]
+context = torch.tensor(encoded_seed, dtype=torch.long, device=Config.device).unsqueeze(
+    0
+)
+generated_ids = model.generate(context, max_new_tokens=200)[0].tolist()
+
+generated_text = "".join([idx_to_word[idx] for idx in generated_ids])
+print(f"Generated Poetry: {generated_text}")

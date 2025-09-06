@@ -47,4 +47,4 @@ def proprocess(file_path):
     return encoded_poems, vocab, idx_to_word
 
 
-proprocess(file_path="data/chinese_poetry.csv")
+
