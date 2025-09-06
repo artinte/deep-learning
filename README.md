@@ -12,13 +12,25 @@ The code is highly practical. For example, in the Transformer chapter, four meth
 These four methods are progressive in hierarchy and serve as excellent learning materials. The following is the table of contents of the book:
 
 ### 01 Tensor and Gradient Basics
-- [x] 1.1 [Install PyTorch](https://artinte.github.io/deep-learning/pytorch_install.html)
-- [x] 1.2 [Introduction to Tensors](https://artinte.github.io/deep-learning/tensor_intro.html)
-- [x] 1.3 [Data Representation](https://artinte.github.io/deep-learning/data_represent.html)
-- [x] 1.4 [Principles of Deep Learning](https://artinte.github.io/deep-learning/principle_learn.html)
-- [x] 1.5 [Calculus](https://artinte.github.io/deep-learning/calculus.html)
-- [x] 1.6 [Gradient Descent](https://artinte.github.io/deep-learning/gradient_descent.html)
-- [x] 1.7 [Neural Network from Scratch](https://artinte.github.io/deep-learning/network_scratch.html)
+1.1 [Install PyTorch](https://artinte.github.io/deep-learning/pytorch_install.html)
+
+`demo_verify.py` checks if PyTorch is installed and working correctly by verifying its version, it also determines which hardware device (GPU or CPU) is being used for computations.
+
+```
+pip3 install torch torchvision torchaudio
+```
+
+1.2 [Introduction to Tensors](https://artinte.github.io/deep-learning/tensor_intro.html)
+
+1.3 [Data Representation](https://artinte.github.io/deep-learning/data_represent.html)
+
+1.4 [Principles of Deep Learning](https://artinte.github.io/deep-learning/principle_learn.html)
+
+1.5 [Calculus](https://artinte.github.io/deep-learning/calculus.html)
+
+1.6 [Gradient Descent](https://artinte.github.io/deep-learning/gradient_descent.html)
+
+1.7 [Neural Network from Scratch](https://artinte.github.io/deep-learning/network_scratch.html)
 
 ### 02 Fully Connected Network
 
@@ -73,6 +85,36 @@ These four methods are progressive in hierarchy and serve as excellent learning 
 `demo_nadaraya_regression.py`
 
 `demo_scale_dot_product_attention.py` computes scaled dot product attention on query, key and value tensors, using an optional attention mask if passed, and applying dropout if a probability greater than 0.0 is specified.
+
+```
+# Efficient implementation equivalent to the following:
+def scaled_dot_product_attention(query, key, value, attn_mask=None, dropout_p=0.0,
+        is_causal=False, scale=None, enable_gqa=False) -> torch.Tensor:
+    L, S = query.size(-2), key.size(-2)
+    scale_factor = 1 / math.sqrt(query.size(-1)) if scale is None else scale
+    attn_bias = torch.zeros(L, S, dtype=query.dtype, device=query.device)
+    if is_causal:
+        assert attn_mask is None
+        temp_mask = torch.ones(L, S, dtype=torch.bool).tril(diagonal=0)
+        attn_bias.masked_fill_(temp_mask.logical_not(), float("-inf"))
+        attn_bias.to(query.dtype)
+
+    if attn_mask is not None:
+        if attn_mask.dtype == torch.bool:
+            attn_bias.masked_fill_(attn_mask.logical_not(), float("-inf"))
+        else:
+            attn_bias = attn_mask + attn_bias
+
+    if enable_gqa:
+        key = key.repeat_interleave(query.size(-3)//key.size(-3), -3)
+        value = value.repeat_interleave(query.size(-3)//value.size(-3), -3)
+
+    attn_weight = query @ key.transpose(-2, -1) * scale_factor
+    attn_weight += attn_bias
+    attn_weight = torch.softmax(attn_weight, dim=-1)
+    attn_weight = torch.dropout(attn_weight, dropout_p, train=True)
+    return attn_weight @ value
+```
 
 5.2 [Attention Is All You Need](https://artinte.github.io/deep-learning/transformer_paper.html)
 

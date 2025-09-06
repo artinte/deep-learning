@@ -13,7 +13,9 @@ elif torch.backends.mps.is_available():
     print("MPS version:", torch.backends.mps.version)
 
 
-rand_tensor = torch.rand(size=(5, 3))
+rand_tensor = torch.rand(
+    size=(5, 3), device="cuda" if torch.cuda.is_available() else "cpu"
+)
 print("Random tensor:", rand_tensor)
 print("Tensor shape:", rand_tensor.shape)
 print("Tensor dtype:", rand_tensor.dtype)
