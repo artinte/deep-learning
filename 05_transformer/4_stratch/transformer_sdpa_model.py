@@ -11,11 +11,11 @@ class TransformerSdpaModel(torch.nn.Module):
         num_decoder_layers,
         dim_feedforward,
         dropout,
-        custom_encoder,
-        custom_decoder,
         src_vocab_size,
         tgt_vocab_size,
         batch_first,
+        custom_encoder=None,
+        custom_decoder=None,
     ):
         super(TransformerSdpaModel, self).__init__()
         self.transformer = torch.nn.Transformer(
