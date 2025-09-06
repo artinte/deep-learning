@@ -10,6 +10,10 @@ sys.path.append(str(project_root))
 
 from common import decision_boundary
 
+torch.manual_seed(0)
+numpy.random.seed(0)
+sklearn.random.seed(0)
+
 X_np, y_np = sklearn.datasets.make_moons(n_samples=200, noise=0.15)
 X = torch.tensor(X_np, dtype=torch.float32)
 y = torch.tensor(y_np, dtype=torch.long)

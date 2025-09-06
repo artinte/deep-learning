@@ -21,7 +21,7 @@ def plot_single(x, y, pred_func):
     internal_decision_plot(x, pred_func)
     pyplot.grid(True)
     pyplot.scatter(x[:, 0], x[:, 1], c=y)
-    pyplot.subplots_adjust(left=0.08, right=0.92, top=0.96, bottom=0.06)
+    pyplot.subplots_adjust(left=0.08, right=0.96, top=0.96, bottom=0.06)
     pyplot.show()
 
 def plot_multi(x, y, pred_func):

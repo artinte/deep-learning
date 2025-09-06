@@ -22,12 +22,21 @@ These four methods are progressive in hierarchy and serve as excellent learning 
 
 ### 02 Fully Connected Network
 
-- [x] 2.1 [Linear Algebra](https://artinte.github.io/deep-learning/linear_algebra.html)
-- [x] 2.2 [Points Classification](https://artinte.github.io/deep-learning/point_classify.html)
-- [x] 2.3 [PyTorch Basics](https://artinte.github.io/deep-learning/pytorch_basics.html)
-- [x] 2.4 [Activation Function](https://artinte.github.io/deep-learning/activation_function.html)
-- [x] 2.5 [Loss Function](https://artinte.github.io/deep-learning/loss_function.html)
-- [x] 2.6 [Optimizer](https://artinte.github.io/deep-learning/optimizer.html)
+2.1 [Linear Algebra](https://artinte.github.io/deep-learning/linear_algebra.html)
+
+2.2 [Points Classification](https://artinte.github.io/deep-learning/point_classify.html)
+
+`demo_dnn_torch.py` demonstrates how to build and train a simple, two-layer neural network using PyTorch to solve a classification problem. The network is designed to classify data points generated from a "make_moons" dataset, which is a non-linear dataset.
+
+![Output of DNN Classification](docs/res/02/dnn_classify_torch.png)
+
+2.3 [PyTorch Basics](https://artinte.github.io/deep-learning/pytorch_basics.html)
+
+2.4 [Activation Function](https://artinte.github.io/deep-learning/activation_function.html)
+
+2.5 [Loss Function](https://artinte.github.io/deep-learning/loss_function.html)
+
+2.6 [Optimizer](https://artinte.github.io/deep-learning/optimizer.html)
 
 ### 03 Convolutional Network
 
