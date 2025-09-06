@@ -62,11 +62,11 @@ model = TransformerSdpaModel(
     num_decoder_layers,
     dim_feedforward,
     dropout,
-    custom_encoder,
-    custom_decoder,
     len(src_vocab),
     len(tgt_vocab),
     batch_first=batch_first,
+    custom_encoder=custom_encoder,
+    custom_decoder=custom_decoder,
 ).to(device)
 
 loss_fn = torch.nn.CrossEntropyLoss(ignore_index=special_tokens["<pad>"])

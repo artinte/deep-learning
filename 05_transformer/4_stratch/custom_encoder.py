@@ -15,8 +15,8 @@ class CustomEncoderLayer(torch.nn.Module):
     ):
         super().__init__()
         # self.self_attn = torch.nn.MultiheadAttention(
-        self.self_attn = MultiheadAttention(
-        # self.self_attn = MultiheadAttentionScratch(
+        # self.self_attn = MultiheadAttention(
+        self.self_attn = MultiheadAttentionScratch(
             d_model, nhead, dropout=dropout, batch_first=batch_first
         )
 
