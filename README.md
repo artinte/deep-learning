@@ -31,11 +31,15 @@ These four methods are progressive in hierarchy and serve as excellent learning 
 
 ### 03 Convolutional Network
 
-- [x] 3.1 [CNN from Scratch](https://artinte.github.io/deep-learning/cnn_classify_stratch.html)
-- [x] 3.2 [AlexNet](https://artinte.github.io/deep-learning/alex_net.html)
-- [x] 3.3 [ResNet](https://artinte.github.io/deep-learning/res_net.html)
-- [x] 3.4 [U-Net](https://artinte.github.io/deep-learning/u_net.html)
-- [x] 3.5 [DenseNet](https://artinte.github.io/deep-learning/dense_net.html)
+3.1 [CNN from Scratch](https://artinte.github.io/deep-learning/cnn_classify_stratch.html)
+
+3.2 [AlexNet](https://artinte.github.io/deep-learning/alex_net.html)
+
+3.3 [ResNet](https://artinte.github.io/deep-learning/res_net.html)
+
+3.4 [U-Net](https://artinte.github.io/deep-learning/u_net.html)
+
+3.5 [DenseNet](https://artinte.github.io/deep-learning/dense_net.html)
 
 ### 04 Recurrent Network
 
@@ -55,7 +59,11 @@ These four methods are progressive in hierarchy and serve as excellent learning 
 
 5.1 [Attention Mechanism](https://artinte.github.io/deep-learning/attention_mechanism.html)
 
-`demo_scale_dot_product_attention.py`
+`demo_query_key_value.py`
+
+`demo_nadaraya_regression.py`
+
+`demo_scale_dot_product_attention.py` computes scaled dot product attention on query, key and value tensors, using an optional attention mask if passed, and applying dropout if a probability greater than 0.0 is specified.
 
 5.2 [Attention Is All You Need](https://artinte.github.io/deep-learning/transformer_paper.html)
 
