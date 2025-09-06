@@ -11,7 +11,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
 
-num_epochs = 20
+num_epochs = 30
 batch_size = 128
 d_model = 256
 nhead = 8
