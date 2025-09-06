@@ -14,9 +14,9 @@ class PoetryDataset(torch.utils.data.Dataset):
 
 
 class Config:
-    batch_size = 64  # How many independent sequences will we process in parallel.
+    batch_size = 128  # How many independent sequences will we process in parallel.
     block_size = 128  # What is the maxium context length for predictions
-    epochs = 5000  # How many training iterations
+    epochs = 25000  # How many training iterations
     eval_interval = 500  # How often to evaluate the model
     learning_rate = 3e-4  # Learning rate for the optimizer
     device = "cuda" if torch.cuda.is_available() else "cpu"  # Use GPU if available
@@ -83,10 +83,10 @@ class GPTLanguageModel(torch.nn.Module):
             logits = logits[:, -1, :]
             probs = torch.nn.functional.softmax(logits, dim=-1)
             idx_next = torch.multinomial(probs, num_samples=1)
-            idx = torch.cat((idx, idx_next), dim=1)
             # Add the stopping condition.
             if idx_next.item() == special_tokens["<eos>"]:
                 break
+            idx = torch.cat((idx, idx_next), dim=1)
         return idx
     
 def collate_fn(batch):

@@ -75,7 +75,9 @@ The original paper [Attention Is All You Need](https://arxiv.org/abs/1706.03762)
 
 `demo_scratch.py` further decompose the Transformer structure by implementing key components like residual networks and layer normalization to achieve a thorough mastery of the architecture.
 
-5.5 [nanoGPT](https://artinte.github.io/deep-learning/nano_gpt.html)
+5.5 [GPT](https://artinte.github.io/deep-learning/nano_gpt.html)
+
+`project_chinese_poetry.py` defines and trains a GPT-like model to generate Chinese poetry.
 
 5.6 [BERT](https://artinte.github.io/deep-learning/bert.html)
 
