@@ -71,6 +71,10 @@ We will explore the fundamental principles of deep learning, including the conce
 
 3.1 [CNN from Scratch](https://artinte.github.io/deep-learning/cnn_classify_stratch.html)
 
+`demo_cnn_scratch.py`
+
+`demo_cnn_torch.py`
+
 3.2 [AlexNet](https://artinte.github.io/deep-learning/alex_net.html)
 
 3.3 [ResNet](https://artinte.github.io/deep-learning/res_net.html)
