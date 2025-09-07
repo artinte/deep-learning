@@ -27,11 +27,9 @@ def proprocess(file_path):
     tokenized_poems = [list(poem) for poem in df["poem"] if poem]
 
     word_counts = Counter(token for poem in tokenized_poems for token in poem)
-    vocab = {
-        token: i + len(special_tokens)
-        for i, (token, _) in enumerate(word_counts.items())
-    }
-    vocab.update({token: i for token, i in special_tokens.items()})
+    vocab_tokens = [token for token, freq in word_counts.items() if freq >= 30]
+    vocab = {token: i for token, i in special_tokens.items()}
+    vocab.update({token: i + len(special_tokens) for i, token in enumerate(vocab_tokens)})
 
     idx_to_word = {idx: word for word, idx in vocab.items()}
 
@@ -42,7 +40,6 @@ def proprocess(file_path):
             + [vocab["<eos>"]]
         )
         return ids
-
     encoded_poems = [text_to_ids(tokens) for tokens in tokenized_poems]
     return encoded_poems, vocab, idx_to_word
 
