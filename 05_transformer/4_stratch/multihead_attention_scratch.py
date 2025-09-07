@@ -224,7 +224,6 @@ def multi_head_attention_forward(
     in_proj_bias: Optional[torch.Tensor],
     bias_k: Optional[torch.Tensor],
     bias_v: Optional[torch.Tensor],
-    add_zero_attn: bool,
     dropout_p: float,
     out_proj_weight: torch.Tensor,
     out_proj_bias: Optional[torch.Tensor],
@@ -232,10 +231,6 @@ def multi_head_attention_forward(
     key_padding_mask: Optional[torch.Tensor] = None,
     need_weights: bool = True,
     attn_mask: Optional[torch.Tensor] = None,
-    use_separate_proj_weight: bool = False,
-    q_proj_weight: Optional[torch.Tensor] = None,
-    k_proj_weight: Optional[torch.Tensor] = None,
-    v_proj_weight: Optional[torch.Tensor] = None,
     static_k: Optional[torch.Tensor] = None,
     static_v: Optional[torch.Tensor] = None,
     average_attn_weights: bool = True,
@@ -293,52 +288,14 @@ def multi_head_attention_forward(
     assert (
         head_dim * num_heads == embed_dim
     ), f"embed_dim {embed_dim} not divisible by num_heads {num_heads}"
-    if use_separate_proj_weight:
-        # allow MHA to have different embedding dimensions when separate projection weights are used
-        assert (
-            key.shape[:2] == value.shape[:2]
-        ), f"key's sequence and batch dims {key.shape[:2]} do not match value's {value.shape[:2]}"
-    else:
-        assert (
-            key.shape == value.shape
-        ), f"key shape {key.shape} does not match value shape {value.shape}"
 
-    #
-    # compute in-projection
-    #
-    if not use_separate_proj_weight:
-        assert (
-            in_proj_weight is not None
-        ), "use_separate_proj_weight is False but in_proj_weight is None"
-        q, k, v = _in_projection_packed(query, key, value, in_proj_weight, in_proj_bias)
-    else:
-        assert (
-            q_proj_weight is not None
-        ), "use_separate_proj_weight is True but q_proj_weight is None"
-        assert (
-            k_proj_weight is not None
-        ), "use_separate_proj_weight is True but k_proj_weight is None"
-        assert (
-            v_proj_weight is not None
-        ), "use_separate_proj_weight is True but v_proj_weight is None"
-        if in_proj_bias is None:
-            b_q = b_k = b_v = None
-        else:
-            b_q, b_k, b_v = in_proj_bias.chunk(3)
-        q, k, v = _in_projection(
-            query,
-            key,
-            value,
-            q_proj_weight,
-            k_proj_weight,
-            v_proj_weight,
-            b_q,
-            b_k,
-            b_v,
-        )
+    assert (
+        key.shape == value.shape
+    ), f"key shape {key.shape} does not match value shape {value.shape}"
 
+    q, k, v = _in_projection_packed(query, key, value, in_proj_weight, in_proj_bias)
+    
     # prep attention mask
-
     if attn_mask is not None:
         # ensure attn_mask's dim is 3
         if attn_mask.dim() == 2:
@@ -399,20 +356,6 @@ def multi_head_attention_forward(
             static_v.size(2) == head_dim
         ), f"expecting static_v.size(2) of {head_dim}, but got {static_v.size(2)}"
         v = static_v
-
-    # add zero attention along batch dimension (now first)
-    if add_zero_attn:
-        zero_attn_shape = (bsz * num_heads, 1, head_dim)
-        k = torch.cat(
-            [k, torch.zeros(zero_attn_shape, dtype=k.dtype, device=k.device)], dim=1
-        )
-        v = torch.cat(
-            [v, torch.zeros(zero_attn_shape, dtype=v.dtype, device=v.device)], dim=1
-        )
-        if attn_mask is not None:
-            attn_mask = torch.nn.functional.pad(attn_mask, (0, 1))
-        if key_padding_mask is not None:
-            key_padding_mask = torch.nn.functional.pad(key_padding_mask, (0, 1))
 
     # update source sequence length after adjustments
     src_len = k.size(1)
@@ -498,8 +441,6 @@ class MultiheadAttentionScratch(torch.nn.Module):
         embed_dim,
         num_heads,
         dropout=0.0,
-        kdim=None,
-        vdim=None,
         batch_first=False,
         device=None,
         dtype=None,
@@ -512,9 +453,6 @@ class MultiheadAttentionScratch(torch.nn.Module):
         factory_kwargs = {"device": device, "dtype": dtype}
         super().__init__()
         self.embed_dim = embed_dim
-        self.kdim = kdim if kdim is not None else embed_dim
-        self.vdim = vdim if vdim is not None else embed_dim
-        self._qkv_same_embed_dim = self.kdim == embed_dim and self.vdim == embed_dim
 
         self.num_heads = num_heads
         self.dropout = dropout
@@ -524,41 +462,17 @@ class MultiheadAttentionScratch(torch.nn.Module):
             self.head_dim * num_heads == self.embed_dim
         ), "embed_dim must be divisible by num_heads"
 
-        if not self._qkv_same_embed_dim:
-            self.q_proj_weight = torch.nn.Parameter(
-                torch.empty((embed_dim, embed_dim), **factory_kwargs)
-            )
-            self.k_proj_weight = torch.nn.Parameter(
-                torch.empty((embed_dim, self.kdim), **factory_kwargs)
-            )
-            self.v_proj_weight = torch.nn.Parameter(
-                torch.empty((embed_dim, self.vdim), **factory_kwargs)
-            )
-            self.register_parameter("in_proj_weight", None)
-        else:
-            self.in_proj_weight = torch.nn.Parameter(
-                torch.empty((3 * embed_dim, embed_dim), **factory_kwargs)
-            )
-            self.register_parameter("q_proj_weight", None)
-            self.register_parameter("k_proj_weight", None)
-            self.register_parameter("v_proj_weight", None)
+        self.in_proj_weight = torch.nn.Parameter(
+            torch.empty((3 * embed_dim, embed_dim), **factory_kwargs)
+        )
 
         self.register_parameter("in_proj_bias", None)
         self.out_proj = torch.nn.Linear(embed_dim, embed_dim, **factory_kwargs)
 
         self.in_proj_bias = None
         self.bias_k = self.bias_v = None
-        self.add_zero_attn = False
 
-        self._reset_parameters()
-
-    def _reset_parameters(self) -> None:
-        if self._qkv_same_embed_dim:
-            torch.nn.init.xavier_uniform_(self.in_proj_weight)
-        else:
-            torch.nn.init.xavier_uniform_(self.q_proj_weight)
-            torch.nn.init.xavier_uniform_(self.k_proj_weight)
-            torch.nn.init.xavier_uniform_(self.v_proj_weight)
+        torch.nn.init.xavier_uniform_(self.in_proj_weight)
 
     def forward(
         self,
@@ -611,7 +525,6 @@ class MultiheadAttentionScratch(torch.nn.Module):
                 self.in_proj_bias,
                 self.bias_k,
                 self.bias_v,
-                self.add_zero_attn,
                 self.dropout,
                 self.out_proj.weight,
                 self.out_proj.bias,
