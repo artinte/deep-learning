@@ -1,5 +1,6 @@
 import torch
 from positional_encoding import PositionalEncoding
+from custom_transformer import CustomTransformer
 
 
 class TransformerScratchModel(torch.nn.Module):
@@ -7,9 +8,6 @@ class TransformerScratchModel(torch.nn.Module):
         self,
         d_model,
         nhead,
-        num_encoder_layers,
-        num_decoder_layers,
-        dim_feedforward,
         dropout,
         src_vocab_size,
         tgt_vocab_size,
@@ -18,15 +16,11 @@ class TransformerScratchModel(torch.nn.Module):
         custom_decoder=None,
     ):
         super(TransformerScratchModel, self).__init__()
-        self.transformer = torch.nn.Transformer(
+        self.transformer = CustomTransformer(
             d_model=d_model,
             nhead=nhead,
-            num_encoder_layers=num_encoder_layers,
-            num_decoder_layers=num_decoder_layers,
-            dim_feedforward=dim_feedforward,
             custom_encoder=custom_encoder,
             custom_decoder=custom_decoder,
-            dropout=dropout,
             batch_first=batch_first,
         )
         self.d_model = d_model

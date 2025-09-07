@@ -58,9 +58,6 @@ custom_decoder = CustomDecoder(
 model = TransformerScratchModel(
     d_model,
     nhead,
-    num_encoder_layers,
-    num_decoder_layers,
-    dim_feedforward,
     dropout,
     len(src_vocab),
     len(tgt_vocab),
