@@ -1,6 +1,5 @@
 import sys
 import pathlib
-import os
 import random
 from matplotlib import pyplot
 
