@@ -40,75 +40,6 @@ def scaled_dot_product_attention(
     return attn_weight @ value
 
 
-def _in_projection(
-    q: torch.Tensor,
-    k: torch.Tensor,
-    v: torch.Tensor,
-    w_q: torch.Tensor,
-    w_k: torch.Tensor,
-    w_v: torch.Tensor,
-    b_q: Optional[torch.Tensor] = None,
-    b_k: Optional[torch.Tensor] = None,
-    b_v: Optional[torch.Tensor] = None,
-) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-    r"""Perform the in-projection step of the attention operation.
-
-    This is simply a triple of linear projections,
-    with shape constraints on the weights which
-    ensure embedding dimension uniformity in the projected outputs.
-    Output is a triple containing projection tensors for query, key and value.
-
-    Args:
-        q, k, v: query, key and value tensors to be projected.
-        w_q, w_k, w_v: weights for q, k and v, respectively.
-        b_q, b_k, b_v: optional biases for q, k and v, respectively.
-
-    Shape:
-        Inputs:
-        - q: :math:`(Qdims..., Eq)` where Eq is the query embedding dimension and Qdims are any
-            number of leading dimensions.
-        - k: :math:`(Kdims..., Ek)` where Ek is the key embedding dimension and Kdims are any
-            number of leading dimensions.
-        - v: :math:`(Vdims..., Ev)` where Ev is the value embedding dimension and Vdims are any
-            number of leading dimensions.
-        - w_q: :math:`(Eq, Eq)`
-        - w_k: :math:`(Eq, Ek)`
-        - w_v: :math:`(Eq, Ev)`
-        - b_q: :math:`(Eq)`
-        - b_k: :math:`(Eq)`
-        - b_v: :math:`(Eq)`
-
-        Output: in output triple :math:`(q', k', v')`,
-         - q': :math:`[Qdims..., Eq]`
-         - k': :math:`[Kdims..., Eq]`
-         - v': :math:`[Vdims..., Eq]`
-
-    """
-    Eq, Ek, Ev = q.size(-1), k.size(-1), v.size(-1)
-    assert w_q.shape == (
-        Eq,
-        Eq,
-    ), f"expecting query weights shape of {(Eq, Eq)}, but got {w_q.shape}"
-    assert w_k.shape == (
-        Eq,
-        Ek,
-    ), f"expecting key weights shape of {(Eq, Ek)}, but got {w_k.shape}"
-    assert w_v.shape == (
-        Eq,
-        Ev,
-    ), f"expecting value weights shape of {(Eq, Ev)}, but got {w_v.shape}"
-    assert b_q is None or b_q.shape == (
-        Eq,
-    ), f"expecting query bias shape of {(Eq,)}, but got {b_q.shape}"
-    assert b_k is None or b_k.shape == (
-        Eq,
-    ), f"expecting key bias shape of {(Eq,)}, but got {b_k.shape}"
-    assert b_v is None or b_v.shape == (
-        Eq,
-    ), f"expecting value bias shape of {(Eq,)}, but got {b_v.shape}"
-    return torch.nn.functional.linear(q, w_q, b_q), torch.nn.functional.linear(k, w_k, b_k), torch.nn.functional.linear(v, w_v, b_v)
-
-
 def _in_projection_packed(
     q: torch.Tensor,
     k: torch.Tensor,
@@ -116,33 +47,6 @@ def _in_projection_packed(
     w: torch.Tensor,
     b: Optional[torch.Tensor] = None,
 ) -> list[torch.Tensor]:
-    r"""Perform the in-projection step of the attention operation, using packed weights.
-
-    Output is a triple containing projection tensors for query, key and value.
-
-    Args:
-        q, k, v: query, key and value tensors to be projected. For self-attention,
-            these are typically the same tensor; for encoder-decoder attention,
-            k and v are typically the same tensor. (We take advantage of these
-            identities for performance if they are present.) Regardless, q, k and v
-            must share a common embedding dimension; otherwise their shapes may vary.
-        w: projection weights for q, k and v, packed into a single tensor. Weights
-            are packed along dimension 0, in q, k, v order.
-        b: optional projection biases for q, k and v, packed into a single tensor
-            in q, k, v order.
-
-    Shape:
-        Inputs:
-        - q: :math:`(..., E)` where E is the embedding dimension
-        - k: :math:`(..., E)` where E is the embedding dimension
-        - v: :math:`(..., E)` where E is the embedding dimension
-        - w: :math:`(E * 3, E)` where E is the embedding dimension
-        - b: :math:`E * 3` where E is the embedding dimension
-
-        Output:
-        - in output list :math:`[q', k', v']`, each output tensor will have the
-            same shape as the corresponding input tensor.
-    """
     E = q.size(-1)
     if k is v:
         if q is k:
@@ -221,9 +125,6 @@ def multi_head_attention_forward(
     embed_dim_to_check: int,
     num_heads: int,
     in_proj_weight: Optional[torch.Tensor],
-    in_proj_bias: Optional[torch.Tensor],
-    bias_k: Optional[torch.Tensor],
-    bias_v: Optional[torch.Tensor],
     dropout_p: float,
     out_proj_weight: torch.Tensor,
     out_proj_bias: Optional[torch.Tensor],
@@ -231,8 +132,6 @@ def multi_head_attention_forward(
     key_padding_mask: Optional[torch.Tensor] = None,
     need_weights: bool = True,
     attn_mask: Optional[torch.Tensor] = None,
-    static_k: Optional[torch.Tensor] = None,
-    static_v: Optional[torch.Tensor] = None,
     average_attn_weights: bool = True,
     is_causal: bool = False,
 ) -> tuple[torch.Tensor, Optional[torch.Tensor]]:
@@ -293,7 +192,7 @@ def multi_head_attention_forward(
         key.shape == value.shape
     ), f"key shape {key.shape} does not match value shape {value.shape}"
 
-    q, k, v = _in_projection_packed(query, key, value, in_proj_weight, in_proj_bias)
+    q, k, v = _in_projection_packed(query, key, value, in_proj_weight)
     
     # prep attention mask
     if attn_mask is not None:
@@ -316,46 +215,10 @@ def multi_head_attention_forward(
                 f"attn_mask's dimension {attn_mask.dim()} is not supported"
             )
 
-    # add bias along batch dimension (currently second)
-    if bias_k is not None and bias_v is not None:
-        assert static_k is None, "bias cannot be added to static key."
-        assert static_v is None, "bias cannot be added to static value."
-        k = torch.cat([k, bias_k.repeat(1, bsz, 1)])
-        v = torch.cat([v, bias_v.repeat(1, bsz, 1)])
-        if attn_mask is not None:
-            attn_mask = torch.nn.functional.pad(attn_mask, (0, 1))
-        if key_padding_mask is not None:
-            key_padding_mask = torch.nn.functional.pad(key_padding_mask, (0, 1))
-    else:
-        assert bias_k is None
-        assert bias_v is None
-
-    #
     # reshape q, k, v for multihead attention and make them batch first
-    #
     q = q.view(tgt_len, bsz * num_heads, head_dim).transpose(0, 1)
-    if static_k is None:
-        k = k.view(k.shape[0], bsz * num_heads, head_dim).transpose(0, 1)
-    else:
-        # TODO finish disentangling control flow so we don't do in-projections when statics are passed
-        assert (
-            static_k.size(0) == bsz * num_heads
-        ), f"expecting static_k.size(0) of {bsz * num_heads}, but got {static_k.size(0)}"
-        assert (
-            static_k.size(2) == head_dim
-        ), f"expecting static_k.size(2) of {head_dim}, but got {static_k.size(2)}"
-        k = static_k
-    if static_v is None:
-        v = v.view(v.shape[0], bsz * num_heads, head_dim).transpose(0, 1)
-    else:
-        # TODO finish disentangling control flow so we don't do in-projections when statics are passed
-        assert (
-            static_v.size(0) == bsz * num_heads
-        ), f"expecting static_v.size(0) of {bsz * num_heads}, but got {static_v.size(0)}"
-        assert (
-            static_v.size(2) == head_dim
-        ), f"expecting static_v.size(2) of {head_dim}, but got {static_v.size(2)}"
-        v = static_v
+    k = k.view(k.shape[0], bsz * num_heads, head_dim).transpose(0, 1)
+    v = v.view(v.shape[0], bsz * num_heads, head_dim).transpose(0, 1)
 
     # update source sequence length after adjustments
     src_len = k.size(1)
@@ -466,11 +329,7 @@ class MultiheadAttentionScratch(torch.nn.Module):
             torch.empty((3 * embed_dim, embed_dim), **factory_kwargs)
         )
 
-        self.register_parameter("in_proj_bias", None)
         self.out_proj = torch.nn.Linear(embed_dim, embed_dim, **factory_kwargs)
-
-        self.in_proj_bias = None
-        self.bias_k = self.bias_v = None
 
         torch.nn.init.xavier_uniform_(self.in_proj_weight)
 
@@ -522,9 +381,6 @@ class MultiheadAttentionScratch(torch.nn.Module):
                 self.embed_dim,
                 self.num_heads,
                 self.in_proj_weight,
-                self.in_proj_bias,
-                self.bias_k,
-                self.bias_v,
                 self.dropout,
                 self.out_proj.weight,
                 self.out_proj.bias,
