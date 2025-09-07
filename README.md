@@ -155,6 +155,8 @@ def scaled_dot_product_attention(query, key, value, attn_mask=None, dropout_p=0.
 
 The original paper [Attention Is All You Need](https://arxiv.org/abs/1706.03762), and some code snippets to help understand the paper's content. The Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.
 
+![Transformer Architecture](docs/res/05/transformer_arch_600.jpg)
+
 `demo_transformers.py`
 
 5.3 [nn.Transformer](https://artinte.github.io/deep-learning/nn_transformer.html)
