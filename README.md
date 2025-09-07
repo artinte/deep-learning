@@ -22,6 +22,16 @@ pip3 install torch torchvision torchaudio
 
 1.2 [Introduction to Tensors](https://artinte.github.io/deep-learning/tensor_intro.html)
 
+`demo_create.py` 
+
+![Tensor of PyTorch](docs/res/01/tensor_three_dims.png)
+
+`demo_indexing.py`
+
+`demo_operate.py`
+
+
+
 1.3 [Data Representation](https://artinte.github.io/deep-learning/data_represent.html)
 
 1.4 [Principles of Deep Learning](https://artinte.github.io/deep-learning/principle_learn.html)
