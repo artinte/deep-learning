@@ -88,9 +88,12 @@ class GPTLanguageModel(torch.nn.Module):
                 break
             idx = torch.cat((idx, idx_next), dim=1)
         return idx
-    
+
+
 def collate_fn(batch):
-    padded_batch = torch.nn.utils.rnn.pad_sequence(batch, batch_first=True, padding_value=special_tokens["<pad>"])
+    padded_batch = torch.nn.utils.rnn.pad_sequence(
+        batch, batch_first=True, padding_value=special_tokens["<pad>"]
+    )
     x = padded_batch[:, :-1]
     y = padded_batch[:, 1:]
     return x, y
@@ -115,6 +118,12 @@ val_loader = torch.utils.data.DataLoader(
     val_dataset, batch_size=Config.batch_size, shuffle=False, collate_fn=collate_fn
 )
 
+(sample_src, sample_tgt) = next(iter(train_loader))
+print(sample_src.shape)
+print(sample_src)
+print(sample_tgt.shape)
+print(sample_tgt)
+
 
 def get_batch(split_loader):
     xb, yb = next(split_loader)
@@ -126,11 +135,11 @@ def get_batch(split_loader):
 def estimate_loss(model, train_loader, val_loader):
     out = {}
     model.eval()
-    
+
     # Create fresh iterators for evaluation
     train_iter = iter(train_loader)
     val_iter = iter(val_loader)
-    
+
     for split in ["train", "val"]:
         losses = torch.zeros(Config.eval_iters)
         current_iter = train_iter if split == "train" else val_iter
@@ -143,10 +152,10 @@ def estimate_loss(model, train_loader, val_loader):
                 break
             logits, loss = model(X, Y)
             losses[k] = loss.item()
-        
+
         # Calculate mean loss for the batches that were processed
         out[split] = losses.mean()
-        
+
     model.train()
     return out
 
