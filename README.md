@@ -34,6 +34,20 @@ pip3 install torch torchvision torchaudio
 
 1.3 [Data Representation](https://artinte.github.io/deep-learning/data_represent.html)
 
+`demo_features.py`
+
+`demo_text_data.py`
+
+`demo_audio_data.py`
+
+![Audio Sample Waveform](docs/res/01/audio_sample_data.png)
+
+`demo_image_data.py`
+
+`demo_video_data.py`
+
+
+
 1.4 [Principles of Deep Learning](https://artinte.github.io/deep-learning/principle_learn.html)
 
 We will explore the fundamental principles of deep learning, including the concepts of machine learning, rules and representations, neural networks, and optimization techniques such as gradient descent.
