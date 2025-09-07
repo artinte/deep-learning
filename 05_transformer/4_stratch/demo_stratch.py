@@ -1,6 +1,6 @@
 import torch
 from torchmetrics.text.bleu import BLEUScore
-from transformer_sdpa_model import TransformerSdpaModel
+from transformer_scratch_model import TransformerScratchModel
 from custom_decoder import CustomDecoder, CustomDecoderLayer
 from custom_encoder import CustomEncoder, CustomEncoderLayer
 from train import train
@@ -55,7 +55,7 @@ custom_decoder = CustomDecoder(
     num_layers=num_decoder_layers,
 )
 
-model = TransformerSdpaModel(
+model = TransformerScratchModel(
     d_model,
     nhead,
     num_encoder_layers,
