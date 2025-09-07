@@ -144,9 +144,7 @@ class MultiheadAttentionScratch(torch.nn.Module):
         key: torch.Tensor,
         value: torch.Tensor,
         key_padding_mask: Optional[torch.Tensor] = None,
-        need_weights: bool = True,
         attn_mask: Optional[torch.Tensor] = None,
-        average_attn_weights: bool = True,
         is_causal: bool = False,
     ) -> tuple[torch.Tensor, Optional[torch.Tensor]]:
 
@@ -173,10 +171,8 @@ class MultiheadAttentionScratch(torch.nn.Module):
             else:
                 query, key, value = (x.transpose(1, 0) for x in (query, key, value))
 
-        attn_output = None
-        attn_output_weights = None
         # set up shape vars
-        tgt_len, bsz, embed_dim = query.shape
+        tgt_len, batch_size, embed_dim = query.shape
         src_len, _, _ = key.shape
 
         if is_causal and attn_mask is None:
@@ -186,8 +182,8 @@ class MultiheadAttentionScratch(torch.nn.Module):
                 "`generate_square_subsequent_mask` to create this mask."
             )
 
-        if is_causal and key_padding_mask is None and not need_weights:
-            # when we have a kpm or need weights, we need attn_mask
+        if is_causal and key_padding_mask is None:
+            # when we have a kpm, we need attn_mask
             # Otherwise, we use the is_causal hint go as is_causal
             # indicator to SDPA.
             attn_mask = None
@@ -221,7 +217,7 @@ class MultiheadAttentionScratch(torch.nn.Module):
                     )
                 attn_mask = attn_mask.unsqueeze(0)
             elif attn_mask.dim() == 3:
-                correct_3d_size = (bsz * self.num_heads, tgt_len, src_len)
+                correct_3d_size = (batch_size * self.num_heads, tgt_len, src_len)
                 if attn_mask.shape != correct_3d_size:
                     raise RuntimeError(
                         f"The shape of the 3D attn_mask is {attn_mask.shape}, but should be {correct_3d_size}."
@@ -232,9 +228,9 @@ class MultiheadAttentionScratch(torch.nn.Module):
                 )
 
         # reshape q, k, v for multihead attention and make them batch first
-        q = q.view(tgt_len, bsz * self.num_heads, self.head_dim).transpose(0, 1)
-        k = k.view(k.shape[0], bsz * self.num_heads, self.head_dim).transpose(0, 1)
-        v = v.view(v.shape[0], bsz * self.num_heads, self.head_dim).transpose(0, 1)
+        q = q.view(tgt_len, batch_size * self.num_heads, self.head_dim).transpose(0, 1)
+        k = k.view(k.shape[0], batch_size * self.num_heads, self.head_dim).transpose(0, 1)
+        v = v.view(v.shape[0], batch_size * self.num_heads, self.head_dim).transpose(0, 1)
 
         # update source sequence length after adjustments
         src_len = k.size(1)
@@ -242,9 +238,9 @@ class MultiheadAttentionScratch(torch.nn.Module):
         # merge key padding and attention masks
         if key_padding_mask is not None:
             key_padding_mask = (
-                key_padding_mask.view(bsz, 1, 1, src_len)
+                key_padding_mask.view(batch_size, 1, 1, src_len)
                 .expand(-1, self.num_heads, -1, -1)
-                .reshape(bsz * self.num_heads, 1, src_len)
+                .reshape(batch_size * self.num_heads, 1, src_len)
             )
             if attn_mask is None:
                 attn_mask = key_padding_mask
@@ -255,74 +251,34 @@ class MultiheadAttentionScratch(torch.nn.Module):
         if not self.training:
             self.dropout = 0.0
 
-        # (deep breath) calculate attention and out projection
-        if need_weights:
-            _B, _Nt, E = q.shape
-            q_scaled = q * math.sqrt(1.0 / float(E))
-
-            assert not (
-                is_causal and attn_mask is None
-            ), "FIXME: is_causal not implemented for need_weights"
-
-            if attn_mask is not None:
-                attn_output_weights = torch.baddbmm(
-                    attn_mask, q_scaled, k.transpose(-2, -1)
-                )
+        # attn_mask can be either (L,S) or (N*num_heads, L, S)
+        # if attn_mask's shape is (1, L, S) we need to unsqueeze to (1, 1, L, S)
+        # in order to match the input for SDPA of (N, num_heads, L, S)
+        if attn_mask is not None:
+            if attn_mask.size(0) == 1 and attn_mask.dim() == 3:
+                attn_mask = attn_mask.unsqueeze(0)
             else:
-                attn_output_weights = torch.bmm(q_scaled, k.transpose(-2, -1))
-            attn_output_weights = torch.nn.functional.softmax(
-                attn_output_weights, dim=-1
-            )
-            if self.dropout > 0.0:
-                attn_output_weights = torch.nn.functional.dropout(
-                    attn_output_weights, p=self.dropout
-                )
+                attn_mask = attn_mask.view(batch_size, self.num_heads, -1, src_len)
 
-            attn_output = torch.bmm(attn_output_weights, v)
+        q = q.view(batch_size, self.num_heads, tgt_len, self.head_dim)
+        k = k.view(batch_size, self.num_heads, src_len, self.head_dim)
+        v = v.view(batch_size, self.num_heads, src_len, self.head_dim)
 
-            attn_output = (
-                attn_output.transpose(0, 1).contiguous().view(tgt_len * bsz, embed_dim)
-            )
-            attn_output = torch.nn.functional.linear(
-                attn_output, self.out_proj.weight, self.out_proj.bias
-            )
-            attn_output = attn_output.view(tgt_len, bsz, attn_output.size(1))
+        attn_output = scaled_dot_product_attention(
+            q, k, v, attn_mask, self.dropout, is_causal
+        )
+        attn_output = (
+            attn_output.permute(2, 0, 1, 3)
+            .contiguous()
+            .view(batch_size * tgt_len, embed_dim)
+        )
 
-            # optionally average attention weights over heads
-            attn_output_weights = attn_output_weights.view(
-                bsz, self.num_heads, tgt_len, src_len
-            )
-            if average_attn_weights:
-                attn_output_weights = attn_output_weights.mean(dim=1)
-        else:
-            # attn_mask can be either (L,S) or (N*num_heads, L, S)
-            # if attn_mask's shape is (1, L, S) we need to unsqueeze to (1, 1, L, S)
-            # in order to match the input for SDPA of (N, num_heads, L, S)
-            if attn_mask is not None:
-                if attn_mask.size(0) == 1 and attn_mask.dim() == 3:
-                    attn_mask = attn_mask.unsqueeze(0)
-                else:
-                    attn_mask = attn_mask.view(bsz, self.num_heads, -1, src_len)
-
-            q = q.view(bsz, self.num_heads, tgt_len, self.head_dim)
-            k = k.view(bsz, self.num_heads, src_len, self.head_dim)
-            v = v.view(bsz, self.num_heads, src_len, self.head_dim)
-
-            attn_output = scaled_dot_product_attention(
-                q, k, v, attn_mask, self.dropout, is_causal
-            )
-            attn_output = (
-                attn_output.permute(2, 0, 1, 3)
-                .contiguous()
-                .view(bsz * tgt_len, embed_dim)
-            )
-
-            attn_output = torch.nn.functional.linear(
-                attn_output, self.out_proj.weight, self.out_proj.bias
-            )
-            attn_output = attn_output.view(tgt_len, bsz, attn_output.size(1))
+        attn_output = torch.nn.functional.linear(
+            attn_output, self.out_proj.weight, self.out_proj.bias
+        )
+        attn_output = attn_output.view(tgt_len, batch_size, attn_output.size(1))
 
         if self.batch_first:
-            return attn_output.transpose(1, 0), attn_output_weights
+            return attn_output.transpose(1, 0), None
         else:
-            return attn_output, attn_output_weights
+            return attn_output, None
