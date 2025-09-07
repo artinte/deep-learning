@@ -91,10 +91,7 @@ def _in_projection_packed(
 def _canonical_mask(
     mask: Optional[torch.Tensor],
     mask_name: str,
-    other_type: Optional[torch.dtype],
-    other_name: str,
     target_type: torch.dtype,
-    check_other: bool = True,
 ) -> Optional[torch.Tensor]:
     if mask is not None:
         _mask_dtype = mask.dtype
@@ -110,19 +107,10 @@ def _canonical_mask(
     return mask
 
 
-def _none_or_dtype(input: Optional[torch.Tensor]) -> Optional[torch.dtype]:
-    if input is None:
-        return None
-    elif isinstance(input, torch.Tensor):
-        return input.dtype
-    raise RuntimeError("input to _none_or_dtype() must be None or torch.Tensor")
-
-
 def multi_head_attention_forward(
     query: torch.Tensor,
     key: torch.Tensor,
     value: torch.Tensor,
-    embed_dim_to_check: int,
     num_heads: int,
     in_proj_weight: Optional[torch.Tensor],
     dropout_p: float,
@@ -143,8 +131,6 @@ def multi_head_attention_forward(
     key_padding_mask = _canonical_mask(
         mask=key_padding_mask,
         mask_name="key_padding_mask",
-        other_type=_none_or_dtype(attn_mask),
-        other_name="attn_mask",
         target_type=query.dtype,
     )
 
@@ -164,10 +150,7 @@ def multi_head_attention_forward(
         attn_mask = _canonical_mask(
             mask=attn_mask,
             mask_name="attn_mask",
-            other_type=None,
-            other_name="",
             target_type=query.dtype,
-            check_other=False,
         )
 
         if key_padding_mask is not None:
@@ -176,9 +159,6 @@ def multi_head_attention_forward(
             # longer causal.
             is_causal = False
 
-    assert (
-        embed_dim == embed_dim_to_check
-    ), f"was expecting embedding dimension of {embed_dim_to_check}, but got {embed_dim}"
     if isinstance(embed_dim, torch.Tensor):
         # embed_dim can be a tensor when JIT tracing
         head_dim = embed_dim.div(num_heads, rounding_mode="trunc")
@@ -308,27 +288,19 @@ class MultiheadAttentionScratch(torch.nn.Module):
         device=None,
         dtype=None,
     ) -> None:
-        if embed_dim <= 0 or num_heads <= 0:
-            raise ValueError(
-                f"embed_dim and num_heads must be greater than 0,"
-                f" got embed_dim={embed_dim} and num_heads={num_heads} instead"
-            )
+        assert embed_dim > 0 and num_heads > 0
         factory_kwargs = {"device": device, "dtype": dtype}
         super().__init__()
         self.embed_dim = embed_dim
-
         self.num_heads = num_heads
         self.dropout = dropout
         self.batch_first = batch_first
+        assert embed_dim % num_heads == 0
         self.head_dim = embed_dim // num_heads
-        assert (
-            self.head_dim * num_heads == self.embed_dim
-        ), "embed_dim must be divisible by num_heads"
 
         self.in_proj_weight = torch.nn.Parameter(
             torch.empty((3 * embed_dim, embed_dim), **factory_kwargs)
         )
-
         self.out_proj = torch.nn.Linear(embed_dim, embed_dim, **factory_kwargs)
 
         torch.nn.init.xavier_uniform_(self.in_proj_weight)
@@ -345,21 +317,16 @@ class MultiheadAttentionScratch(torch.nn.Module):
         is_causal: bool = False,
     ) -> tuple[torch.Tensor, Optional[torch.Tensor]]:
 
-        key_padding_mask = torch.nn.functional._canonical_mask(
+        key_padding_mask = _canonical_mask(
             mask=key_padding_mask,
             mask_name="key_padding_mask",
-            other_type=torch.nn.functional._none_or_dtype(attn_mask),
-            other_name="attn_mask",
             target_type=query.dtype,
         )
 
-        attn_mask = torch.nn.functional._canonical_mask(
+        attn_mask = _canonical_mask(
             mask=attn_mask,
             mask_name="attn_mask",
-            other_type=None,
-            other_name="",
             target_type=query.dtype,
-            check_other=False,
         )
 
         if self.batch_first:
@@ -378,7 +345,6 @@ class MultiheadAttentionScratch(torch.nn.Module):
                 query,
                 key,
                 value,
-                self.embed_dim,
                 self.num_heads,
                 self.in_proj_weight,
                 self.dropout,
