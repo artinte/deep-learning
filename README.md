@@ -22,7 +22,7 @@ pip3 install torch torchvision torchaudio
 
 1.2 [Introduction to Tensors](https://artinte.github.io/deep-learning/tensor_intro.html)
 
-`demo_create.py` 
+`demo_create.py` demonstrates the fundamental ways to create and manipulate PyTorch tensors, which are the core data structures in the PyTorch framework.
 
 ![Tensor of PyTorch](docs/res/01/tensor_three_dims.png)
 
