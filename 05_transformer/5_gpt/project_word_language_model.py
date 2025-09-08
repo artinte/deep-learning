@@ -1,14 +1,15 @@
 import torch
 
+
 class Config:
-  # size of word embeddings
-  emsize=200
-  # the number of heads in the encoder/decoder of the transformer model
-  nhead=2
-  # number of hidden units per layer
-  nhid=200
-  # number of layers
-  nlayers
+    # size of word embeddings
+    emsize = 200
+    # the number of heads in the encoder/decoder of the transformer model
+    nhead = 2
+    # number of hidden units per layer
+    nhid = 200
+    # number of layers
+    nlayers = 2
 
 
 torch.manual_seed(0)
@@ -35,6 +36,7 @@ corpus = data.Corpus(args.data)
 # dependence of e. g. 'g' on 'f' can not be learned, but allows more efficient
 # batch processing.
 
+
 def batchify(data, bsz):
     # Work out how cleanly we can divide the dataset into bsz parts.
     nbatch = data.size(0) // bsz
@@ -43,6 +45,7 @@ def batchify(data, bsz):
     # Evenly divide the data across the bsz batches.
     data = data.view(bsz, -1).t().contiguous()
     return data.to(device)
+
 
 eval_batch_size = 10
 train_data = batchify(corpus.train, args.batch_size)
