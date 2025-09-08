@@ -175,11 +175,15 @@ The original paper [Attention Is All You Need](https://arxiv.org/abs/1706.03762)
 
 `project_chinese_poetry.py` defines and trains a GPT-like model to generate Chinese poetry.
 
+`project_word_language_model.py` trains a multi-layer RNN (Elman, GRU, or LSTM) or Transformer on a language modeling task. By default, the training script uses the Wikitext-2 dataset, provided. The trained model can then be used by the script to generate new text.
+
 5.6 [BERT](https://artinte.github.io/deep-learning/bert.html)
 
 The `project_bert.py` code references the [google-research/bert](https://github.com/google-research/bert) project, but is implemented using PyTorch. BERT, which stands for Bidirectional Encoder Representations from Transformers, is designed to pre-train deep bidirectional representations from unlabeled text by jointly conditioning on both left and right context in all layers.
 
 5.7 [Vision Transformer](https://artinte.github.io/deep-learning/vision_transformer.html)
+
+
 
 ### 06 Diffusion Model
 
@@ -219,22 +223,33 @@ The `project_bert.py` code references the [google-research/bert](https://github.
 
 ### 08 Audio
 
-- [x] 8.1 [Speech Feature Extraction](https://artinte.github.io/deep-learning/speech_feature.html)
-- [x] 8.2 [Automatic Speech Recognition](https://artinte.github.io/deep-learning/speech_recognition.html)
-- [x] 8.3 [Text-to-Speech](https://artinte.github.io/deep-learning/text_to_speech.html)
-- [x] 8.4 [Music Transcription](https://artinte.github.io/deep-learning/music_transcription.html)
-- [x] 8.5 [Music Synthesis](https://artinte.github.io/deep-learning/music_synthesis.html)
+8.1 [Speech Feature Extraction](https://artinte.github.io/deep-learning/speech_feature.html)
+
+8.2 [Automatic Speech Recognition](https://artinte.github.io/deep-learning/speech_recognition.html)
+
+8.3 [Text-to-Speech](https://artinte.github.io/deep-learning/text_to_speech.html)
+
+8.4 [Music Transcription](https://artinte.github.io/deep-learning/music_transcription.html)
+
+8.5 [Music Synthesis](https://artinte.github.io/deep-learning/music_synthesis.html)
 
 ### 09 Image and Video
 
-- [x] 9.1 [Object Detection](https://artinte.github.io/deep-learning/object_detection.html)
-- [x] 9.2 [Transfer Learning](https://artinte.github.io/deep-learning/transfer_learning.html)
-- [x] 9.3 [FGSM Attack](https://artinte.github.io/deep-learning/fgsm_attack.html)
-- [x] 9.4 [Spatial Transformer](https://artinte.github.io/deep-learning/spatial_transformer.html)
-- [x] 9.5 [DeepFaceLab](https://artinte.github.io/deep-learning/deep_face_lab.html)
-- [x] 9.6 [DeepFaceLive](https://artinte.github.io/deep-learning/deep_face_live.html)
-- [x] 9.7 [Segment Anything](https://artinte.github.io/deep-learning/segment_anything.html)
-- [x] 9.8 [Intro to Autoencoders](https://artinte.github.io/deep-learning/intro_auto_encoder.html)
+9.1 [Object Detection](https://artinte.github.io/deep-learning/object_detection.html)
+
+9.2 [Transfer Learning](https://artinte.github.io/deep-learning/transfer_learning.html)
+
+9.3 [FGSM Attack](https://artinte.github.io/deep-learning/fgsm_attack.html)
+
+9.4 [Spatial Transformer](https://artinte.github.io/deep-learning/spatial_transformer.html)
+
+9.5 [DeepFaceLab](https://artinte.github.io/deep-learning/deep_face_lab.html)
+
+9.6 [DeepFaceLive](https://artinte.github.io/deep-learning/deep_face_live.html)
+
+9.7 [Segment Anything](https://artinte.github.io/deep-learning/segment_anything.html)
+
+9.8 [Intro to Autoencoders](https://artinte.github.io/deep-learning/intro_auto_encoder.html)
 
 ### 10 Reinforcement Learning
 
