@@ -58,9 +58,12 @@ We will explore the fundamental principles of deep learning, including the conce
 
 1.6 [Gradient Descent](https://artinte.github.io/deep-learning/gradient_descent.html)
 
+
 1.7 [Neural Network from Scratch](https://artinte.github.io/deep-learning/network_scratch.html)
 
 `demo_simple_network_numpy.py` trains a small neural network from scratch using NumPy to classify a simple dataset of people's heights and weights as either male or female.
+
+![Architecture of Simple DNN](docs/res/01/arch_dnn_scratch.png)
 
 
 ### 02 Fully Connected Network
@@ -195,6 +198,8 @@ The original paper [Attention Is All You Need](https://arxiv.org/abs/1706.03762)
 
 5.5 [GPT](https://artinte.github.io/deep-learning/nano_gpt.html)
 
+![Architecture of GPT](docs/res/05/simple_gpt.jpg)
+
 `project_chinese_poetry.py` defines and trains a GPT-like model to generate Chinese poetry.
 
 `project_word_language_model.py` trains a multi-layer RNN (Elman, GRU, or LSTM) or Transformer on a language modeling task. By default, the training script uses the Wikitext-2 dataset, provided. The trained model can then be used by the script to generate new text.
@@ -208,6 +213,8 @@ The `project_bert.py` code references the [google-research/bert](https://github.
 ![The Architecture of Vision Transformer](docs/res/05/vit_arch_640.png)
 
 `demo_mnist_classify.py`
+
+Implementation of Vision Transformer, a simple way to achieve SOTA in vision classification with only a single transformer encoder, in Pytorch. For more information, please refer to [lucidrains/vit-pytorch](https://github.com/lucidrains/vit-pytorch) .
 
 
 ### 06 Diffusion Model
