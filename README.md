@@ -75,6 +75,28 @@ We will explore the fundamental principles of deep learning, including the conce
 
 2.3 [PyTorch Basics](https://artinte.github.io/deep-learning/pytorch_basics.html)
 
+`demo_quick_start.py` is a complete demonstration of training a simple neural network on the MNIST dataset using PyTorch. The entire process, from data preparation to model training and evaluation, is covered.
+
+```
+model = NeuralNetwork().to(device)
+criterion = torch.nn.CrossEntropyLoss()
+optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
+
+def train(dataloader, model, loss_fn, optimizer):
+    model.train()
+    for batch, (X, y) in enumerate(dataloader):
+        X, y= X.to(device), y.to(device)
+        optimizer.zero_grad()
+
+        # compute prediction error
+        pred = model(X)
+        loss = loss_fn(pred, y)
+
+        # backpropagation
+        loss.backward()
+        optimizer.step()
+```
+
 2.4 [Activation Function](https://artinte.github.io/deep-learning/activation_function.html)
 
 2.5 [Loss Function](https://artinte.github.io/deep-learning/loss_function.html)

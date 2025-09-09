@@ -73,7 +73,7 @@ class NeuralNetwork(torch.nn.Module):
 model = NeuralNetwork().to(device)
 print(model)
 
-loss_fn = torch.nn.CrossEntropyLoss()
+criterion = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
 
 def train(dataloader, model, loss_fn, optimizer):
@@ -81,15 +81,15 @@ def train(dataloader, model, loss_fn, optimizer):
     model.train()
     for batch, (X, y) in enumerate(dataloader):
         X, y= X.to(device), y.to(device)
-        
-        # Compute prediction error.
+        optimizer.zero_grad()
+
+        # compute prediction error
         pred = model(X)
         loss = loss_fn(pred, y)
-        
+
         # backpropagation
         loss.backward()
         optimizer.step()
-        optimizer.zero_grad()
         
         if batch % 100 == 0:
             loss, current = loss.item(), (batch + 1) * len(X)
@@ -113,6 +113,6 @@ def test(dataloader, model, loss_fn):
 epochs = 20
 for t in range(epochs):
     print(f"Epoch {t+1}\n-------------------------------")
-    train(train_dataloader, model, loss_fn, optimizer)
-    test(test_dataloader, model, loss_fn)
+    train(train_dataloader, model, criterion, optimizer)
+    test(test_dataloader, model, criterion)
 print("Done!")
