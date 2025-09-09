@@ -85,7 +85,7 @@ optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
 def train(dataloader, model, loss_fn, optimizer):
     model.train()
     for batch, (X, y) in enumerate(dataloader):
-        X, y= X.to(device), y.to(device)
+        X, y = X.to(device), y.to(device)
         optimizer.zero_grad()
 
         # compute prediction error
@@ -204,6 +204,8 @@ The original paper [Attention Is All You Need](https://arxiv.org/abs/1706.03762)
 The `project_bert.py` code references the [google-research/bert](https://github.com/google-research/bert) project, but is implemented using PyTorch. BERT, which stands for Bidirectional Encoder Representations from Transformers, is designed to pre-train deep bidirectional representations from unlabeled text by jointly conditioning on both left and right context in all layers.
 
 5.7 [Vision Transformer](https://artinte.github.io/deep-learning/vision_transformer.html)
+
+![The Architecture of Vision Transformer](docs/res/05/vit_arch_640.png)
 
 `demo_mnist_classify.py`
 
