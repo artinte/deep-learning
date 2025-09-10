@@ -144,7 +144,7 @@ def train(dataloader, model, loss_fn, optimizer):
 
 `demo_nadaraya_regression.py`
 
-`demo_scale_dot_product_attention.py` computes scaled dot product attention on query, key and value tensors, using an optional attention mask if passed, and applying dropout if a probability greater than 0.0 is specified.
+`demo_scale_dot_product_attention.py` computes scaled dot product attention on query, key and value tensors, using an optional attention mask if passed, and applying dropout if a probability greater than 0.0 is specified. 
 
 ```
 # Efficient implementation equivalent to the following:
@@ -175,6 +175,8 @@ def scaled_dot_product_attention(query, key, value, attn_mask=None, dropout_p=0.
     attn_weight = torch.dropout(attn_weight, dropout_p, train=True)
     return attn_weight @ value
 ```
+
+`demo_multi_head_attention.py` 
 
 5.2 [Attention Is All You Need](https://artinte.github.io/deep-learning/transformer_paper.html)
 
