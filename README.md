@@ -188,7 +188,33 @@ The original paper [Attention Is All You Need](https://arxiv.org/abs/1706.03762)
 
 5.3 [nn.Transformer](https://artinte.github.io/deep-learning/nn_transformer.html)
 
+This Transformer layer implements the original Transformer architecture described in the Attention Is All You Need paper. The intent of this layer is as a reference implementation for foundational understanding and thus it contains only limited features relative to newer Transformer architectures.
+
+```
+class torch.nn.Transformer(d_model=512, nhead=8, num_encoder_layers=6,
+    num_decoder_layers=6, dim_feedforward=2048, dropout=0.1,
+    activation=<function relu>, custom_encoder=None, custom_decoder=None,
+    layer_norm_eps=1e-05, batch_first=False, norm_first=False,
+    bias=True, device=None, dtype=None)
+```
+
+* d_model (int) – the number of expected features in the encoder/decoder inputs (default=512).
+* nhead (int) – the number of heads in the multiheadattention models (default=8).
+* num_encoder_layers (int) – the number of sub-encoder-layers in the encoder (default=6).
+* num_decoder_layers (int) – the number of sub-decoder-layers in the decoder (default=6).
+* dim_feedforward (int) – the dimension of the feedforward network model (default=2048).
+* dropout (float) – the dropout value (default=0.1).
+* activation (Union[str, Callable[[Tensor], Tensor]]) – the activation function of encoder/decoder intermediate layer, can be a string (“relu” or “gelu”) or a unary callable. Default: relu.
+* custom_encoder (Optional[Any]) – custom encoder (default=None).
+* custom_decoder (Optional[Any]) – custom decoder (default=None).
+* layer_norm_eps (float) – the eps value in layer normalization components (default=1e-5).
+* batch_first (bool) – If True, then the input and output tensors are provided as (batch, seq, feature). Default: False (seq, batch, feature).
+* norm_first (bool) – if True, encoder and decoder layers will perform LayerNorms before other attention and feedforward operations, otherwise after. Default: False (after).
+* bias (bool) – If set to False, Linear and LayerNorm layers will not learn an additive bias. Default: True.
+
 `project_en_de_translate.py` handles English-German translation.
+
+`project_world_language_model.py`
 
 5.4 Multi-Head Attention
 
@@ -203,14 +229,14 @@ class torch.nn.MultiheadAttention(embed_dim, num_heads, dropout=0.0, bias=True,
 Allows the model to jointly attend to information from different representation subspaces.
 
 * embed_dim – Total dimension of the model.
-* num_heads – Number of parallel attention heads. Note that embed_dim will be split across num_heads (i.e. each head will have dimension embed_dim // num_heads).
-* dropout – Dropout probability on attn_output_weights. Default: 0.0 (no dropout).
-* bias – If specified, adds bias to input / output projection layers. Default: True.
+* num_heads – Number of parallel attention heads. Note that `embed_dim` will be split across `num_heads` (i.e. each head will have dimension `embed_dim // num_heads`).
+* dropout – Dropout probability on `attn_output_weights`. Default: `0.0` (no dropout).
+* bias – If specified, adds bias to input / output projection layers. Default: `True`.
 * add_bias_kv – If specified, adds bias to the key and value sequences at dim=0. Default: False.
-* add_zero_attn – If specified, adds a new batch of zeros to the key and value sequences at dim=1. Default: False.
-* kdim – Total number of features for keys. Default: None (uses kdim=embed_dim).
-* vdim – Total number of features for values. Default: None (uses vdim=embed_dim).
-* batch_first – If True, then the input and output tensors are provided as (batch, seq, feature). Default: False (seq, batch, feature).
+* add_zero_attn – If specified, adds a new batch of zeros to the key and value sequences at dim=1. Default: `False`.
+* kdim – Total number of features for keys. Default: `None` (uses `kdim=embed_dim`).
+* vdim – Total number of features for values. Default: `None` (uses vdim=`embed_dim`).
+* batch_first – If `True`, then the input and output tensors are provided as (batch, seq, feature). Default: `False` (seq, batch, feature).
 
 
 5.5 [Transformer from Stratch](https://artinte.github.io/deep-learning/transformer_stratch.html)
