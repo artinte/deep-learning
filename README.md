@@ -176,8 +176,6 @@ def scaled_dot_product_attention(query, key, value, attn_mask=None, dropout_p=0.
     return attn_weight @ value
 ```
 
-`demo_multi_head_attention.py` 
-
 5.2 [Attention Is All You Need](https://artinte.github.io/deep-learning/transformer_paper.html)
 
 The original paper [Attention Is All You Need](https://arxiv.org/abs/1706.03762), and some code snippets to help understand the paper's content. The Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.
@@ -204,13 +202,13 @@ class torch.nn.Transformer(d_model=512, nhead=8, num_encoder_layers=6,
 * num_decoder_layers (int) – the number of sub-decoder-layers in the decoder (default=6).
 * dim_feedforward (int) – the dimension of the feedforward network model (default=2048).
 * dropout (float) – the dropout value (default=0.1).
-* activation (Union[str, Callable[[Tensor], Tensor]]) – the activation function of encoder/decoder intermediate layer, can be a string (“relu” or “gelu”) or a unary callable. Default: relu.
-* custom_encoder (Optional[Any]) – custom encoder (default=None).
-* custom_decoder (Optional[Any]) – custom decoder (default=None).
+* activation (Union[str, Callable[[Tensor], Tensor]]) – the activation function of encoder/decoder intermediate layer, can be a string ("relu" or "gelu") or a unary callable. Default: relu.
+* custom_encoder (Optional[Any]) – custom encoder (default=`None`).
+* custom_decoder (Optional[Any]) – custom decoder (default=`None`).
 * layer_norm_eps (float) – the eps value in layer normalization components (default=1e-5).
-* batch_first (bool) – If True, then the input and output tensors are provided as (batch, seq, feature). Default: False (seq, batch, feature).
-* norm_first (bool) – if True, encoder and decoder layers will perform LayerNorms before other attention and feedforward operations, otherwise after. Default: False (after).
-* bias (bool) – If set to False, Linear and LayerNorm layers will not learn an additive bias. Default: True.
+* batch_first (bool) – If `True`, then the input and output tensors are provided as (batch, seq, feature). Default: `False` (seq, batch, feature).
+* norm_first (bool) – if `True`, encoder and decoder layers will perform LayerNorms before other attention and feedforward operations, otherwise after. Default: `False` (after).
+* bias (bool) – If set to `False`, `Linear` and `LayerNorm` layers will not learn an additive bias. Default: True.
 
 `project_en_de_translate.py` handles English-German translation.
 
@@ -227,6 +225,8 @@ class torch.nn.MultiheadAttention(embed_dim, num_heads, dropout=0.0, bias=True,
 ```
 
 Allows the model to jointly attend to information from different representation subspaces.
+
+`demo_multi_head_attention.py` 
 
 * embed_dim – Total dimension of the model.
 * num_heads – Number of parallel attention heads. Note that `embed_dim` will be split across `num_heads` (i.e. each head will have dimension `embed_dim // num_heads`).
