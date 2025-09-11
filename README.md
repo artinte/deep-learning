@@ -190,7 +190,30 @@ The original paper [Attention Is All You Need](https://arxiv.org/abs/1706.03762)
 
 `project_en_de_translate.py` handles English-German translation.
 
-5.4 [Transformer from Stratch](https://artinte.github.io/deep-learning/transformer_stratch.html)
+5.4 Multi-Head Attention
+
+This MultiheadAttention layer implements the original architecture described in the Attention Is All You Need paper.
+
+```
+class torch.nn.MultiheadAttention(embed_dim, num_heads, dropout=0.0, bias=True,
+    add_bias_kv=False, add_zero_attn=False, kdim=None, vdim=None,
+    batch_first=False, device=None, dtype=None)[source]
+```
+
+Allows the model to jointly attend to information from different representation subspaces.
+
+* embed_dim – Total dimension of the model.
+* num_heads – Number of parallel attention heads. Note that embed_dim will be split across num_heads (i.e. each head will have dimension embed_dim // num_heads).
+* dropout – Dropout probability on attn_output_weights. Default: 0.0 (no dropout).
+* bias – If specified, adds bias to input / output projection layers. Default: True.
+* add_bias_kv – If specified, adds bias to the key and value sequences at dim=0. Default: False.
+* add_zero_attn – If specified, adds a new batch of zeros to the key and value sequences at dim=1. Default: False.
+* kdim – Total number of features for keys. Default: None (uses kdim=embed_dim).
+* vdim – Total number of features for values. Default: None (uses vdim=embed_dim).
+* batch_first – If True, then the input and output tensors are provided as (batch, seq, feature). Default: False (seq, batch, feature).
+
+
+5.5 [Transformer from Stratch](https://artinte.github.io/deep-learning/transformer_stratch.html)
 
 `demo_transformer.py` demonstrates building a machine translation system using PyTorch’s [torch.nn.Transformer](https://docs.pytorch.org/docs/stable/generated/torch.nn.Transformer.html) , a flexible implementation of the Transformer architecture. The API provides encoder–decoder layers with multi-head self-attention and feedforward networks, making it well-suited for sequence-to-sequence tasks such as translation.
 
@@ -198,7 +221,7 @@ The original paper [Attention Is All You Need](https://arxiv.org/abs/1706.03762)
 
 `demo_scratch.py` further decompose the Transformer structure by implementing key components like residual networks and layer normalization to achieve a thorough mastery of the architecture.
 
-5.5 [GPT](https://artinte.github.io/deep-learning/nano_gpt.html)
+5.6 [GPT](https://artinte.github.io/deep-learning/nano_gpt.html)
 
 ![Architecture of GPT](docs/res/05/simple_gpt.jpg)
 
@@ -206,11 +229,11 @@ The original paper [Attention Is All You Need](https://arxiv.org/abs/1706.03762)
 
 `project_word_language_model.py` trains a multi-layer RNN (Elman, GRU, or LSTM) or Transformer on a language modeling task. By default, the training script uses the Wikitext-2 dataset, provided. The trained model can then be used by the script to generate new text.
 
-5.6 [BERT](https://artinte.github.io/deep-learning/bert.html)
+5.7 [BERT](https://artinte.github.io/deep-learning/bert.html)
 
 The `project_bert.py` code references the [google-research/bert](https://github.com/google-research/bert) project, but is implemented using PyTorch. BERT, which stands for Bidirectional Encoder Representations from Transformers, is designed to pre-train deep bidirectional representations from unlabeled text by jointly conditioning on both left and right context in all layers.
 
-5.7 [Vision Transformer](https://artinte.github.io/deep-learning/vision_transformer.html)
+5.8 [Vision Transformer](https://artinte.github.io/deep-learning/vision_transformer.html)
 
 ![The Architecture of Vision Transformer](docs/res/05/vit_arch_640.png)
 
