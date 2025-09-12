@@ -24,10 +24,23 @@
                 <p style="color: #a0a0a0;">Created Date: 2025-07-02</p>
 
                 <p>In this tutorial, we will provide a detailed introduction to the torch.nn.Transformer interface through two examples, helping you fully master its usage.</p>
-                <p>The first example is a generative model from the official PyTorch examples. The second example is an English-to-German translation model, which is a very common example in text processing.</p>
+                <p>The first example is a generative model from the official PyTorch examples <a href="https://github.com/pytorch/examples/tree/main/word_language_model">word_language_model</a> . The second example is an English-to-German translation model, which is a very common example in text processing.</p>
                 
                 <h3>5.3.1 Data Preprocess</h3>
-                
+
+                <pre><code>class Dictionary(object):
+    def __init__(self):
+        self.word2idx = {}
+        self.idx2word = []
+
+    def add_word(self, word):
+        if word not in self.word2idx:
+            self.idx2word.append(word)
+            self.word2idx[word] = len(self.idx2word) - 1
+        return self.word2idx[word]
+
+    def __len__(self):
+        return len(self.idx2word)</code></pre>
 
                 <h3>5.3.2 World Language Model</h3>
 
