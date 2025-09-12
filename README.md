@@ -63,8 +63,6 @@ We will explore the fundamental principles of deep learning, including the conce
 
 `demo_simple_network_numpy.py` trains a small neural network from scratch using NumPy to classify a simple dataset of people's heights and weights as either male or female.
 
-![Architecture of Simple DNN](docs/res/01/arch_dnn_scratch.png)
-
 
 ### 02 Fully Connected Network
 
