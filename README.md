@@ -34,9 +34,9 @@ pip3 install torch torchvision torchaudio
 
 * Each `newaxis` object in the selection tuple serves to expand the dimensions of the resulting selection by one unit-length dimension.
 
-`demo_operate.py`
+The torch package contains data structures for multi-dimensional tensors and defines mathematical operations over these tensors. Additionally, it provides many utilities for efficient serialization of Tensors and arbitrary types, and other useful utilities. The `demo_operate.py` file contains just a few key examples; you can refer to the [PyTorch API](https://docs.pytorch.org/docs/stable/torch.html) for more.
 
-`demo_dot_product.py`
+`demo_dot_product.py` demonstrates dot product operations on tensors by implementing them using basic Python loops, then confirming the results with PyTorch's optimized `torch.matmul()` function. It's a clear illustration of what matrix multiplication and related operations do under the hood.
 
 ```
 def naive_vector_dot(vector_a, vector_b):
@@ -53,7 +53,7 @@ def naive_vector_dot(vector_a, vector_b):
 
 1.3 [Data Representation](https://artinte.github.io/deep-learning/data_represent.html)
 
-`demo_features.py`
+In machine learning and pattern recognition, a feature is an individual measurable property or characteristic of a data set. `demo_features.py` generates and visualizes a simple linear regression dataset. It creates a set of noisy data points that follow a linear trend and then plots both the data and the underlying true linear function.
 
 `demo_text_data.py`
 
