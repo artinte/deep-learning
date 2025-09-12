@@ -23,7 +23,7 @@ tensor_from_array = torch.as_tensor(numpy_array)
 
 device = 'cuda' if torch.cuda.is_available() else 'mps' \
     if torch.mps.is_available() else 'cpu'
-print(device)
+print(f"Use device: {device}")
 
 tensor_custom = torch.tensor([1, 2, 3],
                              dtype=torch.int64,

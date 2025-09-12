@@ -26,9 +26,28 @@ pip3 install torch torchvision torchaudio
 
 ![Tensor of PyTorch](docs/res/01/tensor_three_dims.png)
 
-`demo_indexing.py`
+`demo_indexing.py` demonstrates Tensor indexing and slicing in PyTorch, it's very similar to how you would use NumPy. Indexing is very important because it's seen everywhere in code.
+
+* Basic slicing occurs when obj is a `slice` object (constructed by `start:stop:step` notation inside of brackets), an integer, or a tuple of `slice` objects and integers.
+
+* `Ellipsis` expands to the number of `:` objects needed for the selection tuple to index all dimensions.
+
+* Each `newaxis` object in the selection tuple serves to expand the dimensions of the resulting selection by one unit-length dimension.
 
 `demo_operate.py`
+
+`demo_dot_product.py`
+
+```
+def naive_vector_dot(vector_a, vector_b):
+    assert len(vector_a.shape) == 1
+    assert len(vector_b.shape) == 1
+    assert vector_a.shape[0] == vector_b.shape[0]
+    z = 0.0
+    for i in range(vector_a.shape[0]):
+        z += vector_a[i] * vector_b[i]
+    return z
+```
 
 
 
