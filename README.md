@@ -249,7 +249,7 @@ class GPTModel(torch.nn.Transformer):
         return torch.nn.functional.log_softmax(output, dim=-1)
 ```
 
-5.4 Multi-Head Attention
+5.4 [Multi-Head Attention](https://artinte.github.io/deep-learning/multihead_attention.html)
 
 This MultiheadAttention layer implements the original architecture described in the Attention Is All You Need paper.
 
