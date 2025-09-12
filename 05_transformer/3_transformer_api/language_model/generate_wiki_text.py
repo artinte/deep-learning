@@ -2,7 +2,7 @@ import argparse
 import torch
 
 import data_wiki_text
-from transformer_model import PositionalEncoding, TransformerModel
+from transformer_model import PositionalEncoding, GPTModel
 
 # This file generates new sentences sampled from the language model.
 
@@ -41,7 +41,7 @@ if args.temperature < 1e-3:
 with open(args.checkpoint, 'rb') as f:
     safe_globals = [
         PositionalEncoding,
-        TransformerModel,
+        GPTModel,
         torch.nn.functional.relu,
         torch.nn.modules.activation.MultiheadAttention,
         torch.nn.modules.container.ModuleList,

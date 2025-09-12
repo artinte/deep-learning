@@ -8,7 +8,7 @@ import torch.nn as nn
 import torch.onnx
 
 import data_wiki_text
-from transformer_model import PositionalEncoding, TransformerModel
+from transformer_model import PositionalEncoding, GPTModel
 
 parser = argparse.ArgumentParser(description='PyTorch Wikitext-2 RNN/LSTM/GRU/Transformer Language Model')
 parser.add_argument('--data', type=str, default='./data/wikitext-2',
@@ -93,7 +93,7 @@ test_data = batchify(corpus.test, eval_batch_size)
 
 # Build the model
 ntokens = len(corpus.dictionary)
-model = TransformerModel(ntokens, args.emsize, args.nhead, args.nhid, args.nlayers, args.dropout).to(device)
+model = GPTModel(ntokens, args.emsize, args.nhead, args.nhid, args.nlayers, args.dropout).to(device)
 criterion = nn.NLLLoss()
 if args.use_optimizer:
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr)
@@ -221,7 +221,7 @@ except KeyboardInterrupt:
 with open(args.save, 'rb') as f:
     safe_globals = [
         PositionalEncoding,
-        TransformerModel,
+        GPTModel,
         torch.nn.functional.relu,
         torch.nn.modules.activation.MultiheadAttention,
         torch.nn.modules.container.ModuleList,

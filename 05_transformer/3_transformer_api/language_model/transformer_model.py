@@ -3,14 +3,11 @@ import torch
 from positional_encoding import PositionalEncoding
 
 
-class TransformerModel(torch.nn.Transformer):
-    """Container module with an encoder, a recurrent or transformer module, and a decoder."""
-
-    def __init__(self, ntoken, ninp, nhead, nhid, nlayers, dropout=0.5):
-        super(TransformerModel, self).__init__(
+class GPTModel(torch.nn.Transformer):
+    def __init__(self, ntoken, ninp, nhead, nhid, nlayers, dropout=0.1):
+        super(GPTModel, self).__init__(
             d_model=ninp, nhead=nhead, dim_feedforward=nhid, num_encoder_layers=nlayers
         )
-        self.model_type = "Transformer"
         self.src_mask = None
         self.pos_encoder = PositionalEncoding(ninp, dropout)
 
@@ -19,9 +16,6 @@ class TransformerModel(torch.nn.Transformer):
         self.decoder = torch.nn.Linear(ninp, ntoken)
 
         self.init_weights()
-
-    def _generate_square_subsequent_mask(self, sz):
-        return torch.log(torch.tril(torch.ones(sz, sz)))
 
     def init_weights(self):
         initrange = 0.1
@@ -33,7 +27,7 @@ class TransformerModel(torch.nn.Transformer):
         if has_mask:
             device = src.device
             if self.src_mask is None or self.src_mask.size(0) != len(src):
-                mask = self._generate_square_subsequent_mask(len(src)).to(device)
+                mask = torch.log(torch.tril(torch.ones(len(src), len(src)))).to(device)
                 self.src_mask = mask
         else:
             self.src_mask = None
