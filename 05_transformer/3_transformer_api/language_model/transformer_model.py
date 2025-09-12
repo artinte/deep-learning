@@ -7,9 +7,10 @@ class TransformerModel(torch.nn.Transformer):
     """Container module with an encoder, a recurrent or transformer module, and a decoder."""
 
     def __init__(self, ntoken, ninp, nhead, nhid, nlayers, dropout=0.5):
-        super(TransformerModel, self).__init__(d_model=ninp, nhead=nhead,
-                                               dim_feedforward=nhid, num_encoder_layers=nlayers)
-        self.model_type = 'Transformer'
+        super(TransformerModel, self).__init__(
+            d_model=ninp, nhead=nhead, dim_feedforward=nhid, num_encoder_layers=nlayers
+        )
+        self.model_type = "Transformer"
         self.src_mask = None
         self.pos_encoder = PositionalEncoding(ninp, dropout)
 
@@ -32,8 +33,7 @@ class TransformerModel(torch.nn.Transformer):
         if has_mask:
             device = src.device
             if self.src_mask is None or self.src_mask.size(0) != len(src):
-                mask = self._generate_square_subsequent_mask(
-                    len(src)).to(device)
+                mask = self._generate_square_subsequent_mask(len(src)).to(device)
                 self.src_mask = mask
         else:
             self.src_mask = None

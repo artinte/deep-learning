@@ -1,6 +1,7 @@
 import torch
+import math
 
-class PositionalEncoding(nn.Module):
+class PositionalEncoding(torch.nn.Module):
     r"""Inject some information about the relative or absolute position of the tokens in the sequence.
         The positional encodings have the same dimension as the embeddings, so that the two can be summed.
         Here, we use sine and cosine functions of different frequencies.
@@ -18,7 +19,7 @@ class PositionalEncoding(nn.Module):
 
     def __init__(self, d_model, dropout=0.1, max_len=5000):
         super(PositionalEncoding, self).__init__()
-        self.dropout = nn.Dropout(p=dropout)
+        self.dropout = torch.nn.Dropout(p=dropout)
 
         pe = torch.zeros(max_len, d_model)
         position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
