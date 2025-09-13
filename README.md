@@ -241,6 +241,8 @@ In deep learning, vectors are represented by `torch.Tensor` , which contain a va
 
 2.3 [PyTorch Basics](https://artinte.github.io/deep-learning/pytorch_basics.html)
 
+Most machine learning workflows involve working with data, creating models, optimizing model parameters, and saving the trained models. This tutorial introduces you to a complete ML workflow implemented in PyTorch, with links to learn more about each of these concepts.
+
 `demo_quick_start.py` is a complete demonstration of training a simple neural network on the MNIST dataset using PyTorch. The entire process, from data preparation to model training and evaluation, is covered.
 
 ```
@@ -263,7 +265,20 @@ def train(dataloader, model, loss_fn, optimizer):
         optimizer.step()
 ```
 
+Practice makes perfect, so here is the official [PyTorch Basic](https://docs.pytorch.org/tutorials/beginner/basics/intro.html) tutorial. Being proficient with PyTorch is important, as all subsequent tutorials will be written based on it, and these fundamental concepts will not be revisited.
+
+* Tensors
+* Datasets and DataLoaders
+* Transforms
+* Build Model
+* Automatic Differentiation
+* Optimization Loop
+* Save, Load and Use Model
+
+
 2.4 [Activation Function](https://artinte.github.io/deep-learning/activation_function.html)
+
+
 
 2.5 [Loss Function](https://artinte.github.io/deep-learning/loss_function.html)
 

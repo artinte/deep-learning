@@ -22,6 +22,7 @@ def proprocess(file_path):
 
     allowed_chars_pattern = r"^[，。？！；：\u4e00-\u9fa5]+$"
     df = df[df["poem"].astype(str).str.match(allowed_chars_pattern, na=False)]
+    # df.to_csv("chinese_poetry.csv", index=False, header=False)
     print("Cleaned length:", len(df))
 
     tokenized_poems = [list(poem) for poem in df["poem"] if poem]
