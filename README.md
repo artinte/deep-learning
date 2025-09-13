@@ -63,7 +63,7 @@ In machine learning and pattern recognition, a feature is an individual measurab
 
 ![Audio Sample Waveform](docs/res/01/audio_sample_data.png)
 
-`demo_image_data.py` uses [matplotlib](https://matplotlib.org/) to visualize images from the MNIST dataset, a common dataset of handwritten digits.
+`demo_image_data.py` uses [matplotlib](https://matplotlib.org/) to visualize images from the MNIST dataset, a common dataset of handwritten digits. This is a dataset of 60,000 28x28 grayscale images of the 10 digits, along with a test set of 10,000 images.
 
 ![Samples of MNIST](docs/res/01/samples_mnist.png)
 
@@ -93,14 +93,18 @@ def mnist_read(images_path, labels_path):
     return numpy.array(images), numpy.array(labels)
 ```
 
-`demo_video_data.py` 
-
 
 1.4 [Principles of Deep Learning](https://artinte.github.io/deep-learning/principle_learn.html)
 
 We will explore the fundamental principles of deep learning, including the concepts of machine learning, rules and representations, neural networks, and optimization techniques such as gradient descent.
 
 ![Training Process of Deep Learning](docs/res/01/train_process_640.png)
+
+In deep learning, layers are used to store the weights that need to be updated. Here, we'll use `cnn_activation_visual.py` to show the information inside different layers. Remember, the diagram above is very important. We will frequently encounter concrete examples of concepts like loss functions, optimizers, activation functions, and backpropagation in the future.
+
+To better understand the whole process, `demo_simple_train_anim.py` and `demo_simple_linear_torch.py` find the best fitting line `y = mx + b` for some randomly distributed points.
+
+![Animation of Simple Traning Process](docs/res/01/simple_train_anim.gif)
 
 1.5 [Calculus](https://artinte.github.io/deep-learning/calculus.html)
 
