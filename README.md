@@ -38,6 +38,8 @@ The torch package contains data structures for multi-dimensional tensors and def
 
 `demo_dot_product.py` demonstrates dot product operations on tensors by implementing them using basic Python loops, then confirming the results with PyTorch's optimized `torch.matmul()` function. It's a clear illustration of what matrix multiplication and related operations do under the hood.
 
+![Dot Product of Matrix](docs/res/01/matrix_dot_product.jpg)
+
 ```
 def naive_vector_dot(vector_a, vector_b):
     assert len(vector_a.shape) == 1
@@ -55,16 +57,41 @@ def naive_vector_dot(vector_a, vector_b):
 
 In machine learning and pattern recognition, a feature is an individual measurable property or characteristic of a data set. `demo_features.py` generates and visualizes a simple linear regression dataset. It creates a set of noisy data points that follow a linear trend and then plots both the data and the underlying true linear function.
 
-`demo_text_data.py`
+`demo_text_data.py` downloads, extracts, and explores a dataset of movie reviews for sentiment analysis. In machine learning, text must be converted into numerical data for computation. We'll learn how to use tokenization for this process later.
 
-`demo_audio_data.py`
+`demo_audio_data.py` analyzes and visualizes audio data, specifically focusing on spoken digits.
 
 ![Audio Sample Waveform](docs/res/01/audio_sample_data.png)
 
-`demo_image_data.py`
+`demo_image_data.py` 
 
-`demo_video_data.py`
+```
+def mnist_read(images_path, labels_path):
+    labels = []
+    with open(labels_path, 'rb') as file:
+        magic, size = struct.unpack('>II', file.read(8))
+        if magic != 2049:
+            raise ValueError('Magic number mismatch, got {}'.format(magic))
+        labels = array.array('B', file.read())
 
+    with open(images_path, 'rb') as file:
+        magic, size, rows, cols = struct.unpack('>IIII', file.read(16))
+        if magic != 2051:
+            raise ValueError('Magic number mismatch, got {}'.format(magic))
+        image_data = array.array('B', file.read())
+
+    images = []
+    for k in range(size):
+        images.append([0] * rows * cols)
+    for j in range(size):
+        img = numpy.array(image_data[j * rows * cols:(j + 1) * rows * cols])
+        img = img.reshape(28, 28)
+        images[j][:] = img
+
+    return numpy.array(images), numpy.array(labels)
+```
+
+`demo_video_data.py` 
 
 
 1.4 [Principles of Deep Learning](https://artinte.github.io/deep-learning/principle_learn.html)
