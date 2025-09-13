@@ -108,6 +108,10 @@ To better understand the whole process, `demo_simple_train_anim.py` and `demo_si
 
 1.5 [Calculus](https://artinte.github.io/deep-learning/calculus.html)
 
+Calculus is an essential math prerequisite for deep learning; it's the core of how deep learning models are able to learn. Calculus is also a relatively vast and complex subject. In deep learning, we won't be covering calculus in a dedicated way, but I do have a recommended textbook that is both open-source and free.
+
+[Calculus](https://openstax.org/details/books/calculus-volume-1) is designed for the typical two- or three-semester general calculus course, incorporating innovative features to enhance student learning. The book guides students through the core concepts of calculus and helps them understand how those concepts apply to their lives and the world around them. Due to the comprehensive nature of the material, we are offering the book in three volumes for flexibility and efficiency.
+
 1.6 [Gradient Descent](https://artinte.github.io/deep-learning/gradient_descent.html)
 
 
