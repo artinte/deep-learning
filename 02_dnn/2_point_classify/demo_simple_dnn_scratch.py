@@ -21,18 +21,18 @@ clf = sklearn.linear_model.LogisticRegressionCV()
 clf.fit(X, y)
 decision_boundary.plot_single(X, y, lambda x: clf.predict(x))
 
-num_examples = len(X)   # training set size
-nn_input_dim = 2        # input layer dimensionlity
-nn_output_dim = 2       # output layer dimensionality
+num_examples = len(X)  # training set size
+nn_input_dim = 2  # input layer dimensionlity
+nn_output_dim = 2  # output layer dimensionality
 
 # gradient descent parameters
-epsilon = 0.01          # learning rate fro gradient descent
-reg_lambda = 0.01       # regularization length
+epsilon = 0.01  # learning rate fro gradient descent
+reg_lambda = 0.01  # regularization length
 
 
 # Helper function to evaluate the total loss on the dataset.
 def calculate_loss(model):
-    W1, b1, W2, b2 = model['W1'], model['b1'], model['W2'], model['b2']
+    W1, b1, W2, b2 = model["W1"], model["b1"], model["W2"], model["b2"]
     # Forward propagation to calculate our predictions.
     z1 = X.dot(W1) + b1
     a1 = numpy.tanh(z1)
@@ -43,11 +43,14 @@ def calculate_loss(model):
     correct_logprobs = -numpy.log(probs[range(num_examples), y])
     data_loss = numpy.sum(correct_logprobs)
     # Add regulatization term to loss (optional)
-    data_loss += reg_lambda / 2 * (numpy.sum(numpy.square(W1)) + numpy.sum(numpy.square(W2)))
+    data_loss += (
+        reg_lambda / 2 * (numpy.sum(numpy.square(W1)) + numpy.sum(numpy.square(W2)))
+    )
     return 1.0 / num_examples * data_loss
 
+
 def predict(model, x):
-    W1, b1, W2, b2 = model['W1'], model['b1'], model['W2'], model['b2']
+    W1, b1, W2, b2 = model["W1"], model["b1"], model["W2"], model["b2"]
     # Forward propagation
     z1 = x.dot(W1) + b1
     a1 = numpy.tanh(z1)
@@ -55,6 +58,7 @@ def predict(model, x):
     exp_scores = numpy.exp(z2)
     probs = exp_scores / numpy.sum(exp_scores, axis=1, keepdims=True)
     return numpy.argmax(probs, axis=1)
+
 
 # This function learns parameters for the neural network and returns the model.
 # - nn_hdim: Number of nodes in the hidden layer
@@ -100,14 +104,20 @@ def build_model(nn_hdim, num_passes=2000, print_loss=False):
         b2 += -epsilon * db2
 
         # Assign new parameters to the model
-        model = { 'W1': W1, 'b1': b1, 'W2': W2, 'b2': b2}
+        model = {"W1": W1, "b1": b1, "W2": W2, "b2": b2}
 
         # Optionally print the loss.
         # This is expensive because it uses the whole dataset, so we don't want to do it too often.
         if print_loss and i % 100 == 0:
-            print('Loss after iteration ' + str(i) + ': ' + str(round(calculate_loss(model), 4)))
+            print(
+                "Loss after iteration "
+                + str(i)
+                + ": "
+                + str(round(calculate_loss(model), 4))
+            )
 
     return model
+
 
 # Build a model with a 3-dimensional hidden layer
 model = build_model(3, print_loss=True)
@@ -118,9 +128,9 @@ pyplot.show()
 
 figure = pyplot.figure()
 hidden_layer_dims = [1, 2, 4, 10, 50, 100]
-for i , nn_dim in enumerate(hidden_layer_dims):
+for i, nn_dim in enumerate(hidden_layer_dims):
     figure.add_subplot(2, 3, i + 1)
-    pyplot.title('Hidden size ' + str(nn_dim))
+    pyplot.title("Hidden size " + str(nn_dim))
     model = build_model(nn_hdim=nn_dim)
     decision_boundary.plot_multi(X, y, lambda x: predict(model, x))
 pyplot.show()

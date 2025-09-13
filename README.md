@@ -205,7 +205,7 @@ class OurNeuralNetwork:
         return o1
 ```
 
-`demo_simple_network_torch.py`
+`demo_simple_network_torch.py` is the same as `demo_simple_network_numpy.py` , trains a simple neural network using PyTorch to classify a person's gender (1 for male, 0 for female) based on their weight and height.
 
 ```
 class OurNeuralNetwork(torch.nn.Module):
@@ -225,9 +225,17 @@ class OurNeuralNetwork(torch.nn.Module):
 
 2.1 [Linear Algebra](https://artinte.github.io/deep-learning/linear_algebra.html)
 
+As we've seen, when we only have a few parameters, we can use a simple notation like `w1` , `w2` , and so on. But when there are tens of billions, or even hundreds of billions, of parameters, we need to use a multidimensional vector representation. This is why linear algebra is an essential subject for deep learning.
+
+In deep learning, vectors are represented by `torch.Tensor` , which contain a vast number of computational functions. If you are unfamiliar with linear algebra, you can check out some math textbooks, such as [Introduction to Linear Algebra, Sixth Edition](https://math.mit.edu/~gs/linearalgebra/ila6/indexila6.html) .
+
 2.2 [Points Classification](https://artinte.github.io/deep-learning/point_classify.html)
 
-`demo_dnn_torch.py` demonstrates how to build and train a simple, two-layer neural network using PyTorch to solve a classification problem. The network is designed to classify data points generated from a "make_moons" dataset, which is a non-linear dataset.
+`demo_simple_dnn_scratch.py` constructs a simple fully connected neural network, also known as a dense network, is a type of neural network layer where every neuron in one layer is connected to every neuron in the next layer.
+
+![Architecture of DNN](docs/res/02/point_classify_arch.jpg)
+
+`demo_simple_dnn_torch.py` demonstrates how to build and train a simple, two-layer neural network using PyTorch to solve a classification problem. The network is designed to classify data points generated from a "make_moons" dataset, which is a non-linear dataset.
 
 ![Output of DNN Classification](docs/res/02/dnn_classify_torch.png)
 
