@@ -118,7 +118,7 @@ Our goal is to master the concepts of calculus, as all subsequent calculations a
 
 Before we start this section, we need to clarify two things: what is a gradient, and what is its purpose? From the [Principles of Deep Learning](https://artinte.github.io/deep-learning/principle_learn.html) section, we already know that the goal of training a neural network is to minimize the loss function. In simple terms, a gradient is just a derivative, and one of the most important uses of a derivative is to find the minimum value.
 
-`demo_compound.py` demonstrates the use of the chain rule to calculate a circuit diagram.
+`demo_compound.py` demonstrates the use of the chain rule to calculate a circuit diagram for just three parameters: `x`, `y`, and `z`.
 
 ![Circuit Diagram](docs/res/01/simple_compound_gradient.png)
 
@@ -169,6 +169,56 @@ assert z.grad.item() == 3
 1.7 [Neural Network from Scratch](https://artinte.github.io/deep-learning/network_scratch.html)
 
 `demo_simple_network_numpy.py` trains a small neural network from scratch using NumPy to classify a simple dataset of people's heights and weights as either male or female.
+
+![Archtecture of Simple DNN](docs/res/01/dnn_scratch_arch.png)
+
+The code below implements the neural network shown in the image above, which has one input layer, one hidden layer, and one output layer, for a total of nine parameters. Input data is passed through a forward propagation to get a result, then a loss function is used to calculate the loss, and finally, backpropagation updates the parameters. This process is repeated until the system stabilizes and the desired results are obtained.
+
+```
+class OurNeuralNetwork:
+    """
+    A neural network with:
+        - 2 inputs
+        - a hidden layer with 2 neurons (h1, h2)
+        - an output layer with 1 neuron (o1)
+    """
+
+    def __init__(self):
+        rng = numpy.random.default_rng(0)
+        # weights
+        self.w1 = rng.random()
+        self.w2 = rng.random()
+        self.w3 = rng.random()
+        self.w4 = rng.random()
+        self.w5 = rng.random()
+        self.w6 = rng.random()
+        # biases
+        self.b1 = rng.random()
+        self.b2 = rng.random()
+        self.b3 = rng.random()
+
+    def feedforward(self, x):
+        # x is a numpy array with 2 elements.
+        h1 = sigmoid(self.w1 * x[0] + self.w2 * x[1] + self.b1)
+        h2 = sigmoid(self.w3 * x[0] + self.w4 * x[1] + self.b2)
+        o1 = sigmoid(self.w5 * h1 + self.w6 * h2 + self.b3)
+        return o1
+```
+
+`demo_simple_network_torch.py`
+
+```
+class OurNeuralNetwork(torch.nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.hidden = torch.nn.Sequential(torch.nn.Linear(2, 2), torch.nn.Sigmoid())
+        self.output = torch.nn.Sequential(torch.nn.Linear(2, 1), torch.nn.Sigmoid())
+
+    def forward(self, x):
+        x = self.hidden(x)
+        x = self.output(x)
+        return x
+```
 
 
 ### 02 Fully Connected Network

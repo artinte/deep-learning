@@ -44,7 +44,7 @@ print("Average weight:", int(avg_weight))
 print("Average height:", int(avg_height))
 
 
-class NeuralNet(torch.nn.Module):
+class OurNeuralNetwork(torch.nn.Module):
     def __init__(self):
         super().__init__()
         self.hidden = torch.nn.Sequential(torch.nn.Linear(2, 2), torch.nn.Sigmoid())
@@ -56,7 +56,7 @@ class NeuralNet(torch.nn.Module):
         return x
 
 
-model = NeuralNet()
+model = OurNeuralNetwork()
 criterion = torch.nn.MSELoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
 
