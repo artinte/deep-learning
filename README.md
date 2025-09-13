@@ -112,6 +112,8 @@ Calculus is an essential math prerequisite for deep learning; it's the core of h
 
 [Calculus](https://openstax.org/details/books/calculus-volume-1) is designed for the typical two- or three-semester general calculus course, incorporating innovative features to enhance student learning. The book guides students through the core concepts of calculus and helps them understand how those concepts apply to their lives and the world around them. Due to the comprehensive nature of the material, we are offering the book in three volumes for flexibility and efficiency.
 
+Our goal is to master the concepts of calculus, as all subsequent calculations are performed using the `torch.Tensor.backward` function. If you'd like to see how `backward` is implemented, you can check out the small example [micrograd](https://github.com/karpathy/micrograd) . For teaching purposes, we will be hand-writing the gradient calculations later on, but this is not recommended for production tasks.
+
 1.6 [Gradient Descent](https://artinte.github.io/deep-learning/gradient_descent.html)
 
 
