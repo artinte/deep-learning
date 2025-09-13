@@ -63,7 +63,9 @@ In machine learning and pattern recognition, a feature is an individual measurab
 
 ![Audio Sample Waveform](docs/res/01/audio_sample_data.png)
 
-`demo_image_data.py` 
+`demo_image_data.py` uses [matplotlib](https://matplotlib.org/) to visualize images from the MNIST dataset, a common dataset of handwritten digits.
+
+![Samples of MNIST](docs/res/01/samples_mnist.png)
 
 ```
 def mnist_read(images_path, labels_path):
