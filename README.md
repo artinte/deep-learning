@@ -116,6 +116,11 @@ Our goal is to master the concepts of calculus, as all subsequent calculations a
 
 1.6 [Gradient Descent](https://artinte.github.io/deep-learning/gradient_descent.html)
 
+Before we start this section, we need to clarify two things: what is a gradient, and what is its purpose? From the [Principles of Deep Learning](https://artinte.github.io/deep-learning/principle_learn.html) section, we already know that the goal of training a neural network is to minimize the loss function. In simple terms, a gradient is just a derivative, and one of the most important uses of a derivative is to find the minimum value.
+
+`demo_compound.py` demonstrates the use of the chain rule to calculate a circuit diagram.
+
+![Circuit Diagram](docs/res/01/simple_compound_gradient.png)
 
 1.7 [Neural Network from Scratch](https://artinte.github.io/deep-learning/network_scratch.html)
 
