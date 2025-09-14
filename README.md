@@ -284,9 +284,15 @@ PyTorch provides a wide variety of [non-linear activation functions](https://doc
 
 ![Sigmoid Function](docs/res/02/sigmoid_func.png)
 
+`demo_sigmoid.py` compares the derivative of the sigmoid function at a specific point (x=2) calculated manually and using PyTorch's automatic differentiation feature.
+
 2.5 [Loss Function](https://artinte.github.io/deep-learning/loss_function.html)
 
+A loss function is a crucial component in machine learning that quantifies the difference between a model's predicted output and the actual target values.
+
 2.6 [Optimizer](https://artinte.github.io/deep-learning/optimizer.html)
+
+An optimizer in machine learning, particularly in deep learning, is a function or algorithm that adjusts the model's parameters (like weights and biases) to minimize the loss function, thereby improving the model's performance.
 
 ### 03 Convolutional Network
 
@@ -298,34 +304,48 @@ PyTorch provides a wide variety of [non-linear activation functions](https://doc
 
 3.2 [AlexNet](https://artinte.github.io/deep-learning/alex_net.html)
 
+We trained a large, deep convolutional neural network to classify the 1.3 million high-resolution images in the LSVRC-2010 ImageNet training set into the 1000 different classes.
+
 3.3 [ResNet](https://artinte.github.io/deep-learning/res_net.html)
 
 Deeper neural networks are more difficult to train. We present a residual learning framework to ease the training of networks that are substantially deeper than those used previously.
 
 `demo_pretrained_resnet.py`
 
+In this paper, we present a network and training strategy that relies on the strong use of data augmentation to use the available annotated samples more efficiently. The architecture consists of a contracting path to capture context and a symmetric expanding path that enables precise localization.
+
 `demo_resnet_torch.py`
 
 3.4 [U-Net](https://artinte.github.io/deep-learning/u_net.html)
 
-
-![Architecture of U-Net](docs/res/03/u_net_arch.png)
+In this paper, we present a network and training strategy that relies on the strong use of data augmentation to use the available annotated samples more efficiently. The architecture consists of a contracting path to capture context and a symmetric expanding path that enables precise localization.
 
 3.5 [DenseNet](https://artinte.github.io/deep-learning/dense_net.html)
+
+In this paper, we embrace this observation and introduce the Dense Convolutional Network (DenseNet), which connects each layer to every other layer in a feed-forward fashion.
 
 ### 04 Recurrent Network
 
 4.1 [RNN from Scratch](https://artinte.github.io/deep-learning/rnn_classify_scratch.html)
 
+A simple walkthrough of what RNNs are, how they work, and how to build one from scratch in Python.
+
 4.2 [Text Preprocessing](https://artinte.github.io/deep-learning/word_embed.html)
 
+
 4.3 [Word2Vec](https://artinte.github.io/deep-learning/word2vec.html)
+
+word2vec is not a singular algorithm, rather, it is a family of model architectures and optimizations that can be used to learn word embeddings from large datasets.
 
 4.4 [Text Generation with RNN](https://artinte.github.io/deep-learning/text_generate_rnn.html)
 
 4.5 [Neural Machine Translation](https://artinte.github.io/deep-learning/nmt_align.html)
 
+In this paper, we conjecture that the use of a fixed-length vector is a bottleneck in improving the performance of this basic encoder-decoder architecture, and propose to extend this by allowing a model to automatically (soft-)search for parts of a source sentence that are relevant to predicting a target word, without having to form these parts as a hard segment explicitly.
+
 4.6 [Attention-based NMT](https://artinte.github.io/deep-learning/attention_nmt.html)
+
+This paper examines two simple and effective classes of attentional mechanism: a global approach which always attends to all source words and a local one that only looks at a subset of source words at a time.
 
 ### 05 Transformer
 
