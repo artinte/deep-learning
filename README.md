@@ -278,7 +278,11 @@ Practice makes perfect, so here is the official [PyTorch Basic](https://docs.pyt
 
 2.4 [Activation Function](https://artinte.github.io/deep-learning/activation_function.html)
 
+The activation function of a node in an artificial neural network is a function that calculates the output of the node based on its individual inputs and their weights. Without activation functions, a neural network would only be able to model linear relationships, which are often too simple for real-world data.
 
+PyTorch provides a wide variety of [non-linear activation functions](https://docs.pytorch.org/docs/stable/nn.functional.html) , such as ReLU (Rectified Linear Unit), Sigmoid, Tanh (Hyperbolic Tangent), and Leaky ReLU.
+
+![Sigmoid Function](docs/res/02/sigmoid_func.png)
 
 2.5 [Loss Function](https://artinte.github.io/deep-learning/loss_function.html)
 
