@@ -296,7 +296,16 @@ Practice makes perfect, so here is the official [PyTorch Basic](https://docs.pyt
 
 3.3 [ResNet](https://artinte.github.io/deep-learning/res_net.html)
 
+Deeper neural networks are more difficult to train. We present a residual learning framework to ease the training of networks that are substantially deeper than those used previously.
+
+`demo_pretrained_resnet.py`
+
+`demo_resnet_torch.py`
+
 3.4 [U-Net](https://artinte.github.io/deep-learning/u_net.html)
+
+
+![Architecture of U-Net](docs/res/03/u_net_arch.png)
 
 3.5 [DenseNet](https://artinte.github.io/deep-learning/dense_net.html)
 
