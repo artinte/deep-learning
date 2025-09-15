@@ -298,9 +298,9 @@ An optimizer in machine learning, particularly in deep learning, is a function o
 
 3.1 [CNN from Scratch](https://artinte.github.io/deep-learning/cnn_classify_stratch.html)
 
-`demo_cnn_scratch.py`
+`demo_cnn_scratch.py` build on a basic background knowledge of neural networks and explore what CNNs are, understand how they work, and build a real one from scratch (using only NumPy) in Python.
 
-`demo_cnn_torch.py`
+`demo_cnn_torch.py` is the same as `demo_cnn_scratch.py` , but using PyTorch.
 
 3.2 [AlexNet](https://artinte.github.io/deep-learning/alex_net.html)
 
