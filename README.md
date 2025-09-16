@@ -302,6 +302,11 @@ An optimizer in machine learning, particularly in deep learning, is a function o
 
 `demo_cnn_torch.py` is the same as `demo_cnn_scratch.py` , but using PyTorch.
 
+```
+class torch.nn.Conv2d(in_channels, out_channels, kernel_size, stride=1,
+    padding=0, dilation=1, groups=1, bias=True, padding_mode='zeros', device=None, dtype=None)
+```
+
 3.2 [AlexNet](https://artinte.github.io/deep-learning/alex_net.html)
 
 We trained a large, deep convolutional neural network to classify the 1.3 million high-resolution images in the LSVRC-2010 ImageNet training set into the 1000 different classes.
@@ -525,6 +530,11 @@ Implementation of Vision Transformer, a simple way to achieve SOTA in vision cla
 6.3 [Mathematical Foundation](https://artinte.github.io/deep-learning/diffusion_math.html)
 
 6.4 [Diffusion from Scratch](https://artinte.github.io/deep-learning/diffusion_scratch.html)
+
+`demo_diffusion_mnist_one_step.py`
+
+`demo_diffusion_with_attention.py`
+
 
 6.5 [Estimating Gradients](https://artinte.github.io/deep-learning/estimate_gradients.html)
 
