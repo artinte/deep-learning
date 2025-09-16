@@ -1,0 +1,13 @@
+def lin_func(x, n_sample):
+    preds = np.zeros((n_sample, x.shape[0]))
+    for ii in range(n_sample):
+        w = np.random.normal(0, 1, 2)
+        y = w[0] + w[1] * x
+        preds[ii, :] = y
+    return preds
+
+x_points = np.linspace(-5, 5, 50)
+outs = lin_func(x_points, 10)
+lw_bd = -2 * np.sqrt((1 + x_points ** 2))
+up_bd = 2 * np.sqrt((1 + x_points ** 2))
+
