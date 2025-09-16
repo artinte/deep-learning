@@ -307,6 +307,8 @@ class torch.nn.Conv2d(in_channels, out_channels, kernel_size, stride=1,
     padding=0, dilation=1, groups=1, bias=True, padding_mode='zeros', device=None, dtype=None)
 ```
 
+Applies a 2D convolution over an input signal composed of several input planes.
+
 3.2 [AlexNet](https://artinte.github.io/deep-learning/alex_net.html)
 
 We trained a large, deep convolutional neural network to classify the 1.3 million high-resolution images in the LSVRC-2010 ImageNet training set into the 1000 different classes.
@@ -324,6 +326,14 @@ In this paper, we present a network and training strategy that relies on the str
 3.4 [U-Net](https://artinte.github.io/deep-learning/u_net.html)
 
 In this paper, we present a network and training strategy that relies on the strong use of data augmentation to use the available annotated samples more efficiently. The architecture consists of a contracting path to capture context and a symmetric expanding path that enables precise localization.
+
+```
+class torch.nn.ConvTranspose2d(in_channels, out_channels, kernel_size, stride=1,
+    padding=0, output_padding=0, groups=1, bias=True, dilation=1, padding_mode='zeros', device=None, dtype=None)
+```
+
+Applies a 2D transposed convolution operator over an input image composed of several input planes.
+
 
 3.5 [DenseNet](https://artinte.github.io/deep-learning/dense_net.html)
 
