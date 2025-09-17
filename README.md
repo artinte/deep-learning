@@ -327,9 +327,12 @@ In this paper, we present a network and training strategy that relies on the str
 
 In this paper, we present a network and training strategy that relies on the strong use of data augmentation to use the available annotated samples more efficiently. The architecture consists of a contracting path to capture context and a symmetric expanding path that enables precise localization.
 
+`project_unet_segmentation.py` 
+
 ```
 class torch.nn.ConvTranspose2d(in_channels, out_channels, kernel_size, stride=1,
-    padding=0, output_padding=0, groups=1, bias=True, dilation=1, padding_mode='zeros', device=None, dtype=None)
+    padding=0, output_padding=0, groups=1, bias=True,
+    dilation=1, padding_mode='zeros', device=None, dtype=None)
 ```
 
 Applies a 2D transposed convolution operator over an input image composed of several input planes.
@@ -346,6 +349,7 @@ In this paper, we embrace this observation and introduce the Dense Convolutional
 A simple walkthrough of what RNNs are, how they work, and how to build one from scratch in Python.
 
 4.2 [Text Preprocessing](https://artinte.github.io/deep-learning/word_embed.html)
+
 
 
 4.3 [Word2Vec](https://artinte.github.io/deep-learning/word2vec.html)
@@ -534,6 +538,8 @@ Implementation of Vision Transformer, a simple way to achieve SOTA in vision cla
 ### 06 Diffusion Model
 
 6.1 [Probability Theory](https://artinte.github.io/deep-learning/prob_theory.html)
+
+
 
 6.2 [Gaussian Processes](https://artinte.github.io/deep-learning/gaussian_process.html)
 
