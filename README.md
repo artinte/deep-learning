@@ -371,6 +371,26 @@ In this paper, we embrace this observation and introduce the Dense Convolutional
 
 A simple walkthrough of what RNNs are, how they work, and how to build one from scratch in Python.
 
+The core idea of an RNN is to apply the same operation to each element of a sequence, with the output of the current step feeding back as an additional input for the next step. An RNN cell at a single time step `t` takes two inputs:
+
+* The current element of the sequence `x_t` ;
+* The hidden state from the previous time step `h_(t-1)` .
+
+It then produces a new hidden state `h_t` and an output `y_t` . This can be expressed mathematically as:
+
+```
+h_t = f(W_hh * h_(t-1) + W_xh * x_t + b_h)
+y_t = W_hy * h_t + b_y
+```
+
+Where `W_hh` , `W_xh` and `W_hy` are weight matrices that the network learns during training.
+
+![Architecture of RNN](docs/res/04/rnn_backward.png)
+
+`demo_rnn_classify_scratch.py`
+
+`demo_rnn_classify_torch.py`
+
 4.2 [Text Preprocessing](https://artinte.github.io/deep-learning/word_embed.html)
 
 Text Preprocessing is the critical first step in Natural Language Processing (NLP)—the process of cleaning, transforming, and standardizing raw text data into a structured, machine-readable format. Its goal is to eliminate noise, reduce complexity, and highlight meaningful patterns, so NLP models (e.g., chatbots, sentiment analyzers, translation tools) can learn effectively from the text.
