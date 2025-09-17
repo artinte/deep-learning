@@ -20,6 +20,8 @@ These four methods are progressive in hierarchy and serve as excellent learning 
 pip3 install torch torchvision torchaudio
 ```
 
+In this section, we will set up all the development environments, such as the VS Code editor, CUDA installation, Python installation, and Windows Terminal.
+
 1.2 [Introduction to Tensors](https://artinte.github.io/deep-learning/tensor_intro.html)
 
 `demo_create.py` demonstrates the fundamental ways to create and manipulate PyTorch tensors, which are the core data structures in the PyTorch framework.
@@ -290,9 +292,27 @@ PyTorch provides a wide variety of [non-linear activation functions](https://doc
 
 A loss function is a crucial component in machine learning that quantifies the difference between a model's predicted output and the actual target values.
 
+* nn.L1Loss - Creates a criterion that measures the mean absolute error (MAE) between each element in the input `x` and target `y` .
+* nn.MSELoss - Creates a criterion that measures the mean squared error (squared L2 norm) between each element in the input and target `y` .
+* nn.CrossEntropyLoss - This criterion computes the cross entropy loss between input logits and target.
+* nn.BCELoss - Creates a criterion that measures the Binary Cross Entropy between the target and the input probabilities.
+
 2.6 [Optimizer](https://artinte.github.io/deep-learning/optimizer.html)
 
 An optimizer in machine learning, particularly in deep learning, is a function or algorithm that adjusts the model's parameters (like weights and biases) to minimize the loss function, thereby improving the model's performance.
+
+[torch.optim](https://docs.pytorch.org/docs/stable/optim.html) is a package implementing various optimization algorithms. To use `torch.optim` you have to construct an optimizer object that will hold the current state and will update the parameters based on the computed gradients.
+
+```
+optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
+
+for input, target in dataset:
+    optimizer.zero_grad()
+    output = model(input)
+    loss = loss_fn(output, target)
+    loss.backward()
+    optimizer.step()
+```
 
 ### 03 Convolutional Network
 
@@ -304,14 +324,17 @@ An optimizer in machine learning, particularly in deep learning, is a function o
 
 ```
 class torch.nn.Conv2d(in_channels, out_channels, kernel_size, stride=1,
-    padding=0, dilation=1, groups=1, bias=True, padding_mode='zeros', device=None, dtype=None)
+    padding=0, dilation=1, groups=1, bias=True,
+    padding_mode='zeros', device=None, dtype=None)
 ```
 
 Applies a 2D convolution over an input signal composed of several input planes.
 
 3.2 [AlexNet](https://artinte.github.io/deep-learning/alex_net.html)
 
-We trained a large, deep convolutional neural network to classify the 1.3 million high-resolution images in the LSVRC-2010 ImageNet training set into the 1000 different classes.
+We trained a large, deep convolutional neural network to classify the 1.3 million high-resolution images in the LSVRC-2010 ImageNet training set into the 1000 different classes. On the test data, we achieved top-1 and top-5 error rates of 37.5% and 17.0% which is considerably better than the previous state-of-the-art.
+
+The neural network, which has 60 million parameters and 650,000 neurons, consists of five convolutional layers, some of which are followed by max-pooling layers, and three fully-connected layers with a final 1000-way softmax.
 
 3.3 [ResNet](https://artinte.github.io/deep-learning/res_net.html)
 
@@ -350,7 +373,7 @@ A simple walkthrough of what RNNs are, how they work, and how to build one from 
 
 4.2 [Text Preprocessing](https://artinte.github.io/deep-learning/word_embed.html)
 
-
+Text Preprocessing is the critical first step in Natural Language Processing (NLP)—the process of cleaning, transforming, and standardizing raw text data into a structured, machine-readable format. Its goal is to eliminate noise, reduce complexity, and highlight meaningful patterns, so NLP models (e.g., chatbots, sentiment analyzers, translation tools) can learn effectively from the text.
 
 4.3 [Word2Vec](https://artinte.github.io/deep-learning/word2vec.html)
 
@@ -568,6 +591,8 @@ Implementation of Vision Transformer, a simple way to achieve SOTA in vision cla
 
 `project_auto_deal.py` take screenshots of the phone screen using Android ADB, and perform text recognition with the EasyOCR library.
 
+Its principle is very simple: it uses adb to captures the screen of the mobile phone, performs recognition with EasyOCR, then a text processing model is built to select the next operation, and finally simulates human behavior of using the mobile phone.
+
 7.3 [Language Modeling](https://artinte.github.io/deep-learning/language_model.html)
 
 `project_gamma_finetune.py`
@@ -583,6 +608,12 @@ Implementation of Vision Transformer, a simple way to achieve SOTA in vision cla
 8.1 [Speech Feature Extraction](https://artinte.github.io/deep-learning/speech_feature.html)
 
 8.2 [Automatic Speech Recognition](https://artinte.github.io/deep-learning/speech_recognition.html)
+
+Whisper is a general-purpose speech recognition model. It is trained on a large dataset of diverse audio and is also a multitasking model that can perform multilingual speech recognition, speech translation, and language identification.
+
+`project_whisper.py` 
+
+`project_add_subtitle.py`
 
 8.3 [Text-to-Speech](https://artinte.github.io/deep-learning/text_to_speech.html)
 
@@ -635,6 +666,8 @@ Implementation of Vision Transformer, a simple way to achieve SOTA in vision cla
 ### 12 Deploying Models
 
 12.1 [ONNX](https://artinte.github.io/deep-learning/onnx.html)
+
+
 
 12.2 [ExecuTorch](https://artinte.github.io/deep-learning/execu_torch.html)
 
