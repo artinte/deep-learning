@@ -292,16 +292,21 @@ PyTorch provides a wide variety of [non-linear activation functions](https://doc
 
 A loss function is a crucial component in machine learning that quantifies the difference between a model's predicted output and the actual target values.
 
-* nn.L1Loss - Creates a criterion that measures the mean absolute error (MAE) between each element in the input `x` and target `y` .
-* nn.MSELoss - Creates a criterion that measures the mean squared error (squared L2 norm) between each element in the input and target `y` .
-* nn.CrossEntropyLoss - This criterion computes the cross entropy loss between input logits and target.
-* nn.BCELoss - Creates a criterion that measures the Binary Cross Entropy between the target and the input probabilities.
+* `nn.L1Loss` - Creates a criterion that measures the mean absolute error (MAE) between each element in the input `x` and target `y` .
+* `nn.MSELoss` - Creates a criterion that measures the mean squared error (squared L2 norm) between each element in the input and target `y` .
+* `nn.CrossEntropyLoss` - This criterion computes the cross entropy loss between input logits and target.
+* `nn.BCELoss` - Creates a criterion that measures the Binary Cross Entropy between the target and the input probabilities.
 
 2.6 [Optimizer](https://artinte.github.io/deep-learning/optimizer.html)
 
 An optimizer in machine learning, particularly in deep learning, is a function or algorithm that adjusts the model's parameters (like weights and biases) to minimize the loss function, thereby improving the model's performance.
 
 [torch.optim](https://docs.pytorch.org/docs/stable/optim.html) is a package implementing various optimization algorithms. To use `torch.optim` you have to construct an optimizer object that will hold the current state and will update the parameters based on the computed gradients.
+
+`demo_simple_sgd.py`
+
+`demo_sgd_momentum.py`
+
 
 ```
 optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
@@ -313,6 +318,18 @@ for input, target in dataset:
     loss.backward()
     optimizer.step()
 ```
+
+`demo_simple_adam.py` demonstrates an algorithm for first-order gradient-based optimization of stochastic objective functions, based on adaptive estimates of lower-order moments. The specific calculation process can refer to the paper [Adam: A Method for Stochastic Optimization](https://arxiv.org/abs/1412.6980) .
+
+A learning rate scheduler (lr scheduler) is a component in machine learning, particularly in training neural networks, that dynamically adjusts the learning rate during the training process.
+
+`demo_simple_lr_scheduler.py`
+
+The different between an optimizer's adjustments (e.g., Adam) and a scheduler's adjustments:
+
+* Optimizer (e.g., Adam): Primarily responsible for updating model parameters using gradient information to minimize loss. Its adjustments focus on how much each individual parameter should change in each training step.
+
+* LR Scheduler: Focuses on modifying the global learning rate over time. Its adjustments control the overall "intensity" of updates across all parameters, independent of the optimizer's per-parameter logic.
 
 ### 03 Convolutional Network
 
