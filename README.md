@@ -543,6 +543,8 @@ class GPTModel(torch.nn.Transformer):
 
 5.4 [Multi-Head Attention](https://artinte.github.io/deep-learning/multihead_attention.html)
 
+
+
 This MultiheadAttention layer implements the original architecture described in the Attention Is All You Need paper.
 
 ```
@@ -564,6 +566,10 @@ Allows the model to jointly attend to information from different representation 
 * kdim – Total number of features for keys. Default: `None` (uses `kdim=embed_dim`).
 * vdim – Total number of features for values. Default: `None` (uses vdim=`embed_dim`).
 * batch_first – If `True`, then the input and output tensors are provided as (batch, seq, feature). Default: `False` (seq, batch, feature).
+
+FlashAttention is an algorithm that reorders the attention computation and leverages tiling and recomputation to significantly speed it up and reduce memory usage from quadratic to linear in sequence length.
+
+A KV Cache implementation for a transformer-based Large Language Model stores the key (K) and value (V) tensors from the attention layers for previous tokens during autoregressive text generation.
 
 
 5.5 [Transformer from Stratch](https://artinte.github.io/deep-learning/transformer_stratch.html)
@@ -607,9 +613,17 @@ Implementation of Vision Transformer, a simple way to achieve SOTA in vision cla
 
 6.4 [Diffusion from Scratch](https://artinte.github.io/deep-learning/diffusion_scratch.html)
 
-`demo_diffusion_mnist_one_step.py`
+Learning this section requires basic knowledge of probability theory, as well as an understanding of U-Net networks, attention mechanisms, latent spaces, and text preprocessing. We will use five examples to illustrate diffusion models incrementally, where each example builds on the previous one.
 
-`demo_diffusion_with_attention.py`
+`demo_diffusion_mnist_one_step.py` - Start with the most basic single-step diffusion process, using a simple dataset like MNIST to get started and understand the core principles of diffusion models.
+
+`demo_diffusion_multi_steps.py` - Expand from single-step to multi-step diffusion, understanding the complete forward diffusion and reverse sampling processes.
+
+`demo_diffusion_with_attention.py` - Introduce the attention mechanism, a key component of modern diffusion models (such as Stable Diffusion), and learn how to improve model performance.
+
+`demo_diffusion_latent.py` - Learn about latent space diffusion, an important technique for improving the efficiency of diffusion models, and understand why diffusion is performed in latent space rather than pixel space.
+
+`demo_diffusion_text_prompt.py` - Finally, learn about text-guided diffusion models to generate images based on text prompts, which is one of the most impressive applications of diffusion models.
 
 
 6.5 [Estimating Gradients](https://artinte.github.io/deep-learning/estimate_gradients.html)
@@ -648,9 +662,106 @@ Its principle is very simple: it uses adb to captures the screen of the mobile p
 
 Whisper is a general-purpose speech recognition model. It is trained on a large dataset of diverse audio and is also a multitasking model that can perform multilingual speech recognition, speech translation, and language identification.
 
-`project_whisper.py` 
+`project_whisper.py` merely copies Whisper's source code without any additional operations. It mainly consists of an `AudioEncoder` and a `TextDecoder` . The audio encoder uses an attention module to process audio into input for the text decoder, and the `Whisper` structure is responsible for combining them.
 
-`project_add_subtitle.py`
+```
+class AudioEncoder(nn.Module):
+    def __init__(
+        self, n_mels: int, n_ctx: int, n_state: int, n_head: int, n_layer: int
+    ):
+        super().__init__()
+        self.conv1 = Conv1d(n_mels, n_state, kernel_size=3, padding=1)
+        self.conv2 = Conv1d(n_state, n_state, kernel_size=3, stride=2, padding=1)
+        self.register_buffer("positional_embedding", sinusoids(n_ctx, n_state))
+
+        self.blocks: Iterable[ResidualAttentionBlock] = nn.ModuleList(
+            [ResidualAttentionBlock(n_state, n_head) for _ in range(n_layer)]
+        )
+        self.ln_post = LayerNorm(n_state)
+
+    def forward(self, x: Tensor):
+        """
+        x : torch.Tensor, shape = (batch_size, n_mels, n_ctx)
+            the mel spectrogram of the audio
+        """
+        x = F.gelu(self.conv1(x))
+        x = F.gelu(self.conv2(x))
+        x = x.permute(0, 2, 1)
+
+        assert x.shape[1:] == self.positional_embedding.shape, "incorrect audio shape"
+        x = (x + self.positional_embedding).to(x.dtype)
+
+        for block in self.blocks:
+            x = block(x)
+
+        x = self.ln_post(x)
+        return x
+
+class TextDecoder(nn.Module):
+    def __init__(
+        self, n_vocab: int, n_ctx: int, n_state: int, n_head: int, n_layer: int
+    ):
+        super().__init__()
+
+        self.token_embedding = nn.Embedding(n_vocab, n_state)
+        self.positional_embedding = nn.Parameter(torch.empty(n_ctx, n_state))
+
+        self.blocks: Iterable[ResidualAttentionBlock] = nn.ModuleList(
+            [
+                ResidualAttentionBlock(n_state, n_head, cross_attention=True)
+                for _ in range(n_layer)
+            ]
+        )
+        self.ln = LayerNorm(n_state)
+
+        mask = torch.empty(n_ctx, n_ctx).fill_(-np.inf).triu_(1)
+        self.register_buffer("mask", mask, persistent=False)
+
+    def forward(self, x: Tensor, xa: Tensor, kv_cache: Optional[dict] = None):
+        """
+        x : torch.LongTensor, shape = (batch_size, <= n_ctx)
+            the text tokens
+        xa : torch.Tensor, shape = (batch_size, n_audio_ctx, n_audio_state)
+            the encoded audio features to be attended on
+        """
+        offset = next(iter(kv_cache.values())).shape[1] if kv_cache else 0
+        x = (
+            self.token_embedding(x)
+            + self.positional_embedding[offset : offset + x.shape[-1]]
+        )
+        x = x.to(xa.dtype)
+
+        for block in self.blocks:
+            x = block(x, xa, mask=self.mask, kv_cache=kv_cache)
+
+        x = self.ln(x)
+        logits = (
+            x @ torch.transpose(self.token_embedding.weight.to(x.dtype), 0, 1)
+        ).float()
+
+        return logits
+
+class Whisper(nn.Module):
+    def __init__(self, dims: ModelDimensions):
+        super().__init__()
+        self.dims = dims
+        self.encoder = AudioEncoder(
+            self.dims.n_mels,
+            self.dims.n_audio_ctx,
+            self.dims.n_audio_state,
+            self.dims.n_audio_head,
+            self.dims.n_audio_layer,
+        )
+        self.decoder = TextDecoder(
+            self.dims.n_vocab,
+            self.dims.n_text_ctx,
+            self.dims.n_text_state,
+            self.dims.n_text_head,
+            self.dims.n_text_layer,
+        )
+```
+
+`project_add_subtitle.py` uses the FFmpeg command-line tool to extract audio from a video, then uses Whisper for recognition to generate an SRT file, and finally merges them with FFmpeg to produce a video with subtitles.
 
 8.3 [Text-to-Speech](https://artinte.github.io/deep-learning/text_to_speech.html)
 
@@ -675,6 +786,16 @@ Whisper is a general-purpose speech recognition model. It is trained on a large 
 9.7 [Segment Anything](https://artinte.github.io/deep-learning/segment_anything.html)
 
 9.8 [Intro to Autoencoders](https://artinte.github.io/deep-learning/intro_auto_encoder.html)
+
+An autoencoder is a special type of neural network that is trained to copy its input to its output. For example, given an image of a handwritten digit, an autoencoder first encodes the image into a lower dimensional latent representation, then decodes the latent representation back to an image. An autoencoder learns to compress the data while minimizing the reconstruction error.
+
+The following three examples are from [TensorFlow's autoencoder](https://www.tensorflow.org/tutorials/generative/autoencoder) tutorial, which will be implemented using PyTorch.
+
+`demo_mnist_basic.py`
+
+`demo_image_denoising.py`
+
+`demo_anomaly_detection.py`
 
 ### 10 Reinforcement Learning
 
@@ -703,7 +824,6 @@ Whisper is a general-purpose speech recognition model. It is trained on a large 
 ### 12 Deploying Models
 
 12.1 [ONNX](https://artinte.github.io/deep-learning/onnx.html)
-
 
 
 12.2 [ExecuTorch](https://artinte.github.io/deep-learning/execu_torch.html)
