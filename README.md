@@ -759,6 +759,11 @@ class Whisper(nn.Module):
             self.dims.n_text_head,
             self.dims.n_text_layer,
         )
+
+    def forward(
+        self, mel: torch.Tensor, tokens: torch.Tensor
+    ) -> Dict[str, torch.Tensor]:
+        return self.decoder(tokens, self.encoder(mel))
 ```
 
 `project_add_subtitle.py` uses the FFmpeg command-line tool to extract audio from a video, then uses Whisper for recognition to generate an SRT file, and finally merges them with FFmpeg to produce a video with subtitles.
@@ -766,6 +771,8 @@ class Whisper(nn.Module):
 8.3 [Text-to-Speech](https://artinte.github.io/deep-learning/text_to_speech.html)
 
 8.4 [Music Transcription](https://artinte.github.io/deep-learning/music_transcription.html)
+
+The content of this section is mainly derived from [magenta/mt3](https://github.com/magenta/mt3) . MT3 is a multi-instrument automatic music transcription model that uses the T5X framework. Interested readers can refer to it for further details.
 
 8.5 [Music Synthesis](https://artinte.github.io/deep-learning/music_synthesis.html)
 
@@ -835,6 +842,8 @@ The following three examples are from [TensorFlow's autoencoder](https://www.ten
 ### 13 Model Optimization
 
 13.1 [LoRA](https://artinte.github.io/deep-learning/lora.html)
+
+We propose Low-Rank Adaptation, or LoRA, which freezes the pretrained model weights and injects trainable rank decomposition matrices into each layer of the Transformer architecture, greatly reducing the number of trainable parameters for downstream tasks.
 
 13.2 [Pruning](https://artinte.github.io/deep-learning/pruning.html)
 
