@@ -36,7 +36,7 @@ In this section, we will set up all the development environments, such as the [V
 
 * Each `newaxis` object in the selection tuple serves to expand the dimensions of the resulting selection by one unit-length dimension.
 
-The torch package contains data structures for multi-dimensional tensors and defines mathematical operations over these tensors. Additionally, it provides many utilities for efficient serialization of Tensors and arbitrary types, and other useful utilities. The `demo_operate.py` file contains just a few key examples; you can refer to the [PyTorch API](https://docs.pytorch.org/docs/stable/torch.html) for more.
+The `torch` package contains data structures for multi-dimensional tensors and defines mathematical operations over these tensors. Additionally, it provides many utilities for efficient serialization of Tensors and arbitrary types, and other useful utilities. The `demo_operate.py` file contains just a few key examples; you can refer to the [PyTorch API](https://docs.pytorch.org/docs/stable/torch.html) for more.
 
 `demo_dot_product.py` demonstrates dot product operations on tensors by implementing them using basic Python loops, then confirming the results with PyTorch's optimized `torch.matmul()` function. It's a clear illustration of what matrix multiplication and related operations do under the hood.
 
@@ -296,6 +296,33 @@ A loss function is a crucial component in machine learning that quantifies the d
 * `nn.MSELoss` - Creates a criterion that measures the mean squared error (squared L2 norm) between each element in the input and target `y` .
 * `nn.CrossEntropyLoss` - This criterion computes the cross entropy loss between input logits and target.
 * `nn.BCELoss` - Creates a criterion that measures the Binary Cross Entropy between the target and the input probabilities.
+
+`demo_mse_loss.py`
+
+`demo_cross_entropy_loss.py` calculates the Cross-Entropy Loss for a small batch of predictions. This loss function is a standard way to measure the performance of a classification model whose output consists of logits.
+
+Logits are the raw, unnormalized scores that a neural network or machine learning model produces as its final output, just before an activation function like softmax or sigmoid is applied.
+
+```
+# Suppose we have 3 classes
+num_classes = 3
+
+# Predicted scores (logits), not probabilities
+# Shape: (batch_size, num_classes)
+y_pred = torch.tensor([[2.0, 1.0, 0.1], [0.5, 2.5, 0.3]])
+
+# Ground truth labels (as class indices)
+# Shape: (batch_size,)
+y_true = torch.tensor([0, 1])
+
+criterion = torch.nn.CrossEntropyLoss()
+
+loss = criterion(y_pred, y_true)
+print(f"CrossEntropyLoss: {loss.item():.4f}")
+```
+
+`demo_bce_loss.py`
+
 
 2.6 [Optimizer](https://artinte.github.io/deep-learning/optimizer.html)
 
