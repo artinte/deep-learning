@@ -668,6 +668,10 @@ Its principle is very simple: it uses adb to captures the screen of the mobile p
 
 8.1 [Speech Feature Extraction](https://artinte.github.io/deep-learning/speech_feature.html)
 
+Sound is a mechanical wave that transmits energy through the vibration of a medium, such as air, water, or solids. Understanding its fundamental properties is crucial for converting it into a format that deep learning models can effectively process.
+
+Digital audio mainly includes the following properties: sample rate, amplitude, and storage format.
+
 8.2 [Automatic Speech Recognition](https://artinte.github.io/deep-learning/speech_recognition.html)
 
 Whisper is a general-purpose speech recognition model. It is trained on a large dataset of diverse audio and is also a multitasking model that can perform multilingual speech recognition, speech translation, and language identification.
