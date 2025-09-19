@@ -338,7 +338,9 @@ The different between an optimizer's adjustments (e.g., Adam) and a scheduler's 
 
 `demo_cnn_scratch.py` build on a basic background knowledge of neural networks and explore what CNNs are, understand how they work, and build a real one from scratch (using only NumPy) in Python.
 
-`demo_cnn_torch.py` is the same as `demo_cnn_scratch.py` , but using PyTorch.
+Its core consists of two operations: convolution and pooling.
+
+`demo_cnn_torch.py` is the same as `demo_cnn_scratch.py` , but using `torch.nn.Conv2d` and `torch.nn.MaxPool2d` .
 
 ```
 class torch.nn.Conv2d(in_channels, out_channels, kernel_size, stride=1,
@@ -347,6 +349,13 @@ class torch.nn.Conv2d(in_channels, out_channels, kernel_size, stride=1,
 ```
 
 Applies a 2D convolution over an input signal composed of several input planes.
+
+```
+class torch.nn.MaxPool2d(kernel_size, stride=None,
+    padding=0, dilation=1, return_indices=False, ceil_mode=False)
+```
+
+Applies a 2D max pooling over an input signal composed of several input planes.
 
 3.2 [AlexNet](https://artinte.github.io/deep-learning/alex_net.html)
 
@@ -415,7 +424,7 @@ Text Preprocessing is the critical first step in Natural Language Processing (NL
 
 4.3 [Word2Vec](https://artinte.github.io/deep-learning/word2vec.html)
 
-word2vec is not a singular algorithm, rather, it is a family of model architectures and optimizations that can be used to learn word embeddings from large datasets.
+`word2vec` is not a singular algorithm, rather, it is a family of model architectures and optimizations that can be used to learn word embeddings from large datasets.
 
 4.4 [Text Generation with RNN](https://artinte.github.io/deep-learning/text_generate_rnn.html)
 
