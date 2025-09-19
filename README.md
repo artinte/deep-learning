@@ -20,7 +20,7 @@ These four methods are progressive in hierarchy and serve as excellent learning 
 pip3 install torch torchvision torchaudio
 ```
 
-In this section, we will set up all the development environments, such as the VS Code editor, CUDA installation, Python installation, and Windows Terminal.
+In this section, we will set up all the development environments, such as the [Visual Studio Code](https://code.visualstudio.com/) , CUDA installation, Python installation, and Windows Terminal.
 
 1.2 [Introduction to Tensors](https://artinte.github.io/deep-learning/tensor_intro.html)
 
@@ -303,13 +303,8 @@ An optimizer in machine learning, particularly in deep learning, is a function o
 
 [torch.optim](https://docs.pytorch.org/docs/stable/optim.html) is a package implementing various optimization algorithms. To use `torch.optim` you have to construct an optimizer object that will hold the current state and will update the parameters based on the computed gradients.
 
-`demo_simple_sgd.py`
-
-`demo_sgd_momentum.py`
-
-
 ```
-optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
+optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
 
 for input, target in dataset:
     optimizer.zero_grad()
@@ -318,6 +313,12 @@ for input, target in dataset:
     loss.backward()
     optimizer.step()
 ```
+
+`demo_simple_sgd.py` contains a simple implementation of the Stochastic Gradient Descent (SGD) optimization algorithm.
+
+`demo_sgd_momentum.py` demonstrate how SGD (Stochastic Gradient Descent) with momentum can "jump over" a local minimum, where SGD without momentum might get stuck.
+
+![SGD Momentum](docs/res/02/sgd_momentum.png)
 
 `demo_simple_adam.py` demonstrates an algorithm for first-order gradient-based optimization of stochastic objective functions, based on adaptive estimates of lower-order moments. The specific calculation process can refer to the paper [Adam: A Method for Stochastic Optimization](https://arxiv.org/abs/1412.6980) .
 
