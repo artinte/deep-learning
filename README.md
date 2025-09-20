@@ -36,6 +36,13 @@ In this section, we will set up all the development environments, such as the [V
 
 * Each `newaxis` object in the selection tuple serves to expand the dimensions of the resulting selection by one unit-length dimension.
 
+```
+tensor2d = torch.tensor([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+assert (tensor2d[0] == torch.tensor([1, 2, 3])).all()
+assert (tensor2d[:, 1] == torch.tensor([2, 5, 8])).all()
+assert (tensor2d[1:, 1:] == torch.tensor([[5, 6], [8, 9]])).all()
+```
+
 The `torch` package contains data structures for multi-dimensional tensors and defines mathematical operations over these tensors. Additionally, it provides many utilities for efficient serialization of Tensors and arbitrary types, and other useful utilities. The `demo_operate.py` file contains just a few key examples; you can refer to the [PyTorch API](https://docs.pytorch.org/docs/stable/torch.html) for more.
 
 `demo_dot_product.py` demonstrates dot product operations on tensors by implementing them using basic Python loops, then confirming the results with PyTorch's optimized `torch.matmul()` function. It's a clear illustration of what matrix multiplication and related operations do under the hood.
@@ -296,8 +303,9 @@ A loss function is a crucial component in machine learning that quantifies the d
 * `nn.MSELoss` - Creates a criterion that measures the mean squared error (squared L2 norm) between each element in the input and target `y` .
 * `nn.CrossEntropyLoss` - This criterion computes the cross entropy loss between input logits and target.
 * `nn.BCELoss` - Creates a criterion that measures the Binary Cross Entropy between the target and the input probabilities.
+* `nn.KLDivLoss` - The Kullback-Leibler divergence loss.
 
-`demo_mse_loss.py`
+`demo_mse_loss.py` demonstrates the calculation of Mean Squared Error (MSE) and its gradient, first manually using NumPy and then automatically using PyTorch's `torch.nn.MSELoss` .
 
 `demo_cross_entropy_loss.py` calculates the Cross-Entropy Loss for a small batch of predictions. This loss function is a standard way to measure the performance of a classification model whose output consists of logits.
 
@@ -321,7 +329,7 @@ loss = criterion(y_pred, y_true)
 print(f"CrossEntropyLoss: {loss.item():.4f}")
 ```
 
-`demo_bce_loss.py`
+`demo_bce_loss.py` demonstrates the usage of Binary Cross-Entropy (BCE) Loss in PyTorch. It calculates the loss for a binary classification task, where each sample belongs to one of two classes (e.g., 0 or 1).
 
 
 2.6 [Optimizer](https://artinte.github.io/deep-learning/optimizer.html)
