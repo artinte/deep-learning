@@ -44,7 +44,7 @@ time_bins, mel_bins = mel_spectrogram_db.shape
 duration = (time_bins * hop_length) / sample_rate
 
 img = pyplot.imshow(mel_spectrogram_db, aspect='auto', origin='lower', cmap='viridis',
-                     extent=[0, duration, 0, n_mels])
+                    extent=[0, duration, 0, n_mels])
 pyplot.title('Mel Spectrogram (Torchaudio)')
 pyplot.xlabel('Time (s)')
 pyplot.ylabel('Mel Frequency Bin')
