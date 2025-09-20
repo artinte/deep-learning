@@ -50,16 +50,18 @@ The `torch` package contains data structures for multi-dimensional tensors and d
 ![Dot Product of Matrix](docs/res/01/matrix_dot_product.jpg)
 
 ```
-def naive_vector_dot(vector_a, vector_b):
-    assert len(vector_a.shape) == 1
-    assert len(vector_b.shape) == 1
-    assert vector_a.shape[0] == vector_b.shape[0]
-    z = 0.0
-    for i in range(vector_a.shape[0]):
-        z += vector_a[i] * vector_b[i]
-    return z
+def naive_matrix_dot(matrix_a, matrix_b):
+    assert len(matrix_a.shape) == 2
+    assert len(matrix_b.shape) == 2
+    assert matrix_a.shape[1] == matrix_b.shape[0]
+    result = torch.zeros((matrix_a.shape[0], matrix_b.shape[1]))
+    for i in range(matrix_a.shape[0]):
+        for j in range(matrix_b.shape[1]):
+            row_x = matrix_a[i, :]
+            column_y = matrix_b[:, j]
+            result[i, j] = naive_vector_dot(row_x, column_y)
+    return result
 ```
-
 
 
 1.3 [Data Representation](https://artinte.github.io/deep-learning/data_represent.html)
@@ -71,6 +73,8 @@ In machine learning and pattern recognition, a feature is an individual measurab
 `demo_audio_data.py` analyzes and visualizes audio data, specifically focusing on spoken digits.
 
 ![Audio Sample Waveform](docs/res/01/audio_sample_data.png)
+
+In deep learning, audio is typically converted into a spectrogram. For more detailed information, please refer to [Section 8.1](https://artinte.github.io/deep-learning/speech_feature.html) .
 
 `demo_image_data.py` uses [matplotlib](https://matplotlib.org/) to visualize images from the MNIST dataset, a common dataset of handwritten digits. This is a dataset of 60,000 28x28 grayscale images of the 10 digits, along with a test set of 10,000 images.
 
@@ -111,9 +115,13 @@ We will explore the fundamental principles of deep learning, including the conce
 
 In deep learning, layers are used to store the weights that need to be updated. Here, we'll use `cnn_activation_visual.py` to show the information inside different layers. Remember, the diagram above is very important. We will frequently encounter concrete examples of concepts like loss functions, optimizers, activation functions, and backpropagation in the future.
 
+![Activations of Conv Layer](docs/res/01/conv_activations.png)
+
 To better understand the whole process, `demo_simple_train_anim.py` and `demo_simple_linear_torch.py` find the best fitting line `y = mx + b` for some randomly distributed points.
 
 ![Animation of Simple Traning Process](docs/res/01/simple_train_anim.gif)
+
+This pattern is fundamental to deep learning and you'll see it in many examples that follow. A solid understanding of this diagram lays the groundwork for all of deep learning.
 
 1.5 [Calculus](https://artinte.github.io/deep-learning/calculus.html)
 

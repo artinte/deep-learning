@@ -42,7 +42,7 @@ for i, (imagenet_id, label, score) in enumerate(decoded_predictions):
 layer_outputs = []
 layer_names = []
 for index, layer in enumerate(model.layers):
-    if isinstance(layer, keras.layers.Conv2D) and index % 5 == 0:
+    if isinstance(layer, keras.layers.Conv2D) and index % 2 == 0:
         layer_outputs.append(layer.output)
         layer_names.append(f"Layer {index+1} - {layer.name}")
 
@@ -50,11 +50,16 @@ activation_model = keras.Model(inputs=model.input, outputs=layer_outputs)
 activations = activation_model.predict(img_tensor)
 
 os.makedirs("temp", exist_ok=True)
-for layer_name, activation in zip(layer_names, activations):
+fig, axs = pyplot.subplots(4, 6)
+axs = axs.flatten()
+for i, (layer_name, activation) in enumerate(zip(layer_names, activations)):
+    if i >= 24:
+        break
     print(activation.shape)
-    pyplot.matshow(activation[0, :, :, 0])
-    pyplot.title(layer_name)
-    pyplot.axis("off")
-    pyplot.savefig(os.path.join("temp", layer_name + ".png"))
-    # pyplot.show()
-    pyplot.close()
+    im = axs[i].matshow(activation[0, :, :, 0])
+    # axs[i].set_title(layer_name)
+    axs[i].axis("off")
+pyplot.tight_layout()
+pyplot.savefig(os.path.join("temp", layer_name + ".png"))
+pyplot.show()
+pyplot.close()
