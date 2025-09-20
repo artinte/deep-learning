@@ -297,7 +297,7 @@ z = torch.matmul(x, w) + b
 loss = torch.nn.functional.binary_cross_entropy_with_logits(z, y)
 ```
 
-
+![Simple Computational Graph](docs/res/02/simple_compute_graph.jpg)
 
 
 2.4 [Activation Function](https://artinte.github.io/deep-learning/activation_function.html)
@@ -464,9 +464,25 @@ Where `W_hh` , `W_xh` and `W_hy` are weight matrices that the network learns dur
 
 ![Architecture of RNN](docs/res/04/rnn_backward.png)
 
-`demo_rnn_classify_scratch.py`
+`demo_rnn_classify_scratch.py` builds and trains a vanilla Recurrent Neural Network (RNN) from scratch using NumPy to perform a simple text classification task.
 
-`demo_rnn_classify_torch.py`
+`demo_rnn_classify_torch.py` achieves the same functionality as `demo_rnn_classify_scratch.py` , but it uses the `torch.nn.RNN` module.
+
+```
+class RNNClassifier(torch.nn.Module):
+    def __init__(self, vocab_size, embedding_dim, hidden_dim, output_dim):
+        super(RNNClassifier, self).__init__()
+        self.embedding = torch.nn.Embedding(vocab_size, embedding_dim)
+        self.rnn = torch.nn.RNN(embedding_dim, hidden_dim, batch_first=True)
+        self.dense = torch.nn.Linear(hidden_dim, output_dim)
+    
+    def forward(self, x):
+        embedded = self.embedding(x)
+        _, hidden = self.rnn(embedded)
+        hidden = hidden[-1]
+        out = self.dense(hidden)
+        return out
+```
 
 4.2 [Text Preprocessing](https://artinte.github.io/deep-learning/word_embed.html)
 

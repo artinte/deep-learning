@@ -1,3 +1,4 @@
+from common import simple_text
 import torch
 from matplotlib import pyplot
 import numpy
@@ -8,15 +9,16 @@ import pathlib
 project_root = pathlib.Path(__file__).resolve().parents[2]
 sys.path.append(str(project_root))
 
-from common import simple_text
 
 def encode_texts(texts, word2idx, max_len):
     encoded = [
-        [word2idx[word] for word in text.lower().split() if word in word2idx] 
+        [word2idx[word] for word in text.lower().split() if word in word2idx]
         for text in texts
     ]
-    padded = [seq + [0] * (max_len - len(seq)) if len(seq) < max_len else seq[:max_len] for seq in encoded]
+    padded = [seq + [0] * (max_len - len(seq)) if len(seq)
+              < max_len else seq[:max_len] for seq in encoded]
     return torch.tensor(padded, dtype=torch.long)
+
 
 class RNNClassifier(torch.nn.Module):
     def __init__(self, vocab_size, embedding_dim, hidden_dim, output_dim):
@@ -24,7 +26,7 @@ class RNNClassifier(torch.nn.Module):
         self.embedding = torch.nn.Embedding(vocab_size, embedding_dim)
         self.rnn = torch.nn.RNN(embedding_dim, hidden_dim, batch_first=True)
         self.dense = torch.nn.Linear(hidden_dim, output_dim)
-    
+
     def forward(self, x):
         embedded = self.embedding(x)
         _, hidden = self.rnn(embedded)
@@ -32,15 +34,18 @@ class RNNClassifier(torch.nn.Module):
         out = self.dense(hidden)
         return out
 
+
 if __name__ == '__main__':
     train_texts = simple_text.train_data.keys()
-    train_labels = list(map(lambda x: 1 if x else 0, simple_text.train_data.values()))
+    train_labels = list(map(lambda x: 1 if x else 0,
+                        simple_text.train_data.values()))
     test_texts = simple_text.test_data.keys()
-    test_labels = list(map(lambda x: 1 if x else 0, simple_text.test_data.values()))
-    
+    test_labels = list(map(lambda x: 1 if x else 0,
+                       simple_text.test_data.values()))
+
     vocab = set(word for text in train_texts for word in text.lower().split())
     word2idx = {word: idx + 1 for idx, word in enumerate(vocab)}
-    word2idx["<PAD>"] = 0 
+    word2idx["<PAD>"] = 0
     print(word2idx)
 
     max_sentence_len = 10
@@ -55,11 +60,14 @@ if __name__ == '__main__':
     y_test = torch.tensor(test_labels, dtype=torch.long)
 
     train_dataset = torch.utils.data.TensorDataset(x_train, y_train)
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    train_loader = torch.utils.data.DataLoader(
+        train_dataset, batch_size=batch_size, shuffle=True)
     test_dataset = torch.utils.data.TensorDataset(x_test, y_test)
-    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
-    
-    model = RNNClassifier(len(word2idx), embedding_dim, hidden_dim, output_dim=2)
+    test_loader = torch.utils.data.DataLoader(
+        test_dataset, batch_size=batch_size, shuffle=True)
+
+    model = RNNClassifier(len(word2idx), embedding_dim,
+                          hidden_dim, output_dim=2)
     loss = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 
@@ -76,8 +84,9 @@ if __name__ == '__main__':
             total_loss += l.item()
         losses.append(total_loss / len(train_loader))
         if epoch % 10 == 0:
-            print(f'Epoch {epoch + 1}/{num_epochs}, loss: {total_loss / len(train_loader):.4f}')
-    
+            print(
+                f'Epoch {epoch + 1}/{num_epochs}, loss: {total_loss / len(train_loader):.4f}')
+
     model.eval()
     correct, total = 0, 0
     with torch.no_grad():
@@ -86,9 +95,9 @@ if __name__ == '__main__':
             _, predicted = torch.max(outputs, 1)
             total += y_batch.size(0)
             correct += (predicted == y_batch).sum().item()
-    
+
     print(f'Test accuracy: {correct / total:.4f}')
-    
+
     pyplot.plot(numpy.array(range(len(losses))) * 50, losses, label='Loss')
     pyplot.grid(True)
     pyplot.legend()
