@@ -1,47 +1,7 @@
 import torch
 from matplotlib import pyplot
+from custom_schedule import CustomSchedule
 
-
-class CustomSchedule(torch.optim.lr_scheduler._LRScheduler):
-    """
-    Implements the learning rate schedule described in the Transformer paper.
-    lr = d_model^(-0.5) * min(step^(-0.5), step * warmup_steps^(-1.5))
-    """
-
-    def __init__(
-        self, optimizer, d_model: int, warmup_steps: int = 4000
-    ):  # Added type hints
-        self.d_model = float(d_model)  # Cast to float immediately
-        self.warmup_steps = float(warmup_steps)  # Cast to float
-        # Call super().__init__ after all self attributes are set if they are used in get_lr
-        super().__init__(optimizer)
-
-    def get_lr(self):
-        # self.last_epoch stores the current step/epoch count (0-indexed)
-        # We need to add 1 because step is typically 1-indexed in LR schedules.
-        step = self.last_epoch + 1
-        step_f = float(step)  # Ensure step is float for calculations
-
-        # Handle the case where step is 0 to avoid division by zero in rsqrt(0)
-        # For the original formula, step should start from 1.
-        # If last_epoch starts at -1 (default for _LRScheduler), step will be 0 on first call.
-        # For Transformer's LR, step=0 means LR=0.
-        if step_f == 0:
-            return [0.0] * len(self.optimizer.param_groups)
-
-        # Calculate arg1 and arg2
-        arg1 = torch.rsqrt(torch.tensor(step_f))
-        arg2 = torch.tensor(step_f) * (self.warmup_steps**-1.5)
-
-        # Calculate the final learning rate
-        lr = torch.rsqrt(torch.tensor(self.d_model)) * torch.min(arg1, arg2)
-
-        # Return a list of learning rates, one for each parameter group
-        # Since this schedule computes a single LR, we apply it to all groups.
-        return [lr.item()] * len(self.optimizer.param_groups)
-
-
-# --- Training Setup ---
 # 1. Define your model
 model = torch.nn.Linear(10, 1)  # Still a simple linear model
 
@@ -56,7 +16,6 @@ d_model = 512
 warmup_steps = 4000
 scheduler = CustomSchedule(optimizer, d_model, warmup_steps)
 
-# --- Simulate Learnable Data ---
 # Instead of completely random data, let's create data with a clear linear relationship
 batch_size = 64
 input_dim = 10
@@ -75,7 +34,7 @@ sim_targets = (
     sim_inputs @ true_weights + true_bias + torch.randn(batch_size, output_dim) * 0.05
 )  # Add small noise
 
-# --- Training Loop Example ---
+
 num_training_steps = 10000
 learning_rates = []
 training_losses = []  # List to store training loss values
@@ -115,20 +74,15 @@ for step in range(num_training_steps):
             f"Step {step + 1}: Learning Rate = {current_lr:.8f}, Loss = {loss.item():.8f}"
         )  # Print more decimal places for loss
 
-# --- Plotting Results ---
-fig, axes = pyplot.subplots(1, 2, figsize=(8, 3))
+fig, axes = pyplot.subplots(1, 2)
 
 # Plot Learning Rate Schedule
 axes[0].plot(range(1, num_training_steps + 1), learning_rates)
-axes[0].set_title("Transformer Learning Rate Schedule")
-axes[0].set_xlabel("Training Step")
 axes[0].set_ylabel("Learning Rate")
 axes[0].grid(True)
 
 # Plot Training Loss
 axes[1].plot(range(1, num_training_steps + 1), training_losses, color="red")
-axes[1].set_title("Training Loss over Steps")
-axes[1].set_xlabel("Training Step")
 axes[1].set_ylabel("Loss")
 axes[1].grid(True)
 axes[1].set_yscale("log")  # Often helpful to see small changes when loss is low

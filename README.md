@@ -382,7 +382,9 @@ for input, target in dataset:
 
 A learning rate scheduler (lr scheduler) is a component in machine learning, particularly in training neural networks, that dynamically adjusts the learning rate during the training process.
 
-`demo_simple_lr_scheduler.py`
+`demo_lr_scheduler.py`
+
+![LR Scheduler](docs/res/02/lr_scheduler.png)
 
 The different between an optimizer's adjustments (e.g., Adam) and a scheduler's adjustments:
 
