@@ -504,6 +504,8 @@ Text Preprocessing is the critical first step in Natural Language Processing (NL
 
 4.4 [Text Generation with RNN](https://artinte.github.io/deep-learning/text_generate_rnn.html)
 
+![Text Generation](docs/res/04/simple_lang_model.jpg)
+
 4.5 [Neural Machine Translation](https://artinte.github.io/deep-learning/nmt_align.html)
 
 In this paper, we conjecture that the use of a fixed-length vector is a bottleneck in improving the performance of this basic encoder-decoder architecture, and propose to extend this by allowing a model to automatically (soft-)search for parts of a source sentence that are relevant to predicting a target word, without having to form these parts as a hard segment explicitly.
@@ -515,6 +517,8 @@ This paper examines two simple and effective classes of attentional mechanism: a
 ### 05 Transformer
 
 5.1 [Attention Mechanism](https://artinte.github.io/deep-learning/attention_mechanism.html)
+
+An attention mechanism is a machine learning technique that directs deep learning models to prioritize (or attend to) the most relevant parts of input data.
 
 `demo_query_key_value.py`
 
